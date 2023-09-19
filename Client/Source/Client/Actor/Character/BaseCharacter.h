@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Interface/Network.h"
 #include "BaseCharacter.generated.h"
 
 UCLASS()
-class CLIENT_API ABaseCharacter : public ACharacter
+class CLIENT_API ABaseCharacter : public ACharacter, public INetwork
 {
 	GENERATED_BODY()
 
@@ -25,4 +26,6 @@ public:
 
 public:
 	//Server
+	UPROPERTY(EditAnywhere,Category = "Network")
+		int ClientID;
 };
