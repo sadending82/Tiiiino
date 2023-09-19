@@ -12,6 +12,7 @@
 
 #define SERVERIP 127.0.0.1
 #define SERVERPORT 3500
+#define BUFSIZE 200
 
 class Socket
 {
@@ -20,8 +21,9 @@ public:
 	~Socket() {};
 
 	bool Init();
-
 	bool Connect();
+	void ReceivePacket();
+	void ProcessPacket(char* buf);
 
 private:
 	SOCKET	sock;

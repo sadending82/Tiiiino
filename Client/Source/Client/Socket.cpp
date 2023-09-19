@@ -38,3 +38,64 @@ bool Socket::Connect()
 
     return true;
 }
+
+void Socket::ReceivePacket()
+{
+
+    char buffer[BUFSIZE];
+    int remain_data = 0;
+
+    while (true) {
+
+        DWORD flags = 0;
+        int retval = 0;
+        DWORD packet_size = 0;
+
+        char recvbuf[BUFSIZE];
+
+        WSABUF r_wsabuf;
+        r_wsabuf.buf = recvbuf;
+        r_wsabuf.len = BUFSIZE;
+
+        DWORD recvbytes = 0;
+        retval = WSARecv(sock, &r_wsabuf, 1, &recvbytes, &flags, NULL, NULL);
+
+        if(retval == SOCKET_ERROR) {
+            int err_no = WSAGetLastError();
+            if (err_no != WSA_IO_PENDING) {
+                closesocket(sock);
+                break;
+            }
+        }
+
+        int rest_size = recvbytes;
+        unsigned char* buf_ptr = reinterpret_cast<unsigned char*>(recvbuf);
+
+        while (rest_size > 0)
+        {
+            if (0 == packet_size)
+                packet_size = recvbytes;
+            if (rest_size + remain_data >= packet_size) {
+                std::memcpy(buffer + remain_data, buf_ptr, packet_size - remain_data);
+                ProcessPacket(buffer);
+                buf_ptr += packet_size - remain_data;
+                rest_size -= packet_size - remain_data;
+                packet_size = 0;
+                remain_data = 0;
+            }
+            else {
+                std::memcpy(buffer + remain_data, buf_ptr, rest_size);
+                remain_data += rest_size;
+                rest_size = 0;
+            }
+        }
+    }
+
+}
+
+void Socket::ProcessPacket(char* buf)
+{
+    switch (buf[1]) {
+
+    }
+}

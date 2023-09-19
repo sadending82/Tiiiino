@@ -100,6 +100,7 @@ void Server::do_worker()
 				CreateIoCompletionPort(reinterpret_cast<HANDLE>(c_socket), m_hcp, client_id, 0);
 				clients[client_id].do_recv();
 				c_socket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
+				cout << "player connect\n";
 			}
 			else cout << "Max user exceeded.\n";
 
