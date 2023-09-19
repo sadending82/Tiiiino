@@ -182,3 +182,8 @@ void Server::init()
 	closesocket(m_listenSocket);
 	WSACleanup();
 }
+
+HANDLE Server::get_handle()
+{
+	return m_hcp;
+}

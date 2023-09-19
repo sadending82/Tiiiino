@@ -6,13 +6,13 @@ constexpr int INVALID_KEY = -1;
 
 class Server {
 public:
-
 	void disconnect(int c_id);
 	int get_new_client_id();
 	void process_packet(int c_id, char* packet);
 	void do_worker();
 	void init();
 
+	HANDLE get_handle();
 public:
 	std::array <SESSION, 1000> clients;
 

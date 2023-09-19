@@ -10,6 +10,9 @@ void Timer::init(HANDLE h_cp)
 	std::swap(m_Timer_queue, empty_queue);
 
 	m_isRun = TRUE;
+
+	thread timer_thread{ (std::thread(&Timer::Timer_main, this)) };
+	timer_thread.join();
 }
 
 void Timer::push_event(int key, EVENT_TYPE event_type, int delaytime_ms, char* message)
