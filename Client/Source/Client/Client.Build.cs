@@ -8,7 +8,9 @@ public class Client : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "EnhancedInput" });
+		PublicDependencyModuleNames.AddRange(new string[] { 
+			"Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay",
+			"EnhancedInput", "AnimGraphRuntime" });
 
         //상대경로로 등록가능
         PublicIncludePaths.Add(ModuleDirectory);
