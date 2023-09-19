@@ -10,8 +10,8 @@ int main(int argc, char* argv[])
 {
 	std::wcout.imbue(std::locale("korean"));
 
-	timer->init(g_pServer->get_handle());
 	g_pServer->init();
+	timer->init(g_pServer->get_handle());
 
 	delete timer;
 	delete g_pServer;
