@@ -2,7 +2,7 @@
 #include "CoreMinimal.h"
 #include "UObject/ConstructorHelpers.h"
 
-class UE_ARPG_API UHelpers
+class CLIENT_API UHelpers
 {
 public:
 
@@ -37,6 +37,12 @@ public:
 		}
 
 		InActor->SetRootComponent((*InComponent));
+	}
+
+	template<typename T>
+	static void CreateActorComponent(AActor* InActor, T** InComponent, FName InName)
+	{
+		*InComponent = InActor->CreateDefaultSubobject<T>(InName);
 	}
 
 	template<typename T>
