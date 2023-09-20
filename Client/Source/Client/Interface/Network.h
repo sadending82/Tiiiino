@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
 //#include "Network.generated.h"
-#include "../Socket.h"
+#include "../cSocket.h"
 
 // This class does not need to be modified.
 //UINTERFACE(MinimalAPI)

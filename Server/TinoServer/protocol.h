@@ -31,8 +31,10 @@ public:
 };
 
 struct CS_MOVE_PACKET: public PACKET {
-	char	direction;  // 0 : UP, 1 : DOWN, 2 : LEFT, 3 : RIGHT
-	unsigned  client_time;
+	int sessionId;
+	float x, y, z;
+	float rx, ry, rz;
+	float vx, vy, vz;
 };
 
 struct CS_STOP_PACKET : public PACKET {
@@ -50,8 +52,10 @@ struct CS_CHAT_PACKET : public PACKET {
 };
 
 struct SC_MOVE_PLAYER_PACKET : public PACKET {
-	char	direction;  // 0 : UP, 1 : DOWN, 2 : LEFT, 3 : RIGHT
-	unsigned  client_time;
+	int sessionId;
+	float x, y, z;
+	float rx, ry, rz;
+	float vx, vy, vz;
 };
 
 struct SC_STOP_PLAYER_PACKET : public PACKET {

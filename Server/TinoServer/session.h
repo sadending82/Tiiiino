@@ -10,7 +10,10 @@ public:
 	SESSION_STATE _s_state;
 	int _id;
 	SOCKET _socket;
-	short	x, y;
+	float	x, y, z;
+	float	rx, ry, rz;
+	float	vx, vy, vz;
+	char	anim_num;
 
 	chrono::system_clock::time_point next_move_time;
 	int		_prev_remain;
@@ -22,6 +25,14 @@ public:
 		_socket = 0;
 		x = 0;
 		y = 0;
+		z = 0;
+		rx = 0;
+		ry = 0;
+		rz = 0;
+		vx = 0;
+		vy = 0;
+		vz = 0;
+		anim_num = 0;
 		_s_state = ST_FREE;
 		_prev_remain = 0;
 		next_move_time = chrono::system_clock::now() + chrono::seconds(1);

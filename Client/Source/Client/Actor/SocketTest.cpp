@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "./SocketTest.h"
-#include "../Socket.h"
+#include "../cSocket.h"
 
 
 // Sets default values
@@ -15,7 +15,7 @@ ASocketTest::ASocketTest()
 // Called when the game starts or when spawned
 void ASocketTest::BeginPlay()
 {
-	Socket sock;
+	cSocket sock;
 	Super::BeginPlay();
 	
 	//sock.Init();
