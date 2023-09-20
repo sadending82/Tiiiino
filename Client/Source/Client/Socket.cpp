@@ -43,7 +43,7 @@ void Socket::ReceivePacket()
 {
 
     char buffer[BUFSIZE];
-    int remain_data = 0;
+    unsigned int remain_data = 0;
 
     while (true) {
 
@@ -68,7 +68,7 @@ void Socket::ReceivePacket()
             }
         }
 
-        int rest_size = recvbytes;
+        unsigned int rest_size = recvbytes;
         unsigned char* buf_ptr = reinterpret_cast<unsigned char*>(recvbuf);
 
         while (rest_size > 0)
@@ -96,6 +96,8 @@ void Socket::ReceivePacket()
 void Socket::ProcessPacket(char* buf)
 {
     switch (buf[1]) {
-
+    case 0:
+    default:
+        break;
     }
 }
