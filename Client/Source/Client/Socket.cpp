@@ -8,13 +8,13 @@ bool Socket::Init()
     WSADATA wsa;
     int nRet = WSAStartup(MAKEWORD(2, 2), &wsa);
     if (nRet != 0) {
-        std::cout << "Socket Error : " << WSAGetLastError() << std::endl;
+        //std::cout << "Socket Error : " << WSAGetLastError() << std::endl;
         return false;
     }
 
-    sock = WSASocketW(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
-    if (sock == INVALID_SOCKET) {
-        std::cout << "Socket Error : " << WSAGetLastError() << std::endl;
+    m_sock = WSASocketW(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
+    if (m_sock == INVALID_SOCKET) {
+        //std::cout << "Socket Error : " << WSAGetLastError() << std::endl;
         return false;
     }
 
@@ -26,15 +26,15 @@ bool Socket::Connect()
     SOCKADDR_IN serveraddr;
     ZeroMemory(&serveraddr, sizeof(serveraddr));
     serveraddr.sin_family = AF_INET;
-    serveraddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    serveraddr.sin_addr.s_addr = inet_addr(SERVERIP);
     serveraddr.sin_port = htons(SERVERPORT);
-    int ret = connect(sock, (SOCKADDR*)&serveraddr, sizeof(serveraddr));
+    int ret = connect(m_sock, (SOCKADDR*)&serveraddr, sizeof(serveraddr));
     if (ret == SOCKET_ERROR) {
-        std::cout << "Socket Error : " << WSAGetLastError() << std::endl;
+        //std::cout << "Socket Error : " << WSAGetLastError() << std::endl;
         return false;
     }
 
-    std::cout << "Connection success" << std::endl;
+    //std::cout << "Connection success" << std::endl;
 
     return true;
 }
@@ -42,7 +42,7 @@ bool Socket::Connect()
 void Socket::ReceivePacket()
 {
 
-    char buffer[BUFSIZE];
+    char buffer[BUF_SIZE];
     unsigned int remain_data = 0;
 
     while (true) {
@@ -51,19 +51,19 @@ void Socket::ReceivePacket()
         int retval = 0;
         DWORD packet_size = 0;
 
-        char recvbuf[BUFSIZE];
+        char recvbuf[BUF_SIZE];
 
         WSABUF r_wsabuf;
         r_wsabuf.buf = recvbuf;
-        r_wsabuf.len = BUFSIZE;
+        r_wsabuf.len = BUF_SIZE;
 
         DWORD recvbytes = 0;
-        retval = WSARecv(sock, &r_wsabuf, 1, &recvbytes, &flags, NULL, NULL);
+        retval = WSARecv(m_sock, &r_wsabuf, 1, &recvbytes, &flags, NULL, NULL);
 
         if(retval == SOCKET_ERROR) {
             int err_no = WSAGetLastError();
             if (err_no != WSA_IO_PENDING) {
-                closesocket(sock);
+                closesocket(m_sock);
                 break;
             }
         }
@@ -91,6 +91,22 @@ void Socket::ReceivePacket()
         }
     }
 
+}
+
+bool Socket::SendPacket(char* buf)
+{
+    DWORD sendbytes = 0;
+    WSABUF wsabuf;
+
+    wsabuf.len = buf[0];
+    wsabuf.buf = buf;
+
+    int retval = WSASend(m_sock, &wsabuf, 1, &sendbytes, 0, NULL, NULL);
+    if (retval == SOCKET_ERROR) {
+        return false;
+        //std::cout << "Send Packet Error: %d: " << WSAGetLastError() << std::endl;
+    }
+    return true;
 }
 
 void Socket::ProcessPacket(char* buf)

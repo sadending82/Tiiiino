@@ -27,4 +27,11 @@
 //
 //	//virtual bool ConnectServer() = 0;
 //	//virtual void RecvPacket() = 0;
+//
+//	void Set_pSocket(Socket* s) { m_pSocket = s; }
+//	virtual void SendPacket();
+//
+//private:
+//
+//	Socket* m_pSocket;
 //};

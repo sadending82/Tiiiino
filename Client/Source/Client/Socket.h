@@ -9,10 +9,7 @@
 #include "Windows/PostWindowsApi.h"
 #include "Windows/HideWindowsPlatformTypes.h"
 #include "Runtime/Core/Public/Math/Vector.h"
-
-#define SERVERIP 127.0.0.1
-#define SERVERPORT 3500
-#define BUFSIZE 200
+#include "../../../protocol.h"
 
 class Socket
 {
@@ -23,9 +20,12 @@ public:
 	bool Init();
 	bool Connect();
 	void ReceivePacket();
+	bool SendPacket(char* buf);
 	void ProcessPacket(char* buf);
 
+	SOCKET Get_m_sock() { return m_sock; }
+
 private:
-	SOCKET	sock;
+	SOCKET	m_sock;
 
 };

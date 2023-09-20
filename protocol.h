@@ -1,8 +1,10 @@
-constexpr int PORT_NUM = 3500;
+//test ip
+constexpr auto SERVERIP = "127.0.0.1";
+
+constexpr int SERVERPORT = 3500;
 constexpr int BUF_SIZE = 200;
 
 constexpr int MAX_USER = 300;
-// Packet ID
 
 enum PacketType {
 	// Client To Server
@@ -20,6 +22,10 @@ enum PacketType {
 	SC_MOVE_PLAYER,
 	SC_STOP_PLAYER,
 	SC_ROTATE_PLAYER,
+};
+
+enum EventType {
+	NONE
 };
 
 #pragma pack (push, 1)
@@ -63,5 +69,9 @@ struct SC_ROTATE_PLAYER_PACKET : public PACKET {
 	unsigned  client_time;
 };
 
+struct EVENT {
+	unsigned char size;
+	char	type;
+};
 
 #pragma pack (pop)

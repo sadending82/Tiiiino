@@ -12,9 +12,6 @@ void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	/*Socket sock;
-	sock.Init();
-	sock.Connect();*/
 }
 
 // Called to bind functionality to input
