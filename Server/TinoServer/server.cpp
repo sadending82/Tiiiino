@@ -107,13 +107,13 @@ void Server::do_worker()
 			ZeroMemory(&ex_over->_over, sizeof(ex_over->_over));
 			ex_over->_wsabuf.buf = reinterpret_cast<CHAR*>(c_socket);
 			int addr_size = sizeof(SOCKADDR_IN);
-			AcceptEx(m_listenSocket, c_socket, ex_over->_send_buf, 0, addr_size + 16, addr_size + 16, 0, &ex_over->_over);
+			AcceptEx(m_listenSocket, c_socket, ex_over->_message_buf, 0, addr_size + 16, addr_size + 16, 0, &ex_over->_over);
 			break;
 		}
 		case OP_RECV: {
 			if (0 == num_bytes) disconnect(client_id);
 			int remain_data = num_bytes + clients[key]._prev_remain;
-			char* p = ex_over->_send_buf;
+			char* p = ex_over->_message_buf;
 			while (remain_data > 0) {
 				int packet_size = p[0];
 				if (packet_size <= remain_data) {
@@ -125,7 +125,7 @@ void Server::do_worker()
 			}
 			clients[key]._prev_remain = remain_data;
 			if (remain_data > 0) {
-				memcpy(ex_over->_send_buf, p, remain_data);
+				memcpy(ex_over->_message_buf, p, remain_data);
 			}
 			clients[key].do_recv();
 			break;
@@ -136,6 +136,7 @@ void Server::do_worker()
 			break;
 		}
 		case OP_EVENT: {
+			process_event(ex_over->_message_buf);
 			break;
 		}
 		}
@@ -152,7 +153,7 @@ void Server::init()
 	SOCKADDR_IN server_addr;
 	memset(&server_addr, 0, sizeof(server_addr));
 	server_addr.sin_family = AF_INET;
-	server_addr.sin_port = htons(PORT_NUM);
+	server_addr.sin_port = htons(SERVERPORT);
 	server_addr.sin_addr.S_un.S_addr = INADDR_ANY;
 
 	bind(m_listenSocket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr));
@@ -170,7 +171,7 @@ void Server::init()
 	OVER_EXP a_over;
 	a_over._comp_type = OP_ACCEPT;
 	a_over._wsabuf.buf = reinterpret_cast<CHAR*>(c_socket);
-	AcceptEx(m_listenSocket, c_socket, a_over._send_buf, 0, addr_size + 16, addr_size + 16, 0, &a_over._over);
+	AcceptEx(m_listenSocket, c_socket, a_over._message_buf, 0, addr_size + 16, addr_size + 16, 0, &a_over._over);
 
 	SYSTEM_INFO si;
 	GetSystemInfo(&si);
@@ -182,6 +183,16 @@ void Server::init()
 
 	closesocket(m_listenSocket);
 	WSACleanup();
+}
+
+void Server::process_event(char* message)
+{
+	switch (message[1]) {
+	case NONE:
+	default: {
+		break;
+	}
+	}
 }
 
 HANDLE Server::get_handle()

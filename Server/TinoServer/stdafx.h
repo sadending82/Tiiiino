@@ -19,7 +19,7 @@
 #include <sqlext.h>  
 #include <string>
 
-#include "protocol.h"
+#include "../../protocol.h"
 #include "over_exp.h"
 
 #pragma comment(lib, "WS2_32.lib")

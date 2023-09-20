@@ -11,6 +11,7 @@ public:
 	void process_packet(int c_id, char* packet);
 	void do_worker();
 	void init();
+	void process_event(char* message);
 
 	HANDLE get_handle();
 public:

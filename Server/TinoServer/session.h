@@ -34,7 +34,7 @@ public:
 		DWORD recv_flag = 0;
 		memset(&_recv_over._over, 0, sizeof(_recv_over._over));
 		_recv_over._wsabuf.len = BUF_SIZE - _prev_remain;
-		_recv_over._wsabuf.buf = _recv_over._send_buf + _prev_remain;
+		_recv_over._wsabuf.buf = _recv_over._message_buf + _prev_remain;
 		WSARecv(_socket, &_recv_over._wsabuf, 1, 0, &recv_flag, &_recv_over._over, 0);
 	}
 

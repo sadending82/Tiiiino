@@ -39,7 +39,7 @@ void Timer::Timer_main()
 			OVER_EXP* over_exp = new OVER_EXP;
 			over_exp->target_id = te.key;
 			over_exp->_comp_type = OP_EVENT;
-			memcpy(over_exp->_send_buf, reinterpret_cast<char*>(&te), sizeof(te));
+			memcpy(over_exp->_message_buf, reinterpret_cast<char*>(&te), sizeof(te));
 
 			PostQueuedCompletionStatus(m_hiocp, 1, te.key, (LPOVERLAPPED)&over_exp->_over);
 		}
