@@ -22,10 +22,6 @@ enum PacketType {
 	SC_MOVE_PLAYER
 };
 
-enum EventType {
-	NONE
-};
-
 #pragma pack (push, 1)
 
 struct PACKET {

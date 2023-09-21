@@ -1,5 +1,6 @@
 #pragma once
 #include "Session.h"
+#include "Timer.h"
 
 constexpr int MAX_THREAD = 6;
 constexpr int INVALID_KEY = -1;
@@ -12,11 +13,11 @@ public:
 	void DoWorker();
 	void Init();
 	void ProcessEvent(char* cmessage);
-	HANDLE GetHandle();
 public:
 	array <Session, MAX_USER> mClients;
 private:
 	SOCKET mListenSocket;
 	HANDLE mHCP;
 	vector <thread> mWorkerThreads;
+	Timer* pTimer;
 };

@@ -31,7 +31,7 @@ void Server::ProcessPacket(int cID, char* cpacket)
 {
 	switch (cpacket[1]) 
 	{
-	case NONE:
+	case 0:
 	{
 		break;
 	}
@@ -44,6 +44,12 @@ void Server::ProcessPacket(int cID, char* cpacket)
 
 void Server::DoWorker()
 {
+	EV_UpdateMatchPacket p;
+	p.size = sizeof(EV_UpdateMatchPacket);
+	p.type = 0;
+
+	pTimer->PushEvent(1, eEVENT_TYPE::EV_MATCH_UP, 5000, reinterpret_cast<char*>(&p));
+	cout << "타이머 푸시" << endl;
 	while (true)
 	{
 		DWORD numBytes;
@@ -183,6 +189,10 @@ void Server::Init()
 	for (int i = 0; i < (int)si.dwNumberOfProcessors; ++i)
 		mWorkerThreads.emplace_back(thread(&Server::DoWorker, this));
 
+	pTimer = new Timer;
+	pTimer->Init(mHCP);
+	delete pTimer;
+
 	for (auto& th : mWorkerThreads)
 		th.join();
 
@@ -193,18 +203,24 @@ void Server::Init()
 void Server::ProcessEvent(char* cmessage)
 {
 	switch (cmessage[1]) {
-	case NONE:
+	case static_cast<int> (eEVENT_TYPE::EV_MATCH_UP):
+	{
+		cout << "작동 확인 0" << endl;
+		break;
+	}
+	case static_cast<int> (eEVENT_TYPE::EV_MATCH_IN):
+	{
+		cout << "작동 확인 1" << endl;
+		break;
+	}
+	case static_cast<int> (eEVENT_TYPE::EV_MATCH_OUT):
+	{
+		cout << "작동 확인 2" << endl;
+		break;
+	}
+	default:
 	{
 		break;
 	}
-	default: 
-	{
-		break;
 	}
-	}
-}
-
-HANDLE Server::GetHandle()
-{
-	return mHCP;
 }
