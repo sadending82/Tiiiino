@@ -13,18 +13,10 @@ UCLASS()
 class CLIENT_API ATinoCharacter : public ABaseCharacter
 {
 	GENERATED_BODY()
-	
 
 public:
 
 	ATinoCharacter();
-
-private:
-
-	UPROPERTY(VisibleDefaultsOnly)
-		class USpringArmComponent* SpringArm;
-	UPROPERTY(VisibleDefaultsOnly)
-		class UCameraComponent* Camera;
 
 public:
 
@@ -40,4 +32,15 @@ private:
 	void OnRunning();
 	void OffRunning();
 
+	virtual void Jump() override;
+	virtual void StopJumping() override;
+
+	void CreateDummy();
+
+private:
+
+	UPROPERTY(VisibleDefaultsOnly)
+		class USpringArmComponent* SpringArm;
+	UPROPERTY(VisibleDefaultsOnly)
+		class UCameraComponent* Camera;
 };

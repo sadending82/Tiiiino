@@ -1,33 +1,36 @@
 #pragma once
 #include "stdafx.h"
+using namespace std::chrono;
 
-constexpr int EVENTBUFSIZE = 100;
+constexpr int EVENT_BUF_SIZE = 100;
 
-enum EVENT_TYPE { EV_MOVE, EV_ATTACK };
+struct TimerEvent 
+{
+	int mKey;
+	system_clock::time_point mStartTime;
+	eEVENT_TYPE mEventType;
+	char mEventMessage[EVENT_BUF_SIZE + 1];
 
-struct Timer_event {
-	int key;
-	std::chrono::system_clock::time_point start_time;
-	EVENT_TYPE OE_Type;
-	char event_message[EVENTBUFSIZE + 1];
-
-	constexpr bool operator< (const Timer_event& other) const {
-		return start_time > other.start_time;
+	constexpr bool operator< (const TimerEvent& other) const
+	{
+		return mStartTime > other.mStartTime;
 	}
 };
 
-class Timer {
+class Timer
+{
 public:
-	std::priority_queue<Timer_event> m_Timer_queue;
-
-	void init(HANDLE h_cp);
-	void push_event(int key, EVENT_TYPE event_type, int delaystart_time, char* message);
-	void Timer_main();
-
-	void Set_isRun(bool value) { m_isRun = value; }
+	priority_queue<TimerEvent> mTimerQueue;
+	void Init(HANDLE cHCP);
+	void PushEvent(int ckey, eEVENT_TYPE ceventType, int cdelayStartTime, char* cmessage);
+	void TimerMain();
+	void SetIsRun(bool cvalue) 
+	{
+		mIsRun = cvalue; 
+	}
 
 private:
-	int m_isRun;
-	HANDLE m_hiocp;
-	std::mutex m_timer_lock;
+	int mIsRun;
+	HANDLE mHiocp;
+	mutex mTimerLock;
 };

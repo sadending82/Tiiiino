@@ -1,25 +1,23 @@
 #pragma once
-#include "session.h"
+#include "Session.h"
+#include "Timer.h"
 
 constexpr int MAX_THREAD = 6;
 constexpr int INVALID_KEY = -1;
 
 class Server {
 public:
-	void disconnect(int c_id);
-	int get_new_client_id();
-	void process_packet(int c_id, char* packet);
-	void do_worker();
-	void init();
-	void process_event(char* message);
-
-	HANDLE get_handle();
+	void Disconnect(int cID);
+	int GetNewClientID();
+	void ProcessPacket(int cID, char* cpacket);
+	void DoWorker();
+	void Init();
+	void ProcessEvent(char* cmessage);
 public:
-	std::array <SESSION, 1000> clients;
-
+	array <Session, MAX_USER> mClients;
 private:
-	SOCKET                         m_listenSocket;
-	HANDLE                         m_hcp;
-
-	std::vector <std::thread>      m_worker_threads;
+	SOCKET mListenSocket;
+	HANDLE mHCP;
+	vector <thread> mWorkerThreads;
+	Timer* pTimer;
 };

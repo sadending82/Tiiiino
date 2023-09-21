@@ -1,51 +1,52 @@
-#include "timer.h"
+#include "Timer.h"
 
-using namespace std::chrono;
-
-void Timer::init(HANDLE h_cp)
+void Timer::Init(HANDLE cHCP)
 {
-	m_hiocp = h_cp;
+	mHiocp = cHCP;
 
-	std::priority_queue<Timer_event> empty_queue;
-	std::swap(m_Timer_queue, empty_queue);
+	priority_queue<TimerEvent> empty_queue;
+	swap(mTimerQueue, empty_queue);
 
-	m_isRun = TRUE;
+	mIsRun = TRUE;
 
-	thread timer_thread{ (std::thread(&Timer::Timer_main, this)) };
+	thread timer_thread{ (thread(&Timer::TimerMain, this)) };
 	timer_thread.join();
 }
 
-void Timer::push_event(int key, EVENT_TYPE event_type, int delaytime_ms, char* message)
+void Timer::PushEvent(int ckey, eEVENT_TYPE ceventType, int cdelayStartTime, char* cmessage)
 {
-	std::lock_guard <std::mutex> lg{ m_timer_lock };
-	Timer_event te;
-	te.key = key;
-	te.OE_Type = event_type;
-	te.start_time = system_clock::now() + milliseconds(delaytime_ms);
-	memcpy(te.event_message, message, message[0]);
-	m_Timer_queue.push(te);
+	mTimerLock.lock();
+	TimerEvent te;
+	te.mKey = ckey;
+	te.mEventType = ceventType;
+	te.mStartTime = system_clock::now() + milliseconds(cdelayStartTime);
+	memcpy(te.mEventMessage, cmessage, cmessage[0]);
+	mTimerQueue.push(te);
+	mTimerLock.unlock();
 }
 
-void Timer::Timer_main()
+void Timer::TimerMain()
 {
-	while (m_isRun) {
-		m_timer_lock.lock();
-		if ((m_Timer_queue.empty() == FALSE)
-			&& (m_Timer_queue.top().start_time <= system_clock::now())) {
-			Timer_event te = m_Timer_queue.top();
-			m_Timer_queue.pop();
-			m_timer_lock.unlock();
+	while (mIsRun)
+	{
+		mTimerLock.lock();
+		if ((mTimerQueue.empty() == FALSE) && (mTimerQueue.top().mStartTime <= system_clock::now()))
+		{
+			TimerEvent te = mTimerQueue.top();
+			mTimerQueue.pop();
+			mTimerLock.unlock();
 
-			OVER_EXP* over_exp = new OVER_EXP;
-			over_exp->target_id = te.key;
-			over_exp->_comp_type = OP_EVENT;
-			memcpy(over_exp->_message_buf, reinterpret_cast<char*>(&te), sizeof(te));
+			OverEXP* over_exp = new OverEXP;
+			over_exp->mTargetID = te.mKey;
+			over_exp->mCompType = eCompType::OP_EVENT;
+			memcpy(over_exp->mMessageBuf, reinterpret_cast<char*>(&te), sizeof(te));
 
-			PostQueuedCompletionStatus(m_hiocp, 1, te.key, (LPOVERLAPPED)&over_exp->_over);
+			PostQueuedCompletionStatus(mHiocp, 1, te.mKey, (LPOVERLAPPED)&over_exp->mOver);
 		}
-		else {
-			m_timer_lock.unlock();
-			std::this_thread::sleep_for(100ms);
+		else
+		{
+			mTimerLock.unlock();
+			this_thread::sleep_for(100ms);
 		}
 	}
 }

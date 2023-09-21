@@ -12,15 +12,16 @@
 #include <chrono>
 #include <random>
 
-#include <windows.h>  
+#include <windows.h>
 #include <locale.h>
 
-#define UNICODE  
+#define UNICODE
 #include <sqlext.h>  
 #include <string>
 
 #include "../../protocol.h"
-#include "over_exp.h"
+#include "OverExp.h"
+#include "LobbyProtocol.h"
 
 #pragma comment(lib, "WS2_32.lib")
 #pragma comment(lib, "MSWSock.lib")
