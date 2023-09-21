@@ -10,7 +10,9 @@ int main(int argc, char* argv[])
 {
 	std::wcout.imbue(std::locale("korean"));
 
+#ifdef DBTest
 	g_pDB->ConnectDB();
 
-	g_pDB->DisconnectDB();
+	//g_pDB->DisconnectDB();
+#endif
 }

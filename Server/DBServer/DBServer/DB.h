@@ -14,8 +14,10 @@ public:
 
 	bool ConnectDB();
 	bool ExecuteQuery(MYSQL_STMT* stmt);
+
 	vector<string> SelectUserData(const string& UID);
 	bool InsertNewUser(const string& id, const string& passWord, const string& nickname);
+	bool UpdateUserNickname(const string& uid, const string& nicknameToChange);
 
 	void DisconnectDB();
 
@@ -24,7 +26,7 @@ private:
 	MYSQL		mConn;
 	MYSQL_RES*	mSqlResult;
 	MYSQL_ROW	mSqlRow;
-	MYSQL_STMT* mStmt;
+	MYSQL_STMT* mStmt		= NULL;
 
 	// юс╫ц
 	const char* host = "localhost";

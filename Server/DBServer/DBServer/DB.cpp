@@ -38,6 +38,8 @@ bool DB::ConnectDB()
 	}
 	mStmt = mysql_stmt_init(mConnection);
 
+	UpdateUserNickname("1", "dld");
+
 	return true;
 }
 
@@ -141,8 +143,47 @@ bool DB::InsertNewUser(const string& id, const string& passWord, const string& n
 	return true;
 }
 
+bool DB::UpdateUserNickname(const string& uid, const string& nicknameToChange)
+{
+	string query = "UPDATE userinfo SET nick = ? WHERE UID = ?";
+
+	if (mysql_stmt_prepare(mStmt, query.c_str(), query.length()) != 0) {
+#ifdef Test
+		std::cout << "InsertNewUser stmt prepare error: " << mysql_stmt_error(mStmt) << std::endl;
+#endif
+		return false;
+	}
+
+	const int colNum = 2;
+
+	MYSQL_BIND binds[colNum];
+	memset(binds, 0, sizeof(binds));
+
+	binds[0].buffer_type = MYSQL_TYPE_STRING;
+	binds[0].buffer = (void*)nicknameToChange.c_str();
+	binds[0].buffer_length = nicknameToChange.length();
+
+	int iuid = stoi(uid);
+	binds[1].buffer_type = MYSQL_TYPE_LONG;
+	binds[1].buffer = &iuid;
+
+	if (mysql_stmt_bind_param(mStmt, binds) != 0) {
+
+#ifdef Test
+		std::cout << "UpdateUserNickname stmt bind error: " << mysql_stmt_error(mStmt) << std::endl;
+#endif
+		return false;
+	}
+
+	if (ExecuteQuery(mStmt) != false) {
+		return false;
+	}
+
+	return true;
+}
+
 void DB::DisconnectDB()
 {
-	mysql_close(mConnection);
 	mysql_stmt_close(mStmt);
+	mysql_close(mConnection);
 }
