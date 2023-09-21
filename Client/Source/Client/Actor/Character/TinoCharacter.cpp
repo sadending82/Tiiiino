@@ -1,4 +1,5 @@
 #include "Actor/Character/TinoCharacter.h"
+#include "Actor/Controller/TinoController.h"
 #include "Global.h"
 
 #include "GameFramework/SpringArmComponent.h"
@@ -29,6 +30,7 @@ void ATinoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAxis("HorizonLock", this, &ATinoCharacter::OnHorizonLock);
 	PlayerInputComponent->BindAxis("VerticalLock", this, &ATinoCharacter::OnVerticalLock);
 
+	PlayerInputComponent->BindAction("CreateDummy", EInputEvent::IE_Pressed, this, &ATinoCharacter::CreateDummy);
 	PlayerInputComponent->BindAction("Running", EInputEvent::IE_Pressed, this, &ATinoCharacter::OnRunning);
 	PlayerInputComponent->BindAction("Running", EInputEvent::IE_Released, this, &ATinoCharacter::OffRunning);
 }
@@ -67,4 +69,9 @@ void ATinoCharacter::OnRunning()
 void ATinoCharacter::OffRunning()
 {
 	GetCharacterMovement()->MaxWalkSpeed = 100;
+}
+
+void ATinoCharacter::CreateDummy()
+{
+	GetController<ATinoController>()->CreateDummy();
 }

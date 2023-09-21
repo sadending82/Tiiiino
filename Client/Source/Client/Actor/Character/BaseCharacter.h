@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -8,7 +6,7 @@
 #include "BaseCharacter.generated.h"
 
 UCLASS()
-class CLIENT_API ABaseCharacter : public ACharacter//, public INetwork
+class CLIENT_API ABaseCharacter : public ACharacter, public INetwork
 {
 	GENERATED_BODY()
 
@@ -25,7 +23,14 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 public:
+
+	const int GetClientID() const { return ClientID; }
+	void SetClientID(const int id) { ClientID = id; }
+
+private:
 	//Server
 	UPROPERTY(EditAnywhere,Category = "Network")
 		int ClientID;
+
+
 };
