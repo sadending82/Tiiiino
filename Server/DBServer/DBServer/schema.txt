@@ -1,0 +1,12 @@
+DROP TABLE IF EXISTS `userinfo`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `userinfo` (
+  `UID` int NOT NULL AUTO_INCREMENT COMMENT 'Unique ID',
+  `ID` varchar(20) NOT NULL COMMENT 'account ID',
+  `PassWord` varchar(20) NOT NULL COMMENT 'account PW',
+  `nick` varchar(20) NOT NULL COMMENT 'user nickname\n',
+  `credit` decimal(2,1) NOT NULL COMMENT 'mmr',
+  `point` int NOT NULL,
+  PRIMARY KEY (`UID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
