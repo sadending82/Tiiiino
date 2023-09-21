@@ -16,9 +16,9 @@ bool DB::ConnectDB()
 	}
 
 	SetmConn(conn);
-	mConnecton = mysql_real_connect(&conn, host, user, PW, "Tiiiino", 3306, (const char*)NULL, 0);
+	mConnection = mysql_real_connect(&conn, host, user, PW, "Tiiiino", 3306, (const char*)NULL, 0);
 
-	if (mConnecton == NULL) {
+	if (mConnection == NULL) {
 #ifdef Test
 		std::cout << "connect fail" << std::endl;
 #endif
@@ -30,12 +30,13 @@ bool DB::ConnectDB()
 #endif
 	}
 
-	if (mysql_select_db(mConnecton, "Tiiiino")) {
+	if (mysql_select_db(mConnection, "Tiiiino")) {
 #ifdef Test
 		std::cout << "select db fail" << std::endl;
 #endif
 		return false;
 	}
+	mStmt = mysql_stmt_init(mConnection);
 
 	return true;
 }
@@ -53,24 +54,22 @@ bool DB::ExecuteQuery(MYSQL_STMT* stmt)
 	return true;
 }
 
-vector<string> DB::SelectUserData(const string UID)
+vector<string> DB::SelectUserData(const string& UID)
 {
 	vector<string> data;
 
 	string query = "SELECT * FROM tiiiino.userinfo WHERE UID = " + UID;
 
-	MYSQL_STMT* stmt = mysql_stmt_init(mConnecton);
-
-	if (mysql_stmt_prepare(stmt, query.c_str(), query.length()) != 0) {
+	if (mysql_stmt_prepare(mStmt, query.c_str(), query.length()) != 0) {
 #ifdef Test
-		std::cout << "stmt prepare error: " << mysql_stmt_error(stmt) << std::endl;
+		std::cout << "SelectUserData stmt prepare error: " << mysql_stmt_error(mStmt) << std::endl;
 #endif
 		return data;
 	}
 
-	MYSQL_BIND resultBinds[6];
-	memset(resultBinds, 0, sizeof(resultBinds));
 	const int colNum = 6;
+	MYSQL_BIND resultBinds[colNum];
+	memset(resultBinds, 0, sizeof(resultBinds));
 	char bindData[colNum][50];
 	for (int i = 0; i< colNum; ++i)
 	{
@@ -79,22 +78,71 @@ vector<string> DB::SelectUserData(const string UID)
 		resultBinds[i].buffer = bindData[i];
 	}
 
-	if (mysql_stmt_bind_result(stmt, resultBinds) != 0) {
+	if (mysql_stmt_bind_result(mStmt, resultBinds) != 0) {
 #ifdef Test
-		std::cout << "stmt bind error: " << mysql_stmt_error(stmt) << std::endl;
+		std::cout << "SelectUserData stmt bind error: " << mysql_stmt_error(mStmt) << std::endl;
 #endif
 		return data;
 	}
 
-	if (ExecuteQuery(stmt) != false) {
+	if (ExecuteQuery(mStmt) != false) {
 		return data;
 	}
 
-	mysql_stmt_fetch(stmt);
+	mysql_stmt_fetch(mStmt);
 
 	for (string col : bindData) {
 		data.push_back(col);
 	}
 
 	return data;
+}
+
+bool DB::InsertNewUser(const string& id, const string& passWord, const string& nickname)
+{
+	string query = "INSERT INTO userinfo (ID, PassWord, nick) VALUES (?, ?, ?)";
+
+	if (mysql_stmt_prepare(mStmt, query.c_str(), query.length()) != 0) {
+#ifdef Test
+		std::cout << "InsertNewUser stmt prepare error: " << mysql_stmt_error(mStmt) << std::endl;
+#endif
+		return false;
+	}
+
+	const int colNum = 3;
+
+	MYSQL_BIND binds[colNum];
+	memset(binds, 0, sizeof(binds));
+
+	binds[0].buffer_type = MYSQL_TYPE_STRING;
+	binds[0].buffer = (void*)id.c_str();
+	binds[0].buffer_length = id.length();
+
+	binds[1].buffer_type = MYSQL_TYPE_STRING;
+	binds[1].buffer = (void*)passWord.c_str();
+	binds[1].buffer_length = passWord.length();
+
+	binds[2].buffer_type = MYSQL_TYPE_STRING;
+	binds[2].buffer = (void*)nickname.c_str();
+	binds[2].buffer_length = nickname.length();
+
+	if (mysql_stmt_bind_param(mStmt, binds) != 0) {
+
+#ifdef Test
+			std::cout << "InsertNewUser stmt bind error: " << mysql_stmt_error(mStmt) << std::endl;
+#endif
+		return false;
+	}
+
+	if (ExecuteQuery(mStmt) != false) {
+		return false;
+	}
+
+	return true;
+}
+
+void DB::DisconnectDB()
+{
+	mysql_close(mConnection);
+	mysql_stmt_close(mStmt);
 }

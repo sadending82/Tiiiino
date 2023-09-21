@@ -4,9 +4,13 @@
 
 DB* g_pDB = new DB;
 
+#define DBTest
+
 int main(int argc, char* argv[])
 {
 	std::wcout.imbue(std::locale("korean"));
 
-	bool b = g_pDB->ConnectDB();
+	g_pDB->ConnectDB();
+
+	g_pDB->DisconnectDB();
 }
