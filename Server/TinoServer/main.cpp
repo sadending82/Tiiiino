@@ -1,18 +1,18 @@
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include "stdafx.h"
-#include "server.h"
-#include "timer.h"
+#include "Server.h"
+#include "Timer.h"
 
-Server* g_pServer = new Server;
-Timer* timer = new Timer;
+Server* pServer = new Server;
+Timer* pTimer = new Timer;
 
 int main(int argc, char* argv[])
 {
-	std::wcout.imbue(std::locale("korean"));
+	wcout.imbue(locale("korean"));
 
-	g_pServer->init();
-	timer->init(g_pServer->get_handle());
+	pServer->Init();
+	pTimer->Init(pServer->GetHandle());
 
-	delete timer;
-	delete g_pServer;
+	delete pTimer;
+	delete pServer;
 }

@@ -1,154 +1,159 @@
 #pragma once
 #include "server.h"
 
-void Server::disconnect(int c_id)
+void Server::Disconnect(int cID)
 {
-	clients[c_id]._sl.lock();
-	if (clients[c_id]._s_state == ST_FREE) {
-		clients[c_id]._sl.unlock();
+	mClients[cID].mStateLock.lock();
+	if (mClients[cID].mState == eSessionState::ST_FREE) {
+		mClients[cID].mStateLock.unlock();
 		return;
 	}
-	closesocket(clients[c_id]._socket);
-	clients[c_id]._s_state = ST_FREE;
-	clients[c_id]._sl.unlock();
-
-	for (auto& pl : clients) {
-		if (pl._id == c_id) continue;
-		pl._sl.lock();
-		if (pl._s_state != ST_INGAME) {
-			pl._sl.unlock();
-			continue;
-		}
-		pl._sl.unlock();
-	}
+	closesocket(mClients[cID].mSocket);
+	mClients[cID].mState = eSessionState::ST_FREE;
+	mClients[cID].mStateLock.unlock();
 }
 
-int Server::get_new_client_id()
+int Server::GetNewClientID()
 {
 	for (int i = 0; i < MAX_USER; ++i) {
-		clients[i]._sl.lock();
-		if (clients[i]._s_state == ST_FREE) {
-			clients[i]._s_state = ST_ACCEPTED;
-			clients[i]._sl.unlock();
+		mClients[i].mStateLock.lock();
+		if (mClients[i].mState == eSessionState::ST_FREE) {
+			mClients[i].mState = eSessionState::ST_ACCEPTED;
+			mClients[i].mStateLock.unlock();
 			return i;
 		}
-		clients[i]._sl.unlock();
+		mClients[i].mStateLock.unlock();
 	}
 	return INVALID_KEY;
 }
 
-void Server::process_packet(int c_id, char* packet)
+void Server::ProcessPacket(int cID, char* cpacket)
 {
-	switch (packet[1]) {
-	case CS_MOVE: {
-		CS_MOVE_PACKET* p = reinterpret_cast<CS_MOVE_PACKET*>(packet);
-		clients[c_id].do_send(p);
-
+	switch (cpacket[1]) 
+	{
+	case NONE:
+	{
 		break;
 	}
-
-	case CS_STOP: {
-		CS_MOVE_PACKET* p = reinterpret_cast<CS_MOVE_PACKET*>(packet);
-		clients[c_id].do_send(p);
-
-		break;
-	}
-	case CS_ROTATE: {
-		CS_MOVE_PACKET* p = reinterpret_cast<CS_MOVE_PACKET*>(packet);
-		clients[c_id].do_send(p);
-
-		break;
-	}
-	case CS_CHAT: {
-		CS_CHAT_PACKET* p = reinterpret_cast<CS_CHAT_PACKET*>(packet);
-		clients[c_id].do_send(p);
-
+	default:
+	{
 		break;
 	}
 	}
 }
 
-void Server::do_worker()
+void Server::DoWorker()
 {
-	while (true) {
-		DWORD num_bytes;
+	while (true)
+	{
+		DWORD numBytes;
 		ULONG_PTR key;
 		WSAOVERLAPPED* over = nullptr;
-		BOOL ret = GetQueuedCompletionStatus(m_hcp, &num_bytes, &key, &over, INFINITE);
-		OVER_EXP* ex_over = reinterpret_cast<OVER_EXP*>(over);
+		BOOL ret = GetQueuedCompletionStatus(mHCP, &numBytes, &key, &over, INFINITE);
+		OverEXP* exOver = reinterpret_cast<OverEXP*>(over);
 		int client_id = static_cast<int>(key);
-		if (FALSE == ret) {
-			if (ex_over->_comp_type == OP_ACCEPT) cout << "Accept Error";
-			else {
+		if (FALSE == ret)
+		{
+			if (exOver->mCompType == eCompType::OP_ACCEPT)
+			{
+				cout << "Accept Error";
+			}
+			else
+			{
 				cout << "GQCS Error on client[" << key << "]\n";
-				disconnect(static_cast<int>(key));
-				if (ex_over->_comp_type == OP_SEND) delete ex_over;
+				Disconnect(static_cast<int>(key));
+				if (exOver->mCompType == eCompType::OP_SEND)
+				{
+					delete exOver;
+				}
 				continue;
 			}
 		}
 
-		switch (ex_over->_comp_type) {
-		case OP_ACCEPT: {
-			SOCKET c_socket = reinterpret_cast<SOCKET>(ex_over->_wsabuf.buf);
-			int client_id = get_new_client_id();
-			if (client_id != -1) {
-				clients[client_id].x = 0;
-				clients[client_id].y = 0;
-				clients[client_id]._id = client_id;
-				clients[client_id]._prev_remain = 0;
-				clients[client_id]._socket = c_socket;
-				CreateIoCompletionPort(reinterpret_cast<HANDLE>(c_socket), m_hcp, client_id, 0);
-				clients[client_id].do_recv();
-				c_socket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
+		switch (exOver->mCompType) 
+		{
+		case eCompType::OP_ACCEPT:
+		{
+			SOCKET cSocket = reinterpret_cast<SOCKET>(exOver->mWsaBuf.buf);
+			int client_id = GetNewClientID();
+			if (client_id != INVALID_KEY)
+			{
+				mClients[client_id].mPlayerID = client_id;
+				mClients[client_id].mPrevRemain = 0;
+				mClients[client_id].mSocket = cSocket;
+				CreateIoCompletionPort(reinterpret_cast<HANDLE>(cSocket), mHCP, client_id, 0);
+				mClients[client_id].DoRecv();
+				cSocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
 				cout << "player connect\n";
 			}
-			else cout << "Max user exceeded.\n";
+			else
+			{
+				cout << "Max user exceeded.\n";
+			}
 
-			ZeroMemory(&ex_over->_over, sizeof(ex_over->_over));
-			ex_over->_wsabuf.buf = reinterpret_cast<CHAR*>(c_socket);
+			ZeroMemory(&exOver->mOver, sizeof(exOver->mOver));
+			exOver->mWsaBuf.buf = reinterpret_cast<CHAR*>(cSocket);
 			int addr_size = sizeof(SOCKADDR_IN);
-			AcceptEx(m_listenSocket, c_socket, ex_over->_message_buf, 0, addr_size + 16, addr_size + 16, 0, &ex_over->_over);
+			AcceptEx(mListenSocket, cSocket, exOver->mMessageBuf, 0, addr_size + 16, addr_size + 16, 0, &exOver->mOver);
 			break;
 		}
-		case OP_RECV: {
-			if (0 == num_bytes) disconnect(client_id);
-			int remain_data = num_bytes + clients[key]._prev_remain;
-			char* p = ex_over->_message_buf;
-			while (remain_data > 0) {
-				int packet_size = p[0];
-				if (packet_size <= remain_data) {
-					process_packet(static_cast<int>(key), p);
-					p = p + packet_size;
-					remain_data = remain_data - packet_size;
+		case eCompType::OP_RECV:
+		{
+			if (0 == numBytes)
+			{
+				Disconnect(client_id);
+			}
+			int remainData = numBytes + mClients[key].mPrevRemain;
+			char* p = exOver->mMessageBuf;
+			while (remainData > 0)
+			{
+				int packetSize = p[0];
+				if (packetSize <= remainData)
+				{
+					ProcessPacket(static_cast<int>(key), p);
+					p = p + packetSize;
+					remainData = remainData - packetSize;
 				}
-				else break;
+				else
+				{
+					break;
+				}
 			}
-			clients[key]._prev_remain = remain_data;
-			if (remain_data > 0) {
-				memcpy(ex_over->_message_buf, p, remain_data);
+			mClients[key].mPrevRemain = remainData;
+			if (remainData > 0)
+			{
+				memcpy(exOver->mMessageBuf, p, remainData);
 			}
-			clients[key].do_recv();
+			mClients[key].DoRecv();
 			break;
 		}
-		case OP_SEND: {
-			if (0 == num_bytes) disconnect(client_id);
-			delete ex_over;
+		case eCompType::OP_SEND:
+		{
+			if (0 == numBytes)
+			{
+				Disconnect(client_id);
+			}
+			delete exOver;
 			break;
 		}
-		case OP_EVENT: {
-			process_event(ex_over->_message_buf);
+		case eCompType::OP_EVENT: 
+		{
+			ProcessEvent(exOver->mMessageBuf);
+			break;
+		}
+		default :
+		{
 			break;
 		}
 		}
 	}
 }
 
-void Server::init()
+void Server::Init()
 {
 	WSADATA WSAData;
 	WSAStartup(MAKEWORD(2, 2), &WSAData);
-
-	m_listenSocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
+	mListenSocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
 
 	SOCKADDR_IN server_addr;
 	memset(&server_addr, 0, sizeof(server_addr));
@@ -156,46 +161,50 @@ void Server::init()
 	server_addr.sin_port = htons(SERVERPORT);
 	server_addr.sin_addr.S_un.S_addr = INADDR_ANY;
 
-	bind(m_listenSocket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr));
+	bind(mListenSocket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr));
 
-	listen(m_listenSocket, SOMAXCONN);
+	listen(mListenSocket, SOMAXCONN);
 
 	SOCKADDR_IN cl_addr;
 	int addr_size = sizeof(cl_addr);
 	int client_id = 0;
 
-	m_hcp = CreateIoCompletionPort(INVALID_HANDLE_VALUE, 0, 0, 0);
-	CreateIoCompletionPort(reinterpret_cast<HANDLE>(m_listenSocket), m_hcp, 9999, 0);
+	mHCP = CreateIoCompletionPort(INVALID_HANDLE_VALUE, 0, 0, 0);
+	CreateIoCompletionPort(reinterpret_cast<HANDLE>(mListenSocket), mHCP, 9999, 0);
 
 	SOCKET c_socket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
-	OVER_EXP a_over;
-	a_over._comp_type = OP_ACCEPT;
-	a_over._wsabuf.buf = reinterpret_cast<CHAR*>(c_socket);
-	AcceptEx(m_listenSocket, c_socket, a_over._message_buf, 0, addr_size + 16, addr_size + 16, 0, &a_over._over);
+	OverEXP a_over;
+	a_over.mCompType = eCompType::OP_ACCEPT;
+	a_over.mWsaBuf.buf = reinterpret_cast<CHAR*>(c_socket);
+	AcceptEx(mListenSocket, c_socket, a_over.mMessageBuf, 0, addr_size + 16, addr_size + 16, 0, &a_over.mOver);
 
 	SYSTEM_INFO si;
 	GetSystemInfo(&si);
 	for (int i = 0; i < (int)si.dwNumberOfProcessors; ++i)
-		m_worker_threads.emplace_back(std::thread(&Server::do_worker, this));
+		mWorkerThreads.emplace_back(thread(&Server::DoWorker, this));
 
-	for (auto& th : m_worker_threads)
+	for (auto& th : mWorkerThreads)
 		th.join();
 
-	closesocket(m_listenSocket);
+	closesocket(mListenSocket);
 	WSACleanup();
 }
 
-void Server::process_event(char* message)
+void Server::ProcessEvent(char* cmessage)
 {
-	switch (message[1]) {
+	switch (cmessage[1]) {
 	case NONE:
-	default: {
+	{
+		break;
+	}
+	default: 
+	{
 		break;
 	}
 	}
 }
 
-HANDLE Server::get_handle()
+HANDLE Server::GetHandle()
 {
-	return m_hcp;
+	return mHCP;
 }
