@@ -13,7 +13,7 @@ void Timer::Init(HANDLE cHCP)
 	timer_thread.join();
 }
 
-void Timer::PushEvent(int ckey, EVENT_TYPE ceventType, int cdelayStartTime, char* cmessage)
+void Timer::PushEvent(int ckey, eEVENT_TYPE ceventType, int cdelayStartTime, char* cmessage)
 {
 	mTimerLock.lock();
 	TimerEvent te;
@@ -30,7 +30,8 @@ void Timer::TimerMain()
 	while (mIsRun)
 	{
 		mTimerLock.lock();
-		if ((mTimerQueue.empty() == FALSE) && (mTimerQueue.top().mStartTime <= system_clock::now())) {
+		if ((mTimerQueue.empty() == FALSE) && (mTimerQueue.top().mStartTime <= system_clock::now()))
+		{
 			TimerEvent te = mTimerQueue.top();
 			mTimerQueue.pop();
 			mTimerLock.unlock();

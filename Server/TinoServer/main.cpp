@@ -4,15 +4,12 @@
 #include "Timer.h"
 
 Server* pServer = new Server;
-Timer* pTimer = new Timer;
 
 int main(int argc, char* argv[])
 {
 	wcout.imbue(locale("korean"));
 
 	pServer->Init();
-	pTimer->Init(pServer->GetHandle());
 
-	delete pTimer;
 	delete pServer;
 }

@@ -24,10 +24,6 @@ enum PacketType {
 	SC_ROTATE_PLAYER,
 };
 
-enum EventType {
-	NONE
-};
-
 #pragma pack (push, 1)
 
 struct PACKET {
