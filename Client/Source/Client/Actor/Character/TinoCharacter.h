@@ -17,10 +17,19 @@ class CLIENT_API ATinoCharacter : public ABaseCharacter
 public:
 
 	ATinoCharacter();
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+	//
+	virtual void EndPlay(EEndPlayReason::Type Reason) override;
 
 public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
 
 private:
 	//키입력 관련 함수
@@ -43,4 +52,10 @@ private:
 		class USpringArmComponent* SpringArm;
 	UPROPERTY(VisibleDefaultsOnly)
 		class UCameraComponent* Camera;
+
+public:
+	virtual void RecvPacket() override;
+	virtual bool ConnectServer() override;
+
+
 };
