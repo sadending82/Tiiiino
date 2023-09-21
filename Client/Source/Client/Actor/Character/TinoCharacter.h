@@ -32,6 +32,9 @@ private:
 	void OnRunning();
 	void OffRunning();
 
+	virtual void Jump() override;
+	virtual void StopJumping() override;
+
 	void CreateDummy();
 
 private:
