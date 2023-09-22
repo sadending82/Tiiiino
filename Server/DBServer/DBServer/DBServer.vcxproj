@@ -141,11 +141,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="cSocket.cpp" />
     <ClCompile Include="DB.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="cSocket.h" />
     <ClInclude Include="DB.h" />
   </ItemGroup>
   <ItemGroup>
