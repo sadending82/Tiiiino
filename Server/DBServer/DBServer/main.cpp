@@ -13,6 +13,6 @@ int main(int argc, char* argv[])
 #ifdef DBTest
 	g_pDB->ConnectDB();
 
-	//g_pDB->DisconnectDB();
+	g_pDB->DisconnectDB();
 #endif
 }
