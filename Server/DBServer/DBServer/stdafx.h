@@ -26,4 +26,4 @@
 using namespace std;
 
 #include <mysql.h>
-#pragma comment(lib, "libmySQL.lib")
+#pragma comment(lib, "libmysql.lib")

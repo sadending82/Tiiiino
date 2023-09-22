@@ -7,14 +7,10 @@ class DB {
 public:
 	void SetmConn(MYSQL conn)				{ mConn = conn; }
 	void SetmConnection(MYSQL* connection)	{ mConnection = connection; }
-	void SetmSqlResult(MYSQL_RES* result)	{ mSqlResult = result; }
-	void SetmSqlRow(MYSQL_ROW row)			{ mSqlRow = row; }
 	void SetmStmt(MYSQL_STMT* stmt)			{ mStmt = stmt; }
 
 	MYSQL* GetmConnection() const			{ return mConnection; }
 	MYSQL* GetmConn()			 			{ return &mConn; }
-	MYSQL_RES* GetmSqlResult() const		{ return mSqlResult; }
-	MYSQL_ROW GetmSqlRow() const			{ return mSqlRow; }
 	MYSQL_STMT* GetmStmt() const			{ return mStmt; }
 
 	const char* GetHost()					{ return mHost; }
@@ -33,11 +29,9 @@ public:
 	void DisconnectDB();
 
 private:
-	MYSQL*		mConnection ;
+	MYSQL*		mConnection = NULL;
 	MYSQL		mConn;
-	MYSQL_RES*	mSqlResult;
-	MYSQL_ROW	mSqlRow;
-	MYSQL_STMT* mStmt;
+	MYSQL_STMT* mStmt		= NULL;
 
 	// юс╫ц
 	const char* mHost = "localhost";

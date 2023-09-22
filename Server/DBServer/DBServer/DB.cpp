@@ -5,7 +5,6 @@
 
 bool DB::ConnectDB()
 {
-
 	MYSQL conn;
 	if (mysql_init(&conn) == NULL) {
 #ifdef Test
@@ -36,7 +35,6 @@ bool DB::ConnectDB()
 #endif
 		return false;
 	}
-	mStmt = mysql_stmt_init(GetmConnection());
 
 	return true;
 }
@@ -59,6 +57,8 @@ vector<string> DB::SelectUserData(const string& UID)
 	vector<string> data;
 
 	string query = "SELECT * FROM tiiiino.userinfo WHERE UID = " + UID;
+
+	SetmStmt(mysql_stmt_init(GetmConnection()));
 
 	if (mysql_stmt_prepare(GetmStmt(), query.c_str(), query.length()) != 0) {
 #ifdef Test
