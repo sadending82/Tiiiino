@@ -6,7 +6,7 @@
 
 
 
-void main()
+int main()
 {
 	std::wcout.imbue(std::locale("korean"));
 	gMainServer = new MainServer();
@@ -15,4 +15,5 @@ void main()
 
 	delete gMainServer;
 
+	return 0;
 }

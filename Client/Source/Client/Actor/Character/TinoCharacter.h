@@ -54,8 +54,6 @@ private:
 		class UCameraComponent* Camera;
 
 public:
-	virtual void RecvPacket() override;
-	virtual bool ConnectServer() override;
 
 
 };

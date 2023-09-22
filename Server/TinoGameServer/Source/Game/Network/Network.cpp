@@ -24,6 +24,7 @@ Network::Network()
 	:mSocket(INVALID_SOCKET)
 	, mSocketState(eSocketState::ST_FREE)
 	, mPrevSize(0)
+	, mSocketID(INVALID_SOCKET_ID)
 {
 }
 

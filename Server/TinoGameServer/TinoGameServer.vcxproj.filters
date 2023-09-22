@@ -54,6 +54,9 @@
     <ClCompile Include="Source\Game\Thread\TinoThread.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Game\Room\Room.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Game\Object\Object.h">
@@ -90,6 +93,12 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Source\Game\Thread\TinoThread.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Game\Room\Room.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Game\Utility\Utility.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

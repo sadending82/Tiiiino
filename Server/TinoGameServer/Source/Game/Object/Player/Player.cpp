@@ -3,7 +3,8 @@
 Player::Player()
 	:mNickName(L"")
 	,mDepartment(0.0f)
-	,mSocketID(-1)
+	,mItem(eItemFlags::None)
+	,mRoomID(INVALID_ROOM_ID)
 {
 }
 

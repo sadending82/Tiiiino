@@ -4,20 +4,10 @@
 #include <concurrent_queue.h>
 #include <mutex>
 
+#include "../Utility/Utility.h"
 #include "../../../../../protocol.h"
 
 
-enum class eCOMMAND_IOCP {
-	CMD_ACCEPT, CMD_RECV, CMD_SEND, CMD_SERVER_RECV, CMD_DBSERVER_RECV, //Basic
-	CMD_GAME_WAIT, CMD_GAME_START, CMD_GAME_END, CMD_GAME_RESET //Game Cycle
-};
-
-enum class eSocketState
-{
-	ST_FREE,
-	ST_ACCEPT,
-	ST_INGAME
-};
 
 class WSA_OVER_EX {
 public:
@@ -57,6 +47,11 @@ public:
 	std::mutex& GetStateLockRef() { return mStateLock; }
 	eSocketState GetSocketState() const { return mSocketState; }
 	void SetSocketState(const eSocketState socketState) { mSocketState = socketState; }
+	int GetSocketID() const { return mSocketID; }
+	void SetSocketID(int id) { mSocketID = id; }
+
+	int GetMoveTime() const { return mLastMoveTime; }
+	void SetMoveTime(int movetime) { mLastMoveTime = movetime; }
 
 	void AcceptSetting(const eSocketState& socketState,const eCOMMAND_IOCP& commandIocp,SOCKET& socket);
 protected:
@@ -66,6 +61,8 @@ protected:
 	std::mutex mStateLock;
 	eSocketState mSocketState;
 	int mPrevSize;
+	int mSocketID;
+	int	mLastMoveTime;
 
 };
 

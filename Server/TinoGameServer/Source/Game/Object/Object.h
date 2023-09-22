@@ -1,16 +1,7 @@
 #pragma once
 #include <iostream>
+#include "../Utility/Utility.h"
 
-struct Vector3f {
-	float x, y, z;
-	Vector3f() = default;
-	Vector3f(float x, float y, float z) : x(x), y(y), z(z) {};
-};
-struct Vector4f {
-	float x, y, z, w;
-	Vector4f() = default;
-	Vector4f(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {};
-};
 class Object
 {
 public:
@@ -28,6 +19,7 @@ protected:
 	Vector4f mRotate;
 	
 	Vector3f mScale;
+	int move_time;
 
 };
 

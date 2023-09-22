@@ -1,12 +1,14 @@
 #pragma once
 #include <array>
 #include <vector>
+#include <map>
 
 #include "../Server.h"
 
 
 extern class MainServer* gMainServer;
 
+class Room;
 class MainServer : public Server
 {
 public:
@@ -27,6 +29,8 @@ public:
 	void send_move_packet(int player_id, int mover_id, const bool& inair, float value, const float& sx, const float& sy, const float& sz);
 private:
 	std::array<class Object*, MAX_OBJECT> mObjects;
+	std::map<int, Room*> mRooms;
+	//std::array< std::vector<class Object*>, MAX_ROOM> mRooms;
 	std::vector<std::thread> mWorkerThreads;
 	class WorkerThread* mWorkerThreadRef;
 	HANDLE mhiocp;

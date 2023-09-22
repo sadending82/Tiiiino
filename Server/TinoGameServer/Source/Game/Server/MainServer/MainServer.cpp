@@ -2,6 +2,7 @@
 
 #include "../../Object/Player/Player.h"
 #include "../../Thread/WorkerThread/WorkerThread.h"
+#include "../../Room/Room.h"
 
 MainServer* gMainServer;
 
@@ -9,7 +10,7 @@ using namespace std;
 
 MainServer::MainServer()
 {
-	
+
 }
 
 MainServer::~MainServer()
@@ -25,6 +26,12 @@ MainServer::~MainServer()
 	{
 		if (object)
 			delete object;
+	}
+
+	for (auto& room : mRooms)
+	{
+		if (room.second)
+			delete room.second;
 	}
 
 	delete mWorkerThreadRef;
@@ -70,6 +77,12 @@ void MainServer::init()
 		mObjects[i] = new Player();
 
 	}
+	for (int i = 0; i < MAX_ROOM; ++i)
+	{
+		Room* room = new Room();
+		room->Init();
+		mRooms.insert(make_pair(i,room));
+	}
 	mWorkerThreadRef = new WorkerThread(this);
 
 	std::cout << "Creating Worker Threads\n";
@@ -94,8 +107,8 @@ int MainServer::GenerateID()
 	for (int i = 0; i < MAX_USER; ++i)
 	{
 		auto user = dynamic_cast<Player*>(mObjects[i]);
-		if(user != nullptr)
-			if (user->CanMakeID()) 
+		if (user != nullptr)
+			if (user->CanMakeID())
 				return i;
 	}
 	std::cout << "Player is Over the MAX_USER" << std::endl;
@@ -132,6 +145,9 @@ void MainServer::send_move_packet(int player_id, int mover_id, const bool& inair
 	packet.ry = mObjects[mover_id]->GetRotate().y;
 	packet.rz = mObjects[mover_id]->GetRotate().z;
 	packet.rw = mObjects[mover_id]->GetRotate().w;
+	auto mover = dynamic_cast<Player*>(mObjects[mover_id]);
+	if(mover)
+		packet.move_time = mover->GetMoveTime();
 	packet.speed = value;
 	packet.sx = sx;
 	packet.sy = sy;
@@ -153,14 +169,24 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 		Player* player = dynamic_cast<Player*>(mObjects[client_id]);
 		//character->skintype = packet->skintype;
 		player->SetSocketID(client_id);
+		if (packet->roomID > MAX_ROOM)
+		{
+			//에러
+			cout << "잘못된 방에 입장하려 시도함.\n";
+			break;
+		}
+		player->SetRoomID(packet->roomID);
+		Room* pRoom = mRooms[player->GetRoomID()];
+		pRoom->AddObject(player);
+
 		send_login_ok_packet(client_id, "none");
 
-		
 
-		for (auto& other : mObjects) {
+		//나를 상대에게
+		for (auto& other : pRoom->GetObjectsRef()) {
 			Player* OtherPlayer = dynamic_cast<Player*>(other);
 			if (OtherPlayer == nullptr) break;
-			if (OtherPlayer->GetSocketID() == client_id) continue;
+			if (OtherPlayer->GetSocketID() == INVALID_SOCKET_ID || OtherPlayer->GetSocketID() == client_id) continue;
 
 
 			OtherPlayer->GetStateLockRef().lock();
@@ -175,7 +201,7 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 			//strcpy_s(sendpacket.name, character->name);
 			sendpacket.size = sizeof(sendpacket);
 			sendpacket.type = SC_ADD_PLAYER;
-			
+
 			sendpacket.x = player->GetPosition().x;;
 			sendpacket.y = player->GetPosition().y;
 			sendpacket.z = player->GetPosition().z;
@@ -186,10 +212,11 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 			OtherPlayer->SendPacket(&sendpacket, sizeof(sendpacket));
 		}
 
-		for (auto& other : mObjects) {
+		//상대를 나에게
+		for (auto& other : pRoom->GetObjectsRef()) {
 			Player* OtherPlayer = dynamic_cast<Player*>(other);
 			if (OtherPlayer == nullptr) break;
-			if (OtherPlayer->GetSocketID() == client_id) continue;
+			if (OtherPlayer->GetSocketID() == INVALID_SOCKET_ID || OtherPlayer->GetSocketID() == client_id) continue;
 
 			OtherPlayer->GetStateLockRef().lock();
 			if (eSocketState::ST_INGAME != OtherPlayer->GetSocketState()) {
@@ -215,12 +242,17 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 	case CS_MOVE: {
 		CS_MOVE_PACKET* packet = reinterpret_cast<CS_MOVE_PACKET*>(p);
 		Player* player = dynamic_cast<Player*>(object);
+		if (player == nullptr) break;
+		Room* pRoom = mRooms[player->GetRoomID()];
+
+		player->SetMoveTime(packet->move_time);
 		player->SetPosition(Vector3f(packet->x, packet->y, packet->z));
 		player->SetRotate(Vector4f(packet->rx, packet->ry, packet->rz, packet->rw));
-		for (auto& other : mObjects) {
+		for (auto& other : pRoom->GetObjectsRef()) {
 			Player* OtherPlayer = dynamic_cast<Player*>(other);
 			if (OtherPlayer == nullptr) break;
-			if (OtherPlayer->GetSocketID() == client_id) continue;
+			// && OtherPlayer->GetSocketID() == client_id movepacket에서핑테스트를 하려면 나도 나한테 보내야함 처리는 클라에서
+			if (OtherPlayer->GetSocketID() == INVALID_SOCKET_ID ) continue;
 
 
 			OtherPlayer->GetStateLockRef().lock();

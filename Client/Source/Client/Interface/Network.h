@@ -48,15 +48,39 @@ static std::shared_ptr<class Network> m_Network;
 class ATinoCharacter;
 
 
-void send_login_packet(SOCKET& sock); 
-void send_move_packet(SOCKET& sock, const bool& inair, const float& x, const float& y, const float& z, FQuat& rotate, const float& value, const FVector& speedVec);
+void send_login_packet(); 
+void send_move_packet(const bool& inair, const float& x, const float& y, const float& z, FQuat& rotate, const float& value, const FVector& speedVec);
+
+
+class WSA_OVER_EX {
+public:
+	WSA_OVER_EX() = default;
+	WSA_OVER_EX(unsigned char bytes, void* msg)
+	{
+		ZeroMemory(&mWsaOver, sizeof(mWsaOver));
+		mWsaBuf.buf = reinterpret_cast<char*>(mBuf);
+		mWsaBuf.len = bytes;
+		memcpy(mBuf, msg, bytes);
+	}
+	~WSA_OVER_EX()
+	{
+
+	}
+
+	unsigned char* GetBuf() { return mBuf; }
+	WSABUF& GetWsaBuf() { return mWsaBuf; }
+	WSAOVERLAPPED& GetWsaOver() { return mWsaOver; }
+
+
+private:
+	WSAOVERLAPPED mWsaOver;
+	WSABUF mWsaBuf;
+	unsigned char mBuf[BUF_SIZE];
+};
 
 
 class Network : public std::enable_shared_from_this<Network>
 {
-public:
-
-public:
 public:
 	Network();
 	~Network();
@@ -88,32 +112,18 @@ public:
 
 private:
 	bool isInit;
-};
 
-
-class WSA_OVER_EX {
 public:
-	WSA_OVER_EX() = default;
-	WSA_OVER_EX(unsigned char bytes, void* msg)
-	{
-		ZeroMemory(&mWsaOver, sizeof(mWsaOver));
-		mWsaBuf.buf = reinterpret_cast<char*>(mBuf);
-		mWsaBuf.len = bytes;
-		memcpy(mBuf, msg, bytes);
-	}
-	~WSA_OVER_EX()
-	{
-
-	}
-
-	unsigned char* GetBuf() { return mBuf; }
-	WSABUF& GetWsaBuf() { return mWsaBuf; }
-	WSAOVERLAPPED& GetWsaOver() { return mWsaOver; }
-
-
-private:
-	WSAOVERLAPPED mWsaOver;
-	WSABUF mWsaBuf;
-	unsigned char mBuf[BUF_SIZE];
+	int ClientID;
+	bool ConnectServer();
+	SOCKET s_socket;
+	SOCKADDR_IN server_addr;
+	WSA_OVER_EX recv_expover;
+	int		_prev_size;
+	bool bIsConnected;	//임시 변수
+	void RecvPacket() ;
+	// 112.152.55.49  127.0.0.1  , 112.153.53.142
+	const char* SERVER_ADDR = "127.0.0.1";
 };
+
 

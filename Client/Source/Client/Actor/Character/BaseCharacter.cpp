@@ -2,12 +2,8 @@
 
 // Sets default values
 ABaseCharacter::ABaseCharacter()
-: _prev_size(0)
-, ClientID(-1)
-, OverID(-1)
-, ServerSyncElapsedTime(0)
+: ServerSyncElapsedTime(0)
 , ServerSyncDeltaTime(0.016)
-, s_socket(INVALID_SOCKET)
 {
 	PrimaryActorTick.bCanEverTick = false;
 
@@ -25,17 +21,4 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-}
-
-
-
-void ABaseCharacter::RecvPacket()
-{
-
-}
-
-
-bool ABaseCharacter::ConnectServer()
-{
-	return true;
 }

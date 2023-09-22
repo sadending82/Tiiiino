@@ -19,10 +19,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>16.0</VCProjectVersion>
+    <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{a032d0c5-51ca-4e25-8585-90845d38162b}</ProjectGuid>
-    <RootNamespace>TinoGameServer</RootNamespace>
+    <ProjectGuid>{6e70ac17-21ce-428c-8d44-e37e358fa2ca}</ProjectGuid>
+    <RootNamespace>TinoDummyClient</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -70,27 +70,15 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>false</LinkIncremental>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LinkIncremental>false</LinkIncremental>
-  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
@@ -100,11 +88,11 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -114,11 +102,11 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
@@ -128,47 +116,23 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Game\Room\Room.cpp" />
-    <ClCompile Include="Source\Game\Server\MainServer\MainServer.cpp" />
-    <ClCompile Include="Source\Game\Server\Server.cpp" />
-    <ClCompile Include="Source\Game\Network\Network.cpp" />
-    <ClCompile Include="Source\Game\Object\MapObject\RotateObject\RotateObject.cpp" />
-    <ClCompile Include="Source\Game\Object\MapObject\MoveObject\MoveObject.cpp" />
-    <ClCompile Include="Source\Game\Object\MapObject\MapObject.cpp" />
-    <ClCompile Include="Source\Game\Object\MapObject\RotateObject\R_Platform\R_Platform.cpp" />
-    <ClCompile Include="Source\Game\Object\MapObject\MoveObject\M_Door\M_Door.cpp" />
-    <ClCompile Include="Source\Game\Object\Player\Player.cpp" />
-    <ClCompile Include="Source\Game\Object\Object.cpp" />
-    <ClCompile Include="Source\Game\main.cpp" />
-    <ClCompile Include="Source\Game\Thread\WorkerThread\WorkerThread.cpp" />
-    <ClCompile Include="Source\Game\Thread\TinoThread.cpp" />
+    <ClCompile Include="draw.cpp" />
+    <ClCompile Include="dummy.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Source\Game\Utility\Utility.h" />
-    <ClInclude Include="Source\Game\Room\Room.h" />
-    <ClInclude Include="Source\Game\Server\MainServer\MainServer.h" />
-    <ClInclude Include="Source\Game\Server\Server.h" />
-    <ClInclude Include="Source\Game\Network\Network.h" />
-    <ClInclude Include="Source\Game\Object\MapObject\RotateObject\RotateObject.h" />
-    <ClInclude Include="Source\Game\Object\MapObject\MoveObject\MoveObject.h" />
-    <ClInclude Include="Source\Game\Object\MapObject\MapObject.h" />
-    <ClInclude Include="Source\Game\Object\MapObject\RotateObject\R_Platform\R_Platform.h" />
-    <ClInclude Include="Source\Game\Object\MapObject\MoveObject\M_Door\M_Door.h" />
-    <ClInclude Include="Source\Game\Object\Player\Player.h" />
-    <ClInclude Include="Source\Game\Object\Object.h" />
-    <ClInclude Include="Source\Game\Thread\WorkerThread\WorkerThread.h" />
-    <ClInclude Include="Source\Game\Thread\TinoThread.h" />
+    <ClInclude Include="..\..\protocol.h" />
+    <ClInclude Include="dummy.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

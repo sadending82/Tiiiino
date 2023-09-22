@@ -26,27 +26,13 @@ public:
 
 	const int GetClientID() const { return ClientID; }
 	void SetClientID(const int id) { ClientID = id; }
-	const int GetOverID() const {return OverID; }
-	void SetOverID(const int id) { OverID = id; }
 
 protected:
 	//Server
 	UPROPERTY(EditAnywhere,Category = "Network")
 		int ClientID;
-	UPROPERTY(EditAnywhere, Category = "Network")
-		int OverID;	//overlapped I/O use this
 
 public:
-	// 112.152.55.49  127.0.0.1  , 112.153.53.142
-	const char* SERVER_ADDR = "127.0.0.1";
-public:
-	//Game Server
-	virtual bool ConnectServer() override;
-	SOCKET s_socket;
-	SOCKADDR_IN server_addr;
-	WSA_OVER_EX recv_expover;
-	int		_prev_size;
-	virtual void RecvPacket() override;
 
 	float ServerSyncElapsedTime;	//몇초 마다 이동 동기화 보낼것인지.
 	float ServerSyncDeltaTime;		//몇초 마다 이동 동기화 보낼것인지.
