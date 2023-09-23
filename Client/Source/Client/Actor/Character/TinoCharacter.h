@@ -27,8 +27,6 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 private:
@@ -48,12 +46,23 @@ private:
 
 private:
 
+	bool CanTumble(float DeltaTime);
+	void PlayTumbleMontage(float DeltaTime);
+
+private:
+
 	UPROPERTY(VisibleDefaultsOnly)
 		class USpringArmComponent* SpringArm;
 	UPROPERTY(VisibleDefaultsOnly)
 		class UCameraComponent* Camera;
 
-public:
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+		class UAnimMontage* TumbleMontage;
 
+	UPROPERTY(VisibleDefaultsOnly, Category = "Animation")
+		float CurrentTumbledTime;
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+		float MaxTumbledTime;
 
+	bool bCanTumbled;
 };

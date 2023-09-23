@@ -10,10 +10,9 @@
 #include "Animation/AnimMontage.h"
 
 ATinoCharacter::ATinoCharacter()
+	:MaxTumbledTime(0.5f)
 {
-	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
 	UHelpers::CreateComponent<USpringArmComponent>(this, &SpringArm, "SpringArm",GetCapsuleComponent());
 	UHelpers::CreateComponent<UCameraComponent>(this, &Camera, "Camera", SpringArm);
 
@@ -57,6 +56,7 @@ void ATinoCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	PlayTumbleMontage(DeltaTime);
 	if (Controller != nullptr)
 	{
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -89,6 +89,42 @@ void ATinoCharacter::Tick(float DeltaTime)
 
 	}
 }
+bool ATinoCharacter::CanTumble(float DeltaTime)
+{
+	bool ret = true;
+
+	ret &= GetCharacterMovement()->IsFalling();
+	ret &= (GetVelocity().Z < 0);
+	
+	if (ret && MaxTumbledTime > CurrentTumbledTime) CurrentTumbledTime += DeltaTime;
+
+	bCanTumbled = (CurrentTumbledTime >= MaxTumbledTime);
+
+	return ret;
+}
+
+
+void ATinoCharacter::PlayTumbleMontage(float DeltaTime)
+{
+	CanTumble(DeltaTime);
+
+	if (bCanTumbled && !GetCharacterMovement()->IsFalling())
+	{
+		if (TumbleMontage)
+		{
+			CurrentTumbledTime = 0.f;
+			bCanTumbled = false;
+			PlayAnimMontage(TumbleMontage);
+		}
+		else
+			CLog::Log("Asset TumbleMontage is Invalid");
+	}
+	else if (!bCanTumbled && !GetCharacterMovement()->IsFalling())
+	{
+		CurrentTumbledTime = 0.f;
+	}
+}
+
 
 void ATinoCharacter::OnMoveForward(float Axis)
 {
@@ -141,5 +177,3 @@ void ATinoCharacter::StopJumping()
 {
 	Super::StopJumping();
 }
-
-
