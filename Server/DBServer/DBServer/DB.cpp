@@ -5,8 +5,7 @@
 
 bool DB::ConnectDB()
 {
-	MYSQL conn;
-	if (mysql_init(&conn) == NULL) {
+	if (mysql_init(&mConn) == NULL) {
 #ifdef Test
 		std::cout << "init fail" << std::endl;
 #endif 
@@ -14,37 +13,39 @@ bool DB::ConnectDB()
 		return false;
 	}
 
-	SetmConn(conn);
-	SetmConnection(mysql_real_connect(&conn, GetHost(), GetUser(), GetPassWord(), GetDBName(), GetPort(), (const char*)NULL, 0));
-
-	if (GetmConnection() == NULL) {
+	if (mysql_real_connect(&mConn, GetHost(), GetUser(), GetPassWord(), GetDBName(), GetPort(), (const char*)NULL, 0) != 0) {
+#ifdef Test
+		std::cout << "connect success" << std::endl;
+#endif
+	}
+	else{
 #ifdef Test
 		std::cout << "connect fail" << std::endl;
 #endif
 		return false;
 	}
-	else {
-#ifdef Test
-		std::cout << "connect success" << std::endl;
-#endif
-	}
 
-	if (mysql_select_db(GetmConnection(), GetDBName())) {
+	if (mysql_select_db(&mConn, GetDBName())) {
 #ifdef Test
 		std::cout << "select db fail" << std::endl;
 #endif
 		return false;
 	}
 
+	if ((mStmt = mysql_stmt_init(&mConn)) == NULL) {
+		std::cout << "mysql_stmt_init failed" << std::endl;
+		return false;
+	}
+
 	return true;
 }
 
-bool DB::ExecuteQuery(MYSQL_STMT* stmt)
+bool DB::ExecuteQuery()
 {
-	int state = mysql_stmt_execute(stmt);
+	int state = mysql_stmt_execute(GetmStmt());
 	if (state != 0) {
 #ifdef Test
-		std::cout << "Query Execute error: " << mysql_stmt_error(stmt) << std::endl;
+		std::cout << "Query Execute error: " << mysql_stmt_error(GetmStmt()) << std::endl;
 #endif
 		return false;
 	}
@@ -58,11 +59,9 @@ vector<string> DB::SelectUserData(const string& UID)
 
 	string query = "SELECT * FROM tiiiino.userinfo WHERE UID = " + UID;
 
-	SetmStmt(mysql_stmt_init(GetmConnection()));
-
-	if (mysql_stmt_prepare(GetmStmt(), query.c_str(), query.length()) != 0) {
+	if (mysql_stmt_prepare(mStmt, query.c_str(), query.length()) != 0) {
 #ifdef Test
-		std::cout << "SelectUserData stmt prepare error: " << mysql_stmt_error(mStmt) << std::endl;
+		std::cout << "SelectUserData stmt prepare error: " << mysql_stmt_error(GetmStmt()) << std::endl;
 #endif
 		return data;
 	}
@@ -85,7 +84,7 @@ vector<string> DB::SelectUserData(const string& UID)
 		return data;
 	}
 
-	if (ExecuteQuery(GetmStmt()) != false) {
+	if (ExecuteQuery() != false) {
 		return data;
 	}
 
@@ -104,7 +103,7 @@ bool DB::InsertNewUser(const string& id, const string& passWord, const string& n
 
 	if (mysql_stmt_prepare(GetmStmt(), query.c_str(), query.length()) != 0) {
 #ifdef Test
-		std::cout << "InsertNewUser stmt prepare error: " << mysql_stmt_error(mStmt) << std::endl;
+		std::cout << "InsertNewUser stmt prepare error: " << mysql_stmt_error(GetmStmt()) << std::endl;
 #endif
 		return false;
 	}
@@ -134,7 +133,7 @@ bool DB::InsertNewUser(const string& id, const string& passWord, const string& n
 		return false;
 	}
 
-	if (ExecuteQuery(GetmStmt()) != false) {
+	if (ExecuteQuery() != false) {
 		return false;
 	}
 
@@ -145,7 +144,7 @@ bool DB::UpdateUserNickname(const string& uid, const string& nicknameToChange)
 {
 	string query = "UPDATE userinfo SET nick = ? WHERE UID = ?";
 
-	if (mysql_stmt_prepare(GetmStmt(), query.c_str(), query.length()) != 0) {
+	if (mysql_stmt_prepare(mStmt, query.c_str(), query.length()) != 0) {
 #ifdef Test
 		std::cout << "InsertNewUser stmt prepare error: " << mysql_stmt_error(mStmt) << std::endl;
 #endif
@@ -173,7 +172,7 @@ bool DB::UpdateUserNickname(const string& uid, const string& nicknameToChange)
 		return false;
 	}
 
-	if (ExecuteQuery(GetmStmt()) != false) {
+	if (ExecuteQuery() != false) {
 		return false;
 	}
 
@@ -183,5 +182,5 @@ bool DB::UpdateUserNickname(const string& uid, const string& nicknameToChange)
 void DB::DisconnectDB()
 {
 	mysql_stmt_close(GetmStmt());
-	mysql_close(GetmConn());
+	mysql_close(&mConn);
 }

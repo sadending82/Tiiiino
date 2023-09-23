@@ -25,5 +25,5 @@
 #pragma comment(lib, "MSWSock.lib")
 using namespace std;
 
-#include <mysql.h>
+#include "mysql.h"
 #pragma comment(lib, "libmysql.lib")

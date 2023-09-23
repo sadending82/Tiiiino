@@ -6,10 +6,8 @@ class DB {
 
 public:
 	void SetmConn(MYSQL conn)				{ mConn = conn; }
-	void SetmConnection(MYSQL* connection)	{ mConnection = connection; }
 	void SetmStmt(MYSQL_STMT* stmt)			{ mStmt = stmt; }
 
-	MYSQL* GetmConnection() const			{ return mConnection; }
 	MYSQL* GetmConn()			 			{ return &mConn; }
 	MYSQL_STMT* GetmStmt() const			{ return mStmt; }
 
@@ -20,7 +18,7 @@ public:
 	const int	GetPort()					{ return mPort; }
 
 	bool ConnectDB();
-	bool ExecuteQuery(MYSQL_STMT* stmt);
+	bool ExecuteQuery();
 
 	vector<string> SelectUserData(const string& UID);
 	bool InsertNewUser(const string& id, const string& passWord, const string& nickname);
@@ -29,7 +27,6 @@ public:
 	void DisconnectDB();
 
 private:
-	MYSQL*		mConnection = NULL;
 	MYSQL		mConn;
 	MYSQL_STMT* mStmt		= NULL;
 
