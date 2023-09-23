@@ -34,6 +34,7 @@ void ATinoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAxis("VerticalLock", this, &ATinoCharacter::OnVerticalLock);
 
 	PlayerInputComponent->BindAction("CreateDummy", EInputEvent::IE_Pressed, this, &ATinoCharacter::CreateDummy);
+	PlayerInputComponent->BindAction("Align", EInputEvent::IE_Pressed, this, &ATinoCharacter::Align);
 	PlayerInputComponent->BindAction("Jump", EInputEvent::IE_Pressed, this, &ATinoCharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", EInputEvent::IE_Released, this, &ATinoCharacter::StopJumping);
 	PlayerInputComponent->BindAction("Running", EInputEvent::IE_Pressed, this, &ATinoCharacter::OnRunning);
@@ -123,6 +124,11 @@ void ATinoCharacter::PlayTumbleMontage(float DeltaTime)
 	{
 		CurrentTumbledTime = 0.f;
 	}
+}
+
+void ATinoCharacter::Align()
+{
+	GetController()->SetControlRotation(GetActorForwardVector().Rotation());
 }
 
 

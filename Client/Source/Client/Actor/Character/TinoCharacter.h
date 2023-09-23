@@ -49,6 +49,8 @@ private:
 	bool CanTumble(float DeltaTime);
 	void PlayTumbleMontage(float DeltaTime);
 
+	void Align();
+
 private:
 
 	UPROPERTY(VisibleDefaultsOnly)
