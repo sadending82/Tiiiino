@@ -37,6 +37,7 @@ void ATinoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction("Align", EInputEvent::IE_Pressed, this, &ATinoCharacter::Align);
 	PlayerInputComponent->BindAction("Jump", EInputEvent::IE_Pressed, this, &ATinoCharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", EInputEvent::IE_Released, this, &ATinoCharacter::StopJumping);
+	PlayerInputComponent->BindAction("Dive", EInputEvent::IE_Pressed, this, &ATinoCharacter::Dive);
 	PlayerInputComponent->BindAction("Running", EInputEvent::IE_Pressed, this, &ATinoCharacter::OnRunning);
 	PlayerInputComponent->BindAction("Running", EInputEvent::IE_Released, this, &ATinoCharacter::OffRunning);
 }
@@ -131,6 +132,11 @@ void ATinoCharacter::Align()
 	GetController()->SetControlRotation(GetActorForwardVector().Rotation());
 }
 
+void ATinoCharacter::Dive()
+{
+	if(DiveMontage)
+		PlayAnimMontage(DiveMontage);
+}
 
 void ATinoCharacter::OnMoveForward(float Axis)
 {

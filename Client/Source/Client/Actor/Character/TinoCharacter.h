@@ -51,6 +51,8 @@ private:
 
 	void Align();
 
+	void Dive();
+
 private:
 
 	UPROPERTY(VisibleDefaultsOnly)
@@ -60,6 +62,8 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 		class UAnimMontage* TumbleMontage;
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+		class UAnimMontage* DiveMontage;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = "Animation")
 		float CurrentTumbledTime;
