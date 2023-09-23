@@ -1,0 +1,107 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+// 언리얼 클래스에서 헤더파일은 generated.h아래에 추가하면 에러가 발생하므로 위에 추가해야합니다.
+#pragma once
+
+#include <iostream>
+#include <memory>
+#include <WS2tcpip.h>
+#include "../../../../protocol.h"
+#include "CoreMinimal.h"
+
+
+
+
+
+
+
+enum class AnimType
+{
+};
+
+void CALLBACK send_callback(DWORD err, DWORD num_byte, LPWSAOVERLAPPED send_over, DWORD flag);
+void CALLBACK recv_Gamecallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv_over, DWORD flag);
+
+static std::shared_ptr<class Network> m_Network;
+class ATinoCharacter;
+
+
+void send_login_packet(); 
+void send_move_packet(const bool& inair, const float& x, const float& y, const float& z, FQuat& rotate, const float& value, const FVector& speedVec);
+
+
+class WSA_OVER_EX {
+public:
+	WSA_OVER_EX() = default;
+	WSA_OVER_EX(unsigned char bytes, void* msg)
+	{
+		ZeroMemory(&mWsaOver, sizeof(mWsaOver));
+		mWsaBuf.buf = reinterpret_cast<char*>(mBuf);
+		mWsaBuf.len = bytes;
+		memcpy(mBuf, msg, bytes);
+	}
+	~WSA_OVER_EX()
+	{
+
+	}
+
+	unsigned char* GetBuf() { return mBuf; }
+	WSABUF& GetWsaBuf() { return mWsaBuf; }
+	WSAOVERLAPPED& GetWsaOver() { return mWsaOver; }
+
+
+private:
+	WSAOVERLAPPED mWsaOver;
+	WSABUF mWsaBuf;
+	unsigned char mBuf[BUF_SIZE];
+};
+
+
+class CLIENT_API Network : public std::enable_shared_from_this<Network>
+{
+public:
+	Network();
+	~Network();
+
+
+	const int getNewId();
+	void release();
+	bool init();
+	void process_packet(unsigned char* p);
+
+	static std::shared_ptr<class Network> GetNetwork();
+
+
+public:
+	WSADATA WSAData;
+	void error_display(int err_no);
+
+
+	ATinoCharacter* mMyCharacter;
+	//FString MyCharacterName;
+	//FString MyCharacterPassWord;
+	UPROPERTY()
+		ATinoCharacter* mOtherCharacter[MAX_USER];
+	int mGeneratedID;
+	bool bLevelOpenTriggerEnabled = false;	//게임종료로 인한 초기화가 아닌, OpenLevel로 인한 초기화 일때 제한을 걸기 위함. 
+	bool bLoginFlag = false;	//로그인시 true, Game한판이 끝나고 다시 로비로 돌아올 때 
+	//Flag가 true라면 로그인 창을 띄우지 않기 위해서 있는 트릭.
+	short GameServerPort = -1;		//게임서버 접속용 port
+
+private:
+	bool isInit;
+
+public:
+	int ClientID;
+	bool ConnectServer();
+	SOCKET s_socket;
+	SOCKADDR_IN server_addr;
+	WSA_OVER_EX recv_expover;
+	int		_prev_size;
+	bool bIsConnected;	//임시 변수
+	void RecvPacket() ;
+	// 112.152.55.49  127.0.0.1  , 112.153.53.142
+	const char* SERVER_ADDR = "127.0.0.1";
+};
+
+
+

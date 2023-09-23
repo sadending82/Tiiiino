@@ -17,9 +17,19 @@ void UCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	if (OwnerCharacter)
 	{
-		Velocity = OwnerCharacter->GetVelocity();
-		Speed = OwnerCharacter->GetVelocity().Size2D();
-		Direction = UKismetAnimationLibrary::CalculateDirection(OwnerCharacter->GetVelocity(), OwnerCharacter->GetControlRotation());
-		bIsAir = OwnerCharacter->GetCharacterMovement()->IsFalling();
+
+		if (OwnerCharacter->GetController()->IsPlayerController()) {
+			Velocity = OwnerCharacter->GetVelocity();
+			Speed = OwnerCharacter->GetVelocity().Size2D();
+			Direction = UKismetAnimationLibrary::CalculateDirection(OwnerCharacter->GetVelocity(), OwnerCharacter->GetControlRotation());
+			bIsAir = OwnerCharacter->GetCharacterMovement()->IsFalling();
+		}
+		else {
+			auto otherplayer = Cast<ABaseCharacter>(OwnerCharacter);
+			if (otherplayer)
+			{
+				Speed = otherplayer->ServerSyncSpeed;
+			}
+		}
 	}
 }
