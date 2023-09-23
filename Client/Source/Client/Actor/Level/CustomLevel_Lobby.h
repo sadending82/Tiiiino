@@ -6,7 +6,9 @@
 #include "Actor/Level/CustomBaseLevel.h"
 #include "CustomLevel_Lobby.generated.h"
 
-
+/**
+ * 
+ */
 UCLASS()
 class CLIENT_API ACustomLevel_Lobby : public ACustomBaseLevel
 {
