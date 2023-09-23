@@ -180,6 +180,82 @@ bool DB::UpdateUserNickname(const string& uid, const string& nicknameToChange)
 	return true;
 }
 
+bool DB::UpdateUserCredit(const string& uid, double credit)
+{
+	string query = "UPDATE userinfo SET credit = ? WHERE UID = ?";
+
+	if (mysql_stmt_prepare(mStmt, query.c_str(), query.length()) != 0) {
+#ifdef Test
+		std::cout << "UpdateUserCredit stmt prepare error: " << mysql_stmt_error(mStmt) << std::endl;
+#endif
+		return false;
+	}
+
+	const int colNum = 2;
+
+	MYSQL_BIND binds[colNum];
+	memset(binds, 0, sizeof(binds));
+
+	binds[0].buffer_type = MYSQL_TYPE_DOUBLE;
+	binds[0].buffer = &credit;
+
+	int iuid = stoi(uid);
+	binds[1].buffer_type = MYSQL_TYPE_LONG;
+	binds[1].buffer = &iuid;
+
+	if (mysql_stmt_bind_param(mStmt, binds) != 0) {
+
+#ifdef Test
+		std::cout << "UpdateUserCredit stmt bind error: " << mysql_stmt_error(mStmt) << std::endl;
+#endif
+		return false;
+	}
+
+	if (ExecuteQuery() != false) {
+		return false;
+	}
+
+	return true;
+}
+
+bool DB::UpdateUserPoint(const string& uid, unsigned int point)
+{
+	string query = "UPDATE userinfo SET point = ? WHERE UID = ?";
+
+	if (mysql_stmt_prepare(mStmt, query.c_str(), query.length()) != 0) {
+#ifdef Test
+		std::cout << "UpdateUserPoint stmt prepare error: " << mysql_stmt_error(mStmt) << std::endl;
+#endif
+		return false;
+	}
+
+	const int colNum = 2;
+
+	MYSQL_BIND binds[colNum];
+	memset(binds, 0, sizeof(binds));
+
+	binds[0].buffer_type = MYSQL_TYPE_LONG;
+	binds[0].buffer = &point;
+
+	int iuid = stoi(uid);
+	binds[1].buffer_type = MYSQL_TYPE_LONG;
+	binds[1].buffer = &iuid;
+
+	if (mysql_stmt_bind_param(mStmt, binds) != 0) {
+
+#ifdef Test
+		std::cout << "UpdateUserPoint stmt bind error: " << mysql_stmt_error(mStmt) << std::endl;
+#endif
+		return false;
+	}
+
+	if (ExecuteQuery() != false) {
+		return false;
+	}
+
+	return true;
+}
+
 void DB::DisconnectDB()
 {
 	mysql_stmt_close(GetmStmt());

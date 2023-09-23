@@ -4,7 +4,7 @@
 
 DB* g_pDB = new DB;
 
-#define DBTest
+//#define DBTest
 
 int main(int argc, char* argv[])
 {
@@ -12,7 +12,6 @@ int main(int argc, char* argv[])
 
 #ifdef DBTest
 	g_pDB->ConnectDB();
-
 	g_pDB->DisconnectDB();
 #endif
 }
