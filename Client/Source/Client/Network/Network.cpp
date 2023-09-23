@@ -16,6 +16,7 @@ Network::Network()
 	, mOtherCharacter()
 	, mGeneratedID(0)
 	, isInit(false)
+	, bIsConnected(false)
 {
 	for (int i = 0; i < MAX_USER; ++i)
 	{

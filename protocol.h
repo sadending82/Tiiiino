@@ -1,4 +1,5 @@
 //test ip
+#pragma once
 constexpr auto SERVERIP = "127.0.0.1";
 
 constexpr int SERVERPORT = 3500;
@@ -6,8 +7,8 @@ constexpr int BUF_SIZE = 200;
 
 constexpr int MAX_USER = 300;
 constexpr int MAX_OBJECT = 3000;
-constexpr int MAX_NAME_SIZE = 20;	//임의값, 기획 통해서 정해주어야함.
-constexpr int MAX_ROOM = 10;		//임의값, 기획 통해서 정해주어야함.
+constexpr int MAX_NAME_SIZE = 20;	//닉네임, 중복검사 X
+constexpr int MAX_ROOM = 10;
 constexpr int MAX_ROOM_USER = 8;
 
 enum PacketType {

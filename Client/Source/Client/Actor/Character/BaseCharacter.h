@@ -2,11 +2,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "Interface/Network.h"
 #include "BaseCharacter.generated.h"
 
 UCLASS()
-class CLIENT_API ABaseCharacter : public ACharacter, public INetwork
+class CLIENT_API ABaseCharacter : public ACharacter
 {
 	GENERATED_BODY()
 

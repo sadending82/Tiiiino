@@ -7,31 +7,8 @@
 #include <WS2tcpip.h>
 #include "../../../../protocol.h"
 #include "CoreMinimal.h"
-#include "UObject/Interface.h"
-//#include "../Socket.h"
-#include "Network.generated.h"
-
-UINTERFACE(MinimalAPI)
-class UNetwork : public UInterface
-{
-	GENERATED_BODY()
-};
 
 
-class CLIENT_API INetwork
-{
-	GENERATED_BODY()
-
-public:
-
-	//Server code
-	
-	
-
-	virtual bool ConnectServer() { return true; };
-	virtual void RecvPacket() {};
-};
-//-----------------------------------
 
 
 
@@ -79,7 +56,7 @@ private:
 };
 
 
-class Network : public std::enable_shared_from_this<Network>
+class CLIENT_API Network : public std::enable_shared_from_this<Network>
 {
 public:
 	Network();
@@ -125,5 +102,6 @@ public:
 	// 112.152.55.49  127.0.0.1  , 112.153.53.142
 	const char* SERVER_ADDR = "127.0.0.1";
 };
+
 
 

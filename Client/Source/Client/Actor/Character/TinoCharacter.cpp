@@ -2,7 +2,7 @@
 #include "Actor/Controller/TinoController.h"
 #include "Global.h"
 
-#include "Interface/Network.h"
+#include "Network/Network.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
@@ -45,15 +45,6 @@ void ATinoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 void ATinoCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (GetController()->IsPlayerController())
-	{
-		Network::GetNetwork()->init();
-		Network::GetNetwork()->mMyCharacter = this;
-
-		if (Network::GetNetwork()->ConnectServer())
-			send_login_packet();
-	}
 }
 
 void ATinoCharacter::EndPlay(EEndPlayReason::Type Reason)

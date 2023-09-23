@@ -3,3 +3,12 @@
 
 #include "Actor/Level/CustomLevel_Stage1.h"
 
+void ACustomLevel_Stage1::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+bool ACustomLevel_Stage1::Conn()
+{
+	return false;
+}
