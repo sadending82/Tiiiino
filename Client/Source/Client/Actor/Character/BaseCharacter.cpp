@@ -2,6 +2,8 @@
 
 // Sets default values
 ABaseCharacter::ABaseCharacter()
+: ServerSyncElapsedTime(0)
+, ServerSyncDeltaTime(0.016)
 {
 	PrimaryActorTick.bCanEverTick = false;
 
@@ -20,4 +22,3 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
-

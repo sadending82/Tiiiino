@@ -3,3 +3,12 @@
 
 #include "Actor/Level/CustomBaseLevel.h"
 
+void ACustomBaseLevel::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+bool ACustomBaseLevel::Conn()
+{
+	return false;
+}

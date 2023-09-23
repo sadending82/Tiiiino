@@ -17,10 +17,17 @@ class CLIENT_API ATinoCharacter : public ABaseCharacter
 public:
 
 	ATinoCharacter();
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+	//
+	virtual void EndPlay(EEndPlayReason::Type Reason) override;
 
 public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	virtual void Tick(float DeltaTime) override;
 
 private:
 	//키입력 관련 함수
@@ -39,8 +46,23 @@ private:
 
 private:
 
+	bool CanTumble(float DeltaTime);
+	void PlayTumbleMontage(float DeltaTime);
+
+private:
+
 	UPROPERTY(VisibleDefaultsOnly)
 		class USpringArmComponent* SpringArm;
 	UPROPERTY(VisibleDefaultsOnly)
 		class UCameraComponent* Camera;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+		class UAnimMontage* TumbleMontage;
+
+	UPROPERTY(VisibleDefaultsOnly, Category = "Animation")
+		float CurrentTumbledTime;
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+		float MaxTumbledTime;
+
+	bool bCanTumbled;
 };

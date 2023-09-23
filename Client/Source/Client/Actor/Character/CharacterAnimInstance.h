@@ -13,6 +13,7 @@ class CLIENT_API UCharacterAnimInstance : public UAnimInstance
 	GENERATED_BODY()
 
 public:
+
 	virtual void NativeBeginPlay() override;
 
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;

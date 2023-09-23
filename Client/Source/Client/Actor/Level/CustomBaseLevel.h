@@ -13,5 +13,12 @@ UCLASS()
 class CLIENT_API ACustomBaseLevel : public ALevelScriptActor
 {
 	GENERATED_BODY()
-	
+public:
+	virtual bool Conn();
+protected:
+
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+
 };

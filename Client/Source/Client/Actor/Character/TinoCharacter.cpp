@@ -2,6 +2,7 @@
 #include "Actor/Controller/TinoController.h"
 #include "Global.h"
 
+#include "Network/Network.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
@@ -9,7 +10,9 @@
 #include "Animation/AnimMontage.h"
 
 ATinoCharacter::ATinoCharacter()
+	:MaxTumbledTime(0.5f)
 {
+	PrimaryActorTick.bCanEverTick = true;
 	UHelpers::CreateComponent<USpringArmComponent>(this, &SpringArm, "SpringArm",GetCapsuleComponent());
 	UHelpers::CreateComponent<UCameraComponent>(this, &Camera, "Camera", SpringArm);
 
@@ -36,6 +39,92 @@ void ATinoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction("Running", EInputEvent::IE_Pressed, this, &ATinoCharacter::OnRunning);
 	PlayerInputComponent->BindAction("Running", EInputEvent::IE_Released, this, &ATinoCharacter::OffRunning);
 }
+
+// Called when the game starts or when spawned
+void ATinoCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+void ATinoCharacter::EndPlay(EEndPlayReason::Type Reason)
+{
+	Network::GetNetwork()->release();
+}
+
+// Called every frame
+void ATinoCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	PlayTumbleMontage(DeltaTime);
+	if (Controller != nullptr)
+	{
+		const FRotator Rotation = Controller->GetControlRotation();
+
+		float PitchClamp = FMath::ClampAngle(Rotation.Pitch, -45.f, 30.f);
+		FRotator RotationControl(PitchClamp, Rotation.Yaw, Rotation.Roll);
+
+		if (GetController()->IsPlayerController()) {
+			SleepEx(0, true);
+			auto pos = GetTransform().GetLocation();
+			auto rot = GetTransform().GetRotation();
+
+			ServerSyncElapsedTime += DeltaTime;
+			if (ServerSyncDeltaTime < ServerSyncElapsedTime)
+			{
+				send_move_packet(GetCharacterMovement()->IsFalling(), pos.X, pos.Y, pos.Z, rot, GetVelocity().Size2D(), GetCharacterMovement()->Velocity);
+				ServerSyncElapsedTime = 0.0f;
+			}
+
+			float CharXYVelocity = ((ACharacter::GetCharacterMovement()->Velocity) * FVector(1.f, 1.f, 0.f)).Size();
+
+			
+		}
+		else {
+			//Update GroundSpeedd (22-04-05)
+			//GroundSpeedd = ServerStoreGroundSpeed;
+			//Update Interpolation (22-11-25)
+			//GetCharacterMovement()->Velocity = CharMovingSpeed;
+		}
+
+	}
+}
+bool ATinoCharacter::CanTumble(float DeltaTime)
+{
+	bool ret = true;
+
+	ret &= GetCharacterMovement()->IsFalling();
+	ret &= (GetVelocity().Z < 0);
+	
+	if (ret && MaxTumbledTime > CurrentTumbledTime) CurrentTumbledTime += DeltaTime;
+
+	bCanTumbled = (CurrentTumbledTime >= MaxTumbledTime);
+
+	return ret;
+}
+
+
+void ATinoCharacter::PlayTumbleMontage(float DeltaTime)
+{
+	CanTumble(DeltaTime);
+
+	if (bCanTumbled && !GetCharacterMovement()->IsFalling())
+	{
+		if (TumbleMontage)
+		{
+			CurrentTumbledTime = 0.f;
+			bCanTumbled = false;
+			PlayAnimMontage(TumbleMontage);
+		}
+		else
+			CLog::Log("Asset TumbleMontage is Invalid");
+	}
+	else if (!bCanTumbled && !GetCharacterMovement()->IsFalling())
+	{
+		CurrentTumbledTime = 0.f;
+	}
+}
+
 
 void ATinoCharacter::OnMoveForward(float Axis)
 {

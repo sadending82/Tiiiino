@@ -13,5 +13,13 @@ UCLASS()
 class CLIENT_API ACustomLevel_Stage1 : public ACustomBaseLevel
 {
 	GENERATED_BODY()
-	
+public:
+	virtual bool Conn() override;
+protected:
+
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+
+
 };
