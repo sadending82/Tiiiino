@@ -16,6 +16,7 @@ bool DB::ConnectDB()
 	if (mysql_real_connect(&mConn, GetHost(), GetUser(), GetPassWord(), GetDBName(), GetPort(), (const char*)NULL, 0) != 0) {
 #ifdef Test
 		std::cout << "connect success" << std::endl;
+		mysql_query(&mConn, "set names euckr");
 #endif
 	}
 	else{
