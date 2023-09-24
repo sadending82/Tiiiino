@@ -1,6 +1,6 @@
 #pragma once
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
-#include "DB.h"
+#include "cDB.h"
 
 DB* g_pDB = new DB;
 

@@ -27,3 +27,9 @@ using namespace std;
 
 #include "mysql.h"
 #pragma comment(lib, "libmysql.lib")
+
+constexpr int MAXLOBBY = 10;
+constexpr int INVALIDKEY = -1;
+constexpr int BUFSIZE = 200;
+
+constexpr int STARTKEY = 1;
