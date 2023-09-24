@@ -2,8 +2,8 @@
 
 
 #include "Actor/RotatingPole.h"
-#include "../Engine/Classes/Components/StaticMeshComponent.h"
-#include "../Engine/Classes//GameFramework/Character.h"
+#include "Components/StaticMeshComponent.h"
+#include "GameFramework/Character.h"
 
 // Sets default values
 ARotatingPole::ARotatingPole()
@@ -26,7 +26,10 @@ void ARotatingPole::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimi
 {
 	ACharacter* hitCharacter = Cast<ACharacter>(Other);
 
-	hitCharacter->LaunchCharacter(-HitNormal * ElasticForce, false, false);
+	if (hitCharacter != nullptr)
+	{
+		hitCharacter->LaunchCharacter(-HitNormal * ElasticForce, false, false);
+	}
 }
 
 

@@ -4,6 +4,8 @@
 #include "Actor/AcceleratePlate.h"
 #include "Global.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
+
 
 
 // Sets default values
@@ -11,14 +13,13 @@ AAcceleratePlate::AAcceleratePlate()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
 	SceneRootComponent = CreateDefaultSubobject <USceneComponent>("RootSceneComponent");
-	OverlapMesh = CreateDefaultSubobject<UBoxComponent>(TEXT("AcceleratePlateMesh"));
-	MainMesh = CreateDefaultSubobject<UStaticMeshComponent>("AcceleratePlateMainMesh");
-	
+	MainMesh = CreateDefaultSubobject<UStaticMeshComponent>("MainMesh");
 
 	SceneRootComponent->SetupAttachment(RootComponent);
-	OverlapMesh->SetupAttachment(SceneRootComponent);
 	MainMesh->SetupAttachment(SceneRootComponent);
+	UHelpers::CreateComponent<UStaticMeshComponent>(this, &OverlapMesh, "OverlapMesh", SceneRootComponent);
 
 	OverlapMesh->OnComponentBeginOverlap.AddDynamic(this, &AAcceleratePlate::OnOverlapBegin);
 	OverlapMesh->OnComponentEndOverlap.AddDynamic(this, &AAcceleratePlate::OnOverlapEnd);
@@ -35,17 +36,47 @@ void AAcceleratePlate::BeginPlay()
 void AAcceleratePlate::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	ACharacter* MyCharacter = Cast<ACharacter>(OtherActor);
-
-	CLog::Log("Overlapped!");
-
 	if (MyCharacter != nullptr)
 	{
-		CLog::Log("CASTING_SUCCESS");
+		bIsAccelerationOn = true;
+		MyCharacter->GetCharacterMovement()->MaxWalkSpeed = AccelSpeed;
 	}
 }
 
 void AAcceleratePlate::NotifyActorEndOverlap(AActor* OtherActor)
 {
+	ACharacter* MyCharacter = Cast<ACharacter>(OtherActor);
+	if (MyCharacter != nullptr)
+	{
+		bIsAccelerationOn = false;
+
+
+		TArray<AActor*> AccelActors;
+
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AAcceleratePlate::StaticClass(), AccelActors);
+
+		bool bIsSomeoneAccelOn = false;
+
+		for (auto& actor : AccelActors)
+		{
+			AAcceleratePlate* AccelActor = Cast<AAcceleratePlate>(actor);
+
+			if (AccelActor != nullptr)
+			{
+				if (AccelActor == this) continue;
+
+				if (AccelActor->bIsAccelerationOn) {
+					bIsSomeoneAccelOn = true;
+					break;
+				}
+			}
+		}
+
+		if (!bIsSomeoneAccelOn)
+		{
+			MyCharacter->GetCharacterMovement()->MaxWalkSpeed = BaseSpeed;
+		}
+	}
 }
 
 void AAcceleratePlate::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -53,7 +84,6 @@ void AAcceleratePlate::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
 	ACharacter* MyCharacter = Cast<ACharacter>(OtherActor);
 	if (MyCharacter != nullptr)
 	{
-		CLog::Log("CASTING_SUCCESS_OOB");
 	}
 }
 
