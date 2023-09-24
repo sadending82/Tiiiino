@@ -159,8 +159,10 @@ void Socket::processPacket(int key, unsigned char* buf)
 {
     switch (buf[1])
     {
+        // 로그인 요청
     case 0:
     {
+        bool bCheckLogin = CheckLogin(key, buf);
         break;
     }
     default:
@@ -168,4 +170,11 @@ void Socket::processPacket(int key, unsigned char* buf)
         break;
     }
     }
+}
+
+bool Socket::CheckLogin(int key, unsigned char* buf)
+{
+    //vector<string> userData = m_pDB->SelectUserData();
+
+    return false;
 }

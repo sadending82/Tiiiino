@@ -11,7 +11,10 @@ int main(int argc, char* argv[])
 {
 	std::wcout.imbue(std::locale("korean"));
 	g_pDB->ConnectDB();
-	g_pSocket->ServerReady(g_pDB);
+	//g_pSocket->ServerReady(g_pDB);
+
+	g_pDB->SelectUserData("1");
+	//g_pDB->SelectUserData("aaaa", "bbbb");
 
 	g_pDB->DisconnectDB();
 }

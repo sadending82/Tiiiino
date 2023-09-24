@@ -7,7 +7,7 @@ bool DB::ConnectDB()
 {
 	if (mysql_init(&mConn) == NULL) {
 #ifdef Test
-		std::cout << "init fail" << std::endl;
+		std::cout << "Mysql Handle Init Fail" << std::endl;
 #endif 
 
 		return false;
@@ -15,26 +15,26 @@ bool DB::ConnectDB()
 
 	if (mysql_real_connect(&mConn, GetHost(), GetUser(), GetPassWord(), GetDBName(), GetPort(), (const char*)NULL, 0) != 0) {
 #ifdef Test
-		std::cout << "connect success" << std::endl;
+		std::cout << "DataBase Connect Success" << std::endl;
 		mysql_query(&mConn, "set names euckr");
 #endif
 	}
 	else{
 #ifdef Test
-		std::cout << "connect fail" << std::endl;
+		std::cout << "DataBase Connect Fail" << std::endl;
 #endif
 		return false;
 	}
 
 	if (mysql_select_db(&mConn, GetDBName())) {
 #ifdef Test
-		std::cout << "select db fail" << std::endl;
+		std::cout << "Select DataBase Fail" << std::endl;
 #endif
 		return false;
 	}
 
 	if ((mStmt = mysql_stmt_init(&mConn)) == NULL) {
-		std::cout << "mysql_stmt_init failed" << std::endl;
+		std::cout << "mysql_stmt_init fail" << std::endl;
 		return false;
 	}
 
@@ -58,7 +58,7 @@ vector<string> DB::SelectUserData(const string& UID)
 {
 	vector<string> data;
 
-	string query = "SELECT * FROM tiiiino.userinfo WHERE UID = " + UID;
+	string query = "SELECT * FROM tiiiino.userinfo WHERE UID = "+UID;
 
 	if (mysql_stmt_prepare(mStmt, query.c_str(), query.length()) != 0) {
 #ifdef Test
@@ -67,11 +67,24 @@ vector<string> DB::SelectUserData(const string& UID)
 		return data;
 	}
 
+	/*MYSQL_BIND paramBind;
+	int iuid = stoi(UID);
+	paramBind.buffer_type = MYSQL_TYPE_LONG;
+	paramBind.buffer_length = iuid;
+
+
+	if (mysql_stmt_bind_param(GetmStmt(), &paramBind) != 0) {
+#ifdef Test
+		std::cout << "SelectUserData stmt param bind error: " << mysql_stmt_error(GetmStmt()) << std::endl;
+#endif
+		return data;
+	}*/
+
 	const int colNum = 6;
 	MYSQL_BIND resultBinds[colNum];
 	memset(resultBinds, 0, sizeof(resultBinds));
 	char bindData[colNum][50];
-	for (int i = 0; i< colNum; ++i)
+	for (int i = 0; i < colNum; ++i)
 	{
 		resultBinds[i].buffer_type = MYSQL_TYPE_STRING;
 		resultBinds[i].buffer_length = sizeof(bindData[i]);
@@ -93,7 +106,75 @@ vector<string> DB::SelectUserData(const string& UID)
 
 	for (string col : bindData) {
 		data.push_back(col);
+		cout << col << endl;
 	}
+
+	return data;
+}
+
+vector<string> DB::SelectUserData(const string& id, const string& password)
+{
+	vector<string> data;
+
+	string query = "SELECT UID, nick, credit, point FROM tiiiino.userinfo WHERE id = ? AND password = ?";
+
+	if (mysql_stmt_prepare(mStmt, query.c_str(), query.length()) != 0) {
+#ifdef Test
+		std::cout << "SelectUserData stmt prepare error: " << mysql_stmt_error(GetmStmt()) << std::endl;
+#endif
+		return data;
+	}
+
+	const int paramColNum = 2;
+	MYSQL_BIND paramBinds[paramColNum];
+	memset(paramBinds, 0, sizeof(paramBinds));
+
+	paramBinds[0].buffer_type = MYSQL_TYPE_STRING;
+	paramBinds[0].buffer = (void*)id.c_str();
+	paramBinds[0].buffer_length = id.length();
+
+	paramBinds[1].buffer_type = MYSQL_TYPE_STRING;
+	paramBinds[1].buffer = (void*)password.c_str();
+	paramBinds[1].buffer_length = password.length();
+
+	if (mysql_stmt_bind_param(GetmStmt(), paramBinds) != 0) {
+#ifdef Test
+			std::cout << "SelectUserData stmt param bind error: " << mysql_stmt_error(GetmStmt()) << std::endl;
+#endif
+		return data;
+	}
+
+
+	const int resColNum = 4;
+	MYSQL_BIND resultBinds[resColNum];
+	memset(resultBinds, 0, sizeof(resultBinds));
+	char bindData[resColNum][50];
+	for (int i = 0; i < resColNum; ++i)
+	{
+		resultBinds[i].buffer_type = MYSQL_TYPE_STRING;
+		resultBinds[i].buffer_length = sizeof(bindData[i]);
+		resultBinds[i].buffer = bindData[i];
+	}
+
+	if (mysql_stmt_bind_result(GetmStmt(), resultBinds) != 0) {
+#ifdef Test
+		std::cout << "SelectUserData stmt result bind error: " << mysql_stmt_error(GetmStmt()) << std::endl;
+#endif
+		return data;
+	}
+
+	if (ExecuteQuery() != false) {
+		return data;
+	}
+
+	mysql_stmt_fetch(GetmStmt());
+
+	for (string col : bindData) {
+		data.push_back(col);
+		cout << col << endl;
+	}
+
+	cout << data.size() << endl;
 
 	return data;
 }
