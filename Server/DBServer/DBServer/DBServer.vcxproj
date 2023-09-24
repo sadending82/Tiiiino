@@ -146,13 +146,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="cSocket.cpp" />
-    <ClCompile Include="DB.cpp" />
+    <ClCompile Include="cDB.cpp" />
+    <ClCompile Include="cExOver.h" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\ServerProtocol.h" />
+    <ClInclude Include="cSession.h" />
     <ClInclude Include="cSocket.h" />
-    <ClInclude Include="DB.h" />
+    <ClInclude Include="cDB.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="schema.txt" />
