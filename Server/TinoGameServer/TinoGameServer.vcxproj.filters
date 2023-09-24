@@ -57,6 +57,9 @@
     <ClCompile Include="Source\Game\Room\Room.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Game\Server\LobbyServer\LobbyServer.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Game\Object\Object.h">
@@ -99,6 +102,9 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Source\Game\Utility\Utility.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Game\Server\LobbyServer\LobbyServer.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

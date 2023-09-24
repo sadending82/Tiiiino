@@ -1,6 +1,7 @@
 #pragma once
 #include "Session.h"
 #include "Timer.h"
+#include "../ServerProtocol.h"
 
 constexpr int MAX_THREAD = 6;
 constexpr int INVALID_KEY = -1;
@@ -9,12 +10,15 @@ class Server {
 public:
 	void Disconnect(int cID);
 	int GetNewClientID();
-	void ProcessPacket(int cID, char* cpacket);
+	int GetNewServerID();
+	void ProcessPacket(int cID, unsigned char* cpacket);
+	void ProcessPacketServer(int sID, unsigned char* spacket);
 	void DoWorker();
 	void Init();
-	void ProcessEvent(char* cmessage);
+	void ProcessEvent(unsigned char* cmessage);
 public:
 	array <Session, MAX_USER> mClients;
+	array <Session, MAXGAMESERVER> mServers;
 private:
 	SOCKET mListenSocket;
 	HANDLE mHCP;

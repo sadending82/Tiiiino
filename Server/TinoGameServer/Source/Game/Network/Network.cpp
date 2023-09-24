@@ -39,6 +39,9 @@ void Network::DisConnect()
 	closesocket(mSocket);
 	mSocketState = eSocketState::ST_FREE;
 	mStateLock.unlock();
+#ifdef _DEBUG
+	cout << "Connection DisConnect\n";
+#endif
 	/*
 	do SomeThing;
 	*/

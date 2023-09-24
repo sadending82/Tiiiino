@@ -27,6 +27,10 @@ public:
 
 	void send_login_ok_packet(int player_id, const char* playername);
 	void send_move_packet(int player_id, int mover_id, const bool& inair, float value, const float& sx, const float& sy, const float& sz);
+
+private:
+	void ConnectLobbyServer();
+
 private:
 	std::array<class Object*, MAX_OBJECT> mObjects;
 	std::map<int, Room*> mRooms;

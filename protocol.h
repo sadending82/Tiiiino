@@ -2,8 +2,9 @@
 #pragma once
 constexpr auto SERVERIP = "127.0.0.1";
 
-constexpr int SERVERPORT = 3500;
-constexpr int BUF_SIZE = 200;
+constexpr int GAMESERVERPORT = 3600;
+constexpr int LOBBYSERVERPORT = 3500;
+constexpr int BUF_SIZE = 128;
 
 constexpr int MAX_USER = 300;
 constexpr int MAX_OBJECT = 3000;
@@ -12,17 +13,23 @@ constexpr int MAX_ROOM = 10;
 constexpr int MAX_ROOM_USER = 8;
 
 enum PacketType {
-	// Client To Server
+	// Client To GameServer
 	CS_LOGIN,
 	CS_MOVE,
     CS_CHAT,
 
-	// Server To Client
+	// Client To LobbyServer
+	CL_LOGIN,
+
+	// GameServer To Client
 	SC_LOGIN_OK,
 	SC_LOGIN_FAIL,
 	SC_ADD_PLAYER,
 	SC_REMOVE_PLAYER,
-	SC_MOVE_PLAYER
+	SC_MOVE_PLAYER,
+
+	// Lobbyserver To Client
+	LC_LOGIN_OK,
 };
 
 #pragma pack (push, 1)
@@ -51,6 +58,12 @@ struct CS_CHAT_PACKET : public PACKET {
 
 	char mess[BUF_SIZE];
 };
+
+//-----------------------------------
+struct CL_LOGIN_PACKET :public PACKET {
+	char id[MAX_NAME_SIZE];
+	char password[MAX_NAME_SIZE];
+};
 //-----------------------------------
 
 struct SC_LOGIN_OK_PACKET : public PACKET {
@@ -72,6 +85,11 @@ struct SC_ADD_PLAYER_PACKET : public PACKET {
 	char	name[MAX_NAME_SIZE];
 };
 
+//---------------------------
+struct LC_LOGIN_OK_PACKET : public PACKET {
+	int id;
+	int RoomID;
+};
 struct EVENT {
 	unsigned char size;
 	char	type;
