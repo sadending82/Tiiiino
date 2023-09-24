@@ -26,6 +26,7 @@ public:
 
 	//APlayerController* GetController();
 	TSubclassOf<UUserWidget> GetLobbyWidgetClass() const { return LobbyWidgetClass; }
+	TSubclassOf<UUserWidget> GetLoginWidgetClass() const { return StartingWidgetClass; }
 
 protected:
 	virtual void BeginPlay() override;

@@ -23,10 +23,10 @@ public:
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void TryGameStart();
 
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
-	TSubclassOf<UUserWidget> NextWidgetClass;
+	UPROPERTY(meta = (BindWidget))
+	class UButton* BackButton;
 
-	UPROPERTY()
-	UUserWidget* CurrentWidget;
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void TryBack();
+
 };
