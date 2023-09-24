@@ -16,6 +16,8 @@ public:
 
 	void Setm_pDB(DB* pDB) { m_pDB = pDB; }
 
+	bool CheckLogin(int key, unsigned char* buf);
+
 private:
 	SOCKADDR_IN mServerAddr;
 	HANDLE mHcp;
