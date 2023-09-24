@@ -14,5 +14,7 @@ public class Client : ModuleRules
 
         //상대경로로 등록가능
         PublicIncludePaths.Add(ModuleDirectory);
+
+        bUseUnity = false;
     }
 }
