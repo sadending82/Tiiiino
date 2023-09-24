@@ -25,7 +25,7 @@ public:
 	void CreateDummy();
 
 	//APlayerController* GetController();
-	TSubclassOf<UUserWidget> GetNextWidgetClass() const { return NextWidgetClass; }
+	TSubclassOf<UUserWidget> GetLobbyWidgetClass() const { return LobbyWidgetClass; }
 
 protected:
 	virtual void BeginPlay() override;
@@ -34,7 +34,7 @@ protected:
 	TSubclassOf<UUserWidget> StartingWidgetClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
-	TSubclassOf<UUserWidget> NextWidgetClass;
+	TSubclassOf<UUserWidget> LobbyWidgetClass;
 
 	UPROPERTY()
 	UUserWidget* CurrentWidget;

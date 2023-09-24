@@ -31,7 +31,7 @@ void ULoginUIWidget::TryLogin()
 	//ATinoController::ChangeMenuWidget(ATinoController::GetNextWidgetClass());
 	
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	TinoController->ChangeMenuWidget(TinoController->GetNextWidgetClass());
+	TinoController->ChangeMenuWidget(TinoController->GetLobbyWidgetClass());
 }
 
 void ULoginUIWidget::TryNewAccounts()
