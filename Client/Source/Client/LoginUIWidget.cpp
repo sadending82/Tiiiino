@@ -4,6 +4,10 @@
 #include "LoginUIWidget.h"
 #include "Components/Button.h"
 #include "Components/EditableTextBox.h"
+#include "Actor/Controller/TinoController.h"
+#include "GameFramework/Pawn.h"
+
+#include "Global.h"
 
 void ULoginUIWidget::NativePreConstruct()
 {
@@ -21,23 +25,29 @@ void ULoginUIWidget::NativeDestruct()
 void ULoginUIWidget::TryLogin()
 {
 	// Login Button Onclicked
-	//UE_LOG(LogTemp, Error, TEXT("UnExpected Tree ID"));
+	// UE_LOG(LogTemp, Error, TEXT("UnExpected Tree ID"));
+
+	// Change Lobby Scene
+	//ATinoController::ChangeMenuWidget(ATinoController::GetNextWidgetClass());
+	
+	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	TinoController->ChangeMenuWidget(TinoController->GetNextWidgetClass());
 }
 
 void ULoginUIWidget::TryNewAccounts()
 {
 	// NewAccounts Button Onclicked
-	//UE_LOG(LogTemp, Error, TEXT("UnExpected Tree NewAccounts"));
+	// UE_LOG(LogTemp, Error, TEXT("UnExpected Tree NewAccounts"));
 }
 
 void ULoginUIWidget::InputLoginID(const FText& Text)
 {
 	// Input ID Textbox
-	//UE_LOG(LogTemp, Error, TEXT("UnExpected Tree IDInput"));
+	// UE_LOG(LogTemp, Error, TEXT("UnExpected Tree IDInput"));
 }
 
 void ULoginUIWidget::InputLoginPassword(const FText& Text)
 {
 	// Input Password Textbox
-	//UE_LOG(LogTemp, Error, TEXT("UnExpected Tree PasswordInput"));
+	// UE_LOG(LogTemp, Error, TEXT("UnExpected Tree PasswordInput"));
 }

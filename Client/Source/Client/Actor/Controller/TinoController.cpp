@@ -1,5 +1,6 @@
 #include "Actor/Controller/TinoController.h"
 #include "Actor/Character/TinoCharacter.h"
+#include "GameFramework/PlayerController.h"
 //#include "Global.h"
 
 ATinoController::ATinoController()

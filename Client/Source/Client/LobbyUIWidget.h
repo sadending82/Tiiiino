@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "LoginUIWidget.generated.h"
+#include "LobbyUIWidget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class CLIENT_API ULoginUIWidget : public UUserWidget
+class CLIENT_API ULobbyUIWidget : public UUserWidget
 {
 	GENERATED_BODY()
 public:
@@ -18,28 +18,10 @@ public:
 	virtual void NativeDestruct() override;
 
 	UPROPERTY(meta = (BindWidget))
-	class UButton* LoginButton;
-
-	UPROPERTY(meta = (BindWidget))
-	class UButton* NewAccountsButton;
+	class UButton* GameStartButton;
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	void TryLogin();
-
-	UFUNCTION()
-	void TryNewAccounts();
-
-	UPROPERTY(meta = (BindWidget))
-	class UEditableTextBox* LoginIDTextBox;
-
-	UFUNCTION()
-	void InputLoginID(const FText& Text);
-
-	UPROPERTY(meta = (BindWidget))
-	class UEditableTextBox* LoginPasswordTextBox;
-
-	UFUNCTION()
-	void InputLoginPassword(const FText& Text);
+	void TryGameStart();
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
