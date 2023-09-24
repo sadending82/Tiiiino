@@ -22,7 +22,7 @@ public:
 		DWORD recvFlag = 0;
 		memset(&mRecvOver.mOver, 0, sizeof(mRecvOver.mOver));
 		mRecvOver.mWsaBuf.len = BUF_SIZE - mPrevRemain;
-		mRecvOver.mWsaBuf.buf = mRecvOver.mMessageBuf + mPrevRemain;
+		mRecvOver.mWsaBuf.buf = reinterpret_cast<char*>(mRecvOver.mMessageBuf + mPrevRemain);
 		WSARecv(mSocket, &mRecvOver.mWsaBuf, 1, 0, &recvFlag, &mRecvOver.mOver, 0);
 	}
 	void DoSend(void* packet)

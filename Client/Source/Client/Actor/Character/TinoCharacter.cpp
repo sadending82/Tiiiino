@@ -66,7 +66,7 @@ void ATinoCharacter::Tick(float DeltaTime)
 		float PitchClamp = FMath::ClampAngle(Rotation.Pitch, -45.f, 30.f);
 		FRotator RotationControl(PitchClamp, Rotation.Yaw, Rotation.Roll);
 
-		if (GetController()->IsPlayerController()) {
+		if (GetController()->IsPlayerController() && Network::GetNetwork()->bIsConnected) {
 			SleepEx(0, true);
 			auto pos = GetTransform().GetLocation();
 			auto rot = GetTransform().GetRotation();
@@ -74,7 +74,7 @@ void ATinoCharacter::Tick(float DeltaTime)
 			ServerSyncElapsedTime += DeltaTime;
 			if (ServerSyncDeltaTime < ServerSyncElapsedTime)
 			{
-				send_move_packet(GetCharacterMovement()->IsFalling(), pos.X, pos.Y, pos.Z, rot, GetVelocity().Size2D(), GetCharacterMovement()->Velocity);
+				send_move_packet(Network::GetNetwork()->s_socket,GetCharacterMovement()->IsFalling(), pos.X, pos.Y, pos.Z, rot, GetVelocity().Size2D(), GetCharacterMovement()->Velocity);
 				ServerSyncElapsedTime = 0.0f;
 			}
 

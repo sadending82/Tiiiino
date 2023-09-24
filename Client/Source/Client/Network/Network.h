@@ -20,13 +20,15 @@ enum class AnimType
 
 void CALLBACK send_callback(DWORD err, DWORD num_byte, LPWSAOVERLAPPED send_over, DWORD flag);
 void CALLBACK recv_Gamecallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv_over, DWORD flag);
+void CALLBACK recv_Lobbycallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv_over, DWORD flag);
 
 static std::shared_ptr<class Network> m_Network;
 class ATinoCharacter;
 
 
-void send_login_packet(); 
-void send_move_packet(const bool& inair, const float& x, const float& y, const float& z, FQuat& rotate, const float& value, const FVector& speedVec);
+void send_login_packet(SOCKET& sock,const char* id, const char* password); 
+void send_movetogame_packet(SOCKET& sock, const int& roomID);
+void send_move_packet(SOCKET& sock, const bool& inair, const float& x, const float& y, const float& z, FQuat& rotate, const float& value, const FVector& speedVec);
 
 
 class WSA_OVER_EX {
@@ -67,6 +69,7 @@ public:
 	void release();
 	bool init();
 	void process_packet(unsigned char* p);
+	void l_process_packet(unsigned char* p);
 
 	static std::shared_ptr<class Network> GetNetwork();
 
@@ -91,16 +94,25 @@ private:
 	bool isInit;
 
 public:
+	bool bIsConnected = false;	//게임서버랑 연결이 되었는지,
+	bool bIsConnectedLobby = false;		//로비서버랑 연결이 되었는지
 	int ClientID;
-	bool ConnectServer();
+	bool ConnectServerGame();
+	bool ConnectServerLobby();
 	SOCKET s_socket;
 	SOCKADDR_IN server_addr;
 	WSA_OVER_EX recv_expover;
-	int		_prev_size;
-	bool bIsConnected;	//임시 변수
-	void RecvPacket() ;
+	int		_prev_size{};
+
+	SOCKET l_socket;
+	SOCKADDR_IN l_server_addr;
+	WSA_OVER_EX l_recv_expover;
+	int			l_prev_size{};
+	void RecvPacketGame() ;
+	void RecvPacketLobby();
 	// 112.152.55.49  127.0.0.1  , 112.153.53.142
-	const char* SERVER_ADDR = "127.0.0.1";
+	const char* GAMESERVER_ADDR = "127.0.0.1";
+	const char* LOBBYSERVER_ADDR = "127.0.0.1";
 };
 
 

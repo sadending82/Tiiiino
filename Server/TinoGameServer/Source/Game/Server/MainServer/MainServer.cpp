@@ -43,6 +43,13 @@ MainServer::~MainServer()
 
 void MainServer::init()
 {
+	//--------------------------------
+	/*
+		
+		CPU 선호도 정할 코드 넣는 곳.
+		
+	*/
+	//-------------------------------
 	WSADATA WSAData;
 	WSAStartup(MAKEWORD(2, 2), &WSAData);
 
@@ -50,7 +57,7 @@ void MainServer::init()
 	SOCKADDR_IN server_addr;
 	ZeroMemory(&server_addr, sizeof(server_addr));
 	server_addr.sin_family = AF_INET;
-	server_addr.sin_port = htons(SERVERPORT);
+	server_addr.sin_port = htons(GAMESERVERPORT);
 	server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	bind(mSocket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr));
 	listen(mSocket, SOMAXCONN);
@@ -153,6 +160,11 @@ void MainServer::send_move_packet(int player_id, int mover_id, const bool& inair
 	packet.sy = sy;
 	packet.sz = sz;
 	player->SendPacket(&packet, sizeof(packet));
+}
+
+void MainServer::ConnectLobbyServer()
+{
+
 }
 
 

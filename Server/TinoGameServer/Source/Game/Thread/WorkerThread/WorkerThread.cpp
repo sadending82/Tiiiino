@@ -62,6 +62,12 @@ void WorkerThread::doThread()
 		case eCOMMAND_IOCP::CMD_ACCEPT: {
 			std::cout << "Accept Completed.\n";
 			SOCKET c_socket = *(reinterpret_cast<SOCKET*>(wsa_ex->GetBuf()));
+			LINGER  ling = { 0, };
+			ling.l_onoff = 1;   // LINGER 옵션 사용 여부  
+			ling.l_linger = 0;  // LINGER Timeout 설정  
+			// LINGER 옵션을 Socket에 적용  
+			setsockopt(c_socket, SOL_SOCKET, SO_LINGER, (CHAR*)&ling, sizeof(ling));
+
 			int new_id = mMainServer->GenerateID();
 			if (new_id != -1)
 			{
@@ -72,6 +78,7 @@ void WorkerThread::doThread()
 				CreateIoCompletionPort(reinterpret_cast<HANDLE>(c_socket), mMainServer->GetIOCPHandle(), new_id, 0);
 				player->PreRecvPacket(NULL, 0);
 				player->RecvPacket();
+
 			}
 			else if (new_id == -1)
 			{
