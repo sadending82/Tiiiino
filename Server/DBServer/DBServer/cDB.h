@@ -9,7 +9,7 @@ public:
 	void SetmStmt(MYSQL_STMT* stmt)			{ mStmt = stmt; }
 
 	MYSQL* GetmConn()			 			{ return &mConn; }
-	MYSQL_STMT* GetmStmt() const			{ return mStmt; }
+	MYSQL_STMT* GetmStmt()					{ return mStmt; }
 
 	const char* GetHost()					{ return mHost; }
 	const char* GetUser()					{ return mUser; }
@@ -20,18 +20,18 @@ public:
 	bool ConnectDB();
 	bool ExecuteQuery();
 
-	vector<string> SelectUserData(const string& UID);
+	vector<string> SelectUserData(const int uid);
 	vector<string> SelectUserData(const string& id, const string& password);
 	bool InsertNewUser(const string& id, const string& passWord, const string& nickname);
-	bool UpdateUserNickname(const string& uid, const string& nicknameToChange);
-	bool UpdateUserCredit(const string& uid, double credit);
-	bool UpdateUserPoint(const string& uid, unsigned int point);
+	bool UpdateUserNickname(const int uid, const string& nicknameToChange);
+	bool UpdateUserCredit(const int uid, double credit);
+	bool UpdateUserPoint(const int uid, unsigned int point);
 
 	void DisconnectDB();
 
 private:
 	MYSQL		mConn;
-	MYSQL_STMT* mStmt		= NULL;
+	MYSQL_STMT* mStmt;
 
 	// юс╫ц
 	const char* mHost = "localhost";

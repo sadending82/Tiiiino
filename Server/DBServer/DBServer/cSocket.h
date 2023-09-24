@@ -2,8 +2,7 @@
 #include "stdafx.h"
 #include "cSession.h"
 #include "cDB.h"
-
-constexpr int DBSERVERPORT = 3700;
+#include "../../../../Tiiiino/Server/ServerProtocol.h"
 
 class Socket {
 public:
@@ -13,6 +12,9 @@ public:
 	void WorkerFunc();
 	void ServerReady(DB* pDB);
 	void processPacket(int key, unsigned char* buf);
+
+	void DoRecv(int key);
+	void DoSend(int key, char* buf);
 
 	void Setm_pDB(DB* pDB) { m_pDB = pDB; }
 

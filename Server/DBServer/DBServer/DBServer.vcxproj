@@ -74,13 +74,13 @@
     <IncludePath>$(IncludePath)</IncludePath>
     <LibraryPath>C:\Program Files\MySQL\MySQL Server 8.0\lib;$(LibraryPath)</LibraryPath>
     <ExecutablePath>C:\Program Files\MySQL\MySQL Server 8.0\include;C:\Program Files\MySQL\MySQL Server 8.0\lib;C:\Program Files\MySQL\MySQL Server 8.0\include\mysql;C:\Program Files\MySQL\MySQL Server 8.0;$(ExecutablePath)</ExecutablePath>
-    <ExternalIncludePath>C:\Program Files\MySQL\MySQL Server 8.0\include;$(ExternalIncludePath)</ExternalIncludePath>
+    <ExternalIncludePath>$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(IncludePath)</IncludePath>
     <LibraryPath>C:\Program Files\MySQL\MySQL Server 8.0\lib;$(LibraryPath)</LibraryPath>
     <ExecutablePath>C:\Program Files\MySQL\MySQL Server 8.0\include;C:\Program Files\MySQL\MySQL Server 8.0\lib;C:\Program Files\MySQL\MySQL Server 8.0\include\mysql;C:\Program Files\MySQL\MySQL Server 8.0;$(ExecutablePath)</ExecutablePath>
-    <ExternalIncludePath>C:\Program Files\MySQL\MySQL Server 8.0\include;$(ExternalIncludePath)</ExternalIncludePath>
+    <ExternalIncludePath>$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -152,6 +152,7 @@
     <ClCompile Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\protocol.h" />
     <ClInclude Include="..\..\ServerProtocol.h" />
     <ClInclude Include="cSession.h" />
     <ClInclude Include="cSocket.h" />

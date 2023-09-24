@@ -2,19 +2,17 @@
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include "cDB.h"
 #include "cSocket.h"
-
-DB* g_pDB = new DB;
-Socket* g_pSocket = new Socket;
 //#define DBTest
 
 int main(int argc, char* argv[])
 {
-	std::wcout.imbue(std::locale("korean"));
+	//std::wcout.imbue(std::locale("korean"));
+	DB* g_pDB = new DB;
+	Socket* g_pSocket = new Socket;
+
 	g_pDB->ConnectDB();
-	//g_pSocket->ServerReady(g_pDB);
+	g_pSocket->ServerReady(g_pDB);
 
-	g_pDB->SelectUserData("1");
-	//g_pDB->SelectUserData("aaaa", "bbbb");
 
-	g_pDB->DisconnectDB();
+	//g_pDB->DisconnectDB();
 }
