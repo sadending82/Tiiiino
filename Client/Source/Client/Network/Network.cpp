@@ -139,6 +139,8 @@ void Network::process_packet(unsigned char* p)
 	{
 		SC_LOGIN_OK_PACKET* packet = reinterpret_cast<SC_LOGIN_OK_PACKET*>(p);
 		mMyCharacter->SetClientID(packet->id);
+		//연결성공
+		bIsConnected = true;
 		break;
 	}
 	case SC_MOVE_PLAYER:
@@ -271,7 +273,6 @@ void Network::RecvPacket()
 bool Network::ConnectServer()
 {
 	if (bIsConnected) return false;
-
 	s_socket = WSASocketW(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);
 
 	ZeroMemory(&server_addr, sizeof(server_addr));
@@ -291,7 +292,6 @@ bool Network::ConnectServer()
 		closesocket(s_socket);
 		return false;
 	}
-
 
 	DWORD recv_flag = 0;
 	int ret = WSARecv(s_socket, &recv_expover.GetWsaBuf(), 1, NULL, &recv_flag, &recv_expover.GetWsaOver(), recv_Gamecallback);

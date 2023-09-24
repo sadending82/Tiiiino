@@ -28,7 +28,6 @@ void ACustomLevel_Test::BeginPlay() {
 	Network::GetNetwork()->mMyCharacter = mc1;
 	Conn();
 
-
 	//To Loading ...
 
 	//To Do SomeThing ...
