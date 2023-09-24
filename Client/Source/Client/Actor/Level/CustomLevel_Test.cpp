@@ -52,10 +52,10 @@ bool ACustomLevel_Test::ConnGameServer()
 	auto player = Network::GetNetwork()->mMyCharacter;
 	if (nullptr != player)
 	{
-		if (Network::GetNetwork()->ConnectServer())
+		if (Network::GetNetwork()->ConnectServerGame())
 		{
 			CLog::Log("Connect Successfully");
-			send_login_packet();
+			send_movetogame_packet(Network::GetNetwork()->s_socket, 0); 
 			return true;
 		}
 		else {
@@ -68,22 +68,31 @@ bool ACustomLevel_Test::ConnGameServer()
 
 bool ACustomLevel_Test::ConnLobbyServer()
 {
-
 	auto player = Network::GetNetwork()->mMyCharacter;
 	if (nullptr == player) return false;
 
-	//player->ConnLobbyServer();
-	if (!Network::GetNetwork()->bLoginFlag)
+	if (true == Network::GetNetwork()->ConnectServerLobby())
 	{
-		//player->ShowLoginHUD();
+		if (false == Network::GetNetwork()->bLoginFlag)
+		{
+			send_login_packet(Network::GetNetwork()->l_socket, "dd", "Dd");
+			//player->ShowLoginHUD();
+		}
+		else
+		{
+			//const char* tmpid = TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterName);
+			//const char* tmppass = TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterPassWord);
+			//if (nullptr != Network::GetNetwork()->mMyCharacter)
+			//	send_login_lobby_packet(Network::GetNetwork()->mMyCharacter->l_socket, tmpid, tmppass);
+		}
+		CLog::Log("Connect Successfully");
+		return true;
 	}
-	else
-	{
-		//const char* tmpid = TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterName);
-		//const char* tmppass = TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterPassWord);
-		//if (nullptr != Network::GetNetwork()->mMyCharacter)
-		//	send_login_lobby_packet(Network::GetNetwork()->mMyCharacter->l_socket, tmpid, tmppass);
+	else {
+
+		CLog::Log("Connect Fail!");
 	}
+
 	//UE_LOG(LogTemp, Log, TEXT("Player Try Conn"));
 	return false;
 }

@@ -6,8 +6,7 @@
 
 void CALLBACK send_callback(DWORD err, DWORD num_byte, LPWSAOVERLAPPED send_over, DWORD flag);
 void CALLBACK recv_Gamecallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv_over, DWORD flag);
-//void CALLBACK recv_Lobbycallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv_over, DWORD flag);
-//void CALLBACK recv_Aicallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv_over, DWORD flag);
+void CALLBACK recv_Lobbycallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv_over, DWORD flag);
 
 using namespace std;
 
@@ -93,18 +92,30 @@ void Network::error_display(int err_no)
 	LocalFree(lpMsgBuf);
 }
 
-void send_login_packet()
+void send_login_packet(SOCKET& sock, const char* id, const char* password)
+{
+	CL_LOGIN_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = CL_LOGIN;
+	strcpy_s(packet.id, id);
+	strcpy_s(packet.password, password);
+	//strcpy_s(packet.name, TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterName));
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+}
+
+void send_movetogame_packet(SOCKET& sock,const int& roomID )
 {
 	CS_LOGIN_PACKET packet;
 	packet.size = sizeof(packet);
 	packet.type = CS_LOGIN;
-	packet.roomID = 0;
+	packet.roomID = roomID;
 	//strcpy_s(packet.name, TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterName));
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
-	int ret = WSASend(Network::GetNetwork()->s_socket, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
 }
 
-void send_move_packet(const bool& inair, const float& x, const float& y, const float& z, FQuat& rotate, const float& value, const FVector& speedVec)
+void send_move_packet(SOCKET& sock, const bool& inair, const float& x, const float& y, const float& z, FQuat& rotate, const float& value, const FVector& speedVec)
 {
 	CS_MOVE_PACKET packet;
 	packet.size = sizeof(CS_MOVE_PACKET);
@@ -122,7 +133,7 @@ void send_move_packet(const bool& inair, const float& x, const float& y, const f
 	packet.sy = speedVec.Y;
 	packet.sz = speedVec.Z;
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(CS_MOVE_PACKET), &packet);
-	int ret = WSASend(Network::GetNetwork()->s_socket, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
 }
 
 
@@ -213,6 +224,25 @@ void Network::process_packet(unsigned char* p)
 	}
 }
 
+void Network::l_process_packet(unsigned char* p)
+{
+	unsigned char Type = p[1];
+
+	switch (Type)
+	{
+	case LC_LOGIN_OK:
+	{
+		LC_LOGIN_OK_PACKET* packet = reinterpret_cast<LC_LOGIN_OK_PACKET*>(p);
+		mMyCharacter->SetClientID(packet->id);
+		//연결성공
+		bIsConnectedLobby = true;
+		break;
+	}
+	default:
+		break;
+	}
+}
+
 
 
 void CALLBACK send_callback(DWORD err, DWORD num_byte, LPWSAOVERLAPPED send_over, DWORD flag)
@@ -244,13 +274,36 @@ void CALLBACK recv_Gamecallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv
 	{
 		memcpy(over->GetBuf(), packet, to_process_data);
 	}
-	Game->RecvPacket();
+	Game->RecvPacketGame();
+}
+
+void CALLBACK recv_Lobbycallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv_over, DWORD flag)
+{
+	WSA_OVER_EX* over = reinterpret_cast<WSA_OVER_EX*>(recv_over);
+	auto Game = Network::GetNetwork();
+	if (nullptr == Game->mMyCharacter) return;
+
+	int to_process_data = num_bytes + Game->l_prev_size;
+	unsigned char* packet = over->GetBuf();
+	int packet_size = packet[0];
+	while (packet_size <= to_process_data) {
+		Game->l_process_packet(packet);
+		to_process_data -= packet_size;
+		packet += packet_size;
+		if (to_process_data > 0) packet_size = packet[0];
+		else break;
+	}
+	Game->l_prev_size = to_process_data;
+	if (to_process_data > 0)
+	{
+		memcpy(over->GetBuf(), packet, to_process_data);
+	}
+	Game->RecvPacketLobby();
 }
 
 
 
-
-void Network::RecvPacket()
+void Network::RecvPacketGame()
 {
 	DWORD recv_flag = 0;
 	ZeroMemory(&recv_expover.GetWsaOver(), sizeof(recv_expover.GetWsaOver()));
@@ -269,17 +322,36 @@ void Network::RecvPacket()
 	}
 }
 
+void Network::RecvPacketLobby()
+{
+	DWORD recv_flag = 0;
+	ZeroMemory(&l_recv_expover.GetWsaOver(), sizeof(l_recv_expover.GetWsaOver()));
 
-bool Network::ConnectServer()
+	l_recv_expover.GetWsaBuf().buf = reinterpret_cast<char*>(l_recv_expover.GetBuf() + l_prev_size);
+	l_recv_expover.GetWsaBuf().len = BUF_SIZE - l_prev_size;
+
+	int ret = WSARecv(l_socket, &l_recv_expover.GetWsaBuf(), 1, NULL, &recv_flag, &l_recv_expover.GetWsaOver(), recv_Lobbycallback);
+	if (SOCKET_ERROR == ret)
+	{
+		int err = WSAGetLastError();
+		if (err != WSA_IO_PENDING)
+		{
+			//error ! 
+		}
+	}
+}
+
+
+bool Network::ConnectServerGame()
 {
 	if (bIsConnected) return false;
 	s_socket = WSASocketW(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);
 
 	ZeroMemory(&server_addr, sizeof(server_addr));
 	server_addr.sin_family = AF_INET;
-	server_addr.sin_port = htons(SERVERPORT);
+	server_addr.sin_port = htons(GAMESERVERPORT);
 
-	inet_pton(AF_INET, SERVER_ADDR, &server_addr.sin_addr);
+	inet_pton(AF_INET, GAMESERVER_ADDR, &server_addr.sin_addr);
 	int rt = connect(s_socket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr));
 	if (SOCKET_ERROR == rt)
 	{
@@ -300,6 +372,44 @@ bool Network::ConnectServer()
 		int err = WSAGetLastError();
 		if (err != WSA_IO_PENDING)
 		{
+			//error ! 
+			return false;
+		}
+	}
+	return true;
+}
+
+bool Network::ConnectServerLobby()
+{
+	if (bIsConnectedLobby) return false;
+	l_socket = WSASocketW(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);
+
+	ZeroMemory(&l_server_addr, sizeof(l_server_addr));
+	l_server_addr.sin_family = AF_INET;
+	l_server_addr.sin_port = htons(LOBBYSERVERPORT);
+
+	inet_pton(AF_INET, LOBBYSERVER_ADDR, &l_server_addr.sin_addr);
+	int rt = connect(l_socket, reinterpret_cast<sockaddr*>(&l_server_addr), sizeof(l_server_addr));
+	if (SOCKET_ERROR == rt)
+	{
+		std::cout << "connet Error :";
+		int err_num = WSAGetLastError();
+		//error_display(err_num);
+		//system("pause");
+		//UE_LOG(LogTemp, Error, TEXT("Conn Error %d"), err_num);
+		//exit(0);
+		closesocket(l_socket);
+		return false;
+	}
+
+	DWORD recv_flag = 0;
+	int ret = WSARecv(l_socket, &l_recv_expover.GetWsaBuf(), 1, NULL, &recv_flag, &l_recv_expover.GetWsaOver(), recv_Lobbycallback);
+	if (SOCKET_ERROR == ret)
+	{
+		int err = WSAGetLastError();
+		if (err != WSA_IO_PENDING)
+		{
+			int err_num = WSAGetLastError();
 			//error ! 
 			return false;
 		}

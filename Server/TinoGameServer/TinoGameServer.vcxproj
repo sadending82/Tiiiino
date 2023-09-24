@@ -139,6 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Game\Server\LobbyServer\LobbyServer.cpp" />
     <ClCompile Include="Source\Game\Room\Room.cpp" />
     <ClCompile Include="Source\Game\Server\MainServer\MainServer.cpp" />
     <ClCompile Include="Source\Game\Server\Server.cpp" />
@@ -155,6 +156,7 @@
     <ClCompile Include="Source\Game\Thread\TinoThread.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Game\Server\LobbyServer\LobbyServer.h" />
     <ClInclude Include="Source\Game\Utility\Utility.h" />
     <ClInclude Include="Source\Game\Room\Room.h" />
     <ClInclude Include="Source\Game\Server\MainServer\MainServer.h" />

@@ -74,7 +74,7 @@ void ATinoCharacter::Tick(float DeltaTime)
 			ServerSyncElapsedTime += DeltaTime;
 			if (ServerSyncDeltaTime < ServerSyncElapsedTime)
 			{
-				send_move_packet(GetCharacterMovement()->IsFalling(), pos.X, pos.Y, pos.Z, rot, GetVelocity().Size2D(), GetCharacterMovement()->Velocity);
+				send_move_packet(Network::GetNetwork()->s_socket,GetCharacterMovement()->IsFalling(), pos.X, pos.Y, pos.Z, rot, GetVelocity().Size2D(), GetCharacterMovement()->Velocity);
 				ServerSyncElapsedTime = 0.0f;
 			}
 

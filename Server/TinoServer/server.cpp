@@ -15,7 +15,7 @@ void Server::Disconnect(int cID)
 
 int Server::GetNewClientID()
 {
-	for (int i = 0; i < MAX_USER; ++i) {
+	for (int i = MAXGAMESERVER; i < MAX_USER; ++i) {
 		mClients[i].mStateLock.lock();
 		if (mClients[i].mState == eSessionState::ST_FREE) {
 			mClients[i].mState = eSessionState::ST_ACCEPTED;
@@ -27,12 +27,53 @@ int Server::GetNewClientID()
 	return INVALID_KEY;
 }
 
-void Server::ProcessPacket(int cID, char* cpacket)
+int Server::GetNewServerID()
+{
+	for (int i = 0; i < MAXGAMESERVER; ++i) {
+		mServers[i].mStateLock.lock();
+		if (mServers[i].mState == eSessionState::ST_FREE) {
+			mServers[i].mState = eSessionState::ST_ACCEPTED;
+			mServers[i].mStateLock.unlock();
+			return i;
+		}
+		mServers[i].mStateLock.unlock();
+	}
+	return INVALID_KEY;
+}
+
+void Server::ProcessPacket(int cID, unsigned char* cpacket)
 {
 	switch (cpacket[1]) 
 	{
-	case 0:
+	case CL_LOGIN:
 	{
+		CL_LOGIN_PACKET* p = reinterpret_cast<CL_LOGIN_PACKET*>(cpacket);
+
+		cout << p->id << "," << p->password << endl;
+		/*
+			Do SomeThing;
+		*/
+		
+		break;
+	}
+	default:
+	{
+		break;
+	}
+	}
+}
+
+void Server::ProcessPacketServer(int sID, unsigned char* spacket)
+{
+
+	switch (spacket[1])
+	{
+	case GL_LOGIN:
+	{
+		GL_LOGIN_PACKET* p = reinterpret_cast<GL_LOGIN_PACKET*>(spacket);
+
+		cout << "OK";
+
 		break;
 	}
 	default:
@@ -48,8 +89,8 @@ void Server::DoWorker()
 	p.size = sizeof(EV_UpdateMatchPacket);
 	p.type = 0;
 
-	pTimer->PushEvent(1, eEVENT_TYPE::EV_MATCH_UP, 5000, reinterpret_cast<char*>(&p));
-	cout << "타이머 푸시" << endl;
+	//pTimer->PushEvent(1, eEVENT_TYPE::EV_MATCH_UP, 5000, reinterpret_cast<char*>(&p));
+	//cout << "타이머 푸시" << endl;
 	while (true)
 	{
 		DWORD numBytes;
@@ -81,26 +122,62 @@ void Server::DoWorker()
 		case eCompType::OP_ACCEPT:
 		{
 			SOCKET cSocket = reinterpret_cast<SOCKET>(exOver->mWsaBuf.buf);
-			int client_id = GetNewClientID();
-			if (client_id != INVALID_KEY)
+			unsigned long long k{};
+			memcpy(&k, exOver->mMessageBuf, sizeof(unsigned long long));
+			if (INCODE_SERVER_PACKET == k)
 			{
-				mClients[client_id].mPlayerID = client_id;
-				mClients[client_id].mPrevRemain = 0;
-				mClients[client_id].mSocket = cSocket;
-				CreateIoCompletionPort(reinterpret_cast<HANDLE>(cSocket), mHCP, client_id, 0);
-				mClients[client_id].DoRecv();
-				cSocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
-				cout << "player connect\n";
-			}
-			else
-			{
-				cout << "Max user exceeded.\n";
-			}
+				int server_id = GetNewServerID();
+				if (server_id != INVALID_KEY)
+				{
+					mServers[server_id].mPlayerID = server_id;
+					mServers[server_id].mRecvOver.mCompType = eCompType::OP_SERVER_RECV;
+					mServers[server_id].mPrevRemain = 0;
+					mServers[server_id].mSocket = cSocket;
+					
+					CreateIoCompletionPort(reinterpret_cast<HANDLE>(cSocket), mHCP, server_id, 0);
+					mServers[server_id].DoRecv();
+					cSocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
+					cout << "server connect\n";
+				}
+				else
+				{
+					cout << "Max server exceeded.\n";
+				}
 
-			ZeroMemory(&exOver->mOver, sizeof(exOver->mOver));
-			exOver->mWsaBuf.buf = reinterpret_cast<CHAR*>(cSocket);
-			int addr_size = sizeof(SOCKADDR_IN);
-			AcceptEx(mListenSocket, cSocket, exOver->mMessageBuf, 0, addr_size + 16, addr_size + 16, 0, &exOver->mOver);
+				ZeroMemory(&exOver->mOver, sizeof(exOver->mOver));
+				exOver->mWsaBuf.buf = reinterpret_cast<CHAR*>(cSocket);
+				int addr_size = sizeof(SOCKADDR_IN);
+				//게임서버가 더 켜져야 한다면
+				/*
+				if(mGameServerCnt < mMaxGameServerCnt) //<<두개 변수 추가해주고
+					AcceptEx(mListenSocket, cSocket, exOver->mMessageBuf, BUF_SIZE - 8, addr_size + 16, addr_size + 16, 0, &exOver->mOver);
+				else
+				*/
+				AcceptEx(mListenSocket, cSocket, exOver->mMessageBuf, 0, addr_size + 16, addr_size + 16, 0, &exOver->mOver);
+			}
+			else {
+				int client_id = GetNewClientID();
+				if (client_id != INVALID_KEY)
+				{
+					mClients[client_id].mPlayerID = client_id;
+					mClients[client_id].mPrevRemain = 0;
+					mClients[client_id].mSocket = cSocket;
+					CreateIoCompletionPort(reinterpret_cast<HANDLE>(cSocket), mHCP, client_id, 0);
+					mClients[client_id].DoRecv();
+					cSocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
+					cout << "player connect\n";
+				}
+				else
+				{
+					cout << "Max user exceeded.\n";
+				}
+
+				ZeroMemory(&exOver->mOver, sizeof(exOver->mOver));
+				exOver->mWsaBuf.buf = reinterpret_cast<CHAR*>(cSocket);
+				int addr_size = sizeof(SOCKADDR_IN);
+				AcceptEx(mListenSocket, cSocket, exOver->mMessageBuf, 0, addr_size + 16, addr_size + 16, 0, &exOver->mOver);
+
+			}
 			break;
 		}
 		case eCompType::OP_RECV:
@@ -110,7 +187,7 @@ void Server::DoWorker()
 				Disconnect(client_id);
 			}
 			int remainData = numBytes + mClients[key].mPrevRemain;
-			char* p = exOver->mMessageBuf;
+			unsigned char* p = (unsigned char*)exOver->mMessageBuf;
 			while (remainData > 0)
 			{
 				int packetSize = p[0];
@@ -133,6 +210,42 @@ void Server::DoWorker()
 			mClients[key].DoRecv();
 			break;
 		}
+		case eCompType::OP_SERVER_RECV:
+		{
+			ServerOverEXP* serverExOver = reinterpret_cast<ServerOverEXP*>(exOver);
+			key = serverExOver->mServerTargetID;
+
+			if (0 == numBytes)
+			{
+				Disconnect(client_id);
+			}
+			int remainData = numBytes + mServers[key].mPrevRemain;
+			unsigned char* p = (unsigned char*)exOver->mMessageBuf;
+			while (remainData > 0)
+			{
+				int packetSize = p[0];
+				if (packetSize <= remainData)
+				{
+					ProcessPacketServer(static_cast<int>(key), p);
+					p = p + packetSize;
+					remainData = remainData - packetSize;
+				}
+				else
+				{
+					break;
+				}
+			}
+			mServers[key].mPrevRemain = remainData;
+			if (remainData > 0)
+			{
+				memcpy(exOver->mMessageBuf, p, remainData);
+			}
+			mServers[key].DoRecv();
+			break;
+
+
+			break;
+		}
 		case eCompType::OP_SEND:
 		{
 			if (0 == numBytes)
@@ -144,7 +257,7 @@ void Server::DoWorker()
 		}
 		case eCompType::OP_EVENT: 
 		{
-			ProcessEvent(exOver->mMessageBuf);
+			ProcessEvent((unsigned char*)exOver->mMessageBuf);
 			break;
 		}
 		default :
@@ -164,7 +277,7 @@ void Server::Init()
 	SOCKADDR_IN server_addr;
 	memset(&server_addr, 0, sizeof(server_addr));
 	server_addr.sin_family = AF_INET;
-	server_addr.sin_port = htons(SERVERPORT);
+	server_addr.sin_port = htons(LOBBYSERVERPORT);
 	server_addr.sin_addr.S_un.S_addr = INADDR_ANY;
 
 	bind(mListenSocket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr));
@@ -182,7 +295,7 @@ void Server::Init()
 	OverEXP a_over;
 	a_over.mCompType = eCompType::OP_ACCEPT;
 	a_over.mWsaBuf.buf = reinterpret_cast<CHAR*>(c_socket);
-	AcceptEx(mListenSocket, c_socket, a_over.mMessageBuf, 0, addr_size + 16, addr_size + 16, 0, &a_over.mOver);
+	AcceptEx(mListenSocket, c_socket, a_over.mMessageBuf, BUF_SIZE - 8, addr_size + 16, addr_size + 16, 0, &a_over.mOver);
 
 	SYSTEM_INFO si;
 	GetSystemInfo(&si);
@@ -200,7 +313,7 @@ void Server::Init()
 	WSACleanup();
 }
 
-void Server::ProcessEvent(char* cmessage)
+void Server::ProcessEvent(unsigned char* cmessage)
 {
 	switch (cmessage[1]) {
 	case static_cast<int> (eEVENT_TYPE::EV_MATCH_UP):
