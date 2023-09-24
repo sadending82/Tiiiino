@@ -135,6 +135,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\protocol.h" />
+    <ClInclude Include="..\ServerProtocol.h" />
     <ClInclude Include="LobbyProtocol.h" />
     <ClInclude Include="OverExp.h" />
     <ClInclude Include="Server.h" />

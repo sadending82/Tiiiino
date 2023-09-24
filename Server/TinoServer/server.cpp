@@ -85,12 +85,12 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 
 void Server::DoWorker()
 {
-	EV_UpdateMatchPacket p;
+	/*EV_UpdateMatchPacket p;
 	p.size = sizeof(EV_UpdateMatchPacket);
 	p.type = 0;
 
-	//pTimer->PushEvent(1, eEVENT_TYPE::EV_MATCH_UP, 5000, reinterpret_cast<char*>(&p));
-	//cout << "타이머 푸시" << endl;
+	pTimer->PushEvent(1, eEVENT_TYPE::EV_MATCH_UP, 5000, reinterpret_cast<char*>(&p));
+	cout << "타이머 푸시" << endl;*/
 	while (true)
 	{
 		DWORD numBytes;
@@ -296,6 +296,55 @@ void Server::Init()
 	a_over.mCompType = eCompType::OP_ACCEPT;
 	a_over.mWsaBuf.buf = reinterpret_cast<CHAR*>(c_socket);
 	AcceptEx(mListenSocket, c_socket, a_over.mMessageBuf, BUF_SIZE - 8, addr_size + 16, addr_size + 16, 0, &a_over.mOver);
+
+	SOCKET LDsocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
+	SOCKADDR_IN serverAddr;
+	::memset(&serverAddr, 0, sizeof(serverAddr));
+	serverAddr.sin_family = AF_INET;
+	serverAddr.sin_port = htons(DBSERVERPORT);
+	inet_pton(AF_INET, SERVERIP, &serverAddr.sin_addr);
+
+	if (connect(LDsocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR) {
+		cout << "DB서버 커넥트 실패" << endl;
+	}
+	else {
+		cout << "DB서버 커넥트 성공" << endl;
+		OverEXP ss_over;
+		ss_over.mCompType = eCompType::OP_ACCEPT;
+		ss_over.mWsaBuf.buf = reinterpret_cast<CHAR*>(LDsocket);
+
+		// 바인드 걸어 주기 -> 기존 클라 말고 서버 쪽으로
+
+		int server_id = GetNewServerID();
+		if (server_id != INVALID_KEY)
+		{
+			mServers[server_id].mPlayerID = server_id;
+			mServers[server_id].mRecvOver.mCompType = eCompType::OP_SERVER_RECV;
+			mServers[server_id].mPrevRemain = 0;
+			mServers[server_id].mSocket = LDsocket;
+
+			CreateIoCompletionPort(reinterpret_cast<HANDLE>(LDsocket), mHCP, server_id, 0);
+			mServers[server_id].DoRecv();
+			LDsocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
+			cout << "server connect\n";
+		}
+		else
+		{
+			cout << "Max server exceeded.\n";
+		}
+
+		ZeroMemory(&ss_over.mOver, sizeof(ss_over.mOver));
+		ss_over.mWsaBuf.buf = reinterpret_cast<CHAR*>(LDsocket);
+		int addr_size = sizeof(SOCKADDR_IN);
+		AcceptEx(mListenSocket, LDsocket, ss_over.mMessageBuf, 0, addr_size + 16, addr_size + 16, 0, &ss_over.mOver);
+
+		LD_LOGIN_PACKET p;
+		p.size = sizeof(LD_LOGIN_PACKET);
+		p.type = LD_LOGIN;
+		p.testNum = 123;
+
+		mServers[server_id].DoSend(&p);
+	}
 
 	SYSTEM_INFO si;
 	GetSystemInfo(&si);
