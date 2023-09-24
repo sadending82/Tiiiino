@@ -4,7 +4,7 @@ constexpr auto SERVERIP = "127.0.0.1";
 
 constexpr int GAMESERVERPORT = 3600;
 constexpr int LOBBYSERVERPORT = 3500;
-constexpr int BUF_SIZE = 128;
+constexpr int BUF_SIZE = 200;
 
 constexpr int MAX_USER = 300;
 constexpr int MAX_OBJECT = 3000;
