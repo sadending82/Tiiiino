@@ -1,6 +1,8 @@
 #pragma once
 #include "cSocket.h"
 
+#define Test
+
 int Socket::SetKey()
 {
     int cnt = STARTKEY;
@@ -40,7 +42,7 @@ void Socket::WorkerFunc()
         ExOver* exOver = reinterpret_cast<ExOver*>(over);
 
         if (false == retval) {
-            //Disconnect(key);
+            Disconnect(key);
         }
 
         switch (exOver->mOpType) {
@@ -56,20 +58,23 @@ void Socket::WorkerFunc()
                 mSessions[newKey].DoRecv();
             }
             else {
-                closesocket(reinterpret_cast<SOCKET>(exOver->mSocket));
+                Disconnect(newKey);
+                break;
             }
 
             ZeroMemory(&exOver->mOver, sizeof(exOver->mOver));
-            SOCKET c_socket = WSASocketW(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
-            exOver->mSocket = c_socket;
-            BOOL ret = AcceptEx(mListenSocket, c_socket
+            SOCKET cSocket = WSASocketW(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
+            exOver->mSocket = cSocket;
+            BOOL ret = AcceptEx(mListenSocket, cSocket
                 , exOver->mMessageBuf
                 , 0, 32, 32, NULL, &exOver->mOver);
             if (false == ret) {
                 int err_num = WSAGetLastError();
                 if (err_num != WSA_IO_PENDING)
                 {
-                    printf("%d\n", err_num);
+#ifdef Test
+                    std::cout << "Accept Error: " << err_num << std::endl;
+#endif
                 }
             }
             break;
@@ -102,8 +107,10 @@ void Socket::WorkerFunc()
     }
 }
 
-void Socket::ServerReady()
+void Socket::ServerReady(DB* pDB)
 {
+    Setm_pDB(pDB);
+
 	WSADATA WSAData;
 	WSAStartup(MAKEWORD(2, 2), &WSAData);
 
@@ -138,12 +145,27 @@ void Socket::ServerReady()
 #ifdef Test
 			std::cout << "Accept Error: " << err_num << std::endl;
 #endif
+            return;
 		}
 	}
+#ifdef Test
+    std::cout << "Connect To Lobby Server Ready" << std::endl;
+#endif
 
     WorkerFunc();
 }
 
 void Socket::processPacket(int key, unsigned char* buf)
 {
+    switch (buf[1])
+    {
+    case 0:
+    {
+        break;
+    }
+    default:
+    {
+        break;
+    }
+    }
 }

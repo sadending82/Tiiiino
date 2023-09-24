@@ -9,8 +9,9 @@ class Socket {
 public:
 
 	int SetKey();
+	void Disconnect(int key);
 	void WorkerFunc();
-	void ServerReady();
+	void ServerReady(DB* pDB);
 	void processPacket(int key, unsigned char* buf);
 
 	void Setm_pDB(DB* pDB) { m_pDB = pDB; }
