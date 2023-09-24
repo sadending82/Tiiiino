@@ -8,6 +8,33 @@ ATinoController::ATinoController()
 {
 }
 
+void ATinoController::BeginPlay()
+{
+	Super::BeginPlay();
+	if (StartingWidgetClass != nullptr)
+	{
+		ChangeMenuWidget(StartingWidgetClass);
+	}
+}
+
+void ATinoController::ChangeMenuWidget(TSubclassOf<UUserWidget> NewWidgetClass)
+{
+	if (CurrentWidget != nullptr)
+	{
+		CurrentWidget->RemoveFromViewport();
+		CurrentWidget = nullptr;
+	}
+
+	if (NewWidgetClass != nullptr)
+	{
+		CurrentWidget = CreateWidget(GetWorld(), NewWidgetClass);
+		if (CurrentWidget != nullptr)
+		{
+			CurrentWidget->AddToViewport();
+		}
+	}
+}
+
 void ATinoController::CreateDummy()
 {
 	if (TinoCharacterClass)

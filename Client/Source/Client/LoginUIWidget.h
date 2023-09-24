@@ -20,7 +20,24 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* LoginButton;
 
+	UPROPERTY(meta = (BindWidget))
+	class UButton* NewAccountsButton;
+
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void TryLogin();
 
+	UFUNCTION()
+	void TryNewAccounts();
+
+	UPROPERTY(meta = (BindWidget))
+	class UEditableTextBox* LoginIDTextBox;
+
+	UFUNCTION()
+	void InputLoginID(const FText& Text);
+
+	UPROPERTY(meta = (BindWidget))
+	class UEditableTextBox* LoginPasswordTextBox;
+
+	UFUNCTION()
+	void InputLoginPassword(const FText& Text);
 };
