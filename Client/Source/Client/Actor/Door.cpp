@@ -68,7 +68,6 @@ void ADoor::Tick(float DeltaTime)
 			fRemainMoveDist = 0.f;
 			bIsOpeningDoor = false;
 			OpenType = WaitToClose;
-			CLog::Log("opentype wait to close");
 		}
 	}
 
@@ -86,7 +85,6 @@ void ADoor::Tick(float DeltaTime)
 			fRemainMoveDist = 0.f;
 			bIsClosingDoor = false;
 			OpenType = WaitToOpen;
-			CLog::Log("opentype wait to open");
 		}
 		
 	}
@@ -95,14 +93,12 @@ void ADoor::Tick(float DeltaTime)
 
 void ADoor::SetStartOpenDoor()
 {
-	CLog::Log("start open door");
 	bIsOpeningDoor = true;
 	fRemainMoveDist = DoorOpenDistance;
 }
 
 void ADoor::SetStartCloseDoor()
 {
-	CLog::Log("start close door");
 	bIsClosingDoor = true;
 	fRemainMoveDist = DoorOpenDistance;
 }
