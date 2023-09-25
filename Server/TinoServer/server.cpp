@@ -76,6 +76,11 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 
 		break;
 	}
+	case DL_LOGIN_OK: {
+		DL_LOGIN_OK_PACKET* p = reinterpret_cast<DL_LOGIN_OK_PACKET*>(spacket);
+
+		break;
+	}
 	default:
 	{
 		break;
@@ -341,7 +346,8 @@ void Server::Init()
 		LD_LOGIN_PACKET p;
 		p.size = sizeof(LD_LOGIN_PACKET);
 		p.type = LD_LOGIN;
-		p.testNum = 123;
+		memcpy (p.id, "aaaa", sizeof("aaaa"));
+		memcpy (p.password, "bbbb", sizeof("bbbb"));
 
 		mServers[server_id].DoSend(&p);
 	}
