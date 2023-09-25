@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{355dbfc5-e283-41c2-a9ea-7a23ffb4e4bd}</ProjectGuid>
+    <ProjectGuid>{58B0CD49-F2C7-4C3D-BBA4-19F0170B0E1A}</ProjectGuid>
     <RootNamespace>TinoServer</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
@@ -127,6 +127,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\protocol.h" />
+    <ClInclude Include="..\ServerProtocol.h" />
     <ClInclude Include="LobbyProtocol.h" />
     <ClInclude Include="OverExp.h" />
     <ClInclude Include="server.h" />

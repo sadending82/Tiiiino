@@ -139,6 +139,15 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		mClients[p->user_id].mPoint = p->point;
 		mClients[p->user_id].mUID = p->uid;
 
+		LC_LOGIN_OK_PACKET pac;
+		pac.type = LC_LOGIN_OK;
+		pac.size = sizeof(LC_LOGIN_OK_PACKET);
+		pac.id = p->user_id;
+		pac.RoomID = 0;
+		pac.UID = mClients[p->user_id].mUID;
+
+		mClients[p->user_id].DoSend(&pac);
+
 		// 클라쪽에 로그인 성공 했다고 알려줘야 함
 
 		break;
