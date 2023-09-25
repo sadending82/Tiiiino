@@ -5,6 +5,7 @@
 #include "Actor/Controller/TinoController.h"
 #include "GameFramework/PlayerController.h"
 #include "Kismet/GameplayStatics.h"
+#include "Utilities/CLog.h"
 
 
 void CALLBACK send_callback(DWORD err, DWORD num_byte, LPWSAOVERLAPPED send_over, DWORD flag);
@@ -253,8 +254,13 @@ void Network::l_process_packet(unsigned char* p)
 		mDBUID = packet->UID;
 		//연결성공
 		bIsConnectedLobby = true;
+		CLog::Print("LC_LOGIN_OK IS CALLING");
 
 		auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(mMyCharacter->GetWorld(), 0));
+		if (TinoController == nullptr)
+		{
+			CLog::Print("TinoController is nullptr");
+		}
 		TinoController->ChangeMenuWidget(TinoController->GetLobbyWidgetClass());
 
 		break;
