@@ -169,6 +169,8 @@ void Socket::processPacket(int key, unsigned char* buf)
     case LD_LOGIN:
     {
         ProcessPacket_Login(key, buf);
+
+        cout << "로그인 패킷 받음\n";
         break;
     }
     default:
@@ -179,7 +181,7 @@ void Socket::processPacket(int key, unsigned char* buf)
 }
 
 // DB
-bool Socket::CheckLogin(int key, const char* id, const char* password)
+bool Socket::CheckLogin(int key, const char* id, const char* password, int userid)
 {
     auto userData = m_pDB->SelectUserDataForLogin(id, password);
 
@@ -193,7 +195,7 @@ bool Socket::CheckLogin(int key, const char* id, const char* password)
     int point = get<3>(userData);
     bool state = get<4>(userData);
 
-    SendUserDataAfterLogin(key, uid, nickname, credit, point, state);
+    SendUserDataAfterLogin(key, uid, nickname, credit, point, state, userid);
 
     m_pDB->UpdateUserConnectionState(uid, true);
 
@@ -201,7 +203,7 @@ bool Socket::CheckLogin(int key, const char* id, const char* password)
 }
 
 // SendPacket
-void Socket::SendUserDataAfterLogin(int key, int uid, string& nickname, double credit, int point, bool state)
+void Socket::SendUserDataAfterLogin(int key, int uid, string& nickname, double credit, int point, bool state, int userid)
 {
     DL_LOGIN_OK_PACKET p;
     p.size = sizeof(DL_LOGIN_OK_PACKET);
@@ -213,6 +215,7 @@ void Socket::SendUserDataAfterLogin(int key, int uid, string& nickname, double c
     p.credit = credit;
     p.point = point;
     p.connState = state;
+    p.user_id = userid;
 
     mSessions[key].DoSend(reinterpret_cast<DL_LOGIN_OK_PACKET*>(&p));
 }
@@ -231,7 +234,7 @@ void Socket::ProcessPacket_Login(int key, unsigned char* buf)
 {
     LD_LOGIN_PACKET* p = reinterpret_cast<LD_LOGIN_PACKET*>(buf);
 
-    bool bCheckLogin = CheckLogin(key, p->id, p->password);
+    bool bCheckLogin = CheckLogin(key, p->id, p->password, p->user_id);
     if (bCheckLogin == false) {
         SendLoginFail(key, p->id);
     }

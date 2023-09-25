@@ -49,9 +49,13 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 	case CL_LOGIN:
 	{
 		CL_LOGIN_PACKET* p = reinterpret_cast<CL_LOGIN_PACKET*>(cpacket);
-		LD_LOGIN_PACKET* pac = reinterpret_cast<LD_LOGIN_PACKET*>(p);
-		pac->user_id = cID;
-
+		LD_LOGIN_PACKET pac;
+		pac.type = LD_LOGIN;
+		pac.size = sizeof(LD_LOGIN_PACKET);
+		pac.user_id = cID;
+		memcpy(pac.id, p->id, sizeof(pac.id));
+		memcpy(pac.password, p->password, sizeof(pac.password));
+		cout << pac.id << endl;
 		// db 서버에 전송
 		mServers[0].DoSend(&pac);
 		break;
