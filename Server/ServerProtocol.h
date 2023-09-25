@@ -59,6 +59,7 @@ struct LG_USER_INTO_GAME_PACKET : public SPACKET {
 struct LD_LOGIN_PACKET :public SPACKET {
 	char	id[MAX_NAME_SIZE];
 	char	password[MAX_NAME_SIZE];
+	int		user_id;
 };
 
 struct DL_LOGIN_OK_PACKET :public SPACKET {
@@ -66,11 +67,12 @@ struct DL_LOGIN_OK_PACKET :public SPACKET {
 	char	nickname[MAX_NAME_SIZE];
 	double	credit;
 	int		point;
+	int		user_id;
 	bool	connState;
 };
 
 struct DL_LOGIN_FAIL_PACKET :public SPACKET {
-	char	id[MAX_NAME_SIZE];
+	int		user_id;
 };
 
 #pragma pack (pop)
