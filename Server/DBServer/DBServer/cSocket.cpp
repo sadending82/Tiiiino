@@ -116,6 +116,10 @@ void Socket::WorkerFunc()
 void Socket::ServerReady(DB* pDB)
 {
     Setm_pDB(pDB);
+#ifdef Test
+    //m_pDB->SelectUserData(1);
+    //CheckLogin(1, "aaaa", "bbbb");
+#endif
 
     WSADATA wsa;
     WSAStartup(MAKEWORD(2, 2), &wsa);
@@ -179,7 +183,9 @@ bool Socket::CheckLogin(int key, const char* id, const char* password)
 {
     auto userData = m_pDB->SelectUserDataForLogin(id, password);
 
-    if (get<0>(userData) == INVALIDKEY) return false;
+    if (get<0>(userData) == 0) {
+        return false;
+    }
 
     int uid = get<0>(userData);
     string nickname = get<1>(userData);
@@ -215,7 +221,7 @@ void Socket::SendLoginFail(int key, const char* id) {
     DL_LOGIN_FAIL_PACKET p;
     p.size = sizeof(DL_LOGIN_FAIL_PACKET);
     p.type = SPacketType::DL_LOGIN_FAIL;
-    memcpy(p.id, id, sizeof(id));
+    //memcpy(p.id, id, sizeof(id));
 
     mSessions[key].DoSend(reinterpret_cast<DL_LOGIN_FAIL_PACKET*>(&p));
 }
