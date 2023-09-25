@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "Blueprint/UserWidget.h"
 #include "TinoController.generated.h"
 
 /**
@@ -18,10 +19,30 @@ public:
 	ATinoController();
 
 public:
-
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void ChangeMenuWidget(TSubclassOf<UUserWidget> NewWidgetClass);
+	
 	void CreateDummy();
 
+	//APlayerController* GetController();
+	TSubclassOf<UUserWidget> GetLobbyWidgetClass() const { return LobbyWidgetClass; }
+	TSubclassOf<UUserWidget> GetLoginWidgetClass() const { return StartingWidgetClass; }
+
+protected:
+	virtual void BeginPlay() override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
+	TSubclassOf<UUserWidget> StartingWidgetClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
+	TSubclassOf<UUserWidget> LobbyWidgetClass;
+
+	UPROPERTY()
+	UUserWidget* CurrentWidget;
+
 private:
+	
+
 
 	UPROPERTY(EditAnywhere, Category = "Test")
 		int32 MaxDummyCount;
@@ -34,5 +55,6 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "BPClass")
 		TSubclassOf<class ATinoCharacter> TinoCharacterClass;
+
 
 };
