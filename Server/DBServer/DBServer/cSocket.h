@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "cSession.h"
 #include "cDB.h"
-#include "../../../../Tiiiino/Server/ServerProtocol.h"
+#include "../../ServerProtocol.h"
 
 class Socket {
 public:
