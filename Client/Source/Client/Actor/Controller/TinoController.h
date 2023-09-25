@@ -27,6 +27,8 @@ public:
 	//APlayerController* GetController();
 	TSubclassOf<UUserWidget> GetLobbyWidgetClass() const { return LobbyWidgetClass; }
 	TSubclassOf<UUserWidget> GetLoginWidgetClass() const { return StartingWidgetClass; }
+	TSubclassOf<UUserWidget> GetCreateAccountsWidgetClass() const { return CreateAccountsWidgetClass; }
+
 
 protected:
 	virtual void BeginPlay() override;
@@ -36,6 +38,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
 	TSubclassOf<UUserWidget> LobbyWidgetClass;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
+	TSubclassOf<UUserWidget> CreateAccountsWidgetClass;
 
 	UPROPERTY()
 	UUserWidget* CurrentWidget;

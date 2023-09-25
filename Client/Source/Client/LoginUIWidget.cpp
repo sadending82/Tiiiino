@@ -26,9 +26,6 @@ void ULoginUIWidget::TryLogin()
 {
 	// Login Button Onclicked
 	// UE_LOG(LogTemp, Error, TEXT("UnExpected Tree ID"));
-
-	// Change Lobby Scene
-	//ATinoController::ChangeMenuWidget(ATinoController::GetNextWidgetClass());
 	
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	TinoController->ChangeMenuWidget(TinoController->GetLobbyWidgetClass());
@@ -38,6 +35,9 @@ void ULoginUIWidget::TryNewAccounts()
 {
 	// NewAccounts Button Onclicked
 	// UE_LOG(LogTemp, Error, TEXT("UnExpected Tree NewAccounts"));
+
+	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	TinoController->ChangeMenuWidget(TinoController->GetCreateAccountsWidgetClass());
 }
 
 void ULoginUIWidget::InputLoginID(const FText& Text)
