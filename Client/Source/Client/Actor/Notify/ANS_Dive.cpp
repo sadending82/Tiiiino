@@ -19,9 +19,10 @@ void UANS_Dive::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase*
 	if (TinoCharacter)
 	{
 		TinoCharacter->Jump();
-		TinoCharacter->DisableInputMode();
 		TinoCharacter->SetMaxTumbleTime(0.3f);
 		TinoCharacter->GetCharacterMovement()->MaxWalkSpeed = 0;
+		TinoCharacter->GetCharacterMovement()->Velocity = FVector::ZeroVector;
+		TinoCharacter->SetMovementState(EMovementState::EMS_Dive);
 	}
 	
 
@@ -51,9 +52,8 @@ void UANS_Dive::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* A
 	auto TinoCharacter = Cast<ATinoCharacter>(MeshComp->GetOwner());
 	if (TinoCharacter)
 	{
-		TinoCharacter->EnableInputMode();
 		TinoCharacter->SetMaxTumbleTime(0.5f);
 		TinoCharacter->GetCharacterMovement()->MaxWalkSpeed = 400;
-
+		TinoCharacter->SetMovementState(EMovementState::EMS_Normal);
 	}
 }

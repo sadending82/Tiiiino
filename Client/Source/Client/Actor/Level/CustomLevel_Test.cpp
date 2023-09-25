@@ -4,7 +4,8 @@
 #include "Actor/Level/CustomLevel_Test.h"
 #include "Network/Network.h"
 #include "Actor/Character/TinoCharacter.h"
-#include "Utilities/CLog.h"
+
+#include "Global.h"
 
 
 void ACustomLevel_Test::BeginPlay() {
@@ -31,7 +32,10 @@ void ACustomLevel_Test::BeginPlay() {
 	//To Loading ...
 
 	//To Do SomeThing ...
-
+	FInputModeUIOnly LobbyInputMode;
+	auto Controller = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	Controller->SetInputMode(LobbyInputMode);
+	Controller->bShowMouseCursor = true;
 }
 
 

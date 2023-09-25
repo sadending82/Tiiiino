@@ -10,7 +10,8 @@
 #include "Animation/AnimMontage.h"
 
 ATinoCharacter::ATinoCharacter()
-	:MaxTumbledTime(0.5f)
+	:MaxTumbledTime(0.5f),
+	MovementState(EMovementState::EMS_Normal)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	UHelpers::CreateComponent<USpringArmComponent>(this, &SpringArm, "SpringArm",GetCapsuleComponent());
@@ -38,8 +39,6 @@ void ATinoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction("Jump", EInputEvent::IE_Pressed, this, &ATinoCharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", EInputEvent::IE_Released, this, &ATinoCharacter::StopJumping);
 	PlayerInputComponent->BindAction("Dive", EInputEvent::IE_Pressed, this, &ATinoCharacter::Dive);
-	PlayerInputComponent->BindAction("Running", EInputEvent::IE_Pressed, this, &ATinoCharacter::OnRunning);
-	PlayerInputComponent->BindAction("Running", EInputEvent::IE_Released, this, &ATinoCharacter::OffRunning);
 }
 
 // Called when the game starts or when spawned
@@ -99,7 +98,6 @@ bool ATinoCharacter::CanTumble(float DeltaTime)
 	ret &= (GetVelocity().Z < 0);
 	
 	if (ret && MaxTumbledTime > CurrentTumbledTime) CurrentTumbledTime += DeltaTime;
-
 	bCanTumbled = (CurrentTumbledTime >= MaxTumbledTime);
 
 	return ret;
@@ -140,18 +138,26 @@ void ATinoCharacter::Dive()
 
 void ATinoCharacter::OnMoveForward(float Axis)
 {
-	FRotator rotator = FRotator(0, GetControlRotation().Yaw, 0);
-	FVector dir = FQuat(rotator).GetForwardVector().GetUnsafeNormal2D();
+	if (CanMove())
+	{
+		FRotator rotator = FRotator(0, GetControlRotation().Yaw, 0);
+		FVector dir = FQuat(rotator).GetForwardVector().GetUnsafeNormal2D();
 
-	AddMovementInput(dir, Axis);
+		AddMovementInput(dir, Axis);
+	}
+	
 }
 
 void ATinoCharacter::OnMoveRight(float Axis)
 {
-	FRotator rotator = FRotator(0, GetControlRotation().Yaw, 0);
-	FVector dir = FQuat(rotator).GetRightVector().GetUnsafeNormal2D();
+	if (CanMove())
+	{
+		FRotator rotator = FRotator(0, GetControlRotation().Yaw, 0);
+		FVector dir = FQuat(rotator).GetRightVector().GetUnsafeNormal2D();
 
-	AddMovementInput(dir, Axis);
+		AddMovementInput(dir, Axis);
+	}
+	
 }
 
 void ATinoCharacter::OnHorizonLock(float Axis)
@@ -164,16 +170,6 @@ void ATinoCharacter::OnVerticalLock(float Axis)
 	AddControllerPitchInput(Axis);
 }
 
-void ATinoCharacter::OnRunning()
-{
-	GetCharacterMovement()->MaxWalkSpeed = 200;
-}
-
-void ATinoCharacter::OffRunning()
-{
-	GetCharacterMovement()->MaxWalkSpeed = 100;
-}
-
 void ATinoCharacter::CreateDummy()
 {
 	GetController<ATinoController>()->CreateDummy();
@@ -182,7 +178,14 @@ void ATinoCharacter::CreateDummy()
 void ATinoCharacter::Jump()
 {
 	Super::Jump();
-	
+	SetMovementState(EMovementState::EMS_Up);
+}
+
+void ATinoCharacter::StopJumping()
+{
+	Super::StopJumping();
+	SetMovementState(EMovementState::EMS_Normal);
+
 }
 
 void ATinoCharacter::PlayTumbleMontage()
@@ -200,7 +203,19 @@ void ATinoCharacter::EnableInputMode()
 	EnableInput(GetController<APlayerController>());
 }
 
-void ATinoCharacter::StopJumping()
+bool ATinoCharacter::CanMove()
 {
-	Super::StopJumping();
+	bool ret = true;
+
+	switch (MovementState)
+	{
+	case EMovementState::EMS_Normal:
+	case EMovementState::EMS_Fall:
+		ret = true;
+		break;
+	default:
+		ret = false;
+	}
+	return ret;
 }
+
