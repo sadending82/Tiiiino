@@ -52,17 +52,15 @@ bool DB::ExecuteQuery()
 	return true;
 }
 
-vector<string> DB::SelectUserData(const int uid)
+tuple<string, string, double, int> DB::SelectUserData(const int uid)
 {
-	vector<string> data;
-
 	string query = "SELECT id, nick, credit, point FROM userinfo WHERE uid = ?";
 
 	if (mysql_stmt_prepare(mStmt, query.c_str(), query.length()) != 0) {
 #ifdef Test
 		std::cout << "SelectUserData stmt prepare error: " << mysql_stmt_error(mStmt) << std::endl;
 #endif
-		return vector<string>();
+		return tuple<string, string, double, int>();
 	}
 
 	MYSQL_BIND paramBind;
@@ -73,41 +71,51 @@ vector<string> DB::SelectUserData(const int uid)
 #ifdef Test
 		std::cout << "SelectUserData stmt param bind error: " << mysql_stmt_error(mStmt) << std::endl;
 #endif
-		return vector<string>();
+		return tuple<string, string, double, int>();
 	}
 
 	const int resColNum = 4;
 	MYSQL_BIND resultBinds[resColNum];
 	memset(resultBinds, 0, sizeof(resultBinds));
-	char bindData[resColNum][50];
-	for (int i = 0; i < resColNum; ++i)
+	char bindID[MAX_NAME_SIZE];
+	char bindNickname[MAX_NAME_SIZE];
+	double bindCredit;
+	int bindPoint;
 	{
-		resultBinds[i].buffer_type = MYSQL_TYPE_STRING;
-		resultBinds[i].buffer_length = sizeof(bindData[i]);
-		resultBinds[i].buffer = bindData[i];
+		resultBinds[0].buffer_type = MYSQL_TYPE_STRING;
+		resultBinds[0].buffer_length = sizeof(bindID);
+		resultBinds[0].buffer = bindID;
+
+		resultBinds[1].buffer_type = MYSQL_TYPE_STRING;
+		resultBinds[1].buffer_length = sizeof(bindNickname);
+		resultBinds[1].buffer = bindNickname;
+
+		resultBinds[2].buffer_type = MYSQL_TYPE_DOUBLE;
+		resultBinds[2].buffer = &bindCredit;
+
+		resultBinds[3].buffer_type = MYSQL_TYPE_LONG;
+		resultBinds[3].buffer = &bindPoint;
+
 	}
 
 	if (mysql_stmt_bind_result(mStmt, resultBinds) != 0) {
 #ifdef Test
 		std::cout << "SelectUserData stmt result bind error: " << mysql_stmt_error(mStmt) << std::endl;
 #endif
-		return vector<string>();
+		return tuple<string, string, double, int>();
 	}
 
 	if (ExecuteQuery() == false) {
-		return vector<string>();
+		return tuple<string, string, double, int>();
 	}
 
 	if (mysql_stmt_fetch(mStmt) != 0) {
-		return vector<string>();
+		return tuple<string, string, double, int>();
 	}
 
-	for (string col : bindData) {
-		data.push_back(col);
-		cout << col << endl;
-	}
+	cout << bindID << " // " << bindNickname << " // " << bindCredit << " // " << bindPoint << endl;
 
-	return data;
+	return make_tuple(bindID, bindNickname, bindCredit, bindPoint);
 }
 
 tuple<int, string, double, int, bool> DB::SelectUserDataForLogin(const string& id, const string& password)
@@ -118,7 +126,7 @@ tuple<int, string, double, int, bool> DB::SelectUserDataForLogin(const string& i
 #ifdef Test
 		std::cout << "SelectUserData stmt prepare error: " << mysql_stmt_error(mStmt) << std::endl;
 #endif
-		return make_tuple(INVALIDKEY, "", 0.0, 0, false);
+		return tuple<int, string, double, int, bool>();
 	}
 
 	const int paramColNum = 2;
@@ -137,7 +145,7 @@ tuple<int, string, double, int, bool> DB::SelectUserDataForLogin(const string& i
 #ifdef Test
 			std::cout << "SelectUserData stmt param bind error: " << mysql_stmt_error(mStmt) << std::endl;
 #endif
-		return make_tuple(INVALIDKEY, "", 0.0, 0, false);
+		return tuple<int, string, double, int, bool>();
 	}
 
 	const int resColNum = 5;
@@ -169,15 +177,15 @@ tuple<int, string, double, int, bool> DB::SelectUserDataForLogin(const string& i
 #ifdef Test
 		std::cout << "SelectUserData stmt result bind error: " << mysql_stmt_error(mStmt) << std::endl;
 #endif
-		return make_tuple(INVALIDKEY, "", 0.0, 0, false);
+		return tuple<int, string, double, int, bool>();
 	}
 
 	if (ExecuteQuery() == false) {
-		return make_tuple(INVALIDKEY, "", 0.0, 0, false);
+		return tuple<int, string, double, int, bool>();
 	}
 
 	if (mysql_stmt_fetch(mStmt) != 0) {
-		return make_tuple(INVALIDKEY, "", 0.0, 0, false);
+		return tuple<int, string, double, int, bool>();
 	}
 
 	return make_tuple(bindUID, bindNickname, bindCredit, bindPoint, bindState);

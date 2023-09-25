@@ -20,9 +20,11 @@ public:
 	bool ConnectDB();
 	bool ExecuteQuery();
 
-	vector<string> SelectUserData(const int uid);
+	tuple<string, string, double, int> SelectUserData(const int uid);
 	tuple<int, string, double, int, bool> SelectUserDataForLogin(const string& id, const string& password);
+
 	bool InsertNewUser(const string& id, const string& passWord, const string& nickname);
+
 	bool UpdateUserConnectionState(const int uid, const bool state);
 	bool UpdateUserNickname(const int uid, const string& nicknameToChange);
 	bool UpdateUserCredit(const int uid, double credit);
