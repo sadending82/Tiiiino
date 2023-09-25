@@ -248,6 +248,7 @@ void Network::l_process_packet(unsigned char* p)
 	{
 		LC_LOGIN_OK_PACKET* packet = reinterpret_cast<LC_LOGIN_OK_PACKET*>(p);
 		mMyCharacter->SetClientID(packet->id);
+		mDBUID = packet->UID;
 		//연결성공
 		bIsConnectedLobby = true;
 
