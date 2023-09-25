@@ -65,9 +65,9 @@ void ATinoCharacter::Tick(float DeltaTime)
 
 		float PitchClamp = FMath::ClampAngle(Rotation.Pitch, -45.f, 30.f);
 		FRotator RotationControl(PitchClamp, Rotation.Yaw, Rotation.Roll);
-
+		SleepEx(0, true);
 		if (GetController()->IsPlayerController() && Network::GetNetwork()->bIsConnected) {
-			SleepEx(0, true);
+			
 			auto pos = GetTransform().GetLocation();
 			auto rot = GetTransform().GetRotation();
 
