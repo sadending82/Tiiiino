@@ -39,7 +39,6 @@ public:
 	int GetmTargetID() { return mTargetID; }
 
 //private:
-	SOCKET mSocket;
 	WSAOVERLAPPED mOver;
 	WSABUF mWsaBuf;
 	unsigned char mMessageBuf[BUF_SIZE];
