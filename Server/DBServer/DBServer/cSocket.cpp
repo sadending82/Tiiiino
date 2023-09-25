@@ -118,7 +118,7 @@ void Socket::ServerReady(DB* pDB)
     Setm_pDB(pDB);
 #ifdef Test
     //m_pDB->SelectUserData(1);
-    //CheckLogin(1, "aaaa", "bbbb");
+    //CheckLogin(1, "aaaa", "bbbb",1 );
 #endif
 
     WSADATA wsa;
