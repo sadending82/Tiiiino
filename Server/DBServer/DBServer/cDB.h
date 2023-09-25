@@ -21,7 +21,7 @@ public:
 	bool ExecuteQuery();
 
 	vector<string> SelectUserData(const int uid);
-	vector<string> SelectUserData(const string& id, const string& password);
+	tuple<int, string, double, int> SelectUserData(const string& id, const string& password);
 	bool InsertNewUser(const string& id, const string& passWord, const string& nickname);
 	bool UpdateUserNickname(const int uid, const string& nicknameToChange);
 	bool UpdateUserCredit(const int uid, double credit);

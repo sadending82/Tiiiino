@@ -20,7 +20,11 @@ enum SPacketType {
 	GL_LOGIN,
 
 	// LobbyServer To DBServer
-	LD_LOGIN
+	LD_LOGIN,
+
+	// DBServer To LobbyServer
+	DL_LOGIN_OK,
+	DL_LOGIN_FAIL
 };
 
 
@@ -38,7 +42,18 @@ struct GL_LOGIN_PACKET : public SPACKET {
 };
 
 struct LD_LOGIN_PACKET :public SPACKET {
-	int		testNum;
+	char	id[MAX_NAME_SIZE];
+	char	password[MAX_NAME_SIZE];
+};
+
+struct DL_LOGIN_OK_PACKET :public SPACKET {
+	int		uid;
+	char	nickname[MAX_NAME_SIZE];
+	double	credit;
+	int		point;
+};
+
+struct DL_LOGIN_FAIL_PACKET :public SPACKET {
 };
 
 #pragma pack (pop)

@@ -20,6 +20,8 @@ public:
 
 	bool CheckLogin(int key, unsigned char* buf);
 
+	void SendUserDataAfterLogin(int key, int uid, string nickname, double credit, int point);
+
 private:
 	SOCKADDR_IN mServerAddr;
 	HANDLE mHcp;

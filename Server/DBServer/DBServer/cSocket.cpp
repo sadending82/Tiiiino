@@ -164,7 +164,7 @@ void Socket::processPacket(int key, unsigned char* buf)
         // 로그인 요청
     case LD_LOGIN:
     {
-        //bool bCheckLogin = CheckLogin(key, buf);
+        bool bCheckLogin = CheckLogin(key, buf);
         break;
     }
     default:
@@ -219,7 +219,32 @@ void Socket::DoSend(int key, char* buf)
 
 bool Socket::CheckLogin(int key, unsigned char* buf)
 {
-    //vector<string> userData = m_pDB->SelectUserData();
+    LD_LOGIN_PACKET* rp = reinterpret_cast<LD_LOGIN_PACKET*>(buf);
+
+    auto userData = m_pDB->SelectUserData(rp->id, rp->password);
+
+    int uid = get<0>(userData);
+    string nickname = get<1>(userData);
+    double credit = get<2>(userData);
+    int point = get<3>(userData);
+
+    if (get<0>(userData) != INVALIDKEY) {
+        SendUserDataAfterLogin(key, uid, nickname, credit, point);
+        return true;
+    }
 
     return false;
+}
+
+void Socket::SendUserDataAfterLogin(int key, int uid, string nickname, double credit, int point)
+{
+    DL_LOGIN_OK_PACKET sp;
+    sp.type = SPacketType::DL_LOGIN_OK;
+    sp.size = sizeof(DL_LOGIN_OK_PACKET);
+    sp.uid = uid;
+    memcpy(sp.nickname, nickname.c_str(), nickname.size());
+    sp.credit = credit;
+    sp.point = point;
+
+    mSessions[key].DoSend(reinterpret_cast<DL_LOGIN_OK_PACKET*>(&sp));
 }
