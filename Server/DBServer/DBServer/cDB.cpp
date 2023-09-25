@@ -175,7 +175,7 @@ tuple<int, string, double, int> DB::SelectUserData(const string& id, const strin
 
 	mysql_stmt_fetch(mStmt);
 
-	cout << bindUID << " | " << bindNickname << " | " << bindCredit << " | " << bindPoint << endl;
+	//cout << bindUID << " | " << bindNickname << " | " << bindCredit << " | " << bindPoint << endl;
 
 	return make_tuple(bindUID, bindNickname, bindCredit, bindPoint);
 }
