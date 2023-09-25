@@ -370,17 +370,17 @@ void Server::Init()
 			cout << "Max server exceeded.\n";
 		}
 
-		ZeroMemory(&ss_over.mOver, sizeof(ss_over.mOver));
-		ss_over.mWsaBuf.buf = reinterpret_cast<CHAR*>(LDsocket);
-		int addr_size = sizeof(SOCKADDR_IN);
-		AcceptEx(mListenSocket, LDsocket, ss_over.mMessageBuf, 0, addr_size + 16, addr_size + 16, 0, &ss_over.mOver);
-
-		LD_LOGIN_PACKET p;
-		p.size = sizeof(LD_LOGIN_PACKET);
-		p.type = LD_LOGIN;
-		//p.testNum = 123;
-
-		mServers[server_id].DoSend(&p);
+		//ZeroMemory(&ss_over.mOver, sizeof(ss_over.mOver));
+		//ss_over.mWsaBuf.buf = reinterpret_cast<CHAR*>(LDsocket);
+		//int addr_size = sizeof(SOCKADDR_IN);
+		//AcceptEx(mListenSocket, LDsocket, ss_over.mMessageBuf, 0, addr_size + 16, addr_size + 16, 0, &ss_over.mOver);
+		//
+		//LD_LOGIN_PACKET p;
+		//p.size = sizeof(LD_LOGIN_PACKET);
+		//p.type = LD_LOGIN;
+		////p.testNum = 123;
+		//
+		//mServers[server_id].DoSend(&p);
 	}
 
 	SYSTEM_INFO si;
