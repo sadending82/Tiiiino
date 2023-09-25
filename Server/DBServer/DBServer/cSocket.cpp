@@ -117,7 +117,7 @@ void Socket::ServerReady(DB* pDB)
 {
     Setm_pDB(pDB);
 #ifdef Test
-    m_pDB->SelectUserData(1);
+    //m_pDB->SelectUserData(1);
     //CheckLogin(1, "aaaa", "bbbb");
 #endif
 
@@ -221,7 +221,7 @@ void Socket::SendLoginFail(int key, const char* id) {
     DL_LOGIN_FAIL_PACKET p;
     p.size = sizeof(DL_LOGIN_FAIL_PACKET);
     p.type = SPacketType::DL_LOGIN_FAIL;
-    memcpy(p.id, id, sizeof(id));
+    //memcpy(p.id, id, sizeof(id));
 
     mSessions[key].DoSend(reinterpret_cast<DL_LOGIN_FAIL_PACKET*>(&p));
 }
