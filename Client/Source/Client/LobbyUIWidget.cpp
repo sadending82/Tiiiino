@@ -3,7 +3,7 @@
 
 #include "LobbyUIWidget.h"
 #include "Actor/Controller/TinoController.h"
-
+#include "Network/Network.h"
 #include "Global.h"
 
 void ULobbyUIWidget::NativePreConstruct()
@@ -17,7 +17,7 @@ void ULobbyUIWidget::NativeDestruct()
 void ULobbyUIWidget::TryGameStart()
 {
 	// GameStart Button Onclicked
-
+	send_match_packet(Network::GetNetwork()->l_socket);
 
 }
 

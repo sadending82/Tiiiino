@@ -55,7 +55,8 @@ bool ACustomLevel_Test::ConnGameServer()
 		if (Network::GetNetwork()->ConnectServerGame())
 		{
 			CLog::Log("Connect Successfully");
-			send_movetogame_packet(Network::GetNetwork()->s_socket, 0); 
+			send_movetogame_packet(Network::GetNetwork()->s_socket,Network::GetNetwork()->mDBUID,
+				TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterName), 0);
 			return true;
 		}
 		else {
@@ -75,7 +76,7 @@ bool ACustomLevel_Test::ConnLobbyServer()
 	{
 		if (false == Network::GetNetwork()->bLoginFlag)
 		{
-			send_login_packet(Network::GetNetwork()->l_socket, "dd", "Dd");
+			//send_login_packet(Network::GetNetwork()->l_socket, "dd", "Dd");
 			//player->ShowLoginHUD();
 		}
 		else
@@ -85,7 +86,7 @@ bool ACustomLevel_Test::ConnLobbyServer()
 			//if (nullptr != Network::GetNetwork()->mMyCharacter)
 			//	send_login_lobby_packet(Network::GetNetwork()->mMyCharacter->l_socket, tmpid, tmppass);
 		}
-		CLog::Log("Connect Successfully");
+		CLog::Log("Connect Lobby Successfully");
 		return true;
 	}
 	else {

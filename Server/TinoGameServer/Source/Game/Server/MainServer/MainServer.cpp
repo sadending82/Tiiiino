@@ -3,6 +3,8 @@
 #include "../../Object/Player/Player.h"
 #include "../../Thread/WorkerThread/WorkerThread.h"
 #include "../../Room/Room.h"
+#include "../LobbyServer/LobbyServer.h"
+#include "../../../../../ServerProtocol.h"
 
 MainServer* gMainServer;
 
@@ -90,6 +92,8 @@ void MainServer::init()
 		room->Init();
 		mRooms.insert(make_pair(i,room));
 	}
+	mLobbyServer = new LobbyServer();
+	dynamic_cast<LobbyServer*>(mLobbyServer)->init();
 	mWorkerThreadRef = new WorkerThread(this);
 
 	std::cout << "Creating Worker Threads\n";
@@ -122,7 +126,7 @@ int MainServer::GenerateID()
 	return -1;
 }
 
-void MainServer::send_login_ok_packet(int player_id, const char* playername)
+void MainServer::send_login_ok_packet(const int player_id, const char* playername)
 {
 	auto player = dynamic_cast<Player*>(mObjects[player_id]);
 	SC_LOGIN_OK_PACKET packet;
@@ -134,6 +138,18 @@ void MainServer::send_login_ok_packet(int player_id, const char* playername)
 	packet.id = player_id;
 	//wcscpy(packet.name, playername);
 	player->SendPacket(&packet, sizeof(packet));
+}
+
+void MainServer::send_room_ready_packet(const int roomID)
+{
+	GL_ROOM_READY_PACKET packet;
+	memset(&packet, 0, sizeof(GL_ROOM_READY_PACKET));
+
+	packet.size = sizeof(packet);
+	packet.type = GL_ROOM_READY;
+	packet.roomID = roomID;
+
+	mLobbyServer->SendPacket(&packet, sizeof(packet));
 }
 
 
@@ -162,7 +178,7 @@ void MainServer::send_move_packet(int player_id, int mover_id, const bool& inair
 	player->SendPacket(&packet, sizeof(packet));
 }
 
-void MainServer::ConnectLobbyServer()
+void MainServer::connectLobbyServer()
 {
 
 }
@@ -187,7 +203,27 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 			cout << "잘못된 방에 입장하려 시도함.\n";
 			break;
 		}
+		//로비랑 연결 안 됐을때는 아래 for문이 무시되므로 여기서 세팅
+		//에디터에서 개발 편하게 하려고 넣은 코드
 		player->SetRoomID(packet->roomID);
+
+
+		for (auto tRoom : mRooms)
+		{
+			auto& room = tRoom.second;
+			if (room->IsRoomActive())
+			{
+				if (room->FindPlayerInfo(packet->uID, packet->name))
+				{
+					player->SetRoomID(tRoom.first);
+				}
+			}
+		}
+
+		/*
+			나중에 여기에 제대로 된 방 id가 안나오면 접속을 끊어버려야함. 부정접속
+		*/
+
 		Room* pRoom = mRooms[player->GetRoomID()];
 		pRoom->AddObject(player);
 
@@ -279,6 +315,34 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 			}
 
 		}
+		break;
+	}
+	}
+}
+
+void MainServer::ProcessPacketLobby(const int serverID, unsigned char* p)
+{
+	unsigned char packet_type = p[1];
+	Server* object = mLobbyServer;
+
+	switch (packet_type) {
+	case LG_USER_INTO_GAME: {
+		LG_USER_INTO_GAME_PACKET* packet = reinterpret_cast<LG_USER_INTO_GAME_PACKET*>(p);
+		Room* activeRoom = mRooms[packet->roomID];
+		mRooms[packet->roomID]->ActiveRoom();
+
+		if (true == activeRoom->SettingRoomPlayer(packet->uID, packet->name, packet->roomMax))
+		{
+#ifdef _DEBUG
+			cout << packet->roomID << "번째 방 활성화 완료.\n";
+#endif
+			send_room_ready_packet(packet->roomID);
+		}
+
+		break;
+	}
+	case CS_MOVE: {
+
 		break;
 	}
 	}

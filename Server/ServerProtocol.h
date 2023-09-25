@@ -3,7 +3,7 @@
 
 constexpr int DBSERVERPORT = 3700;
 
-constexpr int MAXGAMESERVER = 1;
+constexpr int MAXGAMESERVER = 2;
 
 
 constexpr unsigned long long INCODE_SERVER_PACKET = 0xFFFF'5137'0808'6310;
@@ -18,6 +18,10 @@ enum SPacketType {
 
 	// GameServer To LobbyServer
 	GL_LOGIN,
+	GL_ROOM_READY,
+
+	// LobbyServer To GameServer
+	LG_USER_INTO_GAME,
 
 	// LobbyServer To DBServer
 	LD_LOGIN,
@@ -37,13 +41,28 @@ public:
 };
 
 struct GL_LOGIN_PACKET : public SPACKET {
+
+};
+
+struct GL_ROOM_READY_PACKET : public SPACKET {
+	int		roomID;
+};
+
+//---
+struct LG_LOGIN_OK_PACKET : public SPACKET {
+
+};
+struct LG_USER_INTO_GAME_PACKET : public SPACKET {
 	char	name[MAX_NAME_SIZE];
-	int		roomID;	//원래는 lobbyServer에서 줘야 하는 값. 나중에 '무조건' 빼야함.
+	int		uID;
+	int		roomID;
+	int		roomMax;	//방 최대 인원. (4명이서 할 수도 있으니까)
 };
 
 struct LD_LOGIN_PACKET :public SPACKET {
 	char	id[MAX_NAME_SIZE];
 	char	password[MAX_NAME_SIZE];
+	int		user_id;
 };
 
 struct DL_LOGIN_OK_PACKET :public SPACKET {
@@ -51,9 +70,12 @@ struct DL_LOGIN_OK_PACKET :public SPACKET {
 	char	nickname[MAX_NAME_SIZE];
 	double	credit;
 	int		point;
+	int		user_id;
+	bool	connState;
 };
 
 struct DL_LOGIN_FAIL_PACKET :public SPACKET {
+	int		user_id;
 };
 
 #pragma pack (pop)

@@ -1,5 +1,6 @@
 #pragma once
 #include "server.h"
+#include "../ServerProtocol.h"
 
 void Server::Disconnect(int cID)
 {
@@ -48,12 +49,47 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 	case CL_LOGIN:
 	{
 		CL_LOGIN_PACKET* p = reinterpret_cast<CL_LOGIN_PACKET*>(cpacket);
-
-		cout << p->id << "," << p->password << endl;
+		LD_LOGIN_PACKET pac;
+		pac.type = LD_LOGIN;
+		pac.size = sizeof(LD_LOGIN_PACKET);
+		pac.user_id = cID;
+		memcpy(pac.id, p->id, sizeof(pac.id));
+		memcpy(pac.password, p->password, sizeof(pac.password));
+		cout << pac.id << endl;
+		// db 서버에 전송
+		mServers[0].DoSend(&pac);
+		break;
+	}
+	case CL_MATCH:
+	{
+		CL_MATCH_PACKET* p = reinterpret_cast<CL_MATCH_PACKET*>(cpacket);
 		/*
-			Do SomeThing;
-		*/
+		지금은!게임서버한테 바로 보내주면 됨.
+		나중엔 이 패킷에서 보내주는게 아니라 여기로 들어온 플레이어들을 모아서
+		따로 매칭 로직을 돌린 후에 매칭이 성사 되면 그 함수에서 아래의 패킷을 보내주면 됨.
+		그리고 이 패킷 하나 크기가 46이라서 8명을 한꺼번에 보내면 344바이트임. 한번에 못보냄
+		포문 돌려서 인원수만큼 보내주면 됨.
 		
+		LG_USER_INTO_GAME_PACKET packet;
+		packet.size = sizeof(packet);
+		packet.type = LG_USER_INTO_GAME;
+		packet.roomID = 0; //여기에 Room Number인데~ 이건 이제 로비서버에서 매칭 로직 돌리면서 정해줘야함 지금은 0 넣으면 됨.
+		strcpy(packet.name, mClients[cID].GetName());
+		strcpy(packet.passWord, mClients[cID].GetPassWord());
+		packet.roomMax = 8;	//여기도 몇명이서 진행하는지 넣는 값. 테스트에는 거의 8명이서 할 거니까 8을 넣어준다. 4명이서 하면 4를 넣는다.
+		sendToGameServer(packet);
+		*/
+
+		LG_USER_INTO_GAME_PACKET packet;
+		packet.size = sizeof(packet);
+		packet.type = LG_USER_INTO_GAME;
+		packet.roomID = 0;//방 번호 임시로 0으로 넣어둠
+		strcpy_s(packet.name, sizeof(mClients[cID].mNickName), mClients[cID].mNickName);
+		packet.uID = mClients[cID].mUID;
+		packet.roomMax = 1;
+		mClients[cID].mRoomID = packet.roomID;	
+		mServers[1].DoSend(&packet);
+
 		break;
 	}
 	default:
@@ -72,13 +108,65 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 	{
 		GL_LOGIN_PACKET* p = reinterpret_cast<GL_LOGIN_PACKET*>(spacket);
 
-		cout << "OK";
+		cout << "게임 서버 접속 확인" << endl;
 
 		break;
 	}
-	case DL_LOGIN_OK: {
-		DL_LOGIN_OK_PACKET* p = reinterpret_cast<DL_LOGIN_OK_PACKET*>(spacket);
+	case GL_ROOM_READY:
+	{
+		GL_ROOM_READY_PACKET* p = reinterpret_cast<GL_ROOM_READY_PACKET*>(spacket);
+		LC_MATCH_RESPONSE_PACKET packet;
+		packet.size = sizeof(packet);
+		packet.type = LC_MATCH_RESPONSE;
+		for (auto& player : mClients)
+		{
+			if (player.mRoomID == p->roomID)
+			{
+				player.DoSend(&packet);
+			}
+		}
+		//자리에 없으셔서 만든 비효율적인 코드 나중에 고쳐주십쇼
+		
 
+		/*
+			패킷의 roomID로 room을 준비 완료로 바꾸고, 클라이언트들에게 게임서버로 가라는 패킷을 보냄.
+			LC_MATCH_RESPONSE_PACKET packet;
+			packet.size = sizeof(packet);
+			packet.type = LC_MATCH_RESPONSE;
+			packet.gameServerPortNum = GAMESERVERPORT + n;	//나중에 게임서버 여러개까지 고려
+			strcpy(packet.gameServerIP,"127.0.0.1"대충아이피);
+			sendToClient(packet);
+
+		*/
+
+		break;
+	}
+	case DL_LOGIN_OK:
+	{
+		cout << "로그인 성공" << endl;
+
+		DL_LOGIN_OK_PACKET* p = reinterpret_cast<DL_LOGIN_OK_PACKET*>(spacket);
+		mClients[p->user_id].mCredit = p->credit;
+		strcpy_s(mClients[p->user_id].mNickName, sizeof(p->nickname), p->nickname);
+		mClients[p->user_id].mPoint = p->point;
+		mClients[p->user_id].mUID = p->uid;
+
+		LC_LOGIN_OK_PACKET pac;
+		pac.type = LC_LOGIN_OK;
+		pac.size = sizeof(LC_LOGIN_OK_PACKET);
+		pac.id = p->user_id;
+		pac.RoomID = 0;
+		pac.UID = mClients[p->user_id].mUID;
+
+		mClients[p->user_id].DoSend(&pac);
+
+		// 클라쪽에 로그인 성공 했다고 알려줘야 함
+
+		break;
+	}
+	case DL_LOGIN_FAIL:
+	{
+		cout << "로그인 실패" << endl;
 		break;
 	}
 	default:
@@ -95,7 +183,8 @@ void Server::DoWorker()
 	p.type = 0;
 
 	pTimer->PushEvent(1, eEVENT_TYPE::EV_MATCH_UP, 5000, reinterpret_cast<char*>(&p));
-	cout << "타이머 푸시" << endl;*/
+	*/
+
 	while (true)
 	{
 		DWORD numBytes;
@@ -338,18 +427,17 @@ void Server::Init()
 			cout << "Max server exceeded.\n";
 		}
 
-		ZeroMemory(&ss_over.mOver, sizeof(ss_over.mOver));
-		ss_over.mWsaBuf.buf = reinterpret_cast<CHAR*>(LDsocket);
-		int addr_size = sizeof(SOCKADDR_IN);
-		AcceptEx(mListenSocket, LDsocket, ss_over.mMessageBuf, 0, addr_size + 16, addr_size + 16, 0, &ss_over.mOver);
-
-		LD_LOGIN_PACKET p;
-		p.size = sizeof(LD_LOGIN_PACKET);
-		p.type = LD_LOGIN;
-		memcpy (p.id, "aaaa", sizeof("aaaa"));
-		memcpy (p.password, "bbbb", sizeof("bbbb"));
-
-		mServers[server_id].DoSend(&p);
+		//ZeroMemory(&ss_over.mOver, sizeof(ss_over.mOver));
+		//ss_over.mWsaBuf.buf = reinterpret_cast<CHAR*>(LDsocket);
+		//int addr_size = sizeof(SOCKADDR_IN);
+		//AcceptEx(mListenSocket, LDsocket, ss_over.mMessageBuf, 0, addr_size + 16, addr_size + 16, 0, &ss_over.mOver);
+		//
+		//LD_LOGIN_PACKET p;
+		//p.size = sizeof(LD_LOGIN_PACKET);
+		//p.type = LD_LOGIN;
+		////p.testNum = 123;
+		//
+		//mServers[server_id].DoSend(&p);
 	}
 
 	SYSTEM_INFO si;

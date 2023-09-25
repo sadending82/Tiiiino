@@ -2,6 +2,9 @@
 
 #include "Network.h"
 #include "Actor/Character/TinoCharacter.h"
+#include "Actor/Controller/TinoController.h"
+#include "GameFramework/PlayerController.h"
+#include "Kismet/GameplayStatics.h"
 
 
 void CALLBACK send_callback(DWORD err, DWORD num_byte, LPWSAOVERLAPPED send_over, DWORD flag);
@@ -53,6 +56,8 @@ void Network::release()
 	if (isInit)
 	{
 		mGeneratedID = 0;
+		bIsConnected = 0;
+		bIsConnectedLobby = 0;
 		mMyCharacter->bIsConnected = 0;
 		mMyCharacter = nullptr;
 		for (auto& p : mOtherCharacter)
@@ -92,24 +97,35 @@ void Network::error_display(int err_no)
 	LocalFree(lpMsgBuf);
 }
 
-void send_login_packet(SOCKET& sock, const char* id, const char* password)
+void send_login_packet(SOCKET& sock, const char* id, const char* passWord)
 {
 	CL_LOGIN_PACKET packet;
 	packet.size = sizeof(packet);
 	packet.type = CL_LOGIN;
 	strcpy_s(packet.id, id);
-	strcpy_s(packet.password, password);
+	strcpy_s(packet.password, passWord);
 	//strcpy_s(packet.name, TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterName));
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
 	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
 }
 
-void send_movetogame_packet(SOCKET& sock,const int& roomID )
+void send_match_packet(SOCKET& sock)
+{
+	CL_MATCH_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = CL_MATCH;
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+}
+
+void send_movetogame_packet(SOCKET& sock, const int uID, const char* id, const int& roomID)
 {
 	CS_LOGIN_PACKET packet;
 	packet.size = sizeof(packet);
 	packet.type = CS_LOGIN;
 	packet.roomID = roomID;
+	packet.uID = uID;
+	strcpy_s(packet.name, id);
 	//strcpy_s(packet.name, TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterName));
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
 	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
@@ -234,8 +250,20 @@ void Network::l_process_packet(unsigned char* p)
 	{
 		LC_LOGIN_OK_PACKET* packet = reinterpret_cast<LC_LOGIN_OK_PACKET*>(p);
 		mMyCharacter->SetClientID(packet->id);
+		mDBUID = packet->UID;
 		//연결성공
 		bIsConnectedLobby = true;
+
+		auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(mMyCharacter->GetWorld(), 0));
+		TinoController->ChangeMenuWidget(TinoController->GetLobbyWidgetClass());
+
+		break;
+	}
+	case LC_MATCH_RESPONSE:
+	{
+		LC_MATCH_RESPONSE_PACKET* packet = reinterpret_cast<LC_MATCH_RESPONSE_PACKET*>(p);
+		//게임서버 연결 코드 나중에 ip랑 포트넘버도 넘겨야함.
+		UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("Level1_ver1_UIBranch"));
 		break;
 	}
 	default:

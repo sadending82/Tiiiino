@@ -48,12 +48,17 @@ void LobbyServer::init()
 			//error ! 
 		}
 	}
+	CreateIoCompletionPort(reinterpret_cast<HANDLE>(mSocket), gMainServer->GetIOCPHandle(), 0, 0);
+	AcceptSetting(eSocketState::ST_ACCEPT, eCOMMAND_IOCP::CMD_SERVER_RECV, mSocket);
+	PreRecvPacket(NULL, 0);
+	RecvPacket();
+
 	std::cout << "End\n";
 
-	SC_MOVE_PLAYER_PACKET packet{};
-	packet.size = sizeof(packet);
-	packet.type = GL_LOGIN;
-	SendPacket(&packet, sizeof(packet));
+	//SC_MOVE_PLAYER_PACKET packet{};
+	//packet.size = sizeof(packet);
+	//packet.type = GL_LOGIN;
+	//SendPacket(&packet, sizeof(packet));
 
 	//mSocket = WSASocketW(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);
 	//
