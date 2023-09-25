@@ -25,24 +25,14 @@ public:
 		mExOver.mWsaBuf.len = BUF_SIZE - mPrevData;
 		mExOver.mWsaBuf.buf = reinterpret_cast<char*>(mExOver.mMessageBuf) + mPrevData;
 		BOOL ret = WSARecv(mSocket, &mExOver.mWsaBuf, 1, 0, &recvFlag, &mExOver.mOver, 0);
-		/*if (ret == false) {
-			int err_no = WSAGetLastError();
-			if (err_no != WSA_IO_PENDING) {
-				cout << "Recv Error " << " code: " << err_no << endl;
-			}
-		}*/
 	}
 	void DoSend(void* packet)
 	{
 		ExOver* sdata = new ExOver{ reinterpret_cast<char*>(packet) };
 		BOOL ret = WSASend(mSocket, &sdata->mWsaBuf, 1, 0, 0, &sdata->mOver, 0);
-		/*if (ret == false) {
-			int err_no = WSAGetLastError();
-			if (err_no != WSA_IO_PENDING) {
-				cout << "Send Error " << " code: " << err_no << endl;
-			}
-		}*/
 	}
+
+
 
 public:
 	ExOver mExOver;

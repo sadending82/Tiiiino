@@ -66,9 +66,11 @@ struct DL_LOGIN_OK_PACKET :public SPACKET {
 	char	nickname[MAX_NAME_SIZE];
 	double	credit;
 	int		point;
+	bool	connState;
 };
 
 struct DL_LOGIN_FAIL_PACKET :public SPACKET {
+	char	id[MAX_NAME_SIZE];
 };
 
 #pragma pack (pop)
