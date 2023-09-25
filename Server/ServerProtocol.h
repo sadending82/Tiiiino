@@ -51,7 +51,7 @@ struct GL_ROOM_READY_PACKET : public SPACKET {
 //---
 struct LG_USER_INTO_GAME_PACKET : public SPACKET {
 	char	name[MAX_NAME_SIZE];
-	char	passWord[MAX_NAME_SIZE];
+	int		uID;
 	int		roomID;
 	int		roomMax;	//방 최대 인원. (4명이서 할 수도 있으니까)
 };

@@ -29,7 +29,7 @@ class ATinoCharacter;
 void send_login_packet(SOCKET& sock,const char* id, const char* passWord); 
 void send_match_packet(SOCKET& sock);
 //game packet
-void send_movetogame_packet(SOCKET& sock,const char* id, const char* passWord, const int& roomID);
+void send_movetogame_packet(SOCKET& sock,const int uID, const char* id, const int& roomID);
 void send_move_packet(SOCKET& sock, const bool& inair, const float& x, const float& y, const float& z, FQuat& rotate, const float& value, const FVector& speedVec);
 
 
@@ -98,6 +98,7 @@ private:
 public:
 	bool bIsConnected = false;	//게임서버랑 연결이 되었는지,
 	bool bIsConnectedLobby = false;		//로비서버랑 연결이 되었는지
+	int mDBUID;
 	int ClientID;
 	bool ConnectServerGame();
 	bool ConnectServerLobby();

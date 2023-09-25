@@ -45,6 +45,7 @@ public:
 struct CS_LOGIN_PACKET : public PACKET {
 	char	name[MAX_NAME_SIZE];
 	char	passWord[MAX_NAME_SIZE];
+	int		uID;
 	int		roomID;	//원래는 lobbyServer에서 줘야 하는 값. 나중에 '무조건' 빼야함.
 	
 };

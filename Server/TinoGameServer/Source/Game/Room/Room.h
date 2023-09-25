@@ -22,26 +22,30 @@ public:
 	void RemovePlayer(Player* player);
 	//The Game Is End, Reset Room ex)clear mObjects
 	void ResetGameRoom();
+	
+	void ActiveRoom();
+	bool IsRoomActive();
 
-	bool SettingRoomPlayer(const std::string id, const std::string passWord, const int& playerMaxNum);
-	bool PlayerInfoCmp(const std::string id, const std::string passWord);
+	bool SettingRoomPlayer(const int uID, const std::string id, const int& playerMaxNum);
+	bool FindPlayerInfo(const int uID, const std::string id);
 	
 	//Object order
 	//0~7 - player 
 	//8~ (MAX_OBJECT-1) - mapobject
 	std::array<Object*, MAX_OBJECT>& GetObjectsRef() { return mObjects;}
 protected:
-	void AddPlayer(Player* player);
-	void AddMapObject(MapObject* mapObject);
+	void addPlayer(Player* player);
+	void addMapObject(MapObject* mapObject);
+	//°ÔÀÓ ·ë »óÅÂ¸¦ Free¿¡¼­ ±ú¿öÁÜ.
 
-	void SetPlayerInfo(const std::string id, const std::string passWord, const int& playerMaxNum);
-	void SetPlayerInfoWithCnt(const std::string id, const std::string passWord, const int& playerMaxNum, int& playerCnt);
+	void setPlayerInfo(const int uID, const std::string id, const int& playerMaxNum);
+	void setPlayerInfoWithCnt(const int uID,const std::string id, const int& playerMaxNum, int& playerCnt);
 protected:
 	std::mutex mObjectsLock;
 	std::array<Object*,MAX_OBJECT> mObjects;
 
 	std::mutex mPlayerInfoLock;
-	std::map<std::string, std::string> mPlayerInfo;
+	std::map<int, std::string> mPlayerInfo;
 
 	std::mutex mRoomStateLock;
 	eRoomState mRoomState;

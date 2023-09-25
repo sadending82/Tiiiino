@@ -175,7 +175,7 @@ void MainServer::send_move_packet(int player_id, int mover_id, const bool& inair
 	player->SendPacket(&packet, sizeof(packet));
 }
 
-void MainServer::ConnectLobbyServer()
+void MainServer::connectLobbyServer()
 {
 
 }
@@ -200,7 +200,27 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 			cout << "잘못된 방에 입장하려 시도함.\n";
 			break;
 		}
+		//로비랑 연결 안 됐을때는 아래 for문이 무시되므로 여기서 세팅
+		//에디터에서 개발 편하게 하려고 넣은 코드
 		player->SetRoomID(packet->roomID);
+
+
+		for (auto tRoom : mRooms)
+		{
+			auto& room = tRoom.second;
+			if (room->IsRoomActive())
+			{
+				if (room->FindPlayerInfo(packet->uID, packet->name))
+				{
+					player->SetRoomID(tRoom.first);
+				}
+			}
+		}
+
+		/*
+			나중에 여기에 제대로 된 방 id가 안나오면 접속을 끊어버려야함. 부정접속
+		*/
+
 		Room* pRoom = mRooms[player->GetRoomID()];
 		pRoom->AddObject(player);
 
@@ -306,9 +326,13 @@ void MainServer::ProcessPacketLobby(const int serverID, unsigned char* p)
 	case LG_USER_INTO_GAME: {
 		LG_USER_INTO_GAME_PACKET* packet = reinterpret_cast<LG_USER_INTO_GAME_PACKET*>(p);
 		Room* activeRoom = mRooms[packet->roomID];
+		mRooms[packet->roomID]->ActiveRoom();
 
-		if (true == activeRoom->SettingRoomPlayer(packet->name, packet->passWord, packet->roomMax))
+		if (true == activeRoom->SettingRoomPlayer(packet->uID, packet->name, packet->roomMax))
 		{
+#ifdef _DEBUG
+			cout << packet->roomID << "번째 방 활성화 완료.\n";
+#endif
 			send_room_ready_packet(packet->roomID);
 		}
 

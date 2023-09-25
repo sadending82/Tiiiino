@@ -31,7 +31,7 @@ public:
 	void send_move_packet(int player_id, int mover_id, const bool& inair, float value, const float& sx, const float& sy, const float& sz);
 
 private:
-	void ConnectLobbyServer();
+	void connectLobbyServer();
 
 private:
 	std::array<class Object*, MAX_OBJECT> mObjects;
