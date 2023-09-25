@@ -1,5 +1,6 @@
 #pragma once
 #include "server.h"
+#include "../ServerProtocol.h"
 
 void Server::Disconnect(int cID)
 {

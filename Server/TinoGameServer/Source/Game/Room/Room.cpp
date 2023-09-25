@@ -99,7 +99,7 @@ bool Room::SettingRoomPlayer(const int uID, const std::string id, const int& pla
 		mRoomStateLock.lock();
 		if (mRoomState == eRoomState::ST_READY || mRoomState == eRoomState::ST_FREE)
 		{
-			mRoomState == eRoomState::ST_READY_COMPLETE;
+			mRoomState = eRoomState::ST_READY_COMPLETE;
 		}
 		mRoomStateLock.unlock();
 		return true;
