@@ -86,7 +86,7 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 		packet.roomID = 0;//방 번호 임시로 0으로 넣어둠
 		strcpy_s(packet.name, sizeof(mClients[cID].mNickName), mClients[cID].mNickName);
 		packet.uID = mClients[cID].mUID;
-		packet.roomMax = 1;
+		packet.roomMax = 2;
 		mClients[cID].mRoomID = packet.roomID;	
 		mServers[1].DoSend(&packet);
 

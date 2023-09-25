@@ -111,8 +111,8 @@ public:
 	SOCKADDR_IN l_server_addr;
 	WSA_OVER_EX l_recv_expover;
 	int			l_prev_size{};
-	void RecvPacketGame() ;
-	void RecvPacketLobby();
+	bool RecvPacketGame() ;
+	bool RecvPacketLobby();
 	// 112.152.55.49  127.0.0.1  , 112.153.53.142
 	const char* GAMESERVER_ADDR = "127.0.0.1";
 	const char* LOBBYSERVER_ADDR = "127.0.0.1";

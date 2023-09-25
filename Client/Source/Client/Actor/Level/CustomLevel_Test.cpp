@@ -52,7 +52,7 @@ bool ACustomLevel_Test::ConnGameServer()
 	auto player = Network::GetNetwork()->mMyCharacter;
 	if (nullptr != player)
 	{
-		if (Network::GetNetwork()->ConnectServerGame())
+		if (true == Network::GetNetwork()->ConnectServerGame())
 		{
 			CLog::Log("Connect Successfully");
 			send_movetogame_packet(Network::GetNetwork()->s_socket,Network::GetNetwork()->mDBUID,
@@ -60,7 +60,6 @@ bool ACustomLevel_Test::ConnGameServer()
 			return true;
 		}
 		else {
-
 			CLog::Log("Connect Fail!");
 		}
 	}
