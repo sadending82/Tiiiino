@@ -71,14 +71,14 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ExecutablePath>C:\Program Files\MySQL\MySQL Server 8.0\include\mysql;C:\Program Files\MySQL\MySQL Server 8.0\include;C:\Program Files\MySQL\MySQL Server 8.0\lib;$(ExecutablePath)</ExecutablePath>
-    <LibraryPath>C:\Program Files\MySQL\MySQL Server 8.0\lib;$(LibraryPath)</LibraryPath>
-    <ExternalIncludePath>C:\Program Files\MySQL\MySQL Server 8.0\include;$(ExternalIncludePath)</ExternalIncludePath>
+    <ExecutablePath>C:\boost_1_69_0\boost_1_69_0;C:\Program Files\MySQL\MySQL Connector C++ 8.1\include;$(ExecutablePath)</ExecutablePath>
+    <LibraryPath>C:\Program Files\MySQL\MySQL Connector C++ 8.1\lib64;$(LibraryPath)</LibraryPath>
+    <ExternalIncludePath>C:\boost_1_69_0\boost_1_69_0;C:\Program Files\MySQL\MySQL Connector C++ 8.1\include\jdbc;C:\Program Files\MySQL\MySQL Connector C++ 8.1\include\mysqlx;C:\Program Files\MySQL\MySQL Connector C++ 8.1\include;$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <ExecutablePath>C:\Program Files\MySQL\MySQL Server 8.0\include\mysql;C:\Program Files\MySQL\MySQL Server 8.0\include;C:\Program Files\MySQL\MySQL Server 8.0\lib;$(ExecutablePath)</ExecutablePath>
-    <LibraryPath>C:\Program Files\MySQL\MySQL Server 8.0\lib;$(LibraryPath)</LibraryPath>
-    <ExternalIncludePath>C:\Program Files\MySQL\MySQL Server 8.0\include;$(ExternalIncludePath)</ExternalIncludePath>
+    <ExecutablePath>C:\boost_1_69_0\boost_1_69_0;C:\Program Files\MySQL\MySQL Connector C++ 8.1\include;$(ExecutablePath)</ExecutablePath>
+    <LibraryPath>C:\Program Files\MySQL\MySQL Connector C++ 8.1\lib64;$(LibraryPath)</LibraryPath>
+    <ExternalIncludePath>C:\boost_1_69_0\boost_1_69_0;C:\Program Files\MySQL\MySQL Connector C++ 8.1\include\jdbc;C:\Program Files\MySQL\MySQL Connector C++ 8.1\include\mysqlx;C:\Program Files\MySQL\MySQL Connector C++ 8.1\include;$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -118,7 +118,10 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>mysqlcppconn.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>
+      </AdditionalOptions>
+      <AdditionalLibraryDirectories>C:\Program Files\MySQL\MySQL Connector C++ 8.1\lib64\vs14;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -135,7 +138,10 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>mysqlcppconn.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>
+      </AdditionalOptions>
+      <AdditionalLibraryDirectories>C:\Program Files\MySQL\MySQL Connector C++ 8.1\lib64\vs14;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

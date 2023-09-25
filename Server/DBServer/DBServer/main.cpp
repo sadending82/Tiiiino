@@ -11,7 +11,7 @@ int main(int argc, char* argv[])
 	Socket* pSocket = new Socket;
 
 	pDB->ConnectDB();
-	pSocket->ServerReady(pDB);
+	//pSocket->ServerReady(pDB);
 
 
 	//g_pDB->DisconnectDB();

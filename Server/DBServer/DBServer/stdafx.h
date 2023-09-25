@@ -1,5 +1,4 @@
 #pragma once
-#include <iostream>
 #include <array>
 #include <WS2tcpip.h>
 #include <MSWSock.h>
@@ -11,6 +10,7 @@
 #include <queue>
 #include <chrono>
 #include <random>
+#include <map>
 
 #include <windows.h>  
 #include <locale.h>
@@ -19,17 +19,25 @@
 #include <sqlext.h>  
 #include <string>
 
+#include <stdlib.h>
+#include <iostream>
+#include <sstream>
+#include <stdexcept>
+#include <memory>
+
+
 #include "../../../protocol.h"
 
 #pragma comment(lib, "WS2_32.lib")
 #pragma comment(lib, "MSWSock.lib")
 using namespace std;
 
-#include "mysql.h"
-#pragma comment(lib, "libmysql.lib")
-
 constexpr int MAXLOBBY = 10;
 constexpr int INVALIDKEY = -1;
 constexpr int BUFSIZE = 200;
 
 constexpr int STARTKEY = 1;
+
+#include "mysql_connection.h"
+
+#include <mysql/jdbc.h>

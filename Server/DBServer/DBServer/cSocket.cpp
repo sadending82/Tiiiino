@@ -183,7 +183,7 @@ void Socket::processPacket(int key, unsigned char* buf)
 // DB
 bool Socket::CheckLogin(int key, const char* id, const char* password, int userid)
 {
-    auto userData = m_pDB->SelectUserDataForLogin(id, password);
+   /* auto userData = m_pDB->SelectUserDataForLogin(id, password);
 
     if (get<0>(userData) == 0) {
         return false;
@@ -197,7 +197,7 @@ bool Socket::CheckLogin(int key, const char* id, const char* password, int useri
 
     SendUserDataAfterLogin(key, uid, nickname, credit, point, state, userid);
 
-    m_pDB->UpdateUserConnectionState(uid, true);
+    m_pDB->UpdateUserConnectionState(uid, true);*/
 
     return true;
 }

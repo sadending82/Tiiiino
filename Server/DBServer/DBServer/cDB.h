@@ -5,12 +5,6 @@
 class DB {
 
 public:
-	void SetmConn(MYSQL conn)				{ mConn = conn; }
-	void SetmStmt(MYSQL_STMT* stmt)			{ mStmt = stmt; }
-
-	MYSQL* GetmConn()			 			{ return &mConn; }
-	MYSQL_STMT* GetmStmt()					{ return mStmt; }
-
 	const char* GetHost()					{ return mHost; }
 	const char* GetUser()					{ return mUser; }
 	const char* GetPassWord()				{ return mPW; }
@@ -18,7 +12,7 @@ public:
 	const int	GetPort()					{ return mPort; }
 
 	bool ConnectDB();
-	bool ExecuteQuery();
+	/*bool ExecuteQuery();
 
 	tuple<string, string, double, int> SelectUserData(const int uid);
 	tuple<int, string, double, int, bool> SelectUserDataForLogin(const string& id, const string& password);
@@ -30,14 +24,14 @@ public:
 	bool UpdateUserCredit(const int uid, double credit);
 	bool UpdateUserPoint(const int uid, unsigned int point);
 
-	void DisconnectDB();
+	void DisconnectDB();*/
 
 private:
-	MYSQL		mConn;
-	MYSQL_STMT* mStmt;
+	sql::mysql::MySQL_Driver* mDriver;
+	sql::Connection* mConn;
 
 	// юс╫ц
-	const char* mHost = "localhost";
+	const char* mHost = "tcp://127.0.0.1:3306";
 	const char* mUser = "root";
 	const char* mPW = "123qwe";
 	const char* mDBName = "Tiiiino";
