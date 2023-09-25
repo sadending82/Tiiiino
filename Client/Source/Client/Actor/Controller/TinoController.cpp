@@ -1,7 +1,7 @@
 #include "Actor/Controller/TinoController.h"
 #include "Actor/Character/TinoCharacter.h"
 #include "GameFramework/PlayerController.h"
-//#include "Global.h"
+#include "Global.h"
 
 ATinoController::ATinoController()
 	:MaxDummyCount(8),
@@ -12,7 +12,7 @@ ATinoController::ATinoController()
 void ATinoController::BeginPlay()
 {
 	Super::BeginPlay();
-	if (StartingWidgetClass != nullptr)
+	if (StartingWidgetClass != nullptr && UGameplayStatics::GetCurrentLevelName(GetWorld()) == "Lobby")
 	{
 		ChangeMenuWidget(StartingWidgetClass);
 	}

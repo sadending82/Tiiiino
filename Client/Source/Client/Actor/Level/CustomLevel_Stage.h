@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Actor/Level/CustomBaseLevel.h"
-#include "CustomLevel_Stage1.generated.h"
+#include "CustomLevel_Stage.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class CLIENT_API ACustomLevel_Stage1 : public ACustomBaseLevel
+class CLIENT_API ACustomLevel_Stage : public ACustomBaseLevel
 {
 	GENERATED_BODY()
 public:
