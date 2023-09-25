@@ -18,6 +18,10 @@ enum SPacketType {
 
 	// GameServer To LobbyServer
 	GL_LOGIN,
+	GL_ROOM_READY,
+
+	// LobbyServer To GameServer
+	LG_USER_INTO_GAME,
 
 	// LobbyServer To DBServer
 	LD_LOGIN,
@@ -37,8 +41,19 @@ public:
 };
 
 struct GL_LOGIN_PACKET : public SPACKET {
+
+};
+
+struct GL_ROOM_READY_PACKET : public SPACKET {
+	int		roomID;
+};
+
+//---
+struct LG_USER_INTO_GAME_PACKET : public SPACKET {
 	char	name[MAX_NAME_SIZE];
-	int		roomID;	//원래는 lobbyServer에서 줘야 하는 값. 나중에 '무조건' 빼야함.
+	char	passWord[MAX_NAME_SIZE];
+	int		roomID;
+	int		roomMax;	//방 최대 인원. (4명이서 할 수도 있으니까)
 };
 
 struct LD_LOGIN_PACKET :public SPACKET {

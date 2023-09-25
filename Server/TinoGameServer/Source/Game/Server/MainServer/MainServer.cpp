@@ -3,6 +3,7 @@
 #include "../../Object/Player/Player.h"
 #include "../../Thread/WorkerThread/WorkerThread.h"
 #include "../../Room/Room.h"
+#include "../../../../../ServerProtocol.h"
 
 MainServer* gMainServer;
 
@@ -122,7 +123,7 @@ int MainServer::GenerateID()
 	return -1;
 }
 
-void MainServer::send_login_ok_packet(int player_id, const char* playername)
+void MainServer::send_login_ok_packet(const int player_id, const char* playername)
 {
 	auto player = dynamic_cast<Player*>(mObjects[player_id]);
 	SC_LOGIN_OK_PACKET packet;
@@ -134,6 +135,18 @@ void MainServer::send_login_ok_packet(int player_id, const char* playername)
 	packet.id = player_id;
 	//wcscpy(packet.name, playername);
 	player->SendPacket(&packet, sizeof(packet));
+}
+
+void MainServer::send_room_ready_packet(const int roomID)
+{
+	GL_ROOM_READY_PACKET packet;
+	memset(&packet, 0, sizeof(GL_ROOM_READY_PACKET));
+
+	packet.size = sizeof(packet);
+	packet.type = GL_ROOM_READY;
+	packet.roomID = roomID;
+
+	mLobbyServer->SendPacket(&packet, sizeof(packet));
 }
 
 
@@ -279,6 +292,30 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 			}
 
 		}
+		break;
+	}
+	}
+}
+
+void MainServer::ProcessPacketLobby(const int serverID, unsigned char* p)
+{
+	unsigned char packet_type = p[1];
+	Server* object = mLobbyServer;
+
+	switch (packet_type) {
+	case LG_USER_INTO_GAME: {
+		LG_USER_INTO_GAME_PACKET* packet = reinterpret_cast<LG_USER_INTO_GAME_PACKET*>(p);
+		Room* activeRoom = mRooms[packet->roomID];
+
+		if (true == activeRoom->SettingRoomPlayer(packet->name, packet->passWord, packet->roomMax))
+		{
+			send_room_ready_packet(packet->roomID);
+		}
+
+		break;
+	}
+	case CS_MOVE: {
+
 		break;
 	}
 	}

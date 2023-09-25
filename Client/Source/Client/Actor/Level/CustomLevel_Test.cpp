@@ -55,7 +55,7 @@ bool ACustomLevel_Test::ConnGameServer()
 		if (Network::GetNetwork()->ConnectServerGame())
 		{
 			CLog::Log("Connect Successfully");
-			send_movetogame_packet(Network::GetNetwork()->s_socket, 0); 
+			send_movetogame_packet(Network::GetNetwork()->s_socket, TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterName), TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterPassWord), 0);
 			return true;
 		}
 		else {

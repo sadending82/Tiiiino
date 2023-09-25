@@ -1,3 +1,5 @@
+#include <cassert>
+
 #include "Room.h"
 #include "../Object/Player/Player.h"
 #include "../Object/MapObject/MapObject.h"
@@ -5,6 +7,10 @@
 Room::Room()
 	: mRoomStageKindof(eRoomStage::ST_AVOID)
 	,mObjects()
+	, mPlayerInfo()
+	, mPlayerCnt(0)
+	, mPlayerMax(0)
+	, mRoomState(eRoomState::ST_FREE)
 {
 
 }
@@ -61,6 +67,39 @@ void Room::ResetGameRoom()
 	}
 }
 
+
+bool Room::SettingRoomPlayer(const std::string id, const std::string passWord, const int& playerMaxNum)
+{
+	int playerCnt = -1;
+	SetPlayerInfoWithCnt(id, passWord, playerMaxNum, playerCnt);
+	if (playerCnt == playerMaxNum)
+	{
+		mRoomStateLock.lock();
+		if (mRoomState == eRoomState::ST_READY || mRoomState == eRoomState::ST_FREE)
+		{
+			mRoomState == eRoomState::ST_READY_COMPLETE;
+		}
+		mRoomStateLock.unlock();
+		return true;
+	}
+	return false;
+}
+
+bool Room::PlayerInfoCmp(const std::string id, const std::string passWord)
+{
+	//이 함수는 mPlayerInfo가 다 쓰여진 난 후에, 읽기만 하는 작업이므로 lock을 안걸어놓음
+	//최대 인원이 안들어왔으면 아직 쓰여질 가능성이 있기 때문에 절대 읽으면 안됨
+	//지금은 이럴 경우가 없게 설계해놨지만, 후에 혹시모르는 설계로 안되면 안되니까 assert걸음.
+	if (mPlayerInfo.size() != mPlayerMax)
+		assert(0);
+	if (passWord == mPlayerInfo.at(id))
+	{
+		return true;
+	}
+
+	return false;
+}
+
 void Room::AddPlayer(Player* player)
 {
 	for (int i = 0; i < MAX_ROOM_USER; ++i)
@@ -98,4 +137,37 @@ void Room::AddMapObject(MapObject* mapObject)
 		}
 		mObjectsLock.unlock();
 	}
+}
+
+
+void Room::SetPlayerInfo(const std::string id, const std::string passWord, const int& playerMaxNum)
+{
+	bool flag = false;
+	mPlayerMax = playerMaxNum;
+	mPlayerInfoLock.lock();
+	if (playerMaxNum == mPlayerCnt)
+	{
+		mPlayerInfoLock.unlock();
+		return;
+	}
+	mPlayerInfo.insert(std::make_pair(id, passWord));
+	mPlayerCnt++;
+	mPlayerInfoLock.unlock();
+
+}
+
+void Room::SetPlayerInfoWithCnt(const std::string id, const std::string passWord, const int& playerMaxNum,__out int& playerCnt)
+{
+	bool flag = false;
+	mPlayerMax = playerMaxNum;
+	mPlayerInfoLock.lock();
+	if (playerMaxNum == mPlayerCnt)
+	{
+		mPlayerInfoLock.unlock();
+		return;
+	}
+	mPlayerInfo.insert(std::make_pair(id, passWord));
+	mPlayerCnt++;
+	playerCnt = mPlayerCnt;
+	mPlayerInfoLock.unlock();
 }

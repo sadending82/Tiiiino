@@ -25,9 +25,11 @@ void CALLBACK recv_Lobbycallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED rec
 static std::shared_ptr<class Network> m_Network;
 class ATinoCharacter;
 
-
-void send_login_packet(SOCKET& sock,const char* id, const char* password); 
-void send_movetogame_packet(SOCKET& sock, const int& roomID);
+//lobby packet
+void send_login_packet(SOCKET& sock,const char* id, const char* passWord); 
+void send_match_packet(SOCKET& sock);
+//game packet
+void send_movetogame_packet(SOCKET& sock,const char* id, const char* passWord, const int& roomID);
 void send_move_packet(SOCKET& sock, const bool& inair, const float& x, const float& y, const float& z, FQuat& rotate, const float& value, const FVector& speedVec);
 
 
@@ -80,8 +82,8 @@ public:
 
 
 	ATinoCharacter* mMyCharacter;
-	//FString MyCharacterName;
-	//FString MyCharacterPassWord;
+	FString MyCharacterName;
+	FString MyCharacterPassWord;
 	UPROPERTY()
 		ATinoCharacter* mOtherCharacter[MAX_USER];
 	int mGeneratedID;

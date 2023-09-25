@@ -24,6 +24,13 @@ enum class eRoomStage
 	ST_AVOID
 };
 
+enum class eRoomState
+{
+	ST_FREE,
+	ST_READY,
+	ST_READY_COMPLETE,
+	ST_INGAME
+};
 //Player Have Item BitFlag with int64
 enum class eItemFlags : __int64
 {

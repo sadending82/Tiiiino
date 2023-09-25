@@ -6,6 +6,7 @@
 #include "Components/EditableTextBox.h"
 #include "Actor/Controller/TinoController.h"
 #include "GameFramework/Pawn.h"
+#include "Network/Network.h"
 
 #include "Global.h"
 
@@ -29,9 +30,14 @@ void ULoginUIWidget::TryLogin()
 
 	// Change Lobby Scene
 	//ATinoController::ChangeMenuWidget(ATinoController::GetNextWidgetClass());
-	
-	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	TinoController->ChangeMenuWidget(TinoController->GetLobbyWidgetClass());
+	const char* id = TCHAR_TO_ANSI(*LoginIDTextBox->GetText().ToString());
+	const char* pass = TCHAR_TO_ANSI(*LoginPasswordTextBox->GetText().ToString());
+	Network::GetNetwork()->MyCharacterName = id;
+	Network::GetNetwork()->MyCharacterPassWord = pass;
+	send_login_packet(Network::GetNetwork()->l_socket, id, pass);
+
+	//auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	//TinoController->ChangeMenuWidget(TinoController->GetLobbyWidgetClass());
 }
 
 void ULoginUIWidget::TryNewAccounts()

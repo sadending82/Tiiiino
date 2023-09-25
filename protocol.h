@@ -20,6 +20,7 @@ enum PacketType {
 
 	// Client To LobbyServer
 	CL_LOGIN,
+	CL_MATCH,
 
 	// GameServer To Client
 	SC_LOGIN_OK,
@@ -30,6 +31,7 @@ enum PacketType {
 
 	// Lobbyserver To Client
 	LC_LOGIN_OK,
+	LC_MATCH_RESPONSE,
 };
 
 #pragma pack (push, 1)
@@ -42,7 +44,9 @@ public:
 
 struct CS_LOGIN_PACKET : public PACKET {
 	char	name[MAX_NAME_SIZE];
+	char	passWord[MAX_NAME_SIZE];
 	int		roomID;	//원래는 lobbyServer에서 줘야 하는 값. 나중에 '무조건' 빼야함.
+	
 };
 
 struct CS_MOVE_PACKET: public PACKET {
@@ -63,6 +67,10 @@ struct CS_CHAT_PACKET : public PACKET {
 struct CL_LOGIN_PACKET :public PACKET {
 	char id[MAX_NAME_SIZE];
 	char password[MAX_NAME_SIZE];
+};
+
+struct CL_MATCH_PACKET : public PACKET {
+
 };
 //-----------------------------------
 
@@ -90,6 +98,13 @@ struct LC_LOGIN_OK_PACKET : public PACKET {
 	int id;
 	int RoomID;
 };
+
+struct LC_MATCH_RESPONSE_PACKET : public PACKET {
+	int gameServerPortNum;
+	unsigned char gameServerIP[4];	//IPv4에서 ip는 4바이트
+};
+
+//--------------------------
 struct EVENT {
 	unsigned char size;
 	char	type;
