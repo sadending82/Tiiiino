@@ -48,12 +48,11 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 	case CL_LOGIN:
 	{
 		CL_LOGIN_PACKET* p = reinterpret_cast<CL_LOGIN_PACKET*>(cpacket);
+		LD_LOGIN_PACKET* pac = reinterpret_cast<LD_LOGIN_PACKET*>(p);
+		pac->user_id = cID;
 
-		cout << p->id << "," << p->password << endl;
-		/*
-			Do SomeThing;
-		*/
-		
+		// db 서버에 전송
+		mServers[0].DoSend(&pac);
 		break;
 	}
 	case CL_MATCH:
@@ -75,6 +74,17 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 		packet.roomMax = 8;	//여기도 몇명이서 진행하는지 넣는 값. 테스트에는 거의 8명이서 할 거니까 8을 넣어준다. 4명이서 하면 4를 넣는다.
 		sendToGameServer(packet);
 		*/
+
+		LG_USER_INTO_GAME_PACKET packet;
+		packet.size = sizeof(packet);
+		packet.type = LG_USER_INTO_GAME;
+		packet.roomID = 0;
+		strcpy_s(packet.name, sizeof(mClients[cID].mNickName), mClients[cID].mNickName);
+		packet.uID = mClients[cID].mUID;
+		packet.roomMax = 8;
+		
+		mClients[cID].DoSend(&packet);
+
 		break;
 	}
 	default:
@@ -93,7 +103,7 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 	{
 		GL_LOGIN_PACKET* p = reinterpret_cast<GL_LOGIN_PACKET*>(spacket);
 
-		cout << "OK";
+		cout << "게임 서버 접속 확인" << endl;
 
 		break;
 	}
@@ -111,6 +121,26 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 			sendToClient(packet);
 
 		*/
+
+		break;
+	}
+	case DL_LOGIN_OK:
+	{
+		cout << "로그인 성공" << endl;
+
+		DL_LOGIN_OK_PACKET* p = reinterpret_cast<DL_LOGIN_OK_PACKET*>(spacket);
+		mClients[p->user_id].mCredit = p->credit;
+		strcpy_s(mClients[p->user_id].mNickName, sizeof(p->nickname), p->nickname);
+		mClients[p->user_id].mPoint = p->point;
+		mClients[p->user_id].mUID = p->uid;
+
+		// 클라쪽에 로그인 성공 했다고 알려줘야 함
+
+		break;
+	}
+	case DL_LOGIN_FAIL:
+	{
+		cout << "로그인 실패" << endl;
 		break;
 	}
 	default:
@@ -127,7 +157,8 @@ void Server::DoWorker()
 	p.type = 0;
 
 	pTimer->PushEvent(1, eEVENT_TYPE::EV_MATCH_UP, 5000, reinterpret_cast<char*>(&p));
-	cout << "타이머 푸시" << endl;*/
+	*/
+
 	while (true)
 	{
 		DWORD numBytes;

@@ -35,7 +35,11 @@ public:
 	OverEXP mRecvOver;
 	mutex	mStateLock;
 	eSessionState mState;
-	int mPlayerID;
+	int		mPlayerID;
+	int		mUID;
+	char	mNickName[MAX_NAME_SIZE];
+	double	mCredit;
+	int		mPoint;
 	SOCKET mSocket;
 	int		mPrevRemain;
 };

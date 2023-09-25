@@ -97,6 +97,7 @@ struct SC_ADD_PLAYER_PACKET : public PACKET {
 //---------------------------
 struct LC_LOGIN_OK_PACKET : public PACKET {
 	int id;
+	int UID;
 	int RoomID;
 };
 
