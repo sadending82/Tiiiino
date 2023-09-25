@@ -29,6 +29,18 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+public:
+
+	virtual void Jump() override;
+
+	void PlayTumbleMontage();
+
+	void DisableInputMode();
+	void EnableInputMode();
+
+	
+	FORCEINLINE void SetMaxTumbleTime(float MaxTime) { MaxTumbledTime = MaxTime; }
+
 private:
 	//키입력 관련 함수
 	void OnMoveForward(float Axis);
@@ -39,7 +51,6 @@ private:
 	void OnRunning();
 	void OffRunning();
 
-	virtual void Jump() override;
 	virtual void StopJumping() override;
 
 	void CreateDummy();

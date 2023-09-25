@@ -185,6 +185,21 @@ void ATinoCharacter::Jump()
 	
 }
 
+void ATinoCharacter::PlayTumbleMontage()
+{
+	PlayAnimMontage(TumbleMontage);
+}
+
+void ATinoCharacter::DisableInputMode()
+{
+	DisableInput(GetController<APlayerController>());
+}
+
+void ATinoCharacter::EnableInputMode()
+{
+	EnableInput(GetController<APlayerController>());
+}
+
 void ATinoCharacter::StopJumping()
 {
 	Super::StopJumping();
