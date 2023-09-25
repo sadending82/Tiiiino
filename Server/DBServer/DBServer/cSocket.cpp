@@ -174,49 +174,6 @@ void Socket::processPacket(int key, unsigned char* buf)
     }
 }
 
-void Socket::DoRecv(int key)
-{
-    DWORD flags = 0;
-
-    SOCKET client_s = mSessions[key].mSocket;
-    ExOver* over = &mSessions[key].mExOver;
-
-    over->mWsaBuf.len = BUFSIZE;
-    over->mWsaBuf.buf = (char*)over->mMessageBuf;
-    ZeroMemory(&over->mOver, sizeof(over->mOver));
-
-    if (WSARecv(client_s, &over->mWsaBuf, 1, (LPDWORD)mSessions[key].mPrevData,
-        &flags, &(over->mOver), NULL)) {
-        int err_no = WSAGetLastError();
-        if (err_no != WSA_IO_PENDING) {
-            cout << "Recv Error | Key: " << key <<  " | code: "<< err_no << endl;
-            Disconnect(key);
-        }
-    }
-}
-
-void Socket::DoSend(int key, char* buf)
-{
-    SOCKET client_s = mSessions[key].mSocket;
-
-    ExOver* over = new ExOver;
-    ZeroMemory(over, sizeof(ExOver));
-    over->mWsaBuf.buf = buf;
-    over->mWsaBuf.len = buf[0];
-
-    memcpy(over->mMessageBuf, buf, buf[0]);
-    over->mOpType = eOpType::OP_SEND;
-    ZeroMemory(&over->mOver, sizeof(over->mOver));
-
-    if (WSASend(client_s, &over->mWsaBuf, 1, NULL,
-        0, &(over->mOver), NULL)) {
-        int err_no = WSAGetLastError();
-        if (err_no != WSA_IO_PENDING) {
-            cout << "Send Error | Key: " << key << " | code: " << err_no << endl;
-        }
-    }
-}
-
 bool Socket::CheckLogin(int key, unsigned char* buf)
 {
     LD_LOGIN_PACKET* rp = reinterpret_cast<LD_LOGIN_PACKET*>(buf);
