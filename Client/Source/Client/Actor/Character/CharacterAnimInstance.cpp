@@ -17,8 +17,9 @@ void UCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	if (OwnerCharacter)
 	{
-
-		if (OwnerCharacter->GetController()->IsPlayerController()) {
+		auto Controller = OwnerCharacter->GetController();
+		if (Controller == nullptr) return;
+		if ( Controller->IsPlayerController()) {
 			Velocity = OwnerCharacter->GetVelocity();
 			Speed = OwnerCharacter->GetVelocity().Size2D();
 			Direction = UKismetAnimationLibrary::CalculateDirection(OwnerCharacter->GetVelocity(), OwnerCharacter->GetControlRotation());
