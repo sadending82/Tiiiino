@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{355DBFC5-E283-41C2-A9EA-7A23FFB4E4BD}</ProjectGuid>
+    <ProjectGuid>{58B0CD49-F2C7-4C3D-BBA4-19F0170B0E1A}</ProjectGuid>
     <RootNamespace>TinoServer</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>

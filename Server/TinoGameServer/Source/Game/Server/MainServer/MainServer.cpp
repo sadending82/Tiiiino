@@ -3,6 +3,7 @@
 #include "../../Object/Player/Player.h"
 #include "../../Thread/WorkerThread/WorkerThread.h"
 #include "../../Room/Room.h"
+#include "../LobbyServer/LobbyServer.h"
 #include "../../../../../ServerProtocol.h"
 
 MainServer* gMainServer;
@@ -91,6 +92,8 @@ void MainServer::init()
 		room->Init();
 		mRooms.insert(make_pair(i,room));
 	}
+	mLobbyServer = new LobbyServer();
+	dynamic_cast<LobbyServer*>(mLobbyServer)->init();
 	mWorkerThreadRef = new WorkerThread(this);
 
 	std::cout << "Creating Worker Threads\n";

@@ -16,6 +16,7 @@ public:
 	~MainServer();
 
 	std::array<class Object*, MAX_OBJECT>& getObjects() { return mObjects; }
+	class Server* GetLobbyServer() { return mLobbyServer; }
 
 	void ProcessPacket(const int clientID, unsigned char* p);
 	void ProcessPacketLobby(const int serverID, unsigned char* p);

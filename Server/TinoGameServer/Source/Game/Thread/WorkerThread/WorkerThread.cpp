@@ -2,6 +2,7 @@
 #include "../../Object/Player/Player.h"
 #include "../../Server/MainServer/MainServer.h"
 #include "../../Network/Network.h"
+#include "../../Server/LobbyServer/LobbyServer.h"
 
 WorkerThread::WorkerThread(MainServer* Server)
 	:mMainServer(Server)
@@ -57,6 +58,35 @@ void WorkerThread::doThread()
 			//뒷구문이 앞으로오는건 의미가 없음. 앞구문에서 성공하여 cmp를 한 번 만으로 끝낼 수 있는 기대효과
 			player->PreRecvPacket(packets, To_Process_Bytes);
 			player->RecvPacket();
+			break;
+		}
+		case eCOMMAND_IOCP::CMD_SERVER_RECV:
+		{
+			if (bytes == 0) {
+				//auto t = dynamic_cast<Player*>(mMainServer->getObjects()[client_id]);
+				//if (t) t->DisConnect();
+				std::cout << "버그버그버그 서버 연결 버그 \n";
+				//Disconnect(client_id);
+				break;
+			}
+
+			LobbyServer* lobbyServer = dynamic_cast<LobbyServer*>(mMainServer->GetLobbyServer());
+			int To_Process_Bytes = bytes + lobbyServer->GetPrevSize();
+			unsigned char* packets = wsa_ex->GetBuf();	//wsa_ex == player->wsa_ex.buf
+
+			if (To_Process_Bytes >= packets[0])
+			{
+				do {
+					mMainServer->ProcessPacketLobby(client_id, packets);
+					To_Process_Bytes -= packets[0];
+					packets += packets[0];
+				} while ((To_Process_Bytes & ~0) && (To_Process_Bytes >= packets[0]));
+			}
+			//To_Process_Bytes != 0 이면 packets보다 큰지 확인해야 알 수 있지만
+			//to_Process_Bytes가 packets보다 크면, To_Process_Bytes != 0인건 확실하므로, 이때는 필요없는 구문
+			//뒷구문이 앞으로오는건 의미가 없음. 앞구문에서 성공하여 cmp를 한 번 만으로 끝낼 수 있는 기대효과
+			lobbyServer->PreRecvPacket(packets, To_Process_Bytes);
+			lobbyServer->RecvPacket();
 			break;
 		}
 		case eCOMMAND_IOCP::CMD_ACCEPT: {
