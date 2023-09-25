@@ -49,6 +49,9 @@ struct GL_ROOM_READY_PACKET : public SPACKET {
 };
 
 //---
+struct LG_LOGIN_OK_PACKET : public SPACKET {
+
+};
 struct LG_USER_INTO_GAME_PACKET : public SPACKET {
 	char	name[MAX_NAME_SIZE];
 	int		uID;

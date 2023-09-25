@@ -15,6 +15,7 @@ public:
 		mSocket = 0;
 		mState = eSessionState::ST_FREE;
 		mPrevRemain = 0;
+		mRoomID = -1;
 	}
 	~Session() {}
 	void DoRecv()
@@ -42,4 +43,5 @@ public:
 	int		mPoint;
 	SOCKET mSocket;
 	int		mPrevRemain;
+	int		mRoomID;	//수민이 임시로 추가해놓음. 얘가 몇번 방에 있는지 확인하기 위함.
 };

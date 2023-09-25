@@ -83,11 +83,11 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 		LG_USER_INTO_GAME_PACKET packet;
 		packet.size = sizeof(packet);
 		packet.type = LG_USER_INTO_GAME;
-		packet.roomID = 0;
+		packet.roomID = 0;//방 번호 임시로 0으로 넣어둠
 		strcpy_s(packet.name, sizeof(mClients[cID].mNickName), mClients[cID].mNickName);
 		packet.uID = mClients[cID].mUID;
 		packet.roomMax = 1;
-		
+		mClients[cID].mRoomID = packet.roomID;	
 		mServers[1].DoSend(&packet);
 
 		break;
@@ -115,6 +115,18 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 	case GL_ROOM_READY:
 	{
 		GL_ROOM_READY_PACKET* p = reinterpret_cast<GL_ROOM_READY_PACKET*>(spacket);
+		LC_MATCH_RESPONSE_PACKET packet;
+		packet.size = sizeof(packet);
+		packet.type = LC_MATCH_RESPONSE;
+		for (auto& player : mClients)
+		{
+			if (player.mRoomID == p->roomID)
+			{
+				player.DoSend(&packet);
+			}
+		}
+		//자리에 없으셔서 만든 비효율적인 코드 나중에 고쳐주십쇼
+		
 
 		/*
 			패킷의 roomID로 room을 준비 완료로 바꾸고, 클라이언트들에게 게임서버로 가라는 패킷을 보냄.

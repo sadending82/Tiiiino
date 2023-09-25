@@ -10,10 +10,10 @@
 int main()
 {
 	std::wcout.imbue(std::locale("korean"));
-	LobbyServer l;
+	//LobbyServer l;
 	gMainServer = new MainServer();
 	gMainServer->init();
-	l.init();
+	//l.init();
 	gMainServer->run();
 
 	delete gMainServer;

@@ -56,6 +56,8 @@ void Network::release()
 	if (isInit)
 	{
 		mGeneratedID = 0;
+		bIsConnected = 0;
+		bIsConnectedLobby = 0;
 		mMyCharacter->bIsConnected = 0;
 		mMyCharacter = nullptr;
 		for (auto& p : mOtherCharacter)
