@@ -64,6 +64,7 @@ tuple<string, string, double, int> DB::SelectUserData(const int uid)
 	}
 
 	MYSQL_BIND paramBind;
+	//memset(&paramBind, 0, sizeof(paramBind));
 	paramBind.buffer_type = MYSQL_TYPE_LONG;
 	paramBind.buffer = (void*)&uid;
 
@@ -267,8 +268,6 @@ bool DB::UpdateUserConnectionState(const int uid, const bool state)
 	if (ExecuteQuery() == false) {
 		return false;
 	}
-
-	return true;
 
 	return true;
 }
