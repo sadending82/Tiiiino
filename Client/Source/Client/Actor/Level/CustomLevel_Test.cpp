@@ -61,12 +61,17 @@ bool ACustomLevel_Test::ConnGameServer()
 			CLog::Log("Connect Successfully");
 			send_movetogame_packet(Network::GetNetwork()->s_socket,Network::GetNetwork()->mDBUID,
 				TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterName), 0);
+			FInputModeGameOnly GameInputMode;
+			auto Controller = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+			Controller->SetInputMode(GameInputMode);
+			Controller->bShowMouseCursor = false;
 			return true;
 		}
 		else {
 			CLog::Log("Connect Fail!");
 		}
 	}
+	
 	return false;
 }
 
