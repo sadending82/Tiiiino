@@ -32,10 +32,7 @@ void ACustomLevel_Test::BeginPlay() {
 	//To Loading ...
 
 	//To Do SomeThing ...
-	FInputModeUIOnly LobbyInputMode;
-	auto Controller = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	Controller->SetInputMode(LobbyInputMode);
-	Controller->bShowMouseCursor = true;
+
 }
 
 
@@ -62,9 +59,10 @@ bool ACustomLevel_Test::ConnGameServer()
 			send_movetogame_packet(Network::GetNetwork()->s_socket,Network::GetNetwork()->mDBUID,
 				TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterName), 0);
 			FInputModeGameOnly GameInputMode;
-			auto Controller = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-			Controller->SetInputMode(GameInputMode);
-			Controller->bShowMouseCursor = false;
+			auto controller = GetWorld()->GetFirstPlayerController();
+			controller->SetInputMode(GameInputMode);
+			controller->SetShowMouseCursor(false);
+			
 			return true;
 		}
 		else {
@@ -82,8 +80,13 @@ bool ACustomLevel_Test::ConnLobbyServer()
 
 	if (true == Network::GetNetwork()->ConnectServerLobby())
 	{
+		FInputModeUIOnly LobbyInputMode;
+		auto Controller = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+		Controller->SetInputMode(LobbyInputMode);
+		Controller->bShowMouseCursor = true;
 		if (false == Network::GetNetwork()->bLoginFlag)
 		{
+
 			//send_login_packet(Network::GetNetwork()->l_socket, "dd", "Dd");
 			//player->ShowLoginHUD();
 		}
