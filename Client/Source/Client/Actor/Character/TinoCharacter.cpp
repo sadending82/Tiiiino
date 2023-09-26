@@ -45,6 +45,15 @@ void ATinoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 void ATinoCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	if (GetController()->IsPlayerController())
+	{
+	}
+	else
+	{
+			GetCharacterMovement()->BrakingDecelerationWalking = 0;
+			GetCharacterMovement()->BrakingFrictionFactor = 0;
+			GetCharacterMovement()->GravityScale = 0.0;
+	}
 }
 
 void ATinoCharacter::EndPlay(EEndPlayReason::Type Reason)
