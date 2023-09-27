@@ -11,6 +11,8 @@ Room::Room()
 	, mPlayerCnt(0)
 	, mPlayerMax(0)
 	, mRoomState(eRoomState::ST_FREE)
+	, mPlayerArrivedCnt(0)
+	, mGameEndTimer(false)
 {
 
 }
@@ -122,6 +124,18 @@ bool Room::FindPlayerInfo(const int uID, const std::string id)
 	return false;
 }
 
+void Room::PlayerArrive(Player* player)
+{
+	int tRank = 0;
+	mPlayerArriveLock.lock();
+	mPlayerArrivedCnt++;
+	tRank = mPlayerArrivedCnt;
+	mPlayerArriveLock.unlock();
+	player->SetRank(tRank);
+	setGameEndTimerStartOnce();		//이 함수는 room 하나당 딱 한 번 실행될 것임 .lockfree CAS(Compare And Set)으로 구현. (mutex 너무많이쓰는거같아서 락프리로 씀) 
+
+}
+
 void Room::addPlayer(Player* player)
 {
 	for (int i = 0; i < MAX_ROOM_USER; ++i)
@@ -149,7 +163,7 @@ void Room::addMapObject(MapObject* mapObject)
 {
 	for (int i = MAX_ROOM_USER; i < MAX_OBJECT; ++i)
 	{
-		//map object같은 경우는 서버에서 순차적으로 넣기 때문에 데이터레이스 걱정 X
+		//map object같은 경우는 서버에서 순차적으로 넣기 때문에 데이터레이스 걱정 X그래도 락은 걸어줌.
 		mObjectsLock.lock();
 		if (nullptr == mObjects[i])
 		{
@@ -192,4 +206,16 @@ void Room::setPlayerInfoWithCnt(const int uID, const std::string id, const int& 
 	mPlayerCnt++;
 	playerCnt = mPlayerCnt;
 	mPlayerInfoLock.unlock();
+}
+
+void Room::setGameEndTimerStartOnce()
+{
+	bool expect = 0;
+	if (std::atomic_compare_exchange_strong(reinterpret_cast<std::atomic_bool*>(&mGameEndTimer), 0, 1))
+	{
+		DEBUGMSGNOPARAM("한 번 실행되야함");
+		/*
+		setTimer
+		*/
+	}
 }

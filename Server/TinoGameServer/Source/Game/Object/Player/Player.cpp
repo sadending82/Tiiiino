@@ -3,8 +3,9 @@
 Player::Player()
 	:mNickName(L"")
 	,mDepartment(0.0f)
-	,mItem(eItemFlags::None)
+	,mEquipment(eEquipmentFlags::None)
 	,mRoomID(INVALID_ROOM_ID)
+	,mPlayerState(ePlayerState::ST_RUNNING)
 {
 }
 
@@ -25,3 +26,43 @@ bool Player::CanMakeID()
 	mStateLock.unlock();
 	return false;
 }
+
+bool Player::IsPlayerArrived()
+{
+	mPlayerStateLock.lock();
+	if (mPlayerState == ePlayerState::ST_ARRIVED)
+	{
+		mPlayerStateLock.unlock();
+		return true;
+	}
+	mPlayerStateLock.unlock();
+	return false;
+}
+
+bool Player::CanPlayerArrive()
+{
+	mPlayerStateLock.lock();
+	if (mPlayerState == ePlayerState::ST_RUNNING)
+	{
+		ChangePlayerState(ePlayerState::ST_ARRIVED);
+		mPlayerStateLock.unlock();
+		return true;
+	}
+	mPlayerStateLock.unlock();
+	return false;
+}
+
+void Player::ChangePlayerState(const ePlayerState playerState)
+{
+	mPlayerState = playerState;
+}
+
+//void Player::PlayerArrive(int rank)
+//{
+//	mPlayerStateLock.lock();
+//	if (mPlayerState == ePlayerState::ST_RUNNING)
+//	{
+//		mPlayerState = ePlayerState::ST_ARRIVED;
+//	}
+//	mPlayerStateLock.unlock();
+//}

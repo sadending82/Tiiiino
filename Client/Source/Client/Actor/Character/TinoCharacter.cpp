@@ -93,9 +93,8 @@ void ATinoCharacter::Tick(float DeltaTime)
 		else {
 			//Update GroundSpeedd (22-04-05)
 			//GroundSpeedd = ServerStoreGroundSpeed;
-			//Update Interpolation (22-11-25)
-			//GetCharacterMovement()->Velocity = CharMovingSpeed;
-		}
+			//Update Interpolation (23-09-27)
+			GetCharacterMovement()->Velocity = ServerCharMovingSpeed;
 
 	}
 }

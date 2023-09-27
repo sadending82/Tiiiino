@@ -1,7 +1,16 @@
 #pragma once
-
+#include <iostream>
 constexpr int INVALID_SOCKET_ID = -1;
 constexpr int INVALID_ROOM_ID = -1;
+
+#ifdef _DEBUG
+#define DEBUGMSGNOPARAM(args) (printf("file: %s, line:%d ",__FILE__,__LINE__), printf(args))
+#define DEBUGMSGONEPARAM(args,k) (printf("file: %s, line:%d ",__FILE__,__LINE__), printf(args,k))
+#else
+#define DEBUGMSGNOPARAM(...)
+#define DEBUGMSGONEPARAM(...)
+#endif
+
 
 enum class eCOMMAND_IOCP {
 	CMD_ACCEPT, CMD_RECV, CMD_SEND, CMD_SERVER_RECV, CMD_DBSERVER_RECV, //Basic
@@ -31,11 +40,19 @@ enum class eRoomState
 	ST_READY_COMPLETE,
 	ST_INGAME
 };
+
 //Player Have Item BitFlag with int64
-enum class eItemFlags : __int64
+enum class eEquipmentFlags : __int64
 {
 	None = 0
 };
+
+enum class ePlayerState
+{
+	ST_RUNNING,
+	ST_ARRIVED,
+};
+
 
 struct Vector3f {
 	float x, y, z;

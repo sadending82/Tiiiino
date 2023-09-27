@@ -47,9 +47,9 @@ void MainServer::init()
 {
 	//--------------------------------
 	/*
-		
+
 		CPU 선호도 정할 코드 넣는 곳.
-		
+
 	*/
 	//-------------------------------
 	WSADATA WSAData;
@@ -90,10 +90,9 @@ void MainServer::init()
 	{
 		Room* room = new Room();
 		room->Init();
-		mRooms.insert(make_pair(i,room));
+		mRooms.insert(make_pair(i, room));
 	}
-	mLobbyServer = new LobbyServer();
-	dynamic_cast<LobbyServer*>(mLobbyServer)->init();
+	connectLobbyServer();
 	mWorkerThreadRef = new WorkerThread(this);
 
 	std::cout << "Creating Worker Threads\n";
@@ -169,7 +168,7 @@ void MainServer::send_move_packet(int player_id, int mover_id, const bool& inair
 	packet.rz = mObjects[mover_id]->GetRotate().z;
 	packet.rw = mObjects[mover_id]->GetRotate().w;
 	auto mover = dynamic_cast<Player*>(mObjects[mover_id]);
-	if(mover)
+	if (mover)
 		packet.move_time = mover->GetMoveTime();
 	packet.speed = value;
 	packet.sx = sx;
@@ -178,9 +177,18 @@ void MainServer::send_move_packet(int player_id, int mover_id, const bool& inair
 	player->SendPacket(&packet, sizeof(packet));
 }
 
+void MainServer::send_player_arrive_packet(const int player_id, const int arrive_id)
+{
+}
+
+void MainServer::send_game_countdown_start_packet(const int player_id)
+{
+}
+
 void MainServer::connectLobbyServer()
 {
-
+	mLobbyServer = new LobbyServer();
+	dynamic_cast<LobbyServer*>(mLobbyServer)->init();
 }
 
 
@@ -301,13 +309,48 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 			Player* OtherPlayer = dynamic_cast<Player*>(other);
 			if (OtherPlayer == nullptr) break;
 			// && OtherPlayer->GetSocketID() == client_id movepacket에서핑테스트를 하려면 나도 나한테 보내야함 처리는 클라에서
-			if (OtherPlayer->GetSocketID() == INVALID_SOCKET_ID ) continue;
+			if (OtherPlayer->GetSocketID() == INVALID_SOCKET_ID) continue;
 
 
 			OtherPlayer->GetStateLockRef().lock();
 			if (eSocketState::ST_INGAME == OtherPlayer->GetSocketState()) {
 				OtherPlayer->GetStateLockRef().unlock();
 				send_move_packet(OtherPlayer->GetSocketID(), client_id, packet->inair, packet->speed, packet->sx, packet->sy, packet->sz);
+
+				continue;
+			}
+			else {
+				OtherPlayer->GetStateLockRef().unlock();
+			}
+
+		}
+		break;
+	}
+	case CS_GOAL: {
+		CS_GOAL_PACKET* packet = reinterpret_cast<CS_GOAL_PACKET*>(p);
+		Player* player = dynamic_cast<Player*>(object);
+		if (player == nullptr) break;
+
+		DEBUGMSGONEPARAM("player Num[%d] Arrive Overlapped Packet \n", player->GetSocketID());
+
+		if (false == player->CanPlayerArrive()) break;	//한 번 도착했으면 패킷 무시
+
+		Room* pRoom = mRooms[player->GetRoomID()];
+
+		pRoom->PlayerArrive(player);
+		DEBUGMSGONEPARAM("player Num[%d] Arrive Complete\n", player->GetSocketID());
+
+		for (auto& other : pRoom->GetObjectsRef()) {
+			Player* OtherPlayer = dynamic_cast<Player*>(other);
+			if (OtherPlayer == nullptr) break;
+			if (OtherPlayer->GetSocketID() == client_id) continue;	//내가 도착한걸 나한테 보낼 필요는 없음.
+			if (OtherPlayer->GetSocketID() == INVALID_SOCKET_ID) continue;
+
+
+			OtherPlayer->GetStateLockRef().lock();
+			if (eSocketState::ST_INGAME == OtherPlayer->GetSocketState()) {
+				OtherPlayer->GetStateLockRef().unlock();
+				send_player_arrive_packet(OtherPlayer->GetSocketID(), client_id);
 
 				continue;
 			}

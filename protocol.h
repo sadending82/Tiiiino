@@ -17,6 +17,7 @@ enum PacketType {
 	CS_LOGIN,
 	CS_MOVE,
     CS_CHAT,
+	CS_GOAL,
 
 	// Client To LobbyServer
 	CL_LOGIN,
@@ -26,8 +27,11 @@ enum PacketType {
 	SC_LOGIN_OK,
 	SC_LOGIN_FAIL,
 	SC_ADD_PLAYER,
-	SC_REMOVE_PLAYER,
+	SC_PLAYER_REMOVE,
 	SC_MOVE_PLAYER,
+	SC_PLAYER_ARRIVE,
+	SC_GAME_COUNTDOWN_START,
+	SC_GAME_END,
 
 	// Lobbyserver To Client
 	LC_LOGIN_OK,
@@ -64,6 +68,10 @@ struct CS_CHAT_PACKET : public PACKET {
 	char mess[BUF_SIZE];
 };
 
+struct CS_GOAL_PACKET : public PACKET {
+
+};
+
 //-----------------------------------
 struct CL_LOGIN_PACKET :public PACKET {
 	char id[MAX_NAME_SIZE];
@@ -94,6 +102,22 @@ struct SC_ADD_PLAYER_PACKET : public PACKET {
 	char	name[MAX_NAME_SIZE];
 };
 
+struct SC_PLAYER_REMOVE_PACKET : public PACKET {
+	int id;
+};
+struct SC_PLAYER_ARRIVE : public PACKET
+{
+	int id;				//who arrived?
+};
+
+struct SC_GAME_COUNTDOWN_START : public PACKET
+{
+
+};
+
+struct SC_GAME_END : public PACKET {
+	char	record;		//성공 실패
+};
 //---------------------------
 struct LC_LOGIN_OK_PACKET : public PACKET {
 	int id;

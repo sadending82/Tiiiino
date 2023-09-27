@@ -30,6 +30,8 @@ public:
 	void send_login_ok_packet(const int player_id, const char* playername);
 	void send_room_ready_packet(const int roomID);
 	void send_move_packet(int player_id, int mover_id, const bool& inair, float value, const float& sx, const float& sy, const float& sz);
+	void send_player_arrive_packet(const int player_id,const int arrive_id);
+	void send_game_countdown_start_packet(const int player_id);
 
 private:
 	void connectLobbyServer();
