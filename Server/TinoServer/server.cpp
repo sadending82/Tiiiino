@@ -433,14 +433,6 @@ void Server::Init()
 			mServers[server_id].DoRecv();
 			LDsocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
 			cout << "server connect\n";
-
-			LD_JOIN_PACKET sp;
-			sp.size = sizeof(sp);
-			sp.type = LD_JOIN;
-			memcpy(sp.id, "dasd", sizeof("dasd"));
-			memcpy(sp.password, "dasd", sizeof("dasd"));
-			// db 서버에 전송
-			mServers[0].DoSend(&sp);
 		}
 		else
 		{
