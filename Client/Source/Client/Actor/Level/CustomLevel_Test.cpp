@@ -4,7 +4,7 @@
 #include "Actor/Level/CustomLevel_Test.h"
 #include "Network/Network.h"
 #include "Actor/Character/TinoCharacter.h"
-
+#include "Actor/Controller/TinoController.h"
 #include "Global.h"
 
 
@@ -58,10 +58,8 @@ bool ACustomLevel_Test::ConnGameServer()
 			CLog::Log("Connect Successfully");
 			send_movetogame_packet(Network::GetNetwork()->s_socket,Network::GetNetwork()->mDBUID,
 				TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterName), 0);
-			FInputModeGameOnly GameInputMode;
-			auto controller = GetWorld()->GetFirstPlayerController();
-			controller->SetInputMode(GameInputMode);
-			controller->SetShowMouseCursor(false);
+
+			GetWorld()->GetFirstPlayerController<ATinoController>()->SetInputGameMode();
 			
 			return true;
 		}
@@ -80,10 +78,8 @@ bool ACustomLevel_Test::ConnLobbyServer()
 
 	if (true == Network::GetNetwork()->ConnectServerLobby())
 	{
-		FInputModeUIOnly LobbyInputMode;
-		auto Controller = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-		Controller->SetInputMode(LobbyInputMode);
-		Controller->bShowMouseCursor = true;
+		GetWorld()->GetFirstPlayerController<ATinoController>()->SetInputUIMode();
+
 		if (false == Network::GetNetwork()->bLoginFlag)
 		{
 

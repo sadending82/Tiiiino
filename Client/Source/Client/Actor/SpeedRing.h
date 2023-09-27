@@ -23,4 +23,26 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+public:
+	UFUNCTION()
+		void BoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+			UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+private:
+	UPROPERTY(VisibleDefaultsOnly, Category = "Component")
+		class USceneComponent* SceneComponent;
+	UPROPERTY(VisibleDefaultsOnly, Category = "Component")
+		class UStaticMeshComponent* Mesh;
+	UPROPERTY(VisibleDefaultsOnly, Category = "Component")
+		class UBoxComponent* OverlapBox;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Stat")
+		float ChangeSpeed;
+	UPROPERTY(EditDefaultsOnly, Category = "Stat")
+		float DurationTime;
+
+	UPROPERTY(VisibleAnywhere, Category = "Stat")
+		float OriginalSpeed;
+
+	FTimerHandle SpeedRingTImer;
 };
