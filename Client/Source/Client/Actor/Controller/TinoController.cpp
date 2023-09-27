@@ -16,6 +16,7 @@ void ATinoController::BeginPlay()
 	{
 		ChangeMenuWidget(StartingWidgetClass);
 	}
+	ChangeMenuWidget(StartingWidgetClass);
 }
 
 void ATinoController::ChangeMenuWidget(TSubclassOf<UUserWidget> NewWidgetClass)
