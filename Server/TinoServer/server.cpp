@@ -44,7 +44,7 @@ int Server::GetNewServerID()
 
 void Server::ProcessPacket(int cID, unsigned char* cpacket)
 {
-	switch (cpacket[1]) 
+	switch (cpacket[1])
 	{
 	case CL_LOGIN:
 	{
@@ -60,6 +60,18 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 		mServers[0].DoSend(&pac);
 		break;
 	}
+	case CL_JOIN:
+	{
+		CL_JOIN_PACKET* rp = reinterpret_cast<CL_JOIN_PACKET*>(cpacket);
+		LD_JOIN_PACKET sp;
+		sp.size = sizeof(sp);
+		sp.type = LD_JOIN;
+		memcpy(sp.id, rp->id, sizeof(rp->id));
+		memcpy(sp.password, rp->password, sizeof(rp->password));
+		// db 서버에 전송
+		mServers[0].DoSend(&sp);
+		break;
+	}
 	case CL_MATCH:
 	{
 		CL_MATCH_PACKET* p = reinterpret_cast<CL_MATCH_PACKET*>(cpacket);
@@ -69,7 +81,7 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 		따로 매칭 로직을 돌린 후에 매칭이 성사 되면 그 함수에서 아래의 패킷을 보내주면 됨.
 		그리고 이 패킷 하나 크기가 46이라서 8명을 한꺼번에 보내면 344바이트임. 한번에 못보냄
 		포문 돌려서 인원수만큼 보내주면 됨.
-		
+
 		LG_USER_INTO_GAME_PACKET packet;
 		packet.size = sizeof(packet);
 		packet.type = LG_USER_INTO_GAME;
@@ -87,7 +99,7 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 		strcpy_s(packet.name, sizeof(mClients[cID].mNickName), mClients[cID].mNickName);
 		packet.uID = mClients[cID].mUID;
 		packet.roomMax = 2;
-		mClients[cID].mRoomID = packet.roomID;	
+		mClients[cID].mRoomID = packet.roomID;
 		mServers[1].DoSend(&packet);
 
 		break;
@@ -126,7 +138,7 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 			}
 		}
 		//자리에 없으셔서 만든 비효율적인 코드 나중에 고쳐주십쇼
-		
+
 
 		/*
 			패킷의 roomID로 room을 준비 완료로 바꾸고, 클라이언트들에게 게임서버로 가라는 패킷을 보냄.
@@ -211,7 +223,7 @@ void Server::DoWorker()
 			}
 		}
 
-		switch (exOver->mCompType) 
+		switch (exOver->mCompType)
 		{
 		case eCompType::OP_ACCEPT:
 		{
@@ -227,7 +239,7 @@ void Server::DoWorker()
 					mServers[server_id].mRecvOver.mCompType = eCompType::OP_SERVER_RECV;
 					mServers[server_id].mPrevRemain = 0;
 					mServers[server_id].mSocket = cSocket;
-					
+
 					CreateIoCompletionPort(reinterpret_cast<HANDLE>(cSocket), mHCP, server_id, 0);
 					mServers[server_id].DoRecv();
 					cSocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
@@ -349,12 +361,12 @@ void Server::DoWorker()
 			delete exOver;
 			break;
 		}
-		case eCompType::OP_EVENT: 
+		case eCompType::OP_EVENT:
 		{
 			ProcessEvent((unsigned char*)exOver->mMessageBuf);
 			break;
 		}
-		default :
+		default:
 		{
 			break;
 		}
@@ -421,6 +433,14 @@ void Server::Init()
 			mServers[server_id].DoRecv();
 			LDsocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
 			cout << "server connect\n";
+
+			LD_JOIN_PACKET sp;
+			sp.size = sizeof(sp);
+			sp.type = LD_JOIN;
+			memcpy(sp.id, "dasd", sizeof("dasd"));
+			memcpy(sp.password, "dasd", sizeof("dasd"));
+			// db 서버에 전송
+			mServers[0].DoSend(&sp);
 		}
 		else
 		{

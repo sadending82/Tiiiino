@@ -16,10 +16,11 @@ enum PacketType {
 	// Client To GameServer
 	CS_LOGIN,
 	CS_MOVE,
-    CS_CHAT,
+	CS_CHAT,
 
 	// Client To LobbyServer
 	CL_LOGIN,
+	CL_JOIN,
 	CL_MATCH,
 
 	// GameServer To Client
@@ -47,10 +48,10 @@ struct CS_LOGIN_PACKET : public PACKET {
 	char	passWord[MAX_NAME_SIZE];
 	int		uID;
 	int		roomID;	//원래는 lobbyServer에서 줘야 하는 값. 나중에 '무조건' 빼야함.
-	
+
 };
 
-struct CS_MOVE_PACKET: public PACKET {
+struct CS_MOVE_PACKET : public PACKET {
 	bool inair;					//in air? (for anim)
 	float x, y, z;				//pos
 	float rx, ry, rz, rw;		//rotate
@@ -66,6 +67,11 @@ struct CS_CHAT_PACKET : public PACKET {
 
 //-----------------------------------
 struct CL_LOGIN_PACKET :public PACKET {
+	char id[MAX_NAME_SIZE];
+	char password[MAX_NAME_SIZE];
+};
+
+struct CL_JOIN_PACKET :public PACKET {
 	char id[MAX_NAME_SIZE];
 	char password[MAX_NAME_SIZE];
 };

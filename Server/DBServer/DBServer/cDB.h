@@ -5,17 +5,17 @@
 class DB {
 
 public:
-	void SetmConn(MYSQL conn)				{ mConn = conn; }
-	void SetmStmt(MYSQL_STMT* stmt)			{ mStmt = stmt; }
+	void SetmConn(MYSQL conn) { mConn = conn; }
+	void SetmStmt(MYSQL_STMT* stmt) { mStmt = stmt; }
 
-	MYSQL* GetmConn()			 			{ return &mConn; }
-	MYSQL_STMT* GetmStmt()					{ return mStmt; }
+	MYSQL* GetmConn() { return &mConn; }
+	MYSQL_STMT* GetmStmt() { return mStmt; }
 
-	const char* GetHost()					{ return mHost; }
-	const char* GetUser()					{ return mUser; }
-	const char* GetPassWord()				{ return mPW; }
-	const char* GetDBName()					{ return mDBName; }
-	const int	GetPort()					{ return mPort; }
+	const char* GetHost() { return mHost; }
+	const char* GetUser() { return mUser; }
+	const char* GetPassWord() { return mPW; }
+	const char* GetDBName() { return mDBName; }
+	const int	GetPort() { return mPort; }
 
 	bool ConnectDB();
 	bool ExecuteQuery();
@@ -23,7 +23,7 @@ public:
 	tuple<string, string, double, int> SelectUserData(const int uid);
 	tuple<int, string, double, int, bool> SelectUserDataForLogin(const string& id, const string& password);
 
-	bool InsertNewUser(const string& id, const string& passWord, const string& nickname);
+	bool InsertNewUser(const string& id, const string& passWord);
 
 	bool UpdateUserConnectionState(const int uid, const bool state);
 	bool UpdateUserNickname(const int uid, const string& nicknameToChange);
