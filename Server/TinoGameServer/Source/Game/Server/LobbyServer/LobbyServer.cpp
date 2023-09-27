@@ -16,11 +16,12 @@ void LobbyServer::init()
 		sizeof(server_addr)) == SOCKET_ERROR)
 	{
 		std::cout << "bind error\n";
+		return;
 	}
 	OVERLAPPED overex;
 	ZeroMemory(&overex, sizeof(overex));
 	server_addr.sin_port = htons(LOBBYSERVERPORT);
-	inet_pton(AF_INET, SERVER_ADDR, &server_addr.sin_addr);
+	inet_pton(AF_INET, LOOBYSERVER_ADDR, &server_addr.sin_addr);
 
 	LPFN_CONNECTEX Conn;
 	GUID guid = WSAID_CONNECTEX;
@@ -45,6 +46,7 @@ void LobbyServer::init()
 		if (err != WSA_IO_PENDING)
 		{
 			std::cout << "error\n";
+			return;
 			//error ! 
 		}
 	}
@@ -53,7 +55,7 @@ void LobbyServer::init()
 	PreRecvPacket(NULL, 0);
 	RecvPacket();
 
-	std::cout << "End\n";
+	std::cout << "Lobby Connect Complete\n";
 
 	//SC_MOVE_PLAYER_PACKET packet{};
 	//packet.size = sizeof(packet);
