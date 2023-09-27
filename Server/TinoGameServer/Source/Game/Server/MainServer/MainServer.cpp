@@ -197,6 +197,7 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 		Player* player = dynamic_cast<Player*>(mObjects[client_id]);
 		//character->skintype = packet->skintype;
 		player->SetSocketID(client_id);
+		cout << " 플레이어 " << client_id << "접속\n";
 		if (packet->roomID > MAX_ROOM)
 		{
 			//에러

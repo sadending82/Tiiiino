@@ -9,6 +9,17 @@
 /**
  * 
  */
+UENUM(BlueprintType)
+enum class EMovementState
+{
+	EMS_Normal UMETA(DisplayName = "Normal"),
+	EMS_Up UMETA(DisplayName = "Up"),
+	EMS_Fall UMETA(DisplayName = "Fall"),
+	EMS_Tumbled UMETA(DisplayName = "Tumbled"),
+	EMS_Dive UMETA(DisplayName = "Dive"),
+	EMS_MAX UMETA(DisplayName = "DefaultMAX")
+};
+
 UCLASS()
 class CLIENT_API ATinoCharacter : public ABaseCharacter
 {
@@ -39,6 +50,7 @@ public:
 	void EnableInputMode();
 
 	
+	FORCEINLINE void SetMovementState(EMovementState State) { MovementState = State; }
 	FORCEINLINE void SetMaxTumbleTime(float MaxTime) { MaxTumbledTime = MaxTime; }
 
 private:
@@ -48,14 +60,13 @@ private:
 	void OnHorizonLock(float Axis);
 	void OnVerticalLock(float Axis);
 
-	void OnRunning();
-	void OffRunning();
-
 	virtual void StopJumping() override;
 
 	void CreateDummy();
 
 private:
+
+	bool CanMove();
 
 	bool CanTumble(float DeltaTime);
 	void PlayTumbleMontage(float DeltaTime);
@@ -80,6 +91,9 @@ private:
 		float CurrentTumbledTime;
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 		float MaxTumbledTime;
+
+	UPROPERTY(VisibleAnywhere, Category = "Enums")
+		EMovementState MovementState;
 
 	bool bCanTumbled;
 };

@@ -5,6 +5,7 @@
 #include "Actor/Controller/TinoController.h"
 #include "GameFramework/PlayerController.h"
 #include "Kismet/GameplayStatics.h"
+#include "Utilities/CLog.h"
 
 
 void CALLBACK send_callback(DWORD err, DWORD num_byte, LPWSAOVERLAPPED send_over, DWORD flag);
@@ -253,8 +254,13 @@ void Network::l_process_packet(unsigned char* p)
 		mDBUID = packet->UID;
 		//연결성공
 		bIsConnectedLobby = true;
+		CLog::Print("LC_LOGIN_OK IS CALLING");
 
 		auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(mMyCharacter->GetWorld(), 0));
+		if (TinoController == nullptr)
+		{
+			CLog::Print("TinoController is nullptr");
+		}
 		TinoController->ChangeMenuWidget(TinoController->GetLobbyWidgetClass());
 
 		break;
@@ -263,7 +269,7 @@ void Network::l_process_packet(unsigned char* p)
 	{
 		LC_MATCH_RESPONSE_PACKET* packet = reinterpret_cast<LC_MATCH_RESPONSE_PACKET*>(p);
 		//게임서버 연결 코드 나중에 ip랑 포트넘버도 넘겨야함.
-		UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("Level1_ver1_UIBranch"));
+		UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("Level1_ver1"));
 		break;
 	}
 	default:
@@ -331,7 +337,7 @@ void CALLBACK recv_Lobbycallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED rec
 
 
 
-void Network::RecvPacketGame()
+bool Network::RecvPacketGame()
 {
 	DWORD recv_flag = 0;
 	ZeroMemory(&recv_expover.GetWsaOver(), sizeof(recv_expover.GetWsaOver()));
@@ -346,11 +352,17 @@ void Network::RecvPacketGame()
 		if (err != WSA_IO_PENDING)
 		{
 			//error ! 
+			UE_LOG(LogTemp, Error, TEXT("return false"));
+			return false;
+		}
+		else {
+			//UE_LOG(LogTemp, Error, TEXT("return true"));
 		}
 	}
+	return true;
 }
 
-void Network::RecvPacketLobby()
+bool Network::RecvPacketLobby()
 {
 	DWORD recv_flag = 0;
 	ZeroMemory(&l_recv_expover.GetWsaOver(), sizeof(l_recv_expover.GetWsaOver()));
@@ -365,8 +377,14 @@ void Network::RecvPacketLobby()
 		if (err != WSA_IO_PENDING)
 		{
 			//error ! 
+			UE_LOG(LogTemp, Error, TEXT("return false"));
+			return false;
+		}
+		else {
+			//UE_LOG(LogTemp, Error, TEXT("return true"));
 		}
 	}
+	return true;
 }
 
 
@@ -392,18 +410,23 @@ bool Network::ConnectServerGame()
 		closesocket(s_socket);
 		return false;
 	}
-
-	DWORD recv_flag = 0;
-	int ret = WSARecv(s_socket, &recv_expover.GetWsaBuf(), 1, NULL, &recv_flag, &recv_expover.GetWsaOver(), recv_Gamecallback);
-	if (SOCKET_ERROR == ret)
-	{
-		int err = WSAGetLastError();
-		if (err != WSA_IO_PENDING)
-		{
-			//error ! 
-			return false;
-		}
-	}
+	return RecvPacketGame();
+	//DWORD recv_flag = 0;
+	//int ret = WSARecv(s_socket, &recv_expover.GetWsaBuf(), 1, NULL, &recv_flag, &recv_expover.GetWsaOver(), recv_Gamecallback);
+	//if (SOCKET_ERROR == ret)
+	//{
+	//	int err = WSAGetLastError();
+	//	if (err != WSA_IO_PENDING)
+	//	{
+	//		//error ! 
+	//		UE_LOG(LogTemp, Error, TEXT("return false"));
+	//		return false;
+	//	}
+	//	else {
+	//		UE_LOG(LogTemp, Error, TEXT("return true"));
+	//		return true;
+	//	}
+	//}
 	return true;
 }
 
@@ -430,17 +453,18 @@ bool Network::ConnectServerLobby()
 		return false;
 	}
 
-	DWORD recv_flag = 0;
-	int ret = WSARecv(l_socket, &l_recv_expover.GetWsaBuf(), 1, NULL, &recv_flag, &l_recv_expover.GetWsaOver(), recv_Lobbycallback);
-	if (SOCKET_ERROR == ret)
-	{
-		int err = WSAGetLastError();
-		if (err != WSA_IO_PENDING)
-		{
-			int err_num = WSAGetLastError();
-			//error ! 
-			return false;
-		}
-	}
+	return RecvPacketLobby();
+	//DWORD recv_flag = 0;
+	//int ret = WSARecv(l_socket, &l_recv_expover.GetWsaBuf(), 1, NULL, &recv_flag, &l_recv_expover.GetWsaOver(), recv_Lobbycallback);
+	//if (SOCKET_ERROR == ret)
+	//{
+	//	int err = WSAGetLastError();
+	//	if (err != WSA_IO_PENDING)
+	//	{
+	//		int err_num = WSAGetLastError();
+	//		//error ! 
+	//		return false;
+	//	}
+	//}
 	return true;
 }
