@@ -49,9 +49,12 @@ public:
 	void DisableInputMode();
 	void EnableInputMode();
 
+	void DiveBegin();
+	void DiveEnd();
 	
 	FORCEINLINE void SetMovementState(EMovementState State) { MovementState = State; }
 	FORCEINLINE void SetMaxTumbleTime(float MaxTime) { MaxTumbledTime = MaxTime; }
+	FORCEINLINE float GetMaxTumbleTime() { return MaxTumbledTime; }
 
 private:
 	//키입력 관련 함수
@@ -67,11 +70,13 @@ private:
 private:
 
 	bool CanMove();
+	bool CanDive();
 
 	bool CanTumble(float DeltaTime);
 	void PlayTumbleMontage(float DeltaTime);
 
 	void Align();
+
 
 	void Dive();
 
@@ -96,4 +101,6 @@ private:
 		EMovementState MovementState;
 
 	bool bCanTumbled;
+	UPROPERTY(VisibleAnywhere, Category = "Animation")
+		bool bIsDiving;
 };

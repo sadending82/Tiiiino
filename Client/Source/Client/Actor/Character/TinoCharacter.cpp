@@ -45,15 +45,19 @@ void ATinoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 void ATinoCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	if (GetController()->IsPlayerController())
+	if (!!GetController())
 	{
-	}
-	else
-	{
+		if (GetController()->IsPlayerController())
+		{
+		}
+		else
+		{
 			GetCharacterMovement()->BrakingDecelerationWalking = 0;
 			GetCharacterMovement()->BrakingFrictionFactor = 0;
 			GetCharacterMovement()->GravityScale = 0.0;
+		}
 	}
+	
 }
 
 void ATinoCharacter::EndPlay(EEndPlayReason::Type Reason)
@@ -139,10 +143,22 @@ void ATinoCharacter::Align()
 	GetController()->SetControlRotation(GetActorForwardVector().Rotation());
 }
 
+void ATinoCharacter::DiveBegin()
+{
+}
+
+void ATinoCharacter::DiveEnd()
+{
+	bIsDiving = false;
+}
+
 void ATinoCharacter::Dive()
 {
-	if(DiveMontage)
+	if (DiveMontage && CanDive())
+	{
+		bIsDiving = true;
 		PlayAnimMontage(DiveMontage);
+	}
 }
 
 void ATinoCharacter::OnMoveForward(float Axis)
@@ -225,6 +241,24 @@ bool ATinoCharacter::CanMove()
 	default:
 		ret = false;
 	}
+	return ret;
+}
+
+bool ATinoCharacter::CanDive()
+{
+	bool ret = false;
+
+	switch (MovementState)
+	{
+	case EMovementState::EMS_Normal:
+	case EMovementState::EMS_Fall:
+		ret = true;
+		break;
+	default:
+		ret = false;
+		break;
+	}
+	ret &= (bIsDiving == false);
 	return ret;
 }
 
