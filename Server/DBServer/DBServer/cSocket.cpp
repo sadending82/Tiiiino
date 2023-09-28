@@ -246,6 +246,6 @@ void Socket::ProcessPacket_SignUp(unsigned char* buf)
     LD_SIGNUP_PACKET* p = reinterpret_cast<LD_SIGNUP_PACKET*>(buf);
     bool bJoin = m_pDB->InsertNewUser(p->id, p->password);
     if (bJoin == false) {
-        cout << "Join new user failed\n";
+        cout << "Sign Up new user failed\n";
     }
 }
