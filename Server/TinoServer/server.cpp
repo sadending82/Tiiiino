@@ -414,10 +414,10 @@ void Server::Init()
 	inet_pton(AF_INET, SERVERIP, &serverAddr.sin_addr);
 
 	if (connect(LDsocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR) {
-		cout << "DBconnection success" << endl;
+		cout << "DBconnection failed" << endl;
 	}
 	else {
-		cout << "DBconnection failed" << endl;
+		cout << "DBconnection success" << endl;
 		OverEXP ss_over;
 		ss_over.mCompType = eCompType::OP_ACCEPT;
 		ss_over.mWsaBuf.buf = reinterpret_cast<CHAR*>(LDsocket);
