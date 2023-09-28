@@ -24,6 +24,7 @@ void UANS_Tumble::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase*
 	auto TinoCharacter = Cast<ATinoCharacter>(MeshComp->GetOwner());
 	if (TinoCharacter)
 	{
+		TinoCharacter->DiveEnd();
 		TinoCharacter->SetMovementState(EMovementState::EMS_Normal);
 	}
 }

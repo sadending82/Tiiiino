@@ -18,31 +18,18 @@ void UANS_Dive::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase*
 	auto TinoCharacter = Cast<ATinoCharacter>(MeshComp->GetOwner());
 	if (TinoCharacter)
 	{
-		TinoCharacter->Jump();
-		TinoCharacter->SetMaxTumbleTime(0.3f);
-		TinoCharacter->GetCharacterMovement()->MaxWalkSpeed = 0;
-		TinoCharacter->GetCharacterMovement()->Velocity = FVector::ZeroVector;
+		TinoCharacter->DiveBegin();
+
+		//Before Launch Saving Data
+		OriginalTumbleTime = TinoCharacter->GetMaxTumbleTime();
+		TinoCharacter->SetMaxTumbleTime(ChangeTumbleTime);
+
+		//Player Launch
+		FVector forwardVector = TinoCharacter->GetActorForwardVector();
+		TinoCharacter->LaunchCharacter(FVector(forwardVector.X* DiveSpeed,forwardVector.Y*DiveSpeed,  DiveSpeedZ),true,true);
 		TinoCharacter->SetMovementState(EMovementState::EMS_Dive);
 	}
-	
 
-}
-
-void UANS_Dive::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, 
-	float FrameDeltaTime, const FAnimNotifyEventReference& EventReference)
-{
-	Super::NotifyTick(MeshComp, Animation, FrameDeltaTime, EventReference);
-
-	auto TinoCharacter = Cast<ATinoCharacter>(MeshComp->GetOwner());
-	if (TinoCharacter)
-	{
-		/*float DiveSpeed = TinoCharacter->GetVelocity().Size2D();
-		if (DiveSpeed <= 0.f) DiveSpeed = MinDiveSpeed;*/
-		FVector NewLocation = TinoCharacter->GetActorLocation()
-			+ TinoCharacter->GetActorForwardVector() * DiveSpeed * FrameDeltaTime;
-		TinoCharacter->SetActorLocation(NewLocation);
-	}
-	
 }
 
 void UANS_Dive::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, 
@@ -52,8 +39,8 @@ void UANS_Dive::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* A
 	auto TinoCharacter = Cast<ATinoCharacter>(MeshComp->GetOwner());
 	if (TinoCharacter)
 	{
-		TinoCharacter->SetMaxTumbleTime(0.5f);
-		TinoCharacter->GetCharacterMovement()->MaxWalkSpeed = 400;
+		//Restore Saving Data
+		TinoCharacter->SetMaxTumbleTime(OriginalTumbleTime);
 		TinoCharacter->SetMovementState(EMovementState::EMS_Normal);
 	}
 }

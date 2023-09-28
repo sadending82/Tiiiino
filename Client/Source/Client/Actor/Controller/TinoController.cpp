@@ -52,3 +52,17 @@ void ATinoController::CreateDummy()
 		}
 	}
 }
+
+void ATinoController::SetInputUIMode()
+{
+	FInputModeUIOnly LobbyInputMode;
+	SetInputMode(LobbyInputMode);
+	SetShowMouseCursor(true);
+}
+
+void ATinoController::SetInputGameMode()
+{
+	FInputModeGameOnly GameInputMode;
+	SetInputMode(GameInputMode);
+	SetShowMouseCursor(false);
+}
