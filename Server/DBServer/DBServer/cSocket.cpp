@@ -116,10 +116,6 @@ void Socket::WorkerFunc()
 void Socket::ServerReady(DB* pDB)
 {
     Setm_pDB(pDB);
-#ifdef Test
-    //m_pDB->SelectUserData(1);
-    //CheckLogin(1, "aaaa", "bbbb",1 );
-#endif
 
     WSADATA wsa;
     WSAStartup(MAKEWORD(2, 2), &wsa);
@@ -171,7 +167,7 @@ void Socket::processPacket(int key, unsigned char* buf)
         break;
     }
     case LD_JOIN: {
-        ProcessPacket_Join(buf);
+        ProcessPacket_SignUp(buf);
         break;
     }
     default:
@@ -245,9 +241,9 @@ void Socket::ProcessPacket_Login(int key, unsigned char* buf)
     }
 }
 
-void Socket::ProcessPacket_Join(unsigned char* buf)
+void Socket::ProcessPacket_SignUp(unsigned char* buf)
 {
-    LD_JOIN_PACKET* p = reinterpret_cast<LD_JOIN_PACKET*>(buf);
+    LD_SIGNUP_PACKET* p = reinterpret_cast<LD_SIGNUP_PACKET*>(buf);
     bool bJoin = m_pDB->InsertNewUser(p->id, p->password);
     if (bJoin == false) {
         cout << "Join new user failed\n";
