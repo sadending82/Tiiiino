@@ -8,12 +8,17 @@ void Timer::Init(HANDLE cHCP)
 	swap(mTimerQueue, empty_queue);
 	
 	mIsRun = TRUE;
+
+	EV_UpdateMatchPacket p;
+	p.size = sizeof(EV_UpdateMatchPacket);
+	p.type = eCompType::OP_EVENT;
+	PushEvent(1, eEVENT_TYPE::EV_MATCH_UP, 10000, reinterpret_cast<unsigned char*>(&p));
 	
 	thread timer_thread{ (thread(&Timer::TimerMain, this)) };
 	timer_thread.join();
 }
 
-void Timer::PushEvent(int ckey, eEVENT_TYPE ceventType, int cdelayStartTime,unsigned char* cmessage)
+void Timer::PushEvent(int ckey, eEVENT_TYPE ceventType, int cdelayStartTime, unsigned char* cmessage)
 {
 	mTimerLock.lock();
 	TimerEvent te;

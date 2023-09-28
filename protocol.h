@@ -22,6 +22,7 @@ enum PacketType {
 	CL_LOGIN,
 	CL_JOIN,
 	CL_MATCH,
+	CL_MATCH_OUT,
 
 	// GameServer To Client
 	SC_LOGIN_OK,
@@ -32,6 +33,7 @@ enum PacketType {
 
 	// Lobbyserver To Client
 	LC_LOGIN_OK,
+	LC_LOGIN_FAIL,
 	LC_MATCH_RESPONSE,
 };
 
@@ -79,6 +81,10 @@ struct CL_JOIN_PACKET :public PACKET {
 struct CL_MATCH_PACKET : public PACKET {
 
 };
+
+struct CL_MATCH_OUT_PACKET : public PACKET {
+
+};
 //-----------------------------------
 
 struct SC_LOGIN_OK_PACKET : public PACKET {
@@ -107,9 +113,13 @@ struct LC_LOGIN_OK_PACKET : public PACKET {
 	int RoomID;
 };
 
+struct 	LC_LOGIN_FAIL_PACKET :public PACKET {
+
+};
+
 struct LC_MATCH_RESPONSE_PACKET : public PACKET {
 	int gameServerPortNum;
-	unsigned char gameServerIP[4];	//IPv4에서 ip는 4바이트
+	char gameServerIP[4];	//IPv4에서 ip는 4바이트
 };
 
 //--------------------------

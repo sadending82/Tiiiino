@@ -77,6 +77,7 @@ struct DL_LOGIN_OK_PACKET :public SPACKET {
 	double	credit;
 	int		point;
 	int		user_id;
+	double	tier;
 	bool	connState;
 };
 
