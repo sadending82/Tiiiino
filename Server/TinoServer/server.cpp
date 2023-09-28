@@ -10,6 +10,8 @@ void Server::Disconnect(int cID)
 		return;
 	}
 
+	cout << "DISCONNECT" << mClients[cID].mUID << endl;
+
 	mMatchListHighTier.remove(cID);
 	mMatchListLowTier.remove(cID);
 
@@ -56,11 +58,10 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 		LD_LOGIN_PACKET pac;
 		pac.type = LD_LOGIN;
 		pac.size = sizeof(LD_LOGIN_PACKET);
-		pac.user_id = cID;
+		pac.userKey = cID;
 		memcpy(pac.id, p->id, sizeof(pac.id));
 		memcpy(pac.password, p->password, sizeof(pac.password));
-		cout << pac.id << endl;
-		// db ¼­¹ö¿¡ Àü¼Û
+		// db ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 		mServers[0].DoSend(&pac);
 		break;
 	}
@@ -72,7 +73,7 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 		sp.type = LD_JOIN;
 		memcpy(sp.id, rp->id, sizeof(rp->id));
 		memcpy(sp.password, rp->password, sizeof(rp->password));
-		// db ¼­¹ö¿¡ Àü¼Û
+		// db ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 		mServers[0].DoSend(&sp);
 		break;
 	}
@@ -111,7 +112,7 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 	{
 		GL_LOGIN_PACKET* p = reinterpret_cast<GL_LOGIN_PACKET*>(spacket);
 
-		cout << "°ÔÀÓ ¼­¹ö Á¢¼Ó È®ÀÎ" << endl;
+		cout << "ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½" << endl;
 
 		break;
 	}
@@ -137,32 +138,48 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 	}
 	case DL_LOGIN_OK:
 	{
-		cout << "·Î±×ÀÎ ¼º°ø" << endl;
+		cout << "ï¿½Î±ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½" << endl;
 
 		DL_LOGIN_OK_PACKET* p = reinterpret_cast<DL_LOGIN_OK_PACKET*>(spacket);
-		mClients[p->user_id].mStateLock.lock();
-		mClients[p->user_id].mCredit = p->credit;
-		strcpy_s(mClients[p->user_id].mNickName, sizeof(p->nickname), p->nickname);
-		mClients[p->user_id].mPoint = p->point;
-		mClients[p->user_id].mUID = p->uid;
-		mClients[p->user_id].mTier = p->tier;
-		mClients[p->user_id].mState = eSessionState::ST_LOBBY;
-		mClients[p->user_id].mStateLock.unlock();
+
+		/*if (p->connState == TRUE) {
+			int disconnID = -1;
+			for (int i = MAXGAMESERVER; i < MAX_USER; ++i) {
+				mClients[i].mStateLock.lock();
+				if (mClients[i].mUID == p->uid) {
+					disconnID = i;
+					mClients[i].mStateLock.unlock();
+					break;
+				}
+				mClients[i].mStateLock.unlock();
+			}
+			if (disconnID != -1)
+				Disconnect(disconnID);
+		}*/
+
+		mClients[p->userKey].mStateLock.lock();
+		mClients[p->userKey].mCredit = p->credit;
+		strcpy_s(mClients[p->userKey].mNickName, sizeof(p->nickname), p->nickname);
+		mClients[p->userKey].mPoint = p->point;
+		mClients[p->userKey].mUID = p->uid;
+		mClients[p->userKey].mTier = p->tier;
+		mClients[p->userKey].mState = eSessionState::ST_LOBBY;
+		mClients[p->userKey].mStateLock.unlock();
 
 		LC_LOGIN_OK_PACKET pac;
 		pac.type = LC_LOGIN_OK;
 		pac.size = sizeof(LC_LOGIN_OK_PACKET);
-		pac.id = p->user_id;
+		pac.id = p->userKey;
 		pac.RoomID = 0;
-		pac.UID = mClients[p->user_id].mUID;
+		pac.UID = mClients[p->userKey].mUID;
 
-		mClients[p->user_id].DoSend(&pac);
+		mClients[p->userKey].DoSend(&pac);
 
 		break;
 	}
 	case DL_LOGIN_FAIL:
 	{
-		cout << "·Î±×ÀÎ ½ÇÆÐ" << endl;
+		cout << "ï¿½Î±ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½" << endl;
 
 		DL_LOGIN_FAIL_PACKET* p = reinterpret_cast<DL_LOGIN_FAIL_PACKET*>(spacket);
 
@@ -170,7 +187,7 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		pac.size = sizeof(LC_LOGIN_FAIL_PACKET);
 		pac.type = LC_LOGIN_FAIL;
 
-		mClients[p->user_id].DoSend(&pac);
+		mClients[p->userKey].DoSend(&pac);
 
 		break;
 	}
@@ -239,9 +256,9 @@ void Server::DoWorker()
 				ZeroMemory(&exOver->mOver, sizeof(exOver->mOver));
 				exOver->mWsaBuf.buf = reinterpret_cast<CHAR*>(cSocket);
 				int addr_size = sizeof(SOCKADDR_IN);
-				//°ÔÀÓ¼­¹ö°¡ ´õ ÄÑÁ®¾ß ÇÑ´Ù¸é
+				//ï¿½ï¿½ï¿½Ó¼ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ñ´Ù¸ï¿½
 				/*
-				if(mGameServerCnt < mMaxGameServerCnt) //<<µÎ°³ º¯¼ö Ãß°¡ÇØÁÖ°í
+				if(mGameServerCnt < mMaxGameServerCnt) //<<ï¿½Î°ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½ï¿½ï¿½ï¿½Ö°ï¿½
 					AcceptEx(mListenSocket, cSocket, exOver->mMessageBuf, BUF_SIZE - 8, addr_size + 16, addr_size + 16, 0, &exOver->mOver);
 				else
 				*/
@@ -397,15 +414,15 @@ void Server::Init()
 	inet_pton(AF_INET, SERVERIP, &serverAddr.sin_addr);
 
 	if (connect(LDsocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR) {
-		cout << "DB¼­¹ö Ä¿³ØÆ® ½ÇÆÐ" << endl;
+		cout << "DBconnection failed" << endl;
 	}
 	else {
-		cout << "DB¼­¹ö Ä¿³ØÆ® ¼º°ø" << endl;
+		cout << "DBconnection success" << endl;
 		OverEXP ss_over;
 		ss_over.mCompType = eCompType::OP_ACCEPT;
 		ss_over.mWsaBuf.buf = reinterpret_cast<CHAR*>(LDsocket);
 
-		// ¹ÙÀÎµå °É¾î ÁÖ±â -> ±âÁ¸ Å¬¶ó ¸»°í ¼­¹ö ÂÊÀ¸·Î
+		// ï¿½ï¿½ï¿½Îµï¿½ ï¿½É¾ï¿½ ï¿½Ö±ï¿½ -> ï¿½ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 		int server_id = GetNewServerID();
 		if (server_id != INVALID_KEY)
@@ -459,7 +476,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 	switch (cmessage[1]) {
 	case eEVENT_TYPE::EV_MATCH_UP:
 	{
-		// ±âº» Ç®¹æ ¸ÅÄª ½ÃÀÛ
+		// ï¿½âº» Ç®ï¿½ï¿½ ï¿½ï¿½Äª ï¿½ï¿½ï¿½ï¿½
 		if (mMatchListHighTier.size() >= MAX_ROOM_USER)
 		{
 			for (int i = 0; i < i < MAX_ROOM_USER; ++i)
@@ -469,7 +486,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 				LG_USER_INTO_GAME_PACKET packet;
 				packet.size = sizeof(packet);
 				packet.type = LG_USER_INTO_GAME;
-				packet.roomID = 0;//¹æ ¹øÈ£ ÀÓ½Ã·Î 0À¸·Î ³Ö¾îµÒ
+				packet.roomID = 0;//ï¿½ï¿½ ï¿½ï¿½È£ ï¿½Ó½Ã·ï¿½ 0ï¿½ï¿½ï¿½ï¿½ ï¿½Ö¾ï¿½ï¿½
 				strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
 				packet.uID = mClients[player_id].mUID;
 				packet.roomMax = MAX_ROOM_USER;
@@ -490,7 +507,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 				LG_USER_INTO_GAME_PACKET packet;
 				packet.size = sizeof(packet);
 				packet.type = LG_USER_INTO_GAME;
-				packet.roomID = 0;//¹æ ¹øÈ£ ÀÓ½Ã·Î 0À¸·Î ³Ö¾îµÒ
+				packet.roomID = 0;//ï¿½ï¿½ ï¿½ï¿½È£ ï¿½Ó½Ã·ï¿½ 0ï¿½ï¿½ï¿½ï¿½ ï¿½Ö¾ï¿½ï¿½
 				strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
 				packet.uID = mClients[player_id].mUID;
 				packet.roomMax = MAX_ROOM_USER;
@@ -503,7 +520,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 			}
 		}
 
-		// 4ÀÎ ÀÌ»ó ´ë±â
+		// 4ï¿½ï¿½ ï¿½Ì»ï¿½ ï¿½ï¿½ï¿½
 		if (mMatchListHighTier.size() >= MAX_ROOM_USER / 2)
 		{
 			EV_CountDownPacket pac;
@@ -538,7 +555,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 
 		system_clock::time_point tTime = system_clock::now();
 
-		if (p->listnum == 0) // »óÀ§ Æ¼¾î
+		if (p->listnum == 0) // ï¿½ï¿½ï¿½ï¿½ Æ¼ï¿½ï¿½
 		{
 			if (mMatchListHighTier.size() < MAX_ROOM_USER / 2)
 			{
@@ -555,7 +572,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 						LG_USER_INTO_GAME_PACKET packet;
 						packet.size = sizeof(packet);
 						packet.type = LG_USER_INTO_GAME;
-						packet.roomID = 0;//¹æ ¹øÈ£ ÀÓ½Ã·Î 0À¸·Î ³Ö¾îµÒ
+						packet.roomID = 0;//ï¿½ï¿½ ï¿½ï¿½È£ ï¿½Ó½Ã·ï¿½ 0ï¿½ï¿½ï¿½ï¿½ ï¿½Ö¾ï¿½ï¿½
 						strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
 						packet.uID = mClients[player_id].mUID;
 						packet.roomMax = mMatchListHighTier.size();
@@ -569,9 +586,9 @@ void Server::ProcessEvent(unsigned char* cmessage)
 				}
 				else
 				{
-					// Å¬¶ó¿¡ ½Ã°£ °ª Àü¼Û -> ½ÃÀÛ ´ë±â ½Ã°£ °¨¼Ò
+					// Å¬ï¿½ï¿½ ï¿½Ã°ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ -> ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½ ï¿½ï¿½ï¿½ï¿½
 					/*
-					   ÆÐÅ¶ ¹ÌÁ¤
+					   ï¿½ï¿½Å¶ ï¿½ï¿½ï¿½ï¿½
 					*/
 
 					EV_CountDownPacket pac;
@@ -582,7 +599,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 				}
 			}
 		}
-		else // ÇÏÀ§ Æ¼¾î
+		else // ï¿½ï¿½ï¿½ï¿½ Æ¼ï¿½ï¿½
 		{
 			if (mMatchListLowTier.size() < MAX_ROOM_USER / 2)
 			{
@@ -599,7 +616,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 						LG_USER_INTO_GAME_PACKET packet;
 						packet.size = sizeof(packet);
 						packet.type = LG_USER_INTO_GAME;
-						packet.roomID = 0;//¹æ ¹øÈ£ ÀÓ½Ã·Î 0À¸·Î ³Ö¾îµÒ
+						packet.roomID = 0;//ï¿½ï¿½ ï¿½ï¿½È£ ï¿½Ó½Ã·ï¿½ 0ï¿½ï¿½ï¿½ï¿½ ï¿½Ö¾ï¿½ï¿½
 						strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
 						packet.uID = mClients[player_id].mUID;
 						packet.roomMax = mMatchListLowTier.size();
@@ -613,9 +630,9 @@ void Server::ProcessEvent(unsigned char* cmessage)
 				}
 				else
 				{
-					// Å¬¶ó¿¡ ½Ã°£ °ª Àü¼Û -> ½ÃÀÛ ´ë±â ½Ã°£ °¨¼Ò
+					// Å¬ï¿½ï¿½ ï¿½Ã°ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ -> ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½ ï¿½ï¿½ï¿½ï¿½
 					/*
-					   ÆÐÅ¶ ¹ÌÁ¤
+					   ï¿½ï¿½Å¶ ï¿½ï¿½ï¿½ï¿½
 					*/
 
 					EV_CountDownPacket pac;

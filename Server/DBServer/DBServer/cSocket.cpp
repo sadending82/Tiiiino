@@ -182,7 +182,7 @@ void Socket::processPacket(int key, unsigned char* buf)
 }
 
 // DB
-bool Socket::CheckLogin(int key, const char* id, const char* password, int userid)
+bool Socket::CheckLogin(int key, const char* id, const char* password, int userKey)
 {
     auto userData = m_pDB->SelectUserDataForLogin(id, password);
 
@@ -195,10 +195,12 @@ bool Socket::CheckLogin(int key, const char* id, const char* password, int useri
     double credit = get<2>(userData);
     int point = get<3>(userData);
     bool state = get<4>(userData);
+    cout << state << endl;
 
-    SendUserDataAfterLogin(key, uid, nickname, credit, point, state, userid);
+    SendUserDataAfterLogin(key, uid, nickname, credit, point, state, userKey);
 
-    m_pDB->UpdateUserConnectionState(uid, true);
+    if (state == FALSE)
+        m_pDB->UpdateUserConnectionState(uid, true);
 
     cout << "Login Success / ID: " << id << endl;
 
@@ -206,7 +208,7 @@ bool Socket::CheckLogin(int key, const char* id, const char* password, int useri
 }
 
 // SendPacket
-void Socket::SendUserDataAfterLogin(int key, int uid, string& nickname, double credit, int point, bool state, int userid)
+void Socket::SendUserDataAfterLogin(int key, int uid, string& nickname, double credit, int point, bool state, int userKey)
 {
     DL_LOGIN_OK_PACKET p;
     p.size = sizeof(DL_LOGIN_OK_PACKET);
@@ -218,16 +220,16 @@ void Socket::SendUserDataAfterLogin(int key, int uid, string& nickname, double c
     p.credit = credit;
     p.point = point;
     p.connState = state;
-    p.user_id = userid;
+    p.userKey = userKey;
 
     mSessions[key].DoSend(reinterpret_cast<DL_LOGIN_OK_PACKET*>(&p));
 }
 
-void Socket::SendLoginFail(int key, const char* id) {
+void Socket::SendLoginFail(int key, const char* id, int userKey) {
     DL_LOGIN_FAIL_PACKET p;
     p.size = sizeof(DL_LOGIN_FAIL_PACKET);
     p.type = SPacketType::DL_LOGIN_FAIL;
-    //memcpy(p.id, id, sizeof(id));
+    p.userKey = userKey;
 
     mSessions[key].DoSend(reinterpret_cast<DL_LOGIN_FAIL_PACKET*>(&p));
 }
@@ -237,9 +239,9 @@ void Socket::ProcessPacket_Login(int key, unsigned char* buf)
 {
     LD_LOGIN_PACKET* p = reinterpret_cast<LD_LOGIN_PACKET*>(buf);
 
-    bool bCheckLogin = CheckLogin(key, p->id, p->password, p->user_id);
+    bool bCheckLogin = CheckLogin(key, p->id, p->password, p->userKey);
     if (bCheckLogin == false) {
-        SendLoginFail(key, p->id);
+        SendLoginFail(key, p->id, p->userKey);
     }
 }
 
