@@ -166,7 +166,7 @@ void Socket::processPacket(int key, unsigned char* buf)
         ProcessPacket_Login(key, buf);
         break;
     }
-    case LD_JOIN: {
+    case LD_SIGNUP: {
         ProcessPacket_SignUp(buf);
         break;
     }

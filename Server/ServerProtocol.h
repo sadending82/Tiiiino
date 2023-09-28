@@ -25,7 +25,7 @@ enum SPacketType {
 
 	// LobbyServer To DBServer
 	LD_LOGIN,
-	LD_JOIN,
+	LD_SIGNUP,
 
 	// DBServer To LobbyServer
 	DL_LOGIN_OK,
@@ -66,7 +66,7 @@ struct LD_LOGIN_PACKET :public SPACKET {
 	int		userKey;
 };
 
-struct LD_JOIN_PACKET :public SPACKET {
+struct LD_SIGNUP_PACKET :public SPACKET {
 	char	id[MAX_NAME_SIZE];
 	char	password[MAX_NAME_SIZE];
 };
