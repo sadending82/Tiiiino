@@ -9,6 +9,10 @@ void Server::Disconnect(int cID)
 		mClients[cID].mStateLock.unlock();
 		return;
 	}
+
+	mMatchListHighTier.remove(cID);
+	mMatchListLowTier.remove(cID);
+
 	closesocket(mClients[cID].mSocket);
 	mClients[cID].mState = eSessionState::ST_FREE;
 	mClients[cID].mStateLock.unlock();
@@ -83,6 +87,13 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 			mMatchListLowTier.push_back(cID);
 		}
 		mClients[cID].mState = eSessionState::ST_MATCH;
+		break;
+	}
+	case CL_MATCH_OUT:
+	{
+		mMatchListHighTier.remove(cID);
+		mMatchListLowTier.remove(cID);
+		mClients[cID].mState = eSessionState::ST_LOBBY;
 		break;
 	}
 	default:
