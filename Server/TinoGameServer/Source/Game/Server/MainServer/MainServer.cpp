@@ -129,7 +129,7 @@ void MainServer::SendPacketWithID(const int receiverID, void* buf, const int buf
 {
 	auto player = dynamic_cast<Player*>(mObjects[receiverID]);
 	if (nullptr != player)
-		player->SendPacket(&buf, sizeof(bufSize));
+		player->SendPacket(buf, bufSize);
 }
 
 void MainServer::send_login_ok_packet(const int player_id, const char* playername)
@@ -170,7 +170,7 @@ SC_LOGIN_OK_PACKET MainServer::make_login_ok_packet(const int player_id,const ch
 void MainServer::send_player_add_packet(const int playerID, void* buf, const int bufSize)
 {
 	auto player = dynamic_cast<Player*>(mObjects[playerID]);
-	player->SendPacket(&buf, sizeof(bufSize));
+	player->SendPacket(buf, bufSize);
 
 }
 
@@ -550,71 +550,71 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 		pRoom->AddObject(player);
 
 
-		//{
-		//	DEBUGMSGNOPARAM("여기 제대로도착");
-		//	SC_LOGIN_OK_PACKET sendpacket = make_login_ok_packet(client_id, "none");
-		//	SendMySelf(client_id, (void*)&sendpacket, sizeof(sendpacket));
-		//}
-		send_login_ok_packet(client_id, "none");
+		{
+			DEBUGMSGNOPARAM("여기 제대로도착");
+			SC_LOGIN_OK_PACKET sendpacket = make_login_ok_packet(client_id, "none");
+			SendMySelf(client_id, (void*)&sendpacket, sizeof(sendpacket));
+		}
+		//send_login_ok_packet(client_id, "none");
 
 
 		//나를 상대에게
 
 
-		//auto spacket = make_player_add_packet(client_id);
-		//SendRoomSomeoneExcept(player->GetRoomID(), client_id, (void*)&spacket, sizeof(spacket));
-		for (auto& other : pRoom->GetObjectsRef()) {
-			Player* OtherPlayer = dynamic_cast<Player*>(other);
-			if (OtherPlayer == nullptr) break;
-			if (OtherPlayer->GetSocketID() == INVALID_SOCKET_ID || OtherPlayer->GetSocketID() == client_id) continue;
-		
-		
-			OtherPlayer->GetStateLockRef().lock();
-			if (eSocketState::ST_INGAME != OtherPlayer->GetSocketState()) {
-				OtherPlayer->GetStateLockRef().unlock();
-				continue;
-			}
-			OtherPlayer->GetStateLockRef().unlock();
-		
-			SC_ADD_PLAYER_PACKET sendpacket;
-			sendpacket.id = client_id;
-			//strcpy_s(sendpacket.name, character->name);
-			sendpacket.size = sizeof(sendpacket);
-			sendpacket.type = SC_ADD_PLAYER;
-		
-			sendpacket.x = player->GetPosition().x;;
-			sendpacket.y = player->GetPosition().y;
-			sendpacket.z = player->GetPosition().z;
-			sendpacket.rx = player->GetRotate().x;
-			sendpacket.ry = player->GetRotate().y;
-			sendpacket.rz = player->GetRotate().z;
-			sendpacket.rw = player->GetRotate().w;
-			OtherPlayer->SendPacket(&sendpacket, sizeof(sendpacket));
-		}
+		auto spacket = make_player_add_packet(client_id);
+		SendRoomSomeoneExcept(player->GetRoomID(), client_id, (void*)&spacket, sizeof(spacket));
+		//for (auto& other : pRoom->GetObjectsRef()) {
+		//	Player* OtherPlayer = dynamic_cast<Player*>(other);
+		//	if (OtherPlayer == nullptr) break;
+		//	if (OtherPlayer->GetSocketID() == INVALID_SOCKET_ID || OtherPlayer->GetSocketID() == client_id) continue;
+		//
+		//
+		//	OtherPlayer->GetStateLockRef().lock();
+		//	if (eSocketState::ST_INGAME != OtherPlayer->GetSocketState()) {
+		//		OtherPlayer->GetStateLockRef().unlock();
+		//		continue;
+		//	}
+		//	OtherPlayer->GetStateLockRef().unlock();
+		//
+		//	SC_ADD_PLAYER_PACKET sendpacket;
+		//	sendpacket.id = client_id;
+		//	//strcpy_s(sendpacket.name, character->name);
+		//	sendpacket.size = sizeof(sendpacket);
+		//	sendpacket.type = SC_ADD_PLAYER;
+		//
+		//	sendpacket.x = player->GetPosition().x;;
+		//	sendpacket.y = player->GetPosition().y;
+		//	sendpacket.z = player->GetPosition().z;
+		//	sendpacket.rx = player->GetRotate().x;
+		//	sendpacket.ry = player->GetRotate().y;
+		//	sendpacket.rz = player->GetRotate().z;
+		//	sendpacket.rw = player->GetRotate().w;
+		//	OtherPlayer->SendPacket(&sendpacket, sizeof(sendpacket));
+		//}
 
 		//방안의 모든 플레이어 정보를 나에게로
-		//SendRoomOthersToMe(player->GetRoomID(), player->GetSocketID(), player->GetSocketID(), &MainServer::make_player_add_packet);
+		SendRoomOthersToMe(player->GetRoomID(), player->GetSocketID(), player->GetSocketID(), &MainServer::make_player_add_packet);
 
-		for (auto& other : pRoom->GetObjectsRef()) {
-			Player* OtherPlayer = dynamic_cast<Player*>(other);
-			if (OtherPlayer == nullptr) break;
-			if (OtherPlayer->GetSocketID() == INVALID_SOCKET_ID || OtherPlayer->GetSocketID() == client_id) continue;
-		
-			OtherPlayer->GetStateLockRef().lock();
-			if (eSocketState::ST_INGAME != OtherPlayer->GetSocketState()) {
-				OtherPlayer->GetStateLockRef().unlock();
-				continue;
-			}
-			OtherPlayer->GetStateLockRef().unlock();
-		
-			SC_ADD_PLAYER_PACKET sendpacket;
-			sendpacket.id = OtherPlayer->GetSocketID();
-			//strcpy_s(sendpacket.name, OtherPlayer->name);
-			sendpacket.size = sizeof(sendpacket);
-			sendpacket.type = SC_ADD_PLAYER;
-			//어차피 서버에서 다시 판결하기때문에 여기 넣어봤자 쓸모 없음.
-			player->SendPacket(&sendpacket, sizeof(sendpacket));
-		}
+		//for (auto& other : pRoom->GetObjectsRef()) {
+		//	Player* OtherPlayer = dynamic_cast<Player*>(other);
+		//	if (OtherPlayer == nullptr) break;
+		//	if (OtherPlayer->GetSocketID() == INVALID_SOCKET_ID || OtherPlayer->GetSocketID() == client_id) continue;
+		//
+		//	OtherPlayer->GetStateLockRef().lock();
+		//	if (eSocketState::ST_INGAME != OtherPlayer->GetSocketState()) {
+		//		OtherPlayer->GetStateLockRef().unlock();
+		//		continue;
+		//	}
+		//	OtherPlayer->GetStateLockRef().unlock();
+		//
+		//	SC_ADD_PLAYER_PACKET sendpacket;
+		//	sendpacket.id = OtherPlayer->GetSocketID();
+		//	//strcpy_s(sendpacket.name, OtherPlayer->name);
+		//	sendpacket.size = sizeof(sendpacket);
+		//	sendpacket.type = SC_ADD_PLAYER;
+		//	//어차피 서버에서 다시 판결하기때문에 여기 넣어봤자 쓸모 없음.
+		//	player->SendPacket(&sendpacket, sizeof(sendpacket));
+		//}
 
 		player->GetStateLockRef().lock();
 		player->SetSocketState(eSocketState::ST_INGAME);
@@ -631,30 +631,30 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 		player->SetPosition(Vector3f(packet->x, packet->y, packet->z));
 		player->SetRotate(Vector4f(packet->rx, packet->ry, packet->rz, packet->rw));
 
-		//{
-		//	auto sPacket = make_move_packet(player->GetSocketID(), packet->inair, packet->speed, packet->sx, packet->sy, packet->sz);
-		//	SendRoomBroadCast(player->GetRoomID(), (void*)&sPacket, sizeof(sPacket));
-		//}
-		for (auto& other : pRoom->GetObjectsRef()) {
-			Player* OtherPlayer = dynamic_cast<Player*>(other);
-			if (OtherPlayer == nullptr) break;
-			// && OtherPlayer->GetSocketID() == client_id movepacket에서핑테스트를 하려면 나도 나한테 보내야함 처리는 클라에서
-			if (OtherPlayer->GetSocketID() == INVALID_SOCKET_ID || OtherPlayer->GetSocketID() == client_id) continue;
-			if (OtherPlayer->GetSocketID() == INVALID_SOCKET_ID) continue;
-		
-		
-			OtherPlayer->GetStateLockRef().lock();
-			if (eSocketState::ST_INGAME == OtherPlayer->GetSocketState()) {
-				OtherPlayer->GetStateLockRef().unlock();
-				send_move_packet(OtherPlayer->GetSocketID(), client_id, packet->inair, packet->speed, packet->sx, packet->sy, packet->sz);
-		
-				continue;
-			}
-			else {
-				OtherPlayer->GetStateLockRef().unlock();
-			}
-		
+		{
+			auto sPacket = make_move_packet(player->GetSocketID(), packet->inair, packet->speed, packet->sx, packet->sy, packet->sz);
+			SendRoomBroadCast(player->GetRoomID(), (void*)&sPacket, sizeof(sPacket));
 		}
+		//for (auto& other : pRoom->GetObjectsRef()) {
+		//	Player* OtherPlayer = dynamic_cast<Player*>(other);
+		//	if (OtherPlayer == nullptr) break;
+		//	// && OtherPlayer->GetSocketID() == client_id movepacket에서핑테스트를 하려면 나도 나한테 보내야함 처리는 클라에서
+		//	if (OtherPlayer->GetSocketID() == INVALID_SOCKET_ID || OtherPlayer->GetSocketID() == client_id) continue;
+		//	if (OtherPlayer->GetSocketID() == INVALID_SOCKET_ID) continue;
+		//
+		//
+		//	OtherPlayer->GetStateLockRef().lock();
+		//	if (eSocketState::ST_INGAME == OtherPlayer->GetSocketState()) {
+		//		OtherPlayer->GetStateLockRef().unlock();
+		//		send_move_packet(OtherPlayer->GetSocketID(), client_id, packet->inair, packet->speed, packet->sx, packet->sy, packet->sz);
+		//
+		//		continue;
+		//	}
+		//	else {
+		//		OtherPlayer->GetStateLockRef().unlock();
+		//	}
+		//
+		//}
 		break;
 	}
 	case CS_GOAL: {

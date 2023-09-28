@@ -122,7 +122,7 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		LC_MATCH_RESPONSE_PACKET packet;
 		packet.size = sizeof(packet);
 		packet.type = LC_MATCH_RESPONSE;
-		strcpy_s(packet.gameServerIP, SERVERIP);
+		memcpy(packet.gameServerIP, SERVERIP, sizeof(packet.gameServerIP));
 		packet.gameServerPortNum = GAMESERVERPORT;
 
 		for (auto& player : mReadytoGame)
@@ -142,7 +142,7 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 
 		DL_LOGIN_OK_PACKET* p = reinterpret_cast<DL_LOGIN_OK_PACKET*>(spacket);
 
-		/*if (p->connState == TRUE) {
+		if (p->connState == TRUE) {
 			int disconnID = -1;
 			for (int i = MAXGAMESERVER; i < MAX_USER; ++i) {
 				mClients[i].mStateLock.lock();
@@ -155,7 +155,7 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 			}
 			if (disconnID != -1)
 				Disconnect(disconnID);
-		}*/
+		}
 
 		mClients[p->userKey].mStateLock.lock();
 		mClients[p->userKey].mCredit = p->credit;
@@ -479,14 +479,14 @@ void Server::ProcessEvent(unsigned char* cmessage)
 		// �⺻ Ǯ�� ��Ī ����
 		if (mMatchListHighTier.size() >= MAX_ROOM_USER)
 		{
-			for (int i = 0; i < i < MAX_ROOM_USER; ++i)
+			for (int i = 0; i < MAX_ROOM_USER; ++i)
 			{
 				int player_id = mMatchListHighTier.front();
 
 				LG_USER_INTO_GAME_PACKET packet;
 				packet.size = sizeof(packet);
 				packet.type = LG_USER_INTO_GAME;
-				packet.roomID = 0;//�� ��ȣ �ӽ÷� 0���� �־��
+				packet.roomID = 0;//�� ��ȣ �ӽ÷� 0���� �־��?
 				strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
 				packet.uID = mClients[player_id].mUID;
 				packet.roomMax = MAX_ROOM_USER;
@@ -500,14 +500,14 @@ void Server::ProcessEvent(unsigned char* cmessage)
 		}
 		if (mMatchListLowTier.size() >= MAX_ROOM_USER)
 		{
-			for (int i = 0; i < i < MAX_ROOM_USER; ++i)
+			for (int i = 0; i < MAX_ROOM_USER; ++i)
 			{
 				int player_id = mMatchListLowTier.front();
 
 				LG_USER_INTO_GAME_PACKET packet;
 				packet.size = sizeof(packet);
 				packet.type = LG_USER_INTO_GAME;
-				packet.roomID = 0;//�� ��ȣ �ӽ÷� 0���� �־��
+				packet.roomID = 0;//�� ��ȣ �ӽ÷� 0���� �־��?
 				strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
 				packet.uID = mClients[player_id].mUID;
 				packet.roomMax = MAX_ROOM_USER;
@@ -515,12 +515,13 @@ void Server::ProcessEvent(unsigned char* cmessage)
 
 				mServers[1].DoSend(&packet);
 
+				
 				mMatchListLowTier.pop_front();
 				mReadytoGame.push_back(player_id);
 			}
 		}
 
-		// 4�� �̻� ���
+		// 4�� �̻� ���?
 		if (mMatchListHighTier.size() >= MAX_ROOM_USER / 2)
 		{
 			EV_CountDownPacket pac;
@@ -545,7 +546,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 		EV_UpdateMatchPacket p;
 		p.size = sizeof(EV_UpdateMatchPacket);
 		p.type = eCompType::OP_EVENT;
-		pTimer->PushEvent(1, eEVENT_TYPE::EV_MATCH_UP, 500, reinterpret_cast<unsigned char*>(&p));
+		pTimer->PushEvent(1, eEVENT_TYPE::EV_MATCH_UP, 10000, reinterpret_cast<unsigned char*>(&p));
 
 		break;
 	}
@@ -565,14 +566,14 @@ void Server::ProcessEvent(unsigned char* cmessage)
 			{
 				if (tTime - mClients[mMatchListHighTier.front()].mMatchStartTime >= milliseconds(2000))
 				{
-					for (int i = 0; i < i < mMatchListHighTier.size(); ++i)
+					for (int i = 0; i < mMatchListHighTier.size(); ++i)
 					{
 						int player_id = mMatchListHighTier.front();
 
 						LG_USER_INTO_GAME_PACKET packet;
 						packet.size = sizeof(packet);
 						packet.type = LG_USER_INTO_GAME;
-						packet.roomID = 0;//�� ��ȣ �ӽ÷� 0���� �־��
+						packet.roomID = 0;//�� ��ȣ �ӽ÷� 0���� �־��?
 						strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
 						packet.uID = mClients[player_id].mUID;
 						packet.roomMax = mMatchListHighTier.size();
@@ -586,7 +587,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 				}
 				else
 				{
-					// Ŭ�� �ð� �� ���� -> ���� ��� �ð� ����
+					// Ŭ�� �ð� �� ���� -> ���� ���?�ð� ����
 					/*
 					   ��Ŷ ����
 					*/
@@ -609,14 +610,14 @@ void Server::ProcessEvent(unsigned char* cmessage)
 			{
 				if (tTime - mClients[mMatchListLowTier.front()].mMatchStartTime >= milliseconds(2000))
 				{
-					for (int i = 0; i < i < mMatchListLowTier.size(); ++i)
+					for (int i = 0; i < mMatchListLowTier.size(); ++i)
 					{
 						int player_id = mMatchListLowTier.front();
 
 						LG_USER_INTO_GAME_PACKET packet;
 						packet.size = sizeof(packet);
 						packet.type = LG_USER_INTO_GAME;
-						packet.roomID = 0;//�� ��ȣ �ӽ÷� 0���� �־��
+						packet.roomID = 0;//�� ��ȣ �ӽ÷� 0���� �־��?
 						strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
 						packet.uID = mClients[player_id].mUID;
 						packet.roomMax = mMatchListLowTier.size();
@@ -630,7 +631,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 				}
 				else
 				{
-					// Ŭ�� �ð� �� ���� -> ���� ��� �ð� ����
+					// Ŭ�� �ð� �� ���� -> ���� ���?�ð� ����
 					/*
 					   ��Ŷ ����
 					*/

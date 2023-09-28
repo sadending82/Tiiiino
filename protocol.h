@@ -1,6 +1,6 @@
 //test ip
 #pragma once
-constexpr auto SERVERIP = "127.0.0.1";
+constexpr const char* SERVERIP = "127.0.0.1";
 
 constexpr int GAMESERVERPORT = 3600;
 constexpr int LOBBYSERVERPORT = 3500;
@@ -143,7 +143,7 @@ struct 	LC_LOGIN_FAIL_PACKET :public PACKET {
 
 struct LC_MATCH_RESPONSE_PACKET : public PACKET {
 	int gameServerPortNum;
-	char gameServerIP[4];	//IPv4에서 ip는 4바이트
+	unsigned char gameServerIP[16];	//IPv4에서 ip는 4바이트인데 글자로 표기하니까 최대 xxx.xxx.xxx.xxx  15 + 널문자 = 16
 };
 
 //--------------------------
