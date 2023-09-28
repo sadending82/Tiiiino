@@ -57,7 +57,7 @@ struct LG_USER_INTO_GAME_PACKET : public SPACKET {
 	char	name[MAX_NAME_SIZE];
 	int		uID;
 	int		roomID;
-	int		roomMax;	//¹æ ÃÖ´ë ÀÎ¿ø. (4¸íÀÌ¼­ ÇÒ ¼öµµ ÀÖÀ¸´Ï±î)
+	int		roomMax;	//ï¿½ï¿½ ï¿½Ö´ï¿½ ï¿½Î¿ï¿½. (4ï¿½ï¿½ï¿½Ì¼ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï±ï¿½)
 };
 
 struct LD_LOGIN_PACKET :public SPACKET {
@@ -77,6 +77,7 @@ struct DL_LOGIN_OK_PACKET :public SPACKET {
 	double	credit;
 	int		point;
 	int		userKey;
+	double	tier;
 	bool	connState;
 };
 

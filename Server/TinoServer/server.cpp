@@ -9,7 +9,12 @@ void Server::Disconnect(int cID)
 		mClients[cID].mStateLock.unlock();
 		return;
 	}
+
 	cout << "DISCONNECT" << mClients[cID].mUID << endl;
+
+	mMatchListHighTier.remove(cID);
+	mMatchListLowTier.remove(cID);
+
 	closesocket(mClients[cID].mSocket);
 	mClients[cID].mState = eSessionState::ST_FREE;
 	mClients[cID].mStateLock.unlock();
@@ -56,7 +61,7 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 		pac.userKey = cID;
 		memcpy(pac.id, p->id, sizeof(pac.id));
 		memcpy(pac.password, p->password, sizeof(pac.password));
-		// db ¼­¹ö¿¡ Àü¼Û
+		// db ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 		mServers[0].DoSend(&pac);
 		break;
 	}
@@ -68,40 +73,28 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 		sp.type = LD_JOIN;
 		memcpy(sp.id, rp->id, sizeof(rp->id));
 		memcpy(sp.password, rp->password, sizeof(rp->password));
-		// db ¼­¹ö¿¡ Àü¼Û
+		// db ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 		mServers[0].DoSend(&sp);
 		break;
 	}
 	case CL_MATCH:
 	{
-		CL_MATCH_PACKET* p = reinterpret_cast<CL_MATCH_PACKET*>(cpacket);
-		/*
-		Áö±ÝÀº!°ÔÀÓ¼­¹öÇÑÅ× ¹Ù·Î º¸³»ÁÖ¸é µÊ.
-		³ªÁß¿£ ÀÌ ÆÐÅ¶¿¡¼­ º¸³»ÁÖ´Â°Ô ¾Æ´Ï¶ó ¿©±â·Î µé¾î¿Â ÇÃ·¹ÀÌ¾îµéÀ» ¸ð¾Æ¼­
-		µû·Î ¸ÅÄª ·ÎÁ÷À» µ¹¸° ÈÄ¿¡ ¸ÅÄªÀÌ ¼º»ç µÇ¸é ±× ÇÔ¼ö¿¡¼­ ¾Æ·¡ÀÇ ÆÐÅ¶À» º¸³»ÁÖ¸é µÊ.
-		±×¸®°í ÀÌ ÆÐÅ¶ ÇÏ³ª Å©±â°¡ 46ÀÌ¶ó¼­ 8¸íÀ» ÇÑ²¨¹ø¿¡ º¸³»¸é 344¹ÙÀÌÆ®ÀÓ. ÇÑ¹ø¿¡ ¸øº¸³¿
-		Æ÷¹® µ¹·Á¼­ ÀÎ¿ø¼ö¸¸Å­ º¸³»ÁÖ¸é µÊ.
-
-		LG_USER_INTO_GAME_PACKET packet;
-		packet.size = sizeof(packet);
-		packet.type = LG_USER_INTO_GAME;
-		packet.roomID = 0; //¿©±â¿¡ Room NumberÀÎµ¥~ ÀÌ°Ç ÀÌÁ¦ ·Îºñ¼­¹ö¿¡¼­ ¸ÅÄª ·ÎÁ÷ µ¹¸®¸é¼­ Á¤ÇØÁà¾ßÇÔ Áö±ÝÀº 0 ³ÖÀ¸¸é µÊ.
-		strcpy(packet.name, mClients[cID].GetName());
-		strcpy(packet.passWord, mClients[cID].GetPassWord());
-		packet.roomMax = 8;	//¿©±âµµ ¸î¸íÀÌ¼­ ÁøÇàÇÏ´ÂÁö ³Ö´Â °ª. Å×½ºÆ®¿¡´Â °ÅÀÇ 8¸íÀÌ¼­ ÇÒ °Å´Ï±î 8À» ³Ö¾îÁØ´Ù. 4¸íÀÌ¼­ ÇÏ¸é 4¸¦ ³Ö´Â´Ù.
-		sendToGameServer(packet);
-		*/
-
-		LG_USER_INTO_GAME_PACKET packet;
-		packet.size = sizeof(packet);
-		packet.type = LG_USER_INTO_GAME;
-		packet.roomID = 0;//¹æ ¹øÈ£ ÀÓ½Ã·Î 0À¸·Î ³Ö¾îµÒ
-		strcpy_s(packet.name, sizeof(mClients[cID].mNickName), mClients[cID].mNickName);
-		packet.uID = mClients[cID].mUID;
-		packet.roomMax = 2;
-		mClients[cID].mRoomID = packet.roomID;
-		mServers[1].DoSend(&packet);
-
+		if (mClients[cID].mTier > 3.5)
+		{
+			mMatchListHighTier.push_back(cID);
+		}
+		else
+		{
+			mMatchListLowTier.push_back(cID);
+		}
+		mClients[cID].mState = eSessionState::ST_MATCH;
+		break;
+	}
+	case CL_MATCH_OUT:
+	{
+		mMatchListHighTier.remove(cID);
+		mMatchListLowTier.remove(cID);
+		mClients[cID].mState = eSessionState::ST_LOBBY;
 		break;
 	}
 	default:
@@ -113,14 +106,13 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 
 void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 {
-
 	switch (spacket[1])
 	{
 	case GL_LOGIN:
 	{
 		GL_LOGIN_PACKET* p = reinterpret_cast<GL_LOGIN_PACKET*>(spacket);
 
-		cout << "°ÔÀÓ ¼­¹ö Á¢¼Ó È®ÀÎ" << endl;
+		cout << "ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½" << endl;
 
 		break;
 	}
@@ -130,36 +122,27 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		LC_MATCH_RESPONSE_PACKET packet;
 		packet.size = sizeof(packet);
 		packet.type = LC_MATCH_RESPONSE;
-		for (auto& player : mClients)
+		strcpy_s(packet.gameServerIP, SERVERIP);
+		packet.gameServerPortNum = GAMESERVERPORT;
+
+		for (auto& player : mReadytoGame)
 		{
-			if (player.mRoomID == p->roomID)
+			if (mClients[player].mRoomID == p->roomID)
 			{
-				player.DoSend(&packet);
+				mClients[player].DoSend(&packet);
+				mClients[player].mState = eSessionState::ST_INGAME;
 			}
 		}
-		//ÀÚ¸®¿¡ ¾øÀ¸¼Å¼­ ¸¸µç ºñÈ¿À²ÀûÀÎ ÄÚµå ³ªÁß¿¡ °íÃÄÁÖ½Ê¼î
-
-
-		/*
-			ÆÐÅ¶ÀÇ roomID·Î roomÀ» ÁØºñ ¿Ï·á·Î ¹Ù²Ù°í, Å¬¶óÀÌ¾ðÆ®µé¿¡°Ô °ÔÀÓ¼­¹ö·Î °¡¶ó´Â ÆÐÅ¶À» º¸³¿.
-			LC_MATCH_RESPONSE_PACKET packet;
-			packet.size = sizeof(packet);
-			packet.type = LC_MATCH_RESPONSE;
-			packet.gameServerPortNum = GAMESERVERPORT + n;	//³ªÁß¿¡ °ÔÀÓ¼­¹ö ¿©·¯°³±îÁö °í·Á
-			strcpy(packet.gameServerIP,"127.0.0.1"´ëÃæ¾ÆÀÌÇÇ);
-			sendToClient(packet);
-
-		*/
 
 		break;
 	}
 	case DL_LOGIN_OK:
 	{
-		cout << "·Î±×ÀÎ ¼º°ø" << endl;
+		cout << "ï¿½Î±ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½" << endl;
 
 		DL_LOGIN_OK_PACKET* p = reinterpret_cast<DL_LOGIN_OK_PACKET*>(spacket);
 
-		// Áßº¹ ·Î±×ÀÎÀÏ °æ¿ì ±âÁ¸ Á¢¼ÓÀÚ ¿¬°á Á¾·á (³ªÁß¿¡ ÄÚµå Á¤¸®)
+		// ï¿½ßºï¿½ ï¿½Î±ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½ß¿ï¿½ ï¿½Úµï¿½ ï¿½ï¿½ï¿½ï¿½)
 		if (p->connState == TRUE) {
 			int disconnID = -1;
 			for (int i = MAXGAMESERVER; i < MAX_USER; ++i) {
@@ -175,10 +158,14 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 				Disconnect(disconnID);
 		}
 
-		mClients[p->userKey].mCredit = p->credit;
-		strcpy_s(mClients[p->userKey].mNickName, sizeof(p->nickname), p->nickname);
-		mClients[p->userKey].mPoint = p->point;
-		mClients[p->userKey].mUID = p->uid;
+		mClients[p->user_id].mStateLock.lock();
+		mClients[p->user_id].mCredit = p->credit;
+		strcpy_s(mClients[p->user_id].mNickName, sizeof(p->nickname), p->nickname);
+		mClients[p->user_id].mPoint = p->point;
+		mClients[p->user_id].mUID = p->uid;
+		mClients[p->user_id].mTier = p->tier;
+		mClients[p->user_id].mState = eSessionState::ST_LOBBY;
+		mClients[p->user_id].mStateLock.unlock();
 
 		LC_LOGIN_OK_PACKET pac;
 		pac.type = LC_LOGIN_OK;
@@ -189,13 +176,20 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 
 		mClients[p->userKey].DoSend(&pac);
 
-		// Å¬¶óÂÊ¿¡ ·Î±×ÀÎ ¼º°ø Çß´Ù°í ¾Ë·ÁÁà¾ß ÇÔ
-
 		break;
 	}
 	case DL_LOGIN_FAIL:
 	{
-		cout << "·Î±×ÀÎ ½ÇÆÐ" << endl;
+		cout << "ï¿½Î±ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½" << endl;
+
+		DL_LOGIN_FAIL_PACKET* p = reinterpret_cast<DL_LOGIN_FAIL_PACKET*>(spacket);
+
+		LC_LOGIN_FAIL_PACKET pac;
+		pac.size = sizeof(LC_LOGIN_FAIL_PACKET);
+		pac.type = LC_LOGIN_FAIL;
+
+		mClients[p->user_id].DoSend(&pac);
+
 		break;
 	}
 	default:
@@ -207,13 +201,6 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 
 void Server::DoWorker()
 {
-	/*EV_UpdateMatchPacket p;
-	p.size = sizeof(EV_UpdateMatchPacket);
-	p.type = 0;
-
-	pTimer->PushEvent(1, eEVENT_TYPE::EV_MATCH_UP, 5000, reinterpret_cast<char*>(&p));
-	*/
-
 	while (true)
 	{
 		DWORD numBytes;
@@ -270,9 +257,9 @@ void Server::DoWorker()
 				ZeroMemory(&exOver->mOver, sizeof(exOver->mOver));
 				exOver->mWsaBuf.buf = reinterpret_cast<CHAR*>(cSocket);
 				int addr_size = sizeof(SOCKADDR_IN);
-				//°ÔÀÓ¼­¹ö°¡ ´õ ÄÑÁ®¾ß ÇÑ´Ù¸é
+				//ï¿½ï¿½ï¿½Ó¼ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ñ´Ù¸ï¿½
 				/*
-				if(mGameServerCnt < mMaxGameServerCnt) //<<µÎ°³ º¯¼ö Ãß°¡ÇØÁÖ°í
+				if(mGameServerCnt < mMaxGameServerCnt) //<<ï¿½Î°ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½ï¿½ï¿½ï¿½Ö°ï¿½
 					AcceptEx(mListenSocket, cSocket, exOver->mMessageBuf, BUF_SIZE - 8, addr_size + 16, addr_size + 16, 0, &exOver->mOver);
 				else
 				*/
@@ -428,15 +415,15 @@ void Server::Init()
 	inet_pton(AF_INET, SERVERIP, &serverAddr.sin_addr);
 
 	if (connect(LDsocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR) {
-		cout << "DB¼­¹ö Ä¿³ØÆ® ½ÇÆÐ" << endl;
+		cout << "DBï¿½ï¿½ï¿½ï¿½ Ä¿ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½" << endl;
 	}
 	else {
-		cout << "DB¼­¹ö Ä¿³ØÆ® ¼º°ø" << endl;
+		cout << "DBï¿½ï¿½ï¿½ï¿½ Ä¿ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½" << endl;
 		OverEXP ss_over;
 		ss_over.mCompType = eCompType::OP_ACCEPT;
 		ss_over.mWsaBuf.buf = reinterpret_cast<CHAR*>(LDsocket);
 
-		// ¹ÙÀÎµå °É¾î ÁÖ±â -> ±âÁ¸ Å¬¶ó ¸»°í ¼­¹ö ÂÊÀ¸·Î
+		// ï¿½ï¿½ï¿½Îµï¿½ ï¿½É¾ï¿½ ï¿½Ö±ï¿½ -> ï¿½ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 		int server_id = GetNewServerID();
 		if (server_id != INVALID_KEY)
@@ -476,11 +463,11 @@ void Server::Init()
 
 	pTimer = new Timer;
 	pTimer->Init(mHCP);
-	delete pTimer;
 
 	for (auto& th : mWorkerThreads)
 		th.join();
 
+	delete pTimer;
 	closesocket(mListenSocket);
 	WSACleanup();
 }
@@ -488,19 +475,175 @@ void Server::Init()
 void Server::ProcessEvent(unsigned char* cmessage)
 {
 	switch (cmessage[1]) {
-	case static_cast<int> (eEVENT_TYPE::EV_MATCH_UP):
+	case eEVENT_TYPE::EV_MATCH_UP:
 	{
-		cout << "ÀÛµ¿ È®ÀÎ 0" << endl;
+		// ï¿½âº» Ç®ï¿½ï¿½ ï¿½ï¿½Äª ï¿½ï¿½ï¿½ï¿½
+		if (mMatchListHighTier.size() >= MAX_ROOM_USER)
+		{
+			for (int i = 0; i < i < MAX_ROOM_USER; ++i)
+			{
+				int player_id = mMatchListHighTier.front();
+
+				LG_USER_INTO_GAME_PACKET packet;
+				packet.size = sizeof(packet);
+				packet.type = LG_USER_INTO_GAME;
+				packet.roomID = 0;//ï¿½ï¿½ ï¿½ï¿½È£ ï¿½Ó½Ã·ï¿½ 0ï¿½ï¿½ï¿½ï¿½ ï¿½Ö¾ï¿½ï¿½
+				strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
+				packet.uID = mClients[player_id].mUID;
+				packet.roomMax = MAX_ROOM_USER;
+				mClients[player_id].mRoomID = packet.roomID;
+
+				mServers[1].DoSend(&packet);
+
+				mMatchListHighTier.pop_front();
+				mReadytoGame.push_back(player_id);
+			}
+		}
+		if (mMatchListLowTier.size() >= MAX_ROOM_USER)
+		{
+			for (int i = 0; i < i < MAX_ROOM_USER; ++i)
+			{
+				int player_id = mMatchListLowTier.front();
+
+				LG_USER_INTO_GAME_PACKET packet;
+				packet.size = sizeof(packet);
+				packet.type = LG_USER_INTO_GAME;
+				packet.roomID = 0;//ï¿½ï¿½ ï¿½ï¿½È£ ï¿½Ó½Ã·ï¿½ 0ï¿½ï¿½ï¿½ï¿½ ï¿½Ö¾ï¿½ï¿½
+				strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
+				packet.uID = mClients[player_id].mUID;
+				packet.roomMax = MAX_ROOM_USER;
+				mClients[player_id].mRoomID = packet.roomID;
+
+				mServers[1].DoSend(&packet);
+
+				mMatchListLowTier.pop_front();
+				mReadytoGame.push_back(player_id);
+			}
+		}
+
+		// 4ï¿½ï¿½ ï¿½Ì»ï¿½ ï¿½ï¿½ï¿½
+		if (mMatchListHighTier.size() >= MAX_ROOM_USER / 2)
+		{
+			EV_CountDownPacket pac;
+			pac.size = sizeof(EV_CountDownPacket);
+			pac.type = eCompType::OP_EVENT;
+			pac.listnum = 0;
+			pTimer->PushEvent(1, eEVENT_TYPE::EV_COUNT_DOWN, 1000, reinterpret_cast<unsigned char*>(&pac));
+
+			mClients[mMatchListHighTier.front()].mMatchStartTime = system_clock::now();
+		}
+		if (mMatchListLowTier.size() >= MAX_ROOM_USER / 2)
+		{
+			EV_CountDownPacket pac;
+			pac.size = sizeof(EV_CountDownPacket);
+			pac.type = eCompType::OP_EVENT;
+			pac.listnum = 1;
+			pTimer->PushEvent(1, eEVENT_TYPE::EV_COUNT_DOWN, 1000, reinterpret_cast<unsigned char*>(&pac));
+
+			mClients[mMatchListLowTier.front()].mMatchStartTime = system_clock::now();
+		}
+
+		EV_UpdateMatchPacket p;
+		p.size = sizeof(EV_UpdateMatchPacket);
+		p.type = eCompType::OP_EVENT;
+		pTimer->PushEvent(1, eEVENT_TYPE::EV_MATCH_UP, 500, reinterpret_cast<unsigned char*>(&p));
+
 		break;
 	}
-	case static_cast<int> (eEVENT_TYPE::EV_MATCH_IN):
+	case eEVENT_TYPE::EV_COUNT_DOWN:
 	{
-		cout << "ÀÛµ¿ È®ÀÎ 1" << endl;
-		break;
-	}
-	case static_cast<int> (eEVENT_TYPE::EV_MATCH_OUT):
-	{
-		cout << "ÀÛµ¿ È®ÀÎ 2" << endl;
+		EV_CountDownPacket* p = reinterpret_cast<EV_CountDownPacket*>(cmessage);
+
+		system_clock::time_point tTime = system_clock::now();
+
+		if (p->listnum == 0) // ï¿½ï¿½ï¿½ï¿½ Æ¼ï¿½ï¿½
+		{
+			if (mMatchListHighTier.size() < MAX_ROOM_USER / 2)
+			{
+				break;
+			}
+			else
+			{
+				if (tTime - mClients[mMatchListHighTier.front()].mMatchStartTime >= milliseconds(2000))
+				{
+					for (int i = 0; i < i < mMatchListHighTier.size(); ++i)
+					{
+						int player_id = mMatchListHighTier.front();
+
+						LG_USER_INTO_GAME_PACKET packet;
+						packet.size = sizeof(packet);
+						packet.type = LG_USER_INTO_GAME;
+						packet.roomID = 0;//ï¿½ï¿½ ï¿½ï¿½È£ ï¿½Ó½Ã·ï¿½ 0ï¿½ï¿½ï¿½ï¿½ ï¿½Ö¾ï¿½ï¿½
+						strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
+						packet.uID = mClients[player_id].mUID;
+						packet.roomMax = mMatchListHighTier.size();
+						mClients[player_id].mRoomID = packet.roomID;
+
+						mServers[1].DoSend(&packet);
+
+						mMatchListHighTier.pop_front();
+						mReadytoGame.push_back(player_id);
+					}
+				}
+				else
+				{
+					// Å¬ï¿½ï¿½ ï¿½Ã°ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ -> ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½ ï¿½ï¿½ï¿½ï¿½
+					/*
+					   ï¿½ï¿½Å¶ ï¿½ï¿½ï¿½ï¿½
+					*/
+
+					EV_CountDownPacket pac;
+					pac.size = sizeof(EV_CountDownPacket);
+					pac.type = eCompType::OP_EVENT;
+					pac.listnum = 0;
+					pTimer->PushEvent(1, eEVENT_TYPE::EV_COUNT_DOWN, 1000, reinterpret_cast<unsigned char*>(&pac));
+				}
+			}
+		}
+		else // ï¿½ï¿½ï¿½ï¿½ Æ¼ï¿½ï¿½
+		{
+			if (mMatchListLowTier.size() < MAX_ROOM_USER / 2)
+			{
+				break;
+			}
+			else
+			{
+				if (tTime - mClients[mMatchListLowTier.front()].mMatchStartTime >= milliseconds(2000))
+				{
+					for (int i = 0; i < i < mMatchListLowTier.size(); ++i)
+					{
+						int player_id = mMatchListLowTier.front();
+
+						LG_USER_INTO_GAME_PACKET packet;
+						packet.size = sizeof(packet);
+						packet.type = LG_USER_INTO_GAME;
+						packet.roomID = 0;//ï¿½ï¿½ ï¿½ï¿½È£ ï¿½Ó½Ã·ï¿½ 0ï¿½ï¿½ï¿½ï¿½ ï¿½Ö¾ï¿½ï¿½
+						strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
+						packet.uID = mClients[player_id].mUID;
+						packet.roomMax = mMatchListLowTier.size();
+						mClients[player_id].mRoomID = packet.roomID;
+
+						mServers[1].DoSend(&packet);
+
+						mMatchListLowTier.pop_front();
+						mReadytoGame.push_back(player_id);
+					}
+				}
+				else
+				{
+					// Å¬ï¿½ï¿½ ï¿½Ã°ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ -> ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½ ï¿½ï¿½ï¿½ï¿½
+					/*
+					   ï¿½ï¿½Å¶ ï¿½ï¿½ï¿½ï¿½
+					*/
+
+					EV_CountDownPacket pac;
+					pac.size = sizeof(EV_CountDownPacket);
+					pac.type = eCompType::OP_EVENT;
+					pac.listnum = 1;
+					pTimer->PushEvent(1, eEVENT_TYPE::EV_COUNT_DOWN, 1000, reinterpret_cast<unsigned char*>(&pac));
+				}
+			}
+		}
 		break;
 	}
 	default:

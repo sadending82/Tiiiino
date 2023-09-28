@@ -119,6 +119,15 @@ void send_match_packet(SOCKET& sock)
 	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
 }
 
+void send_matchout_packet(SOCKET& sock)
+{
+	CL_MATCH_OUT_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = CL_MATCH_OUT;
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+}
+
 void send_movetogame_packet(SOCKET& sock, const int uID, const char* id, const int& roomID)
 {
 	CS_LOGIN_PACKET packet;
