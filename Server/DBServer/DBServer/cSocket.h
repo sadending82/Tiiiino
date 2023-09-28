@@ -22,6 +22,8 @@ public:
 
 	void ProcessPacket_Login(int key, unsigned char* buf);
 
+	void ProcessPacket_Join(unsigned char* buf);
+
 private:
 	SOCKADDR_IN mServerAddr;
 	HANDLE mHcp;

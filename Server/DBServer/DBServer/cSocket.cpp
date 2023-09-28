@@ -17,7 +17,7 @@ int Socket::SetKey()
     }
 }
 
-void Socket::Disconnect(int key) 
+void Socket::Disconnect(int key)
 {
     if (mSessions[key].mState == eSessionState::ST_FREE) {
         return;
@@ -54,7 +54,7 @@ void Socket::WorkerFunc()
                 SOCKET cSocket = reinterpret_cast<SOCKET>(exOver->mWsaBuf.buf);
                 mSessions[newKey].mSocket = cSocket;
                 mSessions[newKey].mExOver.mOpType = eOpType::OP_RECV;
-                mSessions[newKey].mPrevData= 0;
+                mSessions[newKey].mPrevData = 0;
                 mSessions[newKey].mState = eSessionState::ST_ACCEPTED;
                 mSessions[newKey].mID = newKey;
                 CreateIoCompletionPort((HANDLE)mSessions[newKey].mSocket, mHcp, newKey, 0);
@@ -98,7 +98,7 @@ void Socket::WorkerFunc()
                 packet_size = packet_ptr[0];
             }
             packet_size = 0;
-            mSessions[key].mPrevData= 0;
+            mSessions[key].mPrevData = 0;
             if (0 != required_data)
                 memcpy(exOver->mMessageBuf, packet_ptr, required_data);
             mSessions[key].DoRecv();
@@ -145,16 +145,16 @@ void Socket::ServerReady(DB* pDB)
     BOOL ret = AcceptEx(mListenSocket, c_socket, accept_over.mMessageBuf
         , 0, 32, 32, NULL, &accept_over.mOver);
 
-	if (false == ret) {
-		int err_num = WSAGetLastError();
-		if (err_num != WSA_IO_PENDING)
-		{
+    if (false == ret) {
+        int err_num = WSAGetLastError();
+        if (err_num != WSA_IO_PENDING)
+        {
 #ifdef Test
-			std::cout << "Accept Error: " << err_num << std::endl;
+            std::cout << "Accept Error: " << err_num << std::endl;
 #endif
             return;
-		}
-	}
+        }
+    }
 #ifdef Test
     std::cout << "Connect To Lobby Server Ready" << std::endl;
 #endif
@@ -166,11 +166,12 @@ void Socket::processPacket(int key, unsigned char* buf)
     switch (buf[1])
     {
         // 로그인 요청
-    case LD_LOGIN:
-    {
+    case LD_LOGIN: {
         ProcessPacket_Login(key, buf);
-
-        cout << "로그인 패킷 받음\n";
+        break;
+    }
+    case LD_JOIN: {
+        ProcessPacket_Join(buf);
         break;
     }
     default:
@@ -198,6 +199,8 @@ bool Socket::CheckLogin(int key, const char* id, const char* password, int useri
     SendUserDataAfterLogin(key, uid, nickname, credit, point, state, userid);
 
     m_pDB->UpdateUserConnectionState(uid, true);
+
+    cout << "Login Success / ID: " << id << endl;
 
     return true;
 }
@@ -237,5 +240,14 @@ void Socket::ProcessPacket_Login(int key, unsigned char* buf)
     bool bCheckLogin = CheckLogin(key, p->id, p->password, p->user_id);
     if (bCheckLogin == false) {
         SendLoginFail(key, p->id);
+    }
+}
+
+void Socket::ProcessPacket_Join(unsigned char* buf)
+{
+    LD_JOIN_PACKET* p = reinterpret_cast<LD_JOIN_PACKET*>(buf);
+    bool bJoin = m_pDB->InsertNewUser(p->id, p->password);
+    if (bJoin == false) {
+        cout << "Join new user failed\n";
     }
 }

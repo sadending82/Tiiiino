@@ -19,7 +19,7 @@ bool DB::ConnectDB()
 		mysql_query(&mConn, "set names euckr");
 #endif
 	}
-	else{
+	else {
 #ifdef Test
 		std::cout << "DataBase Connect Fail" << std::endl;
 #endif
@@ -64,7 +64,7 @@ tuple<string, string, double, int> DB::SelectUserData(const int uid)
 	}
 
 	MYSQL_BIND paramBind;
-	//memset(&paramBind, 0, sizeof(paramBind));
+	memset(&paramBind, 0, sizeof(paramBind));
 	paramBind.buffer_type = MYSQL_TYPE_LONG;
 	paramBind.buffer = (void*)&uid;
 
@@ -114,8 +114,6 @@ tuple<string, string, double, int> DB::SelectUserData(const int uid)
 		return tuple<string, string, double, int>();
 	}
 
-	cout << bindID << " // " << bindNickname << " // " << bindCredit << " // " << bindPoint << endl;
-
 	return make_tuple(bindID, bindNickname, bindCredit, bindPoint);
 }
 
@@ -144,7 +142,7 @@ tuple<int, string, double, int, bool> DB::SelectUserDataForLogin(const string& i
 
 	if (mysql_stmt_bind_param(mStmt, paramBinds) != 0) {
 #ifdef Test
-			std::cout << "SelectUserData stmt param bind error: " << mysql_stmt_error(mStmt) << std::endl;
+		std::cout << "SelectUserData stmt param bind error: " << mysql_stmt_error(mStmt) << std::endl;
 #endif
 		return tuple<int, string, double, int, bool>();
 	}
@@ -192,9 +190,9 @@ tuple<int, string, double, int, bool> DB::SelectUserDataForLogin(const string& i
 	return make_tuple(bindUID, bindNickname, bindCredit, bindPoint, bindState);
 }
 
-bool DB::InsertNewUser(const string& id, const string& passWord, const string& nickname)
+bool DB::InsertNewUser(const string& id, const string& passWord)
 {
-	string query = "INSERT INTO userinfo (ID, PassWord, nick) VALUES (?, ?, ?)";
+	string query = "INSERT INTO userinfo (ID, PassWord) VALUES (?, ?)";
 
 	if (mysql_stmt_prepare(mStmt, query.c_str(), query.length()) != 0) {
 #ifdef Test
@@ -203,7 +201,7 @@ bool DB::InsertNewUser(const string& id, const string& passWord, const string& n
 		return false;
 	}
 
-	const int colNum = 3;
+	const int colNum = 2;
 
 	MYSQL_BIND binds[colNum];
 	memset(binds, 0, sizeof(binds));
@@ -216,14 +214,11 @@ bool DB::InsertNewUser(const string& id, const string& passWord, const string& n
 	binds[1].buffer = (void*)passWord.c_str();
 	binds[1].buffer_length = passWord.length();
 
-	binds[2].buffer_type = MYSQL_TYPE_STRING;
-	binds[2].buffer = (void*)nickname.c_str();
-	binds[2].buffer_length = nickname.length();
 
 	if (mysql_stmt_bind_param(mStmt, binds) != 0) {
 
 #ifdef Test
-			std::cout << "InsertNewUser stmt bind error: " << mysql_stmt_error(mStmt) << std::endl;
+		std::cout << "InsertNewUser stmt bind error: " << mysql_stmt_error(mStmt) << std::endl;
 #endif
 		return false;
 	}

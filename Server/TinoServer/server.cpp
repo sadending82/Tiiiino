@@ -9,6 +9,10 @@ void Server::Disconnect(int cID)
 		mClients[cID].mStateLock.unlock();
 		return;
 	}
+
+	mMatchListHighTier.remove(cID);
+	mMatchListLowTier.remove(cID);
+
 	closesocket(mClients[cID].mSocket);
 	mClients[cID].mState = eSessionState::ST_FREE;
 	mClients[cID].mStateLock.unlock();
@@ -44,7 +48,7 @@ int Server::GetNewServerID()
 
 void Server::ProcessPacket(int cID, unsigned char* cpacket)
 {
-	switch (cpacket[1]) 
+	switch (cpacket[1])
 	{
 	case CL_LOGIN:
 	{
@@ -60,36 +64,36 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 		mServers[0].DoSend(&pac);
 		break;
 	}
+	case CL_JOIN:
+	{
+		CL_JOIN_PACKET* rp = reinterpret_cast<CL_JOIN_PACKET*>(cpacket);
+		LD_JOIN_PACKET sp;
+		sp.size = sizeof(sp);
+		sp.type = LD_JOIN;
+		memcpy(sp.id, rp->id, sizeof(rp->id));
+		memcpy(sp.password, rp->password, sizeof(rp->password));
+		// db 서버에 전송
+		mServers[0].DoSend(&sp);
+		break;
+	}
 	case CL_MATCH:
 	{
-		CL_MATCH_PACKET* p = reinterpret_cast<CL_MATCH_PACKET*>(cpacket);
-		/*
-		지금은!게임서버한테 바로 보내주면 됨.
-		나중엔 이 패킷에서 보내주는게 아니라 여기로 들어온 플레이어들을 모아서
-		따로 매칭 로직을 돌린 후에 매칭이 성사 되면 그 함수에서 아래의 패킷을 보내주면 됨.
-		그리고 이 패킷 하나 크기가 46이라서 8명을 한꺼번에 보내면 344바이트임. 한번에 못보냄
-		포문 돌려서 인원수만큼 보내주면 됨.
-		
-		LG_USER_INTO_GAME_PACKET packet;
-		packet.size = sizeof(packet);
-		packet.type = LG_USER_INTO_GAME;
-		packet.roomID = 0; //여기에 Room Number인데~ 이건 이제 로비서버에서 매칭 로직 돌리면서 정해줘야함 지금은 0 넣으면 됨.
-		strcpy(packet.name, mClients[cID].GetName());
-		strcpy(packet.passWord, mClients[cID].GetPassWord());
-		packet.roomMax = 8;	//여기도 몇명이서 진행하는지 넣는 값. 테스트에는 거의 8명이서 할 거니까 8을 넣어준다. 4명이서 하면 4를 넣는다.
-		sendToGameServer(packet);
-		*/
-
-		LG_USER_INTO_GAME_PACKET packet;
-		packet.size = sizeof(packet);
-		packet.type = LG_USER_INTO_GAME;
-		packet.roomID = 0;//방 번호 임시로 0으로 넣어둠
-		strcpy_s(packet.name, sizeof(mClients[cID].mNickName), mClients[cID].mNickName);
-		packet.uID = mClients[cID].mUID;
-		packet.roomMax = 2;
-		mClients[cID].mRoomID = packet.roomID;	
-		mServers[1].DoSend(&packet);
-
+		if (mClients[cID].mTier > 3.5)
+		{
+			mMatchListHighTier.push_back(cID);
+		}
+		else
+		{
+			mMatchListLowTier.push_back(cID);
+		}
+		mClients[cID].mState = eSessionState::ST_MATCH;
+		break;
+	}
+	case CL_MATCH_OUT:
+	{
+		mMatchListHighTier.remove(cID);
+		mMatchListLowTier.remove(cID);
+		mClients[cID].mState = eSessionState::ST_LOBBY;
 		break;
 	}
 	default:
@@ -101,7 +105,6 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 
 void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 {
-
 	switch (spacket[1])
 	{
 	case GL_LOGIN:
@@ -118,26 +121,17 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		LC_MATCH_RESPONSE_PACKET packet;
 		packet.size = sizeof(packet);
 		packet.type = LC_MATCH_RESPONSE;
-		for (auto& player : mClients)
+		strcpy_s(packet.gameServerIP, SERVERIP);
+		packet.gameServerPortNum = GAMESERVERPORT;
+
+		for (auto& player : mReadytoGame)
 		{
-			if (player.mRoomID == p->roomID)
+			if (mClients[player].mRoomID == p->roomID)
 			{
-				player.DoSend(&packet);
+				mClients[player].DoSend(&packet);
+				mClients[player].mState = eSessionState::ST_INGAME;
 			}
 		}
-		//자리에 없으셔서 만든 비효율적인 코드 나중에 고쳐주십쇼
-		
-
-		/*
-			패킷의 roomID로 room을 준비 완료로 바꾸고, 클라이언트들에게 게임서버로 가라는 패킷을 보냄.
-			LC_MATCH_RESPONSE_PACKET packet;
-			packet.size = sizeof(packet);
-			packet.type = LC_MATCH_RESPONSE;
-			packet.gameServerPortNum = GAMESERVERPORT + n;	//나중에 게임서버 여러개까지 고려
-			strcpy(packet.gameServerIP,"127.0.0.1"대충아이피);
-			sendToClient(packet);
-
-		*/
 
 		break;
 	}
@@ -146,10 +140,14 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		cout << "로그인 성공" << endl;
 
 		DL_LOGIN_OK_PACKET* p = reinterpret_cast<DL_LOGIN_OK_PACKET*>(spacket);
+		mClients[p->user_id].mStateLock.lock();
 		mClients[p->user_id].mCredit = p->credit;
 		strcpy_s(mClients[p->user_id].mNickName, sizeof(p->nickname), p->nickname);
 		mClients[p->user_id].mPoint = p->point;
 		mClients[p->user_id].mUID = p->uid;
+		mClients[p->user_id].mTier = p->tier;
+		mClients[p->user_id].mState = eSessionState::ST_LOBBY;
+		mClients[p->user_id].mStateLock.unlock();
 
 		LC_LOGIN_OK_PACKET pac;
 		pac.type = LC_LOGIN_OK;
@@ -160,13 +158,20 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 
 		mClients[p->user_id].DoSend(&pac);
 
-		// 클라쪽에 로그인 성공 했다고 알려줘야 함
-
 		break;
 	}
 	case DL_LOGIN_FAIL:
 	{
 		cout << "로그인 실패" << endl;
+
+		DL_LOGIN_FAIL_PACKET* p = reinterpret_cast<DL_LOGIN_FAIL_PACKET*>(spacket);
+
+		LC_LOGIN_FAIL_PACKET pac;
+		pac.size = sizeof(LC_LOGIN_FAIL_PACKET);
+		pac.type = LC_LOGIN_FAIL;
+
+		mClients[p->user_id].DoSend(&pac);
+
 		break;
 	}
 	default:
@@ -178,13 +183,6 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 
 void Server::DoWorker()
 {
-	/*EV_UpdateMatchPacket p;
-	p.size = sizeof(EV_UpdateMatchPacket);
-	p.type = 0;
-
-	pTimer->PushEvent(1, eEVENT_TYPE::EV_MATCH_UP, 5000, reinterpret_cast<char*>(&p));
-	*/
-
 	while (true)
 	{
 		DWORD numBytes;
@@ -211,7 +209,7 @@ void Server::DoWorker()
 			}
 		}
 
-		switch (exOver->mCompType) 
+		switch (exOver->mCompType)
 		{
 		case eCompType::OP_ACCEPT:
 		{
@@ -227,7 +225,7 @@ void Server::DoWorker()
 					mServers[server_id].mRecvOver.mCompType = eCompType::OP_SERVER_RECV;
 					mServers[server_id].mPrevRemain = 0;
 					mServers[server_id].mSocket = cSocket;
-					
+
 					CreateIoCompletionPort(reinterpret_cast<HANDLE>(cSocket), mHCP, server_id, 0);
 					mServers[server_id].DoRecv();
 					cSocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
@@ -349,12 +347,12 @@ void Server::DoWorker()
 			delete exOver;
 			break;
 		}
-		case eCompType::OP_EVENT: 
+		case eCompType::OP_EVENT:
 		{
 			ProcessEvent((unsigned char*)exOver->mMessageBuf);
 			break;
 		}
-		default :
+		default:
 		{
 			break;
 		}
@@ -447,11 +445,11 @@ void Server::Init()
 
 	pTimer = new Timer;
 	pTimer->Init(mHCP);
-	delete pTimer;
 
 	for (auto& th : mWorkerThreads)
 		th.join();
 
+	delete pTimer;
 	closesocket(mListenSocket);
 	WSACleanup();
 }
@@ -459,19 +457,175 @@ void Server::Init()
 void Server::ProcessEvent(unsigned char* cmessage)
 {
 	switch (cmessage[1]) {
-	case static_cast<int> (eEVENT_TYPE::EV_MATCH_UP):
+	case eEVENT_TYPE::EV_MATCH_UP:
 	{
-		cout << "작동 확인 0" << endl;
+		// 기본 풀방 매칭 시작
+		if (mMatchListHighTier.size() >= MAX_ROOM_USER)
+		{
+			for (int i = 0; i < i < MAX_ROOM_USER; ++i)
+			{
+				int player_id = mMatchListHighTier.front();
+
+				LG_USER_INTO_GAME_PACKET packet;
+				packet.size = sizeof(packet);
+				packet.type = LG_USER_INTO_GAME;
+				packet.roomID = 0;//방 번호 임시로 0으로 넣어둠
+				strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
+				packet.uID = mClients[player_id].mUID;
+				packet.roomMax = MAX_ROOM_USER;
+				mClients[player_id].mRoomID = packet.roomID;
+
+				mServers[1].DoSend(&packet);
+
+				mMatchListHighTier.pop_front();
+				mReadytoGame.push_back(player_id);
+			}
+		}
+		if (mMatchListLowTier.size() >= MAX_ROOM_USER)
+		{
+			for (int i = 0; i < i < MAX_ROOM_USER; ++i)
+			{
+				int player_id = mMatchListLowTier.front();
+
+				LG_USER_INTO_GAME_PACKET packet;
+				packet.size = sizeof(packet);
+				packet.type = LG_USER_INTO_GAME;
+				packet.roomID = 0;//방 번호 임시로 0으로 넣어둠
+				strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
+				packet.uID = mClients[player_id].mUID;
+				packet.roomMax = MAX_ROOM_USER;
+				mClients[player_id].mRoomID = packet.roomID;
+
+				mServers[1].DoSend(&packet);
+
+				mMatchListLowTier.pop_front();
+				mReadytoGame.push_back(player_id);
+			}
+		}
+
+		// 4인 이상 대기
+		if (mMatchListHighTier.size() >= MAX_ROOM_USER / 2)
+		{
+			EV_CountDownPacket pac;
+			pac.size = sizeof(EV_CountDownPacket);
+			pac.type = eCompType::OP_EVENT;
+			pac.listnum = 0;
+			pTimer->PushEvent(1, eEVENT_TYPE::EV_COUNT_DOWN, 1000, reinterpret_cast<unsigned char*>(&pac));
+
+			mClients[mMatchListHighTier.front()].mMatchStartTime = system_clock::now();
+		}
+		if (mMatchListLowTier.size() >= MAX_ROOM_USER / 2)
+		{
+			EV_CountDownPacket pac;
+			pac.size = sizeof(EV_CountDownPacket);
+			pac.type = eCompType::OP_EVENT;
+			pac.listnum = 1;
+			pTimer->PushEvent(1, eEVENT_TYPE::EV_COUNT_DOWN, 1000, reinterpret_cast<unsigned char*>(&pac));
+
+			mClients[mMatchListLowTier.front()].mMatchStartTime = system_clock::now();
+		}
+
+		EV_UpdateMatchPacket p;
+		p.size = sizeof(EV_UpdateMatchPacket);
+		p.type = eCompType::OP_EVENT;
+		pTimer->PushEvent(1, eEVENT_TYPE::EV_MATCH_UP, 500, reinterpret_cast<unsigned char*>(&p));
+
 		break;
 	}
-	case static_cast<int> (eEVENT_TYPE::EV_MATCH_IN):
+	case eEVENT_TYPE::EV_COUNT_DOWN:
 	{
-		cout << "작동 확인 1" << endl;
-		break;
-	}
-	case static_cast<int> (eEVENT_TYPE::EV_MATCH_OUT):
-	{
-		cout << "작동 확인 2" << endl;
+		EV_CountDownPacket* p = reinterpret_cast<EV_CountDownPacket*>(cmessage);
+
+		system_clock::time_point tTime = system_clock::now();
+
+		if (p->listnum == 0) // 상위 티어
+		{
+			if (mMatchListHighTier.size() < MAX_ROOM_USER / 2)
+			{
+				break;
+			}
+			else
+			{
+				if (tTime - mClients[mMatchListHighTier.front()].mMatchStartTime >= milliseconds(2000))
+				{
+					for (int i = 0; i < i < mMatchListHighTier.size(); ++i)
+					{
+						int player_id = mMatchListHighTier.front();
+
+						LG_USER_INTO_GAME_PACKET packet;
+						packet.size = sizeof(packet);
+						packet.type = LG_USER_INTO_GAME;
+						packet.roomID = 0;//방 번호 임시로 0으로 넣어둠
+						strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
+						packet.uID = mClients[player_id].mUID;
+						packet.roomMax = mMatchListHighTier.size();
+						mClients[player_id].mRoomID = packet.roomID;
+
+						mServers[1].DoSend(&packet);
+
+						mMatchListHighTier.pop_front();
+						mReadytoGame.push_back(player_id);
+					}
+				}
+				else
+				{
+					// 클라에 시간 값 전송 -> 시작 대기 시간 감소
+					/*
+					   패킷 미정
+					*/
+
+					EV_CountDownPacket pac;
+					pac.size = sizeof(EV_CountDownPacket);
+					pac.type = eCompType::OP_EVENT;
+					pac.listnum = 0;
+					pTimer->PushEvent(1, eEVENT_TYPE::EV_COUNT_DOWN, 1000, reinterpret_cast<unsigned char*>(&pac));
+				}
+			}
+		}
+		else // 하위 티어
+		{
+			if (mMatchListLowTier.size() < MAX_ROOM_USER / 2)
+			{
+				break;
+			}
+			else
+			{
+				if (tTime - mClients[mMatchListLowTier.front()].mMatchStartTime >= milliseconds(2000))
+				{
+					for (int i = 0; i < i < mMatchListLowTier.size(); ++i)
+					{
+						int player_id = mMatchListLowTier.front();
+
+						LG_USER_INTO_GAME_PACKET packet;
+						packet.size = sizeof(packet);
+						packet.type = LG_USER_INTO_GAME;
+						packet.roomID = 0;//방 번호 임시로 0으로 넣어둠
+						strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
+						packet.uID = mClients[player_id].mUID;
+						packet.roomMax = mMatchListLowTier.size();
+						mClients[player_id].mRoomID = packet.roomID;
+
+						mServers[1].DoSend(&packet);
+
+						mMatchListLowTier.pop_front();
+						mReadytoGame.push_back(player_id);
+					}
+				}
+				else
+				{
+					// 클라에 시간 값 전송 -> 시작 대기 시간 감소
+					/*
+					   패킷 미정
+					*/
+
+					EV_CountDownPacket pac;
+					pac.size = sizeof(EV_CountDownPacket);
+					pac.type = eCompType::OP_EVENT;
+					pac.listnum = 1;
+					pTimer->PushEvent(1, eEVENT_TYPE::EV_COUNT_DOWN, 1000, reinterpret_cast<unsigned char*>(&pac));
+				}
+			}
+		}
 		break;
 	}
 	default:

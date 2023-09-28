@@ -14,8 +14,6 @@ int main(int argc, char* argv[])
 
 	pDB->ConnectDB();
 
-	//pDB->SelectUserData(1);
-
 	pSocket->ServerReady(pDB);
 
 

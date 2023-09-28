@@ -21,7 +21,9 @@ enum PacketType {
 
 	// Client To LobbyServer
 	CL_LOGIN,
+	CL_JOIN,
 	CL_MATCH,
+	CL_MATCH_OUT,
 
 	// GameServer To Client
 	SC_LOGIN_OK,
@@ -35,6 +37,7 @@ enum PacketType {
 
 	// Lobbyserver To Client
 	LC_LOGIN_OK,
+	LC_LOGIN_FAIL,
 	LC_MATCH_RESPONSE,
 };
 
@@ -51,10 +54,10 @@ struct CS_LOGIN_PACKET : public PACKET {
 	char	passWord[MAX_NAME_SIZE];
 	int		uID;
 	int		roomID;	//원래는 lobbyServer에서 줘야 하는 값. 나중에 '무조건' 빼야함.
-	
+
 };
 
-struct CS_MOVE_PACKET: public PACKET {
+struct CS_MOVE_PACKET : public PACKET {
 	bool inair;					//in air? (for anim)
 	float x, y, z;				//pos
 	float rx, ry, rz, rw;		//rotate
@@ -78,7 +81,16 @@ struct CL_LOGIN_PACKET :public PACKET {
 	char password[MAX_NAME_SIZE];
 };
 
+struct CL_JOIN_PACKET :public PACKET {
+	char id[MAX_NAME_SIZE];
+	char password[MAX_NAME_SIZE];
+};
+
 struct CL_MATCH_PACKET : public PACKET {
+
+};
+
+struct CL_MATCH_OUT_PACKET : public PACKET {
 
 };
 //-----------------------------------
@@ -125,9 +137,13 @@ struct LC_LOGIN_OK_PACKET : public PACKET {
 	int RoomID;
 };
 
+struct 	LC_LOGIN_FAIL_PACKET :public PACKET {
+
+};
+
 struct LC_MATCH_RESPONSE_PACKET : public PACKET {
 	int gameServerPortNum;
-	unsigned char gameServerIP[4];	//IPv4에서 ip는 4바이트
+	char gameServerIP[4];	//IPv4에서 ip는 4바이트
 };
 
 //--------------------------

@@ -19,6 +19,9 @@ public:
 public:
 	array <Session, MAX_USER> mClients;
 	array <Session, MAXGAMESERVER> mServers;
+	list <int> mMatchListHighTier;
+	list <int> mMatchListLowTier;
+	list <int> mReadytoGame;
 private:
 	SOCKET mListenSocket;
 	HANDLE mHCP;
