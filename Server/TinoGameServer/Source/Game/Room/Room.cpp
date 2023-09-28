@@ -3,6 +3,7 @@
 #include "Room.h"
 #include "../Object/Player/Player.h"
 #include "../Object/MapObject/MapObject.h"
+#include "../Thread/TimerThread/TimerThread.h"
 
 Room::Room()
 	: mRoomStageKindof(eRoomStage::ST_AVOID)
@@ -214,8 +215,6 @@ void Room::setGameEndTimerStartOnce()
 	if (std::atomic_compare_exchange_strong(reinterpret_cast<std::atomic_bool*>(&mGameEndTimer), 0, 1))
 	{
 		DEBUGMSGNOPARAM("한 번 실행되야함");
-		/*
-		setTimer
-		*/
+		TimerThread::MakeTimerEventMilliSec(eTimerType::TYPE_GAME_END, eEventType::TYPE_BROADCAST_ROOM, 2000, 1, 1);
 	}
 }

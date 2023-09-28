@@ -117,12 +117,12 @@ struct SC_ADD_PLAYER_PACKET : public PACKET {
 struct SC_PLAYER_REMOVE_PACKET : public PACKET {
 	int id;
 };
-struct SC_PLAYER_ARRIVE : public PACKET
+struct SC_PLAYER_ARRIVE_PACKET : public PACKET
 {
 	int id;				//who arrived?
 };
 
-struct SC_GAME_COUNTDOWN_START : public PACKET
+struct SC_GAME_COUNTDOWN_START_PACKET : public PACKET
 {
 
 };

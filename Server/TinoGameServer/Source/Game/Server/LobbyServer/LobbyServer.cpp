@@ -4,6 +4,10 @@
 #include "../../../../../ServerProtocol.h"
 #include "../../Utility/Utility.h"
 
+LobbyServer::~LobbyServer()
+{
+}
+
 void LobbyServer::init()
 {
 	SOCKADDR_IN server_addr;

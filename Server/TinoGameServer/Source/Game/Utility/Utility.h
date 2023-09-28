@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <chrono>
 constexpr int INVALID_SOCKET_ID = -1;
 constexpr int INVALID_ROOM_ID = -1;
 
@@ -11,6 +12,23 @@ constexpr int INVALID_ROOM_ID = -1;
 #define DEBUGMSGONEPARAM(...)
 #endif
 
+
+enum class eTimerType
+{
+	
+	TYPE_TREE_RESPAWN, TYPE_PLAYER_RESPAWN, TYPE_PUNNET_RESPAWN, TYPE_HEAL_RESPAWN,
+	TYPE_DURIAN_DMG,
+	TYPE_GAME_WAIT, TYPE_GAME_START, TYPE_GAME_END, TYPE_GAME_RESET
+};
+
+enum class eEventType : char
+{
+	TYPE_BROADCAST_ALL,		//전체 기반
+	TYPE_BROADCAST_ROOM,	//ROOM 기반
+	TYPE_SELF_EXCEPT,		//ROOM 기반
+	TYPE_SELF,				//ROOM 기반
+	TYPE_TARGET,
+};
 
 enum class eCOMMAND_IOCP {
 	CMD_ACCEPT, CMD_RECV, CMD_SEND, CMD_SERVER_RECV, CMD_DBSERVER_RECV, //Basic
@@ -53,6 +71,11 @@ enum class ePlayerState
 	ST_ARRIVED,
 };
 
+struct Vector3i {
+	int x, y, z;
+	Vector3i() = default;
+	Vector3i(int x, int y, int z) : x(x), y(y), z(z) {};
+};
 
 struct Vector3f {
 	float x, y, z;
@@ -64,4 +87,19 @@ struct Vector4f {
 	float x, y, z, w;
 	Vector4f() = default;
 	Vector4f(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {};
+};
+
+struct TimerEvent {
+
+	int senderID{};
+	int receiverID{};
+	Vector3i pos{};
+	std::chrono::system_clock::time_point execTime{};
+	eTimerType type{};
+	eEventType eventType{};
+
+	constexpr bool operator < (const TimerEvent& R) const
+	{
+		return (execTime > R.execTime);
+	}
 };

@@ -1,8 +1,10 @@
 #include "WorkerThread.h"
+#include "../TimerThread/TimerThread.h"
 #include "../../Object/Player/Player.h"
 #include "../../Server/MainServer/MainServer.h"
 #include "../../Network/Network.h"
 #include "../../Server/LobbyServer/LobbyServer.h"
+#include "../../Room/Room.h"
 
 WorkerThread::WorkerThread(MainServer* Server)
 	:mMainServer(Server)
@@ -35,13 +37,13 @@ void WorkerThread::doThread()
 		switch (wsa_ex->GetCmd()) {
 		case eCOMMAND_IOCP::CMD_RECV: {
 			if (bytes == 0) {
-				auto t = dynamic_cast<Player*>(mMainServer->getObjects()[client_id]);
+				auto t = dynamic_cast<Player*>(mMainServer->GetObjects()[client_id]);
 				if (t) t->DisConnect();
 				//Disconnect(client_id);
 				break;
 			}
 
-			Player* player = dynamic_cast<Player*>(mMainServer->getObjects()[client_id]);
+			Player* player = dynamic_cast<Player*>(mMainServer->GetObjects()[client_id]);
 			int To_Process_Bytes = bytes + player->GetPrevSize();
 			unsigned char* packets = wsa_ex->GetBuf();	//wsa_ex == player->wsa_ex.buf
 
@@ -63,7 +65,7 @@ void WorkerThread::doThread()
 		case eCOMMAND_IOCP::CMD_SERVER_RECV:
 		{
 			if (bytes == 0) {
-				//auto t = dynamic_cast<Player*>(mMainServer->getObjects()[client_id]);
+				//auto t = dynamic_cast<Player*>(mMainServer->GetObjects()[client_id]);
 				//if (t) t->DisConnect();
 				std::cout << "버그버그버그 서버 연결 버그 \n";
 				//Disconnect(client_id);
@@ -101,7 +103,7 @@ void WorkerThread::doThread()
 			int new_id = mMainServer->GenerateID();
 			if (new_id != -1)
 			{
-				Player* player = reinterpret_cast<Player*>(mMainServer->getObjects()[new_id]);
+				Player* player = reinterpret_cast<Player*>(mMainServer->GetObjects()[new_id]);
 				player->SetSocketID(new_id);
 				player->AcceptSetting(eSocketState::ST_ACCEPT, eCOMMAND_IOCP::CMD_RECV, c_socket);
 
@@ -121,7 +123,36 @@ void WorkerThread::doThread()
 			AcceptEx(mMainServer->GetSocket(), c_socket, wsa_ex->GetBuf() + 8, 0, sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN) + 16, NULL, &wsa_ex->GetWsaOver());
 			break;
 		}
-		
+		case eCOMMAND_IOCP::CMD_GAME_END:
+		{
+			eEventType eventType = TimerThread::DeserializeEventType(wsa_ex->GetBuf());
+			int roomID = TimerThread::DeserializeReceiver(wsa_ex->GetBuf());
+			matchTimerType(eventType);
+			{
+				auto sPacket = mMainServer->make_game_countdown_start_packet();
+				mMainServer->SendRoomBroadCast(roomID, (void*)&sPacket, sizeof(sPacket));
+			}
+
+			break;
+		}
 		}
 	}
 }
+
+void WorkerThread::matchTimerType(const eEventType eventType)
+{
+	switch (eventType)
+	{
+	case eEventType::TYPE_BROADCAST_ALL:
+		break;
+	case eEventType::TYPE_BROADCAST_ROOM:
+		break;
+	case eEventType::TYPE_SELF_EXCEPT:
+		break;
+	case eEventType::TYPE_SELF:
+		break;
+	case eEventType::TYPE_TARGET:
+		break;
+	}
+}
+
