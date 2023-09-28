@@ -142,8 +142,7 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 
 		DL_LOGIN_OK_PACKET* p = reinterpret_cast<DL_LOGIN_OK_PACKET*>(spacket);
 
-		// �ߺ� �α����� ��� ���� ������ ���� ���� (���߿� �ڵ� ����)
-		if (p->connState == TRUE) {
+		/*if (p->connState == TRUE) {
 			int disconnID = -1;
 			for (int i = MAXGAMESERVER; i < MAX_USER; ++i) {
 				mClients[i].mStateLock.lock();
@@ -156,7 +155,7 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 			}
 			if (disconnID != -1)
 				Disconnect(disconnID);
-		}
+		}*/
 
 		mClients[p->userKey].mStateLock.lock();
 		mClients[p->userKey].mCredit = p->credit;
@@ -415,10 +414,10 @@ void Server::Init()
 	inet_pton(AF_INET, SERVERIP, &serverAddr.sin_addr);
 
 	if (connect(LDsocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR) {
-		cout << "DB���� Ŀ��Ʈ ����" << endl;
+		cout << "DBconnection success" << endl;
 	}
 	else {
-		cout << "DB���� Ŀ��Ʈ ����" << endl;
+		cout << "DBconnection failed" << endl;
 		OverEXP ss_over;
 		ss_over.mCompType = eCompType::OP_ACCEPT;
 		ss_over.mWsaBuf.buf = reinterpret_cast<CHAR*>(LDsocket);
