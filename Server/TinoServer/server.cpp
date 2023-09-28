@@ -9,6 +9,7 @@ void Server::Disconnect(int cID)
 		mClients[cID].mStateLock.unlock();
 		return;
 	}
+	cout << "DISCONNECT" << mClients[cID].mUID << endl;
 	closesocket(mClients[cID].mSocket);
 	mClients[cID].mState = eSessionState::ST_FREE;
 	mClients[cID].mStateLock.unlock();
@@ -52,10 +53,9 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 		LD_LOGIN_PACKET pac;
 		pac.type = LD_LOGIN;
 		pac.size = sizeof(LD_LOGIN_PACKET);
-		pac.user_id = cID;
+		pac.userKey = cID;
 		memcpy(pac.id, p->id, sizeof(pac.id));
 		memcpy(pac.password, p->password, sizeof(pac.password));
-		cout << pac.id << endl;
 		// db 서버에 전송
 		mServers[0].DoSend(&pac);
 		break;
@@ -158,19 +158,36 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		cout << "로그인 성공" << endl;
 
 		DL_LOGIN_OK_PACKET* p = reinterpret_cast<DL_LOGIN_OK_PACKET*>(spacket);
-		mClients[p->user_id].mCredit = p->credit;
-		strcpy_s(mClients[p->user_id].mNickName, sizeof(p->nickname), p->nickname);
-		mClients[p->user_id].mPoint = p->point;
-		mClients[p->user_id].mUID = p->uid;
+
+		// 중복 로그인일 경우 기존 접속자 연결 종료 (나중에 코드 정리)
+		if (p->connState == TRUE) {
+			int disconnID = -1;
+			for (int i = MAXGAMESERVER; i < MAX_USER; ++i) {
+				mClients[i].mStateLock.lock();
+				if (mClients[i].mUID == p->uid) {
+					disconnID = i;
+					mClients[i].mStateLock.unlock();
+					break;
+				}
+				mClients[i].mStateLock.unlock();
+			}
+			if (disconnID != -1)
+				Disconnect(disconnID);
+		}
+
+		mClients[p->userKey].mCredit = p->credit;
+		strcpy_s(mClients[p->userKey].mNickName, sizeof(p->nickname), p->nickname);
+		mClients[p->userKey].mPoint = p->point;
+		mClients[p->userKey].mUID = p->uid;
 
 		LC_LOGIN_OK_PACKET pac;
 		pac.type = LC_LOGIN_OK;
 		pac.size = sizeof(LC_LOGIN_OK_PACKET);
-		pac.id = p->user_id;
+		pac.id = p->userKey;
 		pac.RoomID = 0;
-		pac.UID = mClients[p->user_id].mUID;
+		pac.UID = mClients[p->userKey].mUID;
 
-		mClients[p->user_id].DoSend(&pac);
+		mClients[p->userKey].DoSend(&pac);
 
 		// 클라쪽에 로그인 성공 했다고 알려줘야 함
 

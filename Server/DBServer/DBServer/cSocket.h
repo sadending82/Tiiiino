@@ -18,7 +18,7 @@ public:
 	bool CheckLogin(int key, const char* id, const char* password, int userid);
 
 	void SendUserDataAfterLogin(int key, int uid, string& nickname, double credit, int point, bool state, int userid);
-	void SendLoginFail(int key, const char* id);
+	void SendLoginFail(int key, const char* id, int userKey);
 
 	void ProcessPacket_Login(int key, unsigned char* buf);
 

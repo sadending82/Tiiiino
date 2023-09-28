@@ -119,7 +119,7 @@ tuple<string, string, double, int> DB::SelectUserData(const int uid)
 
 tuple<int, string, double, int, bool> DB::SelectUserDataForLogin(const string& id, const string& password)
 {
-	string query = "SELECT UID, nick, credit, point FROM tiiiino.userinfo WHERE id = ? AND password = ?";
+	string query = "SELECT UID, nick, credit, point, state FROM tiiiino.userinfo WHERE id = ? AND password = ?";
 
 	if (mysql_stmt_prepare(mStmt, query.c_str(), query.length()) != 0) {
 #ifdef Test
@@ -153,7 +153,7 @@ tuple<int, string, double, int, bool> DB::SelectUserDataForLogin(const string& i
 	int bindUID, bindPoint;
 	char bindNickname[MAX_NAME_SIZE];
 	double bindCredit;
-	bool bindState;
+	int bindState;
 	{
 		resultBinds[0].buffer_type = MYSQL_TYPE_LONG;
 		resultBinds[0].buffer = &bindUID;
