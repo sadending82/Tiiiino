@@ -158,14 +158,14 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 				Disconnect(disconnID);
 		}
 
-		mClients[p->user_id].mStateLock.lock();
-		mClients[p->user_id].mCredit = p->credit;
-		strcpy_s(mClients[p->user_id].mNickName, sizeof(p->nickname), p->nickname);
-		mClients[p->user_id].mPoint = p->point;
-		mClients[p->user_id].mUID = p->uid;
-		mClients[p->user_id].mTier = p->tier;
-		mClients[p->user_id].mState = eSessionState::ST_LOBBY;
-		mClients[p->user_id].mStateLock.unlock();
+		mClients[p->userKey].mStateLock.lock();
+		mClients[p->userKey].mCredit = p->credit;
+		strcpy_s(mClients[p->userKey].mNickName, sizeof(p->nickname), p->nickname);
+		mClients[p->userKey].mPoint = p->point;
+		mClients[p->userKey].mUID = p->uid;
+		mClients[p->userKey].mTier = p->tier;
+		mClients[p->userKey].mState = eSessionState::ST_LOBBY;
+		mClients[p->userKey].mStateLock.unlock();
 
 		LC_LOGIN_OK_PACKET pac;
 		pac.type = LC_LOGIN_OK;
@@ -188,7 +188,7 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		pac.size = sizeof(LC_LOGIN_FAIL_PACKET);
 		pac.type = LC_LOGIN_FAIL;
 
-		mClients[p->user_id].DoSend(&pac);
+		mClients[p->userKey].DoSend(&pac);
 
 		break;
 	}
