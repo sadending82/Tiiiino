@@ -24,5 +24,6 @@ void ULobbyUIWidget::TryGameStart()
 void ULobbyUIWidget::TryBack()
 {
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	send_match_packet(Network::GetNetwork()->l_socket);
 	TinoController->ChangeMenuWidget(TinoController->GetLoginWidgetClass());
 }
