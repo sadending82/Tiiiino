@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Actor/RotatingPole.h"
+#include "Actor/Obstacles/RotatingPole.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/Character.h"
 

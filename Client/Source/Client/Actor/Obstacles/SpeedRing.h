@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "BaseObstacle.h"
 #include "SpeedRing.generated.h"
 
 UCLASS()
-class CLIENT_API ASpeedRing : public AActor
+class CLIENT_API ASpeedRing : public ABaseObstacle
 {
 	GENERATED_BODY()
 	

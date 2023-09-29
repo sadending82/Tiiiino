@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "BaseObstacle.h"
 #include "RotatingGround.generated.h"
 
 UCLASS()
-class CLIENT_API ARotatingGround : public AActor
+class CLIENT_API ARotatingGround : public ABaseObstacle
 {
 	GENERATED_BODY()
 	
