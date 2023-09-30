@@ -68,9 +68,9 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 	case CL_JOIN:
 	{
 		CL_JOIN_PACKET* rp = reinterpret_cast<CL_JOIN_PACKET*>(cpacket);
-		LD_JOIN_PACKET sp;
+		LD_SIGNUP_PACKET sp;
 		sp.size = sizeof(sp);
-		sp.type = LD_JOIN;
+		sp.type = LD_SIGNUP;
 		memcpy(sp.id, rp->id, sizeof(rp->id));
 		memcpy(sp.password, rp->password, sizeof(rp->password));
 		// db ������ ����
