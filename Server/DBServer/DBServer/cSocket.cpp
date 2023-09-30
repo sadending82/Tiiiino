@@ -180,7 +180,7 @@ void Socket::processPacket(int key, unsigned char* buf)
 // DB
 bool Socket::CheckLogin(int key, const char* id, const char* password, int userKey)
 {
-    auto userData = m_pDB->SelectUserDataForLogin(id, password);
+    auto userData = m_pDB->SelectUserDataForLogin(id);
 
     if (get<0>(userData) == 0) {
         return false;
@@ -244,7 +244,7 @@ void Socket::ProcessPacket_Login(int key, unsigned char* buf)
 void Socket::ProcessPacket_SignUp(unsigned char* buf)
 {
     LD_SIGNUP_PACKET* p = reinterpret_cast<LD_SIGNUP_PACKET*>(buf);
-    bool bJoin = m_pDB->InsertNewUser(p->id, p->password);
+    bool bJoin = m_pDB->InsertNewUser(p->id);
     if (bJoin == false) {
         cout << "Sign Up new user failed\n";
     }

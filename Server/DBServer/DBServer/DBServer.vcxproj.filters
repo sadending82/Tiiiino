@@ -24,12 +24,18 @@
     <ClCompile Include="main.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="cExOver.h">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.h">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="cSecurity.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cDB.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="cExOver.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="cSession.h">
@@ -38,11 +44,17 @@
     <ClInclude Include="cSocket.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="stdafx.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\ServerProtocol.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\protocol.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="cSecurity.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="schema.txt" />
   </ItemGroup>
 </Project>

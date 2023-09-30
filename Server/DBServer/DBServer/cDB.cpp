@@ -117,9 +117,9 @@ tuple<string, string, double, int> DB::SelectUserData(const int uid)
 	return make_tuple(bindID, bindNickname, bindCredit, bindPoint);
 }
 
-tuple<int, string, double, int, bool> DB::SelectUserDataForLogin(const string& id, const string& password)
+tuple<int, string, double, int, bool> DB::SelectUserDataForLogin(const string& id)
 {
-	string query = "SELECT UID, nick, credit, point, state FROM tiiiino.userinfo WHERE id = ? AND password = ?";
+	string query = "SELECT UID, nick, credit, point, state FROM tiiiino.userinfo WHERE id = ?";
 
 	if (mysql_stmt_prepare(mStmt, query.c_str(), query.length()) != 0) {
 #ifdef Test
@@ -128,19 +128,15 @@ tuple<int, string, double, int, bool> DB::SelectUserDataForLogin(const string& i
 		return tuple<int, string, double, int, bool>();
 	}
 
-	const int paramColNum = 2;
-	MYSQL_BIND paramBinds[paramColNum];
-	memset(paramBinds, 0, sizeof(paramBinds));
+	MYSQL_BIND paramBind;
+	memset(&paramBind, 0, sizeof(paramBind));
 
-	paramBinds[0].buffer_type = MYSQL_TYPE_STRING;
-	paramBinds[0].buffer = (void*)id.c_str();
-	paramBinds[0].buffer_length = id.length();
+	paramBind.buffer_type = MYSQL_TYPE_STRING;
+	paramBind.buffer = (void*)id.c_str();
+	paramBind.buffer_length = id.length();
 
-	paramBinds[1].buffer_type = MYSQL_TYPE_STRING;
-	paramBinds[1].buffer = (void*)password.c_str();
-	paramBinds[1].buffer_length = password.length();
 
-	if (mysql_stmt_bind_param(mStmt, paramBinds) != 0) {
+	if (mysql_stmt_bind_param(mStmt, &paramBind) != 0) {
 #ifdef Test
 		std::cout << "SelectUserData stmt param bind error: " << mysql_stmt_error(mStmt) << std::endl;
 #endif
@@ -190,9 +186,9 @@ tuple<int, string, double, int, bool> DB::SelectUserDataForLogin(const string& i
 	return make_tuple(bindUID, bindNickname, bindCredit, bindPoint, bindState);
 }
 
-bool DB::InsertNewUser(const string& id, const string& passWord)
+bool DB::InsertNewUser(const string& id)
 {
-	string query = "INSERT INTO userinfo (ID, PassWord) VALUES (?, ?)";
+	string query = "INSERT INTO userinfo (ID) VALUES (?)";
 
 	if (mysql_stmt_prepare(mStmt, query.c_str(), query.length()) != 0) {
 #ifdef Test
@@ -201,19 +197,59 @@ bool DB::InsertNewUser(const string& id, const string& passWord)
 		return false;
 	}
 
-	const int colNum = 2;
 
-	MYSQL_BIND binds[colNum];
+	MYSQL_BIND bind;
+	memset(&bind, 0, sizeof(bind));
+
+	bind.buffer_type = MYSQL_TYPE_STRING;
+	bind.buffer = (void*)id.c_str();
+	bind.buffer_length = id.length();
+
+	if (mysql_stmt_bind_param(mStmt, &bind) != 0) {
+
+#ifdef Test
+		std::cout << "InsertNewUser stmt bind error: " << mysql_stmt_error(mStmt) << std::endl;
+#endif
+		return false;
+	}
+
+	if (ExecuteQuery() == false) {
+		return false;
+	}
+
+	return true;
+}
+
+bool DB::InsertNewAccount(const string& id, const string& password)
+{
+	string query = "INSERT INTO account (ID, hashedPassword, salt) VALUES (?, ?, ?)";
+
+	if (mysql_stmt_prepare(mStmt, query.c_str(), query.length()) != 0) {
+#ifdef Test
+		std::cout << "InsertNewUser stmt prepare error: " << mysql_stmt_error(mStmt) << std::endl;
+#endif
+		return false;
+	}
+
+	string salt = mSecurity->GenerateSalt();
+	string hash = mSecurity->HashingPassword(password, salt);
+
+	MYSQL_BIND binds[3];
 	memset(binds, 0, sizeof(binds));
 
-	binds[0].buffer_type = MYSQL_TYPE_STRING;
-	binds[0].buffer = (void*)id.c_str();
-	binds[0].buffer_length = id.length();
+	{
+		binds[0].buffer_type = MYSQL_TYPE_STRING;
+		binds[0].buffer = (void*)id.c_str();
+		binds[0].buffer_length = id.length();
 
-	binds[1].buffer_type = MYSQL_TYPE_STRING;
-	binds[1].buffer = (void*)passWord.c_str();
-	binds[1].buffer_length = passWord.length();
+		binds[1].buffer_type = MYSQL_TYPE_STRING;
+		binds[1].buffer = (void*)hash.c_str();
+		binds[1].buffer_length = hash.length();
 
+		binds[2].buffer_type = MYSQL_TYPE_STRING;
+		binds[2].buffer = (void*)salt.c_str();
+		binds[2].buffer_length = salt.length();
+	}
 
 	if (mysql_stmt_bind_param(mStmt, binds) != 0) {
 
@@ -377,6 +413,31 @@ bool DB::UpdateUserPoint(const int uid, unsigned int point)
 	}
 
 	return true;
+}
+
+bool DB::DeleteAccount(const string& id)
+{
+	return false;
+}
+
+bool DB::SignUpNewPlayer(const string& id, const string& password)
+{
+	bool res = InsertNewAccount(id, password);
+	if (res == false) return false;
+
+	res = InsertNewUser(id);
+	if (res == false) {
+		DeleteAccount(id);
+		return false;
+	}
+
+	return true;
+}
+
+bool DB::CheckVerifyUser(const string& id, const string& password)
+{
+
+	return false;
 }
 
 void DB::DisconnectDB()

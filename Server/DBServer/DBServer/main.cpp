@@ -11,8 +11,12 @@ int main(int argc, char* argv[])
 
 	DB* pDB = new DB;
 	Socket* pSocket = new Socket;
+	Security* pSecurity = new Security;
 
+	pDB->SetmSecurity(pSecurity);
 	pDB->ConnectDB();
+
+	pDB->SignUpNewPlayer("test1", "abcd");
 
 	pSocket->ServerReady(pDB);
 
