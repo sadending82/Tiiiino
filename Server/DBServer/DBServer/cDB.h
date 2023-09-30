@@ -25,11 +25,12 @@ public:
 
 	tuple<string, string, double, int> SelectUserData(const int uid);
 	tuple<int, string, double, int, bool> SelectUserDataForLogin(const string& id);
+	vector<string> SelectHash(const string& id); // Index 0: hash / Index 1: salt
 
 	bool InsertNewUser(const string& id);
 	bool InsertNewAccount(const string& id, const string& password);
 
-	bool UpdateUserConnectionState(const int uid, const bool state);
+	bool UpdateUserConnectionState(const int uid, const int state);
 	bool UpdateUserNickname(const int uid, const string& nicknameToChange);
 	bool UpdateUserCredit(const int uid, double credit);
 	bool UpdateUserPoint(const int uid, unsigned int point);

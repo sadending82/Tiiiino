@@ -16,10 +16,7 @@ int main(int argc, char* argv[])
 	pDB->SetmSecurity(pSecurity);
 	pDB->ConnectDB();
 
-	pDB->SignUpNewPlayer("test1", "abcd");
-
 	pSocket->ServerReady(pDB);
 
-
-	//g_pDB->DisconnectDB();
+	pDB->DisconnectDB();
 }

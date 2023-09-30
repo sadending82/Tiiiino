@@ -186,6 +186,72 @@ tuple<int, string, double, int, bool> DB::SelectUserDataForLogin(const string& i
 	return make_tuple(bindUID, bindNickname, bindCredit, bindPoint, bindState);
 }
 
+vector<string> DB::SelectHash(const string& id)
+{
+	vector<string> result;
+	string query = "SELECT hashedPassword, salt FROM account WHERE ID = ?";
+
+	if (mysql_stmt_prepare(mStmt, query.c_str(), query.length()) != 0) {
+#ifdef Test
+		std::cout << "SelectHash stmt prepare error: " << mysql_stmt_error(mStmt) << std::endl;
+#endif
+		return vector<string>();
+	}
+
+	MYSQL_BIND paramBind;
+	memset(&paramBind, 0, sizeof(paramBind));
+
+	paramBind.buffer_type = MYSQL_TYPE_STRING;
+	paramBind.buffer = (void*)id.c_str();
+	paramBind.buffer_length = id.length();
+
+
+	if (mysql_stmt_bind_param(mStmt, &paramBind) != 0) {
+#ifdef Test
+		std::cout << "SelectHash stmt param bind error: " << mysql_stmt_error(mStmt) << std::endl;
+#endif
+		return vector<string>();
+	}
+
+	const int resColNum = 2;
+	MYSQL_BIND resultBinds[resColNum];
+	memset(resultBinds, 0, sizeof(resultBinds));
+	char bindHash[257];
+	char bindSalt[45];
+	{
+		resultBinds[0].buffer_type = MYSQL_TYPE_STRING;
+		resultBinds[0].buffer_length = sizeof(bindHash);
+		resultBinds[0].buffer = bindHash;
+
+		resultBinds[1].buffer_type = MYSQL_TYPE_STRING;
+		resultBinds[1].buffer_length = sizeof(bindSalt);
+		resultBinds[1].buffer = bindSalt;
+	}
+
+	if (mysql_stmt_bind_result(mStmt, resultBinds) != 0) {
+#ifdef Test
+		std::cout << "SelectUserData stmt result bind error: " << mysql_stmt_error(mStmt) << std::endl;
+#endif
+		return vector<string>();
+	}
+
+	if (ExecuteQuery() == false) {
+		return vector<string>();
+	}
+
+	if (mysql_stmt_fetch(mStmt) != 0) {
+#ifdef Test
+		std::cout << "SelectUserData stmt result fetch error: " << mysql_stmt_error(mStmt) << std::endl;
+#endif
+		return vector<string>();
+	}
+
+	result.push_back(bindHash);
+	result.push_back(bindSalt);
+
+	return result;
+}
+
 bool DB::InsertNewUser(const string& id)
 {
 	string query = "INSERT INTO userinfo (ID) VALUES (?)";
@@ -266,7 +332,7 @@ bool DB::InsertNewAccount(const string& id, const string& password)
 	return true;
 }
 
-bool DB::UpdateUserConnectionState(const int uid, const bool state)
+bool DB::UpdateUserConnectionState(const int uid, const int state)
 {
 	string query = "UPDATE userinfo SET state = ? WHERE UID = ?";
 
@@ -417,7 +483,35 @@ bool DB::UpdateUserPoint(const int uid, unsigned int point)
 
 bool DB::DeleteAccount(const string& id)
 {
-	return false;
+	string query = "Delete FROM account WHERE ID = ?";
+
+	if (mysql_stmt_prepare(mStmt, query.c_str(), query.length()) != 0) {
+#ifdef Test
+		std::cout << "Delete Account stmt prepare error: " << mysql_stmt_error(mStmt) << std::endl;
+#endif
+		return false;
+	}
+
+	MYSQL_BIND bind;
+	memset(&bind, 0, sizeof(bind));
+
+	bind.buffer_type = MYSQL_TYPE_STRING;
+	bind.buffer = (void*)id.c_str();
+	bind.buffer_length = id.length();
+
+	if (mysql_stmt_bind_param(mStmt, &bind) != 0) {
+
+#ifdef Test
+		std::cout << "Delete Account stmt bind error: " << mysql_stmt_error(mStmt) << std::endl;
+#endif
+		return false;
+	}
+
+	if (ExecuteQuery() == false) {
+		return false;
+	}
+
+	return true;
 }
 
 bool DB::SignUpNewPlayer(const string& id, const string& password)
@@ -436,8 +530,16 @@ bool DB::SignUpNewPlayer(const string& id, const string& password)
 
 bool DB::CheckVerifyUser(const string& id, const string& password)
 {
+	vector<string> selectRes = SelectHash(id);
 
-	return false;
+	if (selectRes.empty()) {
+		return false;
+	}
+
+	string hash = selectRes[0];
+	string salt = selectRes[1];
+
+	return mSecurity->VerifyPassword(password, hash, salt);
 }
 
 void DB::DisconnectDB()

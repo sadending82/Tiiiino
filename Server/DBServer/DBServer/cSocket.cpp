@@ -154,6 +154,7 @@ void Socket::ServerReady(DB* pDB)
 #ifdef Test
     std::cout << "Connect To Lobby Server Ready" << std::endl;
 #endif
+
     WorkerFunc();
 }
 
@@ -180,6 +181,12 @@ void Socket::processPacket(int key, unsigned char* buf)
 // DB
 bool Socket::CheckLogin(int key, const char* id, const char* password, int userKey)
 {
+    int res = m_pDB->CheckVerifyUser(id, password);
+    if (res == false) {
+        cout << "Login Information Invalid\n";
+        return false;
+    }
+
     auto userData = m_pDB->SelectUserDataForLogin(id);
 
     if (get<0>(userData) == 0) {
@@ -190,8 +197,7 @@ bool Socket::CheckLogin(int key, const char* id, const char* password, int userK
     string nickname = get<1>(userData);
     double credit = get<2>(userData);
     int point = get<3>(userData);
-    bool state = get<4>(userData);
-    cout << state << endl;
+    int state = get<4>(userData);
 
     SendUserDataAfterLogin(key, uid, nickname, credit, point, state, userKey);
 
@@ -204,7 +210,7 @@ bool Socket::CheckLogin(int key, const char* id, const char* password, int userK
 }
 
 // SendPacket
-void Socket::SendUserDataAfterLogin(int key, int uid, string& nickname, double credit, int point, bool state, int userKey)
+void Socket::SendUserDataAfterLogin(int key, int uid, string& nickname, double credit, int point, int state, int userKey)
 {
     DL_LOGIN_OK_PACKET p;
     p.size = sizeof(DL_LOGIN_OK_PACKET);
@@ -244,7 +250,7 @@ void Socket::ProcessPacket_Login(int key, unsigned char* buf)
 void Socket::ProcessPacket_SignUp(unsigned char* buf)
 {
     LD_SIGNUP_PACKET* p = reinterpret_cast<LD_SIGNUP_PACKET*>(buf);
-    bool bJoin = m_pDB->InsertNewUser(p->id);
+    bool bJoin = m_pDB->SignUpNewPlayer(p->id, p->password);
     if (bJoin == false) {
         cout << "Sign Up new user failed\n";
     }

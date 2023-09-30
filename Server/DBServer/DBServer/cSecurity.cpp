@@ -41,8 +41,7 @@ string Security::HashingPassword(const string password, const string salt)
 
 bool Security::VerifyPassword(string password, string hashedPassword, string salt)
 {
-
-	if (hashedPassword != HashingPassword(password, hashedPassword)) {
+	if (hashedPassword != HashingPassword(password, salt)) {
 		return false;
 	}
 
