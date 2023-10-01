@@ -10,7 +10,7 @@
 #include "Animation/AnimMontage.h"
 
 ATinoCharacter::ATinoCharacter()
-	:MaxTumbledTime(0.5f),
+	:MaxTumbledTime(1.0f),
 	MovementState(EMovementState::EMS_Normal)
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -108,7 +108,7 @@ bool ATinoCharacter::CanTumble(float DeltaTime)
 	bool ret = true;
 
 	ret &= GetCharacterMovement()->IsFalling();
-	ret &= (GetVelocity().Z < 0);
+	//ret &= (GetVelocity().Z != FMath::IsNearlyZero());
 	
 	if (ret && MaxTumbledTime > CurrentTumbledTime) CurrentTumbledTime += DeltaTime;
 	bCanTumbled = (CurrentTumbledTime >= MaxTumbledTime);

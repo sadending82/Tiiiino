@@ -93,7 +93,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 		class UAnimMontage* DiveMontage;
 
-	UPROPERTY(VisibleDefaultsOnly, Category = "Animation")
+	UPROPERTY(VisibleAnywhere, Category = "Animation")
 		float CurrentTumbledTime;
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 		float MaxTumbledTime;
