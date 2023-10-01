@@ -55,6 +55,7 @@ public:
 	FORCEINLINE void SetMovementState(EMovementState State) { MovementState = State; }
 	FORCEINLINE void SetMaxTumbleTime(float MaxTime) { MaxTumbledTime = MaxTime; }
 	FORCEINLINE float GetMaxTumbleTime() { return MaxTumbledTime; }
+	FORCEINLINE bool IsDivining() { return bIsDiving; }
 
 private:
 	//키입력 관련 함수

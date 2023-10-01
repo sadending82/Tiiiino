@@ -37,7 +37,7 @@ void ATinoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction("CreateDummy", EInputEvent::IE_Pressed, this, &ATinoCharacter::CreateDummy);
 	PlayerInputComponent->BindAction("Align", EInputEvent::IE_Pressed, this, &ATinoCharacter::Align);
 	PlayerInputComponent->BindAction("Jump", EInputEvent::IE_Pressed, this, &ATinoCharacter::Jump);
-	PlayerInputComponent->BindAction("Jump", EInputEvent::IE_Released, this, &ATinoCharacter::StopJumping);
+	//PlayerInputComponent->BindAction("Jump", EInputEvent::IE_Released, this, &ATinoCharacter::StopJumping);
 	PlayerInputComponent->BindAction("Dive", EInputEvent::IE_Pressed, this, &ATinoCharacter::Dive);
 }
 
@@ -202,15 +202,17 @@ void ATinoCharacter::CreateDummy()
 
 void ATinoCharacter::Jump()
 {
-	Super::Jump();
-	SetMovementState(EMovementState::EMS_Up);
+	if (CanMove()  && GetCharacterMovement()->IsFalling() == false)
+	{
+		Super::Jump();
+	}
+	
 }
 
 void ATinoCharacter::StopJumping()
 {
 	Super::StopJumping();
 	SetMovementState(EMovementState::EMS_Normal);
-
 }
 
 void ATinoCharacter::PlayTumbleMontage()
