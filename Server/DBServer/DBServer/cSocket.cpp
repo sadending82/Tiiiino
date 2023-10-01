@@ -181,13 +181,13 @@ void Socket::processPacket(int key, unsigned char* buf)
 // DB
 bool Socket::CheckLogin(int key, const char* id, const char* password, int userKey)
 {
-    int res = m_pDB->CheckVerifyUser(id, password);
+    int res = Getm_pDB()->CheckVerifyUser(id, password);
     if (res == false) {
         cout << "Login Information Invalid\n";
         return false;
     }
 
-    auto userData = m_pDB->SelectUserDataForLogin(id);
+    auto userData = Getm_pDB()->SelectUserDataForLogin(id);
 
     if (get<0>(userData) == 0) {
         return false;
@@ -202,7 +202,7 @@ bool Socket::CheckLogin(int key, const char* id, const char* password, int userK
     SendUserDataAfterLogin(key, uid, nickname, credit, point, state, userKey);
 
     if (state == FALSE)
-        m_pDB->UpdateUserConnectionState(uid, true);
+        Getm_pDB()->UpdateUserConnectionState(uid, true);
 
     cout << "Login Success / ID: " << id << endl;
 
@@ -250,7 +250,7 @@ void Socket::ProcessPacket_Login(int key, unsigned char* buf)
 void Socket::ProcessPacket_SignUp(unsigned char* buf)
 {
     LD_SIGNUP_PACKET* p = reinterpret_cast<LD_SIGNUP_PACKET*>(buf);
-    bool bJoin = m_pDB->SignUpNewPlayer(p->id, p->password);
+    bool bJoin = Getm_pDB()->SignUpNewPlayer(p->id, p->password);
     if (bJoin == false) {
         cout << "Sign Up new user failed\n";
     }
