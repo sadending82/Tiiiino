@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Actor/Door.h"
+#include "Actor/Obstacles/Door.h"
 #include "Global.h"
 // Sets default values
 ADoor::ADoor()

@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "BaseObstacle.h"
 #include "LinearBelt.generated.h"
 
 UCLASS()
-class CLIENT_API ALinearBelt : public AActor
+class CLIENT_API ALinearBelt : public ABaseObstacle
 {
 	GENERATED_BODY()
 

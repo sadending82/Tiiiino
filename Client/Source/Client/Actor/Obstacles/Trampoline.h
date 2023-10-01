@@ -3,12 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Global.h"
-#include "GameFramework/Actor.h"
+#include "BaseObstacle.h"
 #include "Trampoline.generated.h"
 
 UCLASS()
-class CLIENT_API ATrampoline : public AActor
+class CLIENT_API ATrampoline : public ABaseObstacle
 {
 	GENERATED_BODY()
 	

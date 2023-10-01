@@ -1,4 +1,4 @@
-#include "Actor/SpeedRing.h"
+#include "Actor/Obstacles/SpeedRing.h"
 //#include "Network/Network.h"
 #include "Global.h"
 

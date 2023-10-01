@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "BaseObstacle.h"
 #include "Door.generated.h"
 
 enum EOpenType
@@ -15,7 +15,7 @@ enum EOpenType
 };
 
 UCLASS()
-class CLIENT_API ADoor : public AActor
+class CLIENT_API ADoor : public ABaseObstacle
 {
 	GENERATED_BODY()
 	

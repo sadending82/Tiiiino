@@ -1,18 +1,15 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
-#include "Global.h"
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
-#include "Components/BoxComponent.h"
-#include "TimerManager.h"
+#include "BaseObstacle.h"
 #include "AcceleratePlate.generated.h"
 
 
 
 UCLASS()
-class CLIENT_API AAcceleratePlate : public AActor
+class CLIENT_API AAcceleratePlate : public ABaseObstacle
 {
 	GENERATED_BODY()
 
@@ -21,6 +18,7 @@ public:
 	AAcceleratePlate();
 
 protected:
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 

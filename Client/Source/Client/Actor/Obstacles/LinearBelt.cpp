@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Actor/LinearBelt.h"
+#include "Actor/Obstacles/LinearBelt.h"
 #include "Global.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
