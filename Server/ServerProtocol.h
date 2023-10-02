@@ -55,6 +55,7 @@ struct LG_LOGIN_OK_PACKET : public SPACKET {
 
 };
 struct LG_USER_INTO_GAME_PACKET : public SPACKET {
+	char	id[MAX_NAME_SIZE];	//player id Not UID
 	char	name[MAX_NAME_SIZE];
 	int		uID;
 	int		roomID;
@@ -79,6 +80,7 @@ struct LD_SIGNUP_PACKET :public SPACKET {
 
 struct DL_LOGIN_OK_PACKET :public SPACKET {
 	int		uid;
+	char	id[MAX_NAME_SIZE];
 	char	nickname[MAX_NAME_SIZE];
 	double	credit;
 	int		point;
