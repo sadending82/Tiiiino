@@ -2,6 +2,7 @@
 
 
 #include "Actor/RespawnArea.h"
+#include "Actor/Character/TinoCharacter.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -30,6 +31,11 @@ void ARespawnArea::NotifyActorBeginOverlap(AActor* OtherActor)
 	{
 		MyCharacter->SetActorLocation(RespawnPoint, false, (FHitResult*)nullptr, ETeleportType::ResetPhysics);
 		MyCharacter->GetCharacterMovement()->StopMovementImmediately();
+		ATinoCharacter* Tino = Cast<ATinoCharacter>(MyCharacter);
+		if (Tino != nullptr)
+		{
+			Tino->DiveEnd();
+		}
 	}
 }
 

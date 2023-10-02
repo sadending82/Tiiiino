@@ -10,7 +10,7 @@
 #include "Animation/AnimMontage.h"
 
 ATinoCharacter::ATinoCharacter()
-	:MaxTumbledTime(0.5f),
+	:MaxTumbledTime(1.0f),
 	MovementState(EMovementState::EMS_Normal)
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -37,7 +37,7 @@ void ATinoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction("CreateDummy", EInputEvent::IE_Pressed, this, &ATinoCharacter::CreateDummy);
 	PlayerInputComponent->BindAction("Align", EInputEvent::IE_Pressed, this, &ATinoCharacter::Align);
 	PlayerInputComponent->BindAction("Jump", EInputEvent::IE_Pressed, this, &ATinoCharacter::Jump);
-	PlayerInputComponent->BindAction("Jump", EInputEvent::IE_Released, this, &ATinoCharacter::StopJumping);
+	//PlayerInputComponent->BindAction("Jump", EInputEvent::IE_Released, this, &ATinoCharacter::StopJumping);
 	PlayerInputComponent->BindAction("Dive", EInputEvent::IE_Pressed, this, &ATinoCharacter::Dive);
 }
 
@@ -111,8 +111,8 @@ bool ATinoCharacter::CanTumble(float DeltaTime)
 	bool ret = true;
 
 	ret &= GetCharacterMovement()->IsFalling();
-	ret &= (GetVelocity().Z < 0);
-
+	//ret &= (GetVelocity().Z != FMath::IsNearlyZero());
+	
 	if (ret && MaxTumbledTime > CurrentTumbledTime) CurrentTumbledTime += DeltaTime;
 	bCanTumbled = (CurrentTumbledTime >= MaxTumbledTime);
 
@@ -205,15 +205,17 @@ void ATinoCharacter::CreateDummy()
 
 void ATinoCharacter::Jump()
 {
-	Super::Jump();
-	SetMovementState(EMovementState::EMS_Up);
+	if (CanMove()  && GetCharacterMovement()->IsFalling() == false)
+	{
+		Super::Jump();
+	}
+	
 }
 
 void ATinoCharacter::StopJumping()
 {
 	Super::StopJumping();
 	SetMovementState(EMovementState::EMS_Normal);
-
 }
 
 void ATinoCharacter::PlayTumbleMontage()
