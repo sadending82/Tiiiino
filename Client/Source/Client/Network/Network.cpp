@@ -59,8 +59,6 @@ void Network::release()
 	if (isInit)
 	{
 		mGeneratedID = 0;
-		bIsConnected = 0;
-		bIsConnectedLobby = 0;
 		mMyCharacter->bIsConnected = 0;
 		mMyCharacter = nullptr;
 		for (auto& p : mOtherCharacter)
@@ -75,6 +73,11 @@ void Network::release()
 			bLoginFlag = false;
 			//editor중지때문이니까 여기도 그냥 false로 다시 초기화.
 			bLevelOpenTriggerEnabled = false;
+			//editor 중지가 아니라 level 변경시 불리는 release에서 변경되지 말아야 할 값은 이 if문 안에 넣기.
+			bIsConnectedLobby = 0;
+			bIsConnected = 0;
+			closesocket(l_socket);
+			l_socket = INVALID_SOCKET;
 		}
 		isInit = false;
 	}
@@ -300,6 +303,7 @@ void Network::process_packet(unsigned char* p)
 		SC_GAME_END_PACKET* packet = reinterpret_cast<SC_GAME_END_PACKET*>(p);
 		closesocket(s_socket);
 		UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("Lobby"));
+		bLevelOpenTriggerEnabled = true;
 		packet->record; // << 이걸로 성공/실패 ui 띄우기.
 
 		break;
@@ -338,6 +342,7 @@ void Network::l_process_packet(unsigned char* p)
 		LC_MATCH_RESPONSE_PACKET* packet = reinterpret_cast<LC_MATCH_RESPONSE_PACKET*>(p);
 		//게임서버 연결 코드 나중에 ip랑 포트넘버도 넘겨야함.
 		UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("Level1_ver1"));
+		bLevelOpenTriggerEnabled = true;
 		break;
 	}
 	default:

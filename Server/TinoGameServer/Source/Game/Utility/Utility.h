@@ -46,10 +46,10 @@ enum class eRoomStage
 
 enum class eRoomState
 {
-	ST_FREE,
-	ST_READY,
-	ST_READY_COMPLETE,
-	ST_INGAME
+	ST_FREE,			//빈 방 empty room
+	ST_READY,			//사람을 받고 있는 방 people come into room 
+	ST_READY_COMPLETE,	//사람을 다 받은 방		people come into room complete
+	ST_INGAME			//게임중인 방
 };
 
 //Player Have Item BitFlag with int64

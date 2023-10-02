@@ -1,6 +1,7 @@
 #include "Actor/Controller/TinoController.h"
 #include "Actor/Character/TinoCharacter.h"
 #include "GameFramework/PlayerController.h"
+#include "Network/Network.h"
 #include "Global.h"
 
 ATinoController::ATinoController()
@@ -14,7 +15,13 @@ void ATinoController::BeginPlay()
 	Super::BeginPlay();
 	if (StartingWidgetClass != nullptr && UGameplayStatics::GetCurrentLevelName(GetWorld()) == "Lobby")
 	{
-		ChangeMenuWidget(StartingWidgetClass);
+		if (false == Network::GetNetwork()->bIsConnectedLobby)
+		{
+			ChangeMenuWidget(StartingWidgetClass);
+		}
+		else {
+			SetInputUIMode();
+		}
 	}
 }
 

@@ -11,7 +11,7 @@ class Session
 public:
 	Session()
 	{
-		mPlayerID = -1;
+		mSocketID = -1;
 		mSocket = 0;
 		mState = eSessionState::ST_FREE;
 		mPrevRemain = 0;
@@ -42,8 +42,9 @@ public:
 	OverEXP mRecvOver;
 	mutex	mStateLock;
 	eSessionState mState;
-	int		mPlayerID;
+	int		mSocketID;
 	int		mUID;
+	char	mID[MAX_NAME_SIZE];
 	char	mNickName[MAX_NAME_SIZE];
 	double	mCredit;
 	int		mPoint;

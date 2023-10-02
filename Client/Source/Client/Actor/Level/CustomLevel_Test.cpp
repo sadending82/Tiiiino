@@ -76,7 +76,7 @@ bool ACustomLevel_Test::ConnLobbyServer()
 	auto player = Network::GetNetwork()->mMyCharacter;
 	if (nullptr == player) return false;
 	//이미 연결 되어있다면,
-	if (Network::GetNetwork()->bIsConnectedLobby)
+	if (true == Network::GetNetwork()->bIsConnectedLobby)
 	{
 		auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 		if (TinoController == nullptr)

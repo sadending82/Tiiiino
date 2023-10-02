@@ -126,6 +126,7 @@ void WorkerThread::doThread()
 		case eCOMMAND_IOCP::CMD_GAME_END:
 		{
 			eEventType eventType = TimerThread::DeserializeEventType(wsa_ex->GetBuf());
+			DEBUGMSGNOPARAM("한번만 오는지 GAME END\n");
 			int roomID = TimerThread::DeserializeReceiver(wsa_ex->GetBuf());
 			{
 				auto sPacket = mMainServer->make_game_end_packet(0);

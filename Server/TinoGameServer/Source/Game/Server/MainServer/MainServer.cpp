@@ -95,7 +95,7 @@ void MainServer::init()
 	}
 	connectLobbyServer();
 	mWorkerThreadRef = new WorkerThread(this);
-
+	mTimerThreadRef = new TimerThread();
 	std::cout << "Creating Worker Threads\n";
 	//vector<thread> worker_threads;
 	//thread timer_thread{ TimerThread };
@@ -105,12 +105,15 @@ void MainServer::init()
 	GetSystemInfo(&si);
 	for (int i = 0; i < (int)si.dwNumberOfProcessors; ++i)
 		mWorkerThreads.emplace_back(&WorkerThread::doThread, mWorkerThreadRef);
+	mTimerThread = thread(&TimerThread::doThread, mTimerThreadRef);
 }
 
 void MainServer::run()
 {
+	mTimerThread.join();
 	for (auto& th : mWorkerThreads)
 		th.join();
+
 }
 
 int MainServer::GenerateID()
@@ -415,9 +418,9 @@ bool MainServer::setPlayerInRoom(Player* player)
 	for (auto& tRoom : mRooms)
 	{
 		auto& room = tRoom.second;
-		if (room->IsRoomActive())
+		if (room->IsRoomReadyComplete())
 		{
-			if (room->FindPlayerInfo(player->GetUID(), player->GetName()))
+			if (room->FindPlayerInfo(player->GetUID(), player->GetID()))
 			{
 				player->SetRoomID(tRoom.first);
 				return true;
@@ -452,8 +455,12 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 		//로비랑 연결 안 됐을때는 아래 for문이 무시되므로 여기서 세팅
 		//에디터에서 개발 편하게 하려고 넣은 코드
 		player->SetRoomID(0);
-		player->SetName(packet->name);
+
+		//uid랑 name이랑 비교구분해서 검증작업 하기  
+		player->SetID(packet->name);
 		player->SetUID(packet->uID);
+		//
+
 		if (false == setPlayerInRoom(player))
 		{
 			/*
@@ -492,7 +499,11 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 	case CS_MOVE: {
 		CS_MOVE_PACKET* packet = reinterpret_cast<CS_MOVE_PACKET*>(p);
 		Player* player = dynamic_cast<Player*>(object);
-		if (player == nullptr) DEBUGMSGNOPARAM("player is nullptr.\n"); break;
+		if (player == nullptr)
+		{
+			DEBUGMSGNOPARAM("player is nullptr.\n");
+			break;
+		}
 		Room* pRoom = mRooms[player->GetRoomID()];
 
 		player->SetMoveTime(packet->move_time);
@@ -508,7 +519,11 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 	case CS_GOAL: {
 		CS_GOAL_PACKET* packet = reinterpret_cast<CS_GOAL_PACKET*>(p);
 		Player* player = dynamic_cast<Player*>(object);
-		if (player == nullptr) DEBUGMSGNOPARAM("player is nullptr.\n"); break;
+		if (player == nullptr)
+		{
+			DEBUGMSGNOPARAM("player is nullptr.\n");
+			break;
+		}
 
 		DEBUGMSGONEPARAM("player Num[%d] Arrive Overlapped Packet \n", player->GetSocketID());
 
@@ -528,7 +543,11 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 	case CS_PING: {
 		CS_PING_PACKET* packet = reinterpret_cast<CS_PING_PACKET*>(p);
 		Player* player = dynamic_cast<Player*>(object);
-		if (player == nullptr) DEBUGMSGNOPARAM("player is nullptr.\n"); break;
+		if (player == nullptr)
+		{
+			DEBUGMSGNOPARAM("player is nullptr.\n");
+			break;
+		}
 		auto ping = chrono::duration_cast<chrono::milliseconds>(chrono::high_resolution_clock::now().time_since_epoch()).count() - packet->ping;
 		player->SetPing(ping);
 
@@ -538,8 +557,12 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 	{
 		CS_ACTION_PACKET* packet = reinterpret_cast<CS_ACTION_PACKET*>(p);
 		Player* player = dynamic_cast<Player*>(object);
-		if (player == nullptr) DEBUGMSGNOPARAM("player is nullptr.\n"); break;
-		
+		if (player == nullptr)
+		{
+			DEBUGMSGNOPARAM("player is nullptr.\n");
+			break;
+		}
+
 		{
 			auto sPacket = make_action_packet(player->GetSocketID(), packet->action);
 			SendRoomSomeoneExcept(player->GetRoomID(), player->GetSocketID(), (void*)&sPacket, sizeof(sPacket));
@@ -561,7 +584,7 @@ void MainServer::ProcessPacketLobby(const int serverID, unsigned char* p)
 		Room* activeRoom = mRooms[packet->roomID];
 		mRooms[packet->roomID]->ActiveRoom();
 
-		if (true == activeRoom->SettingRoomPlayer(packet->uID, packet->name, packet->roomMax))
+		if (true == activeRoom->SettingRoomPlayer(packet->uID, packet->id, packet->roomMax))
 		{
 			DEBUGMSGONEPARAM("%d번째 방 활성화 완료.\n", packet->roomID);
 			send_room_ready_packet(packet->roomID);

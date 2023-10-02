@@ -81,7 +81,19 @@ void Room::ActiveRoom()
 	mRoomStateLock.unlock();
 }
 
-bool Room::IsRoomActive()
+bool Room::IsRoomReadyComplete()
+{
+	mRoomStateLock.lock();
+	if (mRoomState == eRoomState::ST_READY_COMPLETE)
+	{
+		mRoomStateLock.unlock();
+		return true;
+	}
+	mRoomStateLock.unlock();
+	return false;
+}
+
+bool Room::IsRoomReady()
 {
 	mRoomStateLock.lock();
 	if (mRoomState == eRoomState::ST_READY)
@@ -103,9 +115,12 @@ bool Room::SettingRoomPlayer(const int uID, const std::string id, const int& pla
 		if (mRoomState == eRoomState::ST_READY || mRoomState == eRoomState::ST_FREE)
 		{
 			mRoomState = eRoomState::ST_READY_COMPLETE;
+			mRoomStateLock.unlock();
+			return true;
 		}
-		mRoomStateLock.unlock();
-		return true;
+		else {
+			mRoomStateLock.unlock();
+		}
 	}
 	return false;
 }

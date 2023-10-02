@@ -24,7 +24,8 @@ public:
 	void ResetGameRoom();
 	
 	void ActiveRoom();
-	bool IsRoomActive();
+	bool IsRoomReady();
+	bool IsRoomReadyComplete();
 
 	bool SettingRoomPlayer(const int uID, const std::string id, const int& playerMaxNum);
 	bool FindPlayerInfo(const int uID, const std::string id);

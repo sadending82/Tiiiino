@@ -66,6 +66,8 @@ private:
 	std::map<int, Room*> mRooms;
 	//std::array< std::vector<class Object*>, MAX_ROOM> mRooms;
 	std::vector<std::thread> mWorkerThreads;
+	std::thread mTimerThread;
 	class WorkerThread* mWorkerThreadRef;
+	class TimerThread* mTimerThreadRef;
 	HANDLE mhiocp;
 };

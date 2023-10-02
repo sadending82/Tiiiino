@@ -149,6 +149,7 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		mClients[p->userKey].mStateLock.lock();
 		mClients[p->userKey].mCredit = p->credit;
 		strcpy_s(mClients[p->userKey].mNickName, sizeof(p->nickname), p->nickname);
+		strcpy_s(mClients[p->userKey].mID, sizeof(p->id), p->id);
 		mClients[p->userKey].mPoint = p->point;
 		mClients[p->userKey].mUID = p->uid;
 		mClients[p->userKey].mTier = p->tier;
@@ -227,7 +228,7 @@ void Server::DoWorker()
 				int server_id = GetNewServerID();
 				if (server_id != INVALID_KEY)
 				{
-					mServers[server_id].mPlayerID = server_id;
+					mServers[server_id].mSocketID = server_id;
 					mServers[server_id].mRecvOver.mCompType = eCompType::OP_SERVER_RECV;
 					mServers[server_id].mPrevRemain = 0;
 					mServers[server_id].mSocket = cSocket;
@@ -257,7 +258,7 @@ void Server::DoWorker()
 				int client_id = GetNewClientID();
 				if (client_id != INVALID_KEY)
 				{
-					mClients[client_id].mPlayerID = client_id;
+					mClients[client_id].mSocketID = client_id;
 					mClients[client_id].mPrevRemain = 0;
 					mClients[client_id].mSocket = cSocket;
 					CreateIoCompletionPort(reinterpret_cast<HANDLE>(cSocket), mHCP, client_id, 0);
@@ -416,7 +417,7 @@ void Server::Init()
 		int server_id = GetNewServerID();
 		if (server_id != INVALID_KEY)
 		{
-			mServers[server_id].mPlayerID = server_id;
+			mServers[server_id].mSocketID = server_id;
 			mServers[server_id].mRecvOver.mCompType = eCompType::OP_SERVER_RECV;
 			mServers[server_id].mPrevRemain = 0;
 			mServers[server_id].mSocket = LDsocket;
@@ -477,6 +478,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 				packet.type = LG_USER_INTO_GAME;
 				packet.roomID = 0;//�� ��ȣ �ӽ÷� 0���� �־��?
 				strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
+				strcpy_s(packet.id, sizeof(mClients[player_id].mID), mClients[player_id].mID);
 				packet.uID = mClients[player_id].mUID;
 				packet.roomMax = MAX_ROOM_USER;
 				mClients[player_id].mRoomID = packet.roomID;
@@ -498,6 +500,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 				packet.type = LG_USER_INTO_GAME;
 				packet.roomID = 0;//�� ��ȣ �ӽ÷� 0���� �־��?
 				strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
+				strcpy_s(packet.id, sizeof(mClients[player_id].mID), mClients[player_id].mID);
 				packet.uID = mClients[player_id].mUID;
 				packet.roomMax = MAX_ROOM_USER;
 				mClients[player_id].mRoomID = packet.roomID;
@@ -564,6 +567,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 						packet.type = LG_USER_INTO_GAME;
 						packet.roomID = 0;//�� ��ȣ �ӽ÷� 0���� �־��?
 						strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
+						strcpy_s(packet.id, sizeof(mClients[player_id].mID), mClients[player_id].mID);
 						packet.uID = mClients[player_id].mUID;
 						packet.roomMax = mMatchListHighTier.size();
 						mClients[player_id].mRoomID = packet.roomID;
@@ -608,6 +612,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 						packet.type = LG_USER_INTO_GAME;
 						packet.roomID = 0;//�� ��ȣ �ӽ÷� 0���� �־��?
 						strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
+						strcpy_s(packet.id, sizeof(mClients[player_id].mID), mClients[player_id].mID);
 						packet.uID = mClients[player_id].mUID;
 						packet.roomMax = mMatchListLowTier.size();
 						mClients[player_id].mRoomID = packet.roomID;
