@@ -27,6 +27,7 @@ class ATinoCharacter;
 
 //lobby packet
 void send_login_packet(SOCKET& sock,const char* id, const char* passWord); 
+void send_newaccount_packet(SOCKET& sock, const char* id, const char* passWord);
 void send_match_packet(SOCKET& sock);
 void send_matchout_packet(SOCKET& sock);
 //game packet
