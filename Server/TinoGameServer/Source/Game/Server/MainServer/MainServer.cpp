@@ -1,9 +1,10 @@
 #include "MainServer.h"
 
-#include "../../Object/Player/Player.h"
-#include "../../Thread/WorkerThread/WorkerThread.h"
-#include "../../Room/Room.h"
 #include "../LobbyServer/LobbyServer.h"
+#include "../../Object/Player/Player.h"
+#include "../../Room/Room.h"
+#include "../../Thread/TimerThread/TimerThread.h"
+#include "../../Thread/WorkerThread/WorkerThread.h"
 #include "../../../../../ServerProtocol.h"
 
 MainServer* gMainServer;
@@ -282,6 +283,15 @@ SC_GAME_COUNTDOWN_START_PACKET MainServer::make_game_countdown_start_packet()
 	return packet;
 }
 
+SC_PING_PACKET MainServer::make_ping_packet()
+{
+	SC_PING_PACKET packet{};
+	packet.size = sizeof(packet);
+	packet.type = SC_PING;
+	packet.ping = static_cast<unsigned>(chrono::duration_cast<chrono::milliseconds>(chrono::high_resolution_clock::now().time_since_epoch()).count());
+	return packet;
+}
+
 void MainServer::SendAllBroadCast(void* buf, const int bufSize)
 {
 	for (auto& other : mObjects) {
@@ -382,6 +392,24 @@ void MainServer::connectLobbyServer()
 	dynamic_cast<LobbyServer*>(mLobbyServer)->init();
 }
 
+bool MainServer::setPlayerInRoom(Player* player)
+{
+	for (auto& tRoom : mRooms)
+	{
+		auto& room = tRoom.second;
+		if (room->IsRoomActive())
+		{
+			if (room->FindPlayerInfo(player->GetUID(), player->GetName()))
+			{
+				player->SetRoomID(tRoom.first);
+				return true;
+			}
+		}
+	}
+	DEBUGMSGONEPARAM("플레이어와 방 매칭 도중 버그가 발생함[%d]번째플레이어", player->GetUID());
+	return false;
+}
+
 
 
 
@@ -396,49 +424,44 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 		Player* player = dynamic_cast<Player*>(mObjects[client_id]);
 		//character->skintype = packet->skintype;
 		player->SetSocketID(client_id);
-		cout << " 플레이어 " << client_id << "접속\n";
+		DEBUGMSGONEPARAM("플레이어%d 접속\n", client_id);
 		if (packet->roomID > MAX_ROOM)
 		{
 			//에러
-			cout << "잘못된 방에 입장하려 시도함.\n";
+			DEBUGMSGNOPARAM("잘못된 방에 접속하려 시도함.\n");
 			break;
 		}
 		//로비랑 연결 안 됐을때는 아래 for문이 무시되므로 여기서 세팅
 		//에디터에서 개발 편하게 하려고 넣은 코드
 		player->SetRoomID(0);
-
-
-		for (auto tRoom : mRooms)
+		player->SetName(packet->name);
+		player->SetUID(packet->uID);
+		if (false == setPlayerInRoom(player))
 		{
-			auto& room = tRoom.second;
-			if (room->IsRoomActive())
-			{
-				if (room->FindPlayerInfo(packet->uID, packet->name))
-				{
-					player->SetRoomID(tRoom.first);
-				}
-			}
+			/*
+				나중에 여기에 제대로 된 방 id가 안나오면 접속을 끊어버려야함. 부정접속
+			*/
 		}
 
-		/*
-			나중에 여기에 제대로 된 방 id가 안나오면 접속을 끊어버려야함. 부정접속
-		*/
 
 		Room* pRoom = mRooms[player->GetRoomID()];
 		pRoom->AddObject(player);
-
-
 		{
-			DEBUGMSGNOPARAM("여기 제대로도착");
-			SC_LOGIN_OK_PACKET sendpacket = make_login_ok_packet(client_id, "none");
-			SendMySelf(client_id, (void*)&sendpacket, sizeof(sendpacket));
+			SC_LOGIN_OK_PACKET sPacket = make_login_ok_packet(client_id, "none");
+			SendMySelf(client_id, (void*)&sPacket, sizeof(sPacket));
+			//send_login_ok_packet(client_id, "none");
 		}
-		//send_login_ok_packet(client_id, "none");
+		{
+			SC_PING_PACKET sPacket = make_ping_packet();
+			SendMySelf(client_id, (void*)&sPacket, sizeof(sPacket));
+		}
 
 
 		//나를 상대에게
-		auto spacket = make_player_add_packet(client_id);
-		SendRoomSomeoneExcept(player->GetRoomID(), client_id, (void*)&spacket, sizeof(spacket));
+		{
+			auto spacket = make_player_add_packet(client_id);
+			SendRoomSomeoneExcept(player->GetRoomID(), client_id, (void*)&spacket, sizeof(spacket));
+		}
 
 		//방안의 모든 플레이어 정보를 나에게로
 		SendRoomOthersToMe(player->GetRoomID(), player->GetSocketID(), player->GetSocketID(), &MainServer::make_player_add_packet);
@@ -484,6 +507,15 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 		}
 		break;
 	}
+	case CS_PING: {
+		CS_PING_PACKET* packet = reinterpret_cast<CS_PING_PACKET*>(p);
+		Player* player = dynamic_cast<Player*>(object);
+		if (player == nullptr) break;
+		auto ping = chrono::duration_cast<chrono::milliseconds>(chrono::high_resolution_clock::now().time_since_epoch()).count() - packet->ping;
+		player->SetPing(ping);
+
+		break;
+	}
 	}
 }
 
@@ -500,15 +532,11 @@ void MainServer::ProcessPacketLobby(const int serverID, unsigned char* p)
 
 		if (true == activeRoom->SettingRoomPlayer(packet->uID, packet->name, packet->roomMax))
 		{
-#ifdef _DEBUG
-			cout << packet->roomID << "번째 방 활성화 완료.\n";
-#endif
+			DEBUGMSGONEPARAM("%d번째 방 활성화 완료.\n", packet->roomID);
 			send_room_ready_packet(packet->roomID);
+			TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_PING, eEventType::TYPE_BROADCAST_ROOM, 3000, NULL, packet->roomID);
+			
 		}
-
-		break;
-	}
-	case CS_MOVE: {
 
 		break;
 	}

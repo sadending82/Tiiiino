@@ -1,6 +1,7 @@
 //test ip
 #pragma once
 constexpr const char* SERVERIP = "127.0.0.1";
+constexpr const char* LOOBYSERVER_ADDR = "127.0.0.1";
 
 constexpr int GAMESERVERPORT = 3600;
 constexpr int LOBBYSERVERPORT = 3500;
@@ -18,6 +19,7 @@ enum PacketType {
 	CS_MOVE,
     CS_CHAT,
 	CS_GOAL,
+	CS_PING,
 
 	// Client To LobbyServer
 	CL_LOGIN,
@@ -34,6 +36,7 @@ enum PacketType {
 	SC_PLAYER_ARRIVE,
 	SC_GAME_COUNTDOWN_START,
 	SC_GAME_END,
+	SC_PING,
 
 	// Lobbyserver To Client
 	LC_LOGIN_OK,
@@ -75,6 +78,9 @@ struct CS_GOAL_PACKET : public PACKET {
 
 };
 
+struct CS_PING_PACKET : public PACKET {
+	int		ping;
+};
 //-----------------------------------
 struct CL_LOGIN_PACKET :public PACKET {
 	char id[MAX_NAME_SIZE];
@@ -127,8 +133,12 @@ struct SC_GAME_COUNTDOWN_START_PACKET : public PACKET
 
 };
 
-struct SC_GAME_END : public PACKET {
+struct SC_GAME_END_PACKET : public PACKET {
 	char	record;		//성공 실패
+};
+
+struct SC_PING_PACKET : public PACKET {
+	long long	ping;
 };
 //---------------------------
 struct LC_LOGIN_OK_PACKET : public PACKET {

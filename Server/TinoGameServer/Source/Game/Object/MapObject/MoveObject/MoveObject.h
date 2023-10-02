@@ -3,5 +3,10 @@
 
 class MoveObject : public MapObject
 {
+public:
+	MoveObject();
+	virtual ~MoveObject();
+
+protected:
 };
 

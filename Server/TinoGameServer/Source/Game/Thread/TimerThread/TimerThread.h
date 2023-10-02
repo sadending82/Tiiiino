@@ -13,8 +13,9 @@ public:
 
 	virtual void doThread() override;
 
-	static void MakeTimerEventMilliSec(const eTimerType timerType, const eEventType eventType, const int execTimeMilli, int senderID, int receiverID);
-	static void MakeTimerEventMilliSec(const eTimerType timerType, const eEventType eventType, const int execTimeMilli, int senderID, int receiverID, const Vector3i& pos);
+	//if you don't use param, just push NULL
+	static void MakeTimerEventMilliSec(const eCOMMAND_IOCP timerType, const eEventType eventType, const int execTimeMilli, int senderID, int receiverID);
+	static void MakeTimerEventMilliSec(const eCOMMAND_IOCP timerType, const eEventType eventType, const int execTimeMilli, int senderID, int receiverID, const Vector3i& pos);
 
 	static eEventType DeserializeEventType(unsigned char* buf);
 	static int DeserializeReceiver(unsigned char* buf);

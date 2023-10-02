@@ -25,15 +25,12 @@ void TimerThread::doThread()
 			{
 				if (isAlready.execTime <= chrono::system_clock::now())
 				{
-					if (isAlready.type == eTimerType::TYPE_GAME_END)
-					{
-						WSA_OVER_EX* wsa_ex = new WSA_OVER_EX;
-						wsa_ex->SetCmd(eCOMMAND_IOCP::CMD_GAME_END);
-						memcpy(wsa_ex->GetBuf(), &isAlready.eventType, sizeof(char));
-						memcpy(wsa_ex->GetBuf() + sizeof(char), &isAlready.receiverID, sizeof(int));
-						memcpy(wsa_ex->GetBuf() + sizeof(char) + sizeof(int), &isAlready.pos, sizeof(Vector3i));
-						PostQueuedCompletionStatus(gMainServer->GetIOCPHandle(), 1, isAlready.senderID, &wsa_ex->GetWsaOver());
-					}
+					WSA_OVER_EX* wsa_ex = new WSA_OVER_EX;
+					wsa_ex->SetCmd(isAlready.type);
+					memcpy(wsa_ex->GetBuf(), &isAlready.eventType, sizeof(char));
+					memcpy(wsa_ex->GetBuf() + sizeof(char), &isAlready.receiverID, sizeof(int));
+					memcpy(wsa_ex->GetBuf() + sizeof(char) + sizeof(int), &isAlready.pos, sizeof(Vector3i));
+					PostQueuedCompletionStatus(gMainServer->GetIOCPHandle(), 1, isAlready.senderID, &wsa_ex->GetWsaOver());
 					triger = false;
 
 				}
@@ -44,15 +41,12 @@ void TimerThread::doThread()
 				break;
 			if (execEvent.execTime <= chrono::system_clock::now())
 			{
-				if (execEvent.type == eTimerType::TYPE_GAME_END)
-				{
-					WSA_OVER_EX* wsa_ex = new WSA_OVER_EX;
-					wsa_ex->SetCmd(eCOMMAND_IOCP::CMD_GAME_END);
-					memcpy(wsa_ex->GetBuf(), &isAlready.eventType, sizeof(char));
-					memcpy(wsa_ex->GetBuf() + sizeof(char), &isAlready.receiverID, sizeof(int));
-					memcpy(wsa_ex->GetBuf() + sizeof(char) + sizeof(int), &isAlready.pos, sizeof(Vector3i));
-					PostQueuedCompletionStatus(gMainServer->GetIOCPHandle(), 1, execEvent.senderID, &wsa_ex->GetWsaOver());
-				}
+				WSA_OVER_EX* wsa_ex = new WSA_OVER_EX;
+				wsa_ex->SetCmd(isAlready.type);
+				memcpy(wsa_ex->GetBuf(), &isAlready.eventType, sizeof(char));
+				memcpy(wsa_ex->GetBuf() + sizeof(char), &isAlready.receiverID, sizeof(int));
+				memcpy(wsa_ex->GetBuf() + sizeof(char) + sizeof(int), &isAlready.pos, sizeof(Vector3i));
+				PostQueuedCompletionStatus(gMainServer->GetIOCPHandle(), 1, isAlready.senderID, &wsa_ex->GetWsaOver());
 			}
 			else {
 
@@ -74,7 +68,7 @@ void TimerThread::doThread()
 	}
 }
 
-void TimerThread::MakeTimerEventMilliSec(const eTimerType timerType, const eEventType eventType, const int execTimeMilli, int senderID, int receiverID)
+void TimerThread::MakeTimerEventMilliSec(const eCOMMAND_IOCP timerType, const eEventType eventType, const int execTimeMilli, int senderID, int receiverID)
 {
 	TimerEvent instq;
 	instq.type = timerType;
@@ -85,7 +79,7 @@ void TimerThread::MakeTimerEventMilliSec(const eTimerType timerType, const eEven
 	gTimerQueue.push(instq);
 }
 
-void TimerThread::MakeTimerEventMilliSec(const eTimerType timerType, const eEventType eventType, const int execTimeMilli, int senderID, int receiverID, const Vector3i& pos)
+void TimerThread::MakeTimerEventMilliSec(const eCOMMAND_IOCP timerType, const eEventType eventType, const int execTimeMilli, int senderID, int receiverID, const Vector3i& pos)
 {
 	TimerEvent instq;
 	instq.type = timerType;

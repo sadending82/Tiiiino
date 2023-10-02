@@ -42,6 +42,7 @@ public:
 	SC_PLAYER_ARRIVE_PACKET make_player_arrive_packet(const int arriveID);
 	void send_game_countdown_start_packet(const int player_id);
 	SC_GAME_COUNTDOWN_START_PACKET make_game_countdown_start_packet();
+	SC_PING_PACKET make_ping_packet();
 
 
 	//-> 생각해보니 그냥 buffer에 담아서 void*로 보내고 send에서 변환하면 되잖아 ? 바로 진행시켜
@@ -52,11 +53,12 @@ public:
 	void SendMySelf(const int receiverID, void* buf, const int bufSize);
 
 	//남의 정보를 나한테 줄 때는 이 함수를 사용, 대신 이 함수를 쓸 때는 패킷만드는 함수(make_~)를 id 하나로 사용할 수 있게끔 짠다.
+	//other info to owner, use this func, when you use this function, you must write the packet creation function (make_~) parameter just one [const int id].
 	template<class T>
 	void SendRoomOthersToMe(const int roomID,const int receiveID, const int exceptID, T(MainServer::* fp)(const int));
 private:
 	void connectLobbyServer();
-
+	bool setPlayerInRoom(class Player* player);
 private:
 	std::array<class Object*, MAX_OBJECT> mObjects;
 	class Server* mLobbyServer;

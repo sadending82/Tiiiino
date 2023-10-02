@@ -162,6 +162,15 @@ void send_move_packet(SOCKET& sock, const bool& inair, const float& x, const flo
 	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
 }
 
+void send_ping_packet(SOCKET& sock, const long long ping)
+{
+	CS_PING_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PING;
+	packet.ping = ping;
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+}
 
 
 
@@ -244,6 +253,12 @@ void Network::process_packet(unsigned char* p)
 
 			}
 		}
+		break;
+	}
+	case SC_PING: {
+		SC_PING_PACKET* packet = reinterpret_cast<SC_PING_PACKET*>(p);
+		send_ping_packet(s_socket, packet->ping);
+
 		break;
 	}
 	default:

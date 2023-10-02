@@ -13,14 +13,6 @@ constexpr int INVALID_ROOM_ID = -1;
 #endif
 
 
-enum class eTimerType
-{
-	
-	TYPE_TREE_RESPAWN, TYPE_PLAYER_RESPAWN, TYPE_PUNNET_RESPAWN, TYPE_HEAL_RESPAWN,
-	TYPE_DURIAN_DMG,
-	TYPE_GAME_WAIT, TYPE_GAME_START, TYPE_GAME_END, TYPE_GAME_RESET
-};
-
 enum class eEventType : char
 {
 	TYPE_BROADCAST_ALL,		//전체 기반
@@ -32,7 +24,8 @@ enum class eEventType : char
 
 enum class eCOMMAND_IOCP {
 	CMD_ACCEPT, CMD_RECV, CMD_SEND, CMD_SERVER_RECV, CMD_DBSERVER_RECV, //Basic
-	CMD_GAME_WAIT, CMD_GAME_START, CMD_GAME_END, CMD_GAME_RESET //Game Cycle
+	CMD_GAME_WAIT, CMD_GAME_START, CMD_GAME_END, CMD_GAME_RESET, //Game Cycle
+	CMD_PING,
 };
 
 //SocketState
@@ -95,7 +88,7 @@ struct TimerEvent {
 	int receiverID{};
 	Vector3i pos{};
 	std::chrono::system_clock::time_point execTime{};
-	eTimerType type{};
+	eCOMMAND_IOCP type{};
 	eEventType eventType{};
 
 	constexpr bool operator < (const TimerEvent& R) const
