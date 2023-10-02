@@ -43,26 +43,12 @@ public:
 	void send_game_countdown_start_packet(const int player_id);
 	SC_GAME_COUNTDOWN_START_PACKET make_game_countdown_start_packet();
 
-	//위의 샌드함수와 아래 함수포인터 샌드는 의도에 따라 타입을 맞추어야함 ^^,, 프레임워크를 이렇게 짜서 어쩔수없다.
-	//코드중복을 조금이라도 줄이기 위한 나의 작은 몸부리침 정도로 생각해주시길
 
 	//-> 생각해보니 그냥 buffer에 담아서 void*로 보내고 send에서 변환하면 되잖아 ? 바로 진행시켜
-	void SendAllBroadCast(void (MainServer::* fp)(int), int value1);
-	void SendAllBroadCast(void (MainServer::* fp)(int, int), int value1, int value2);
+	void SendAllBroadCast(void* buf, const int bufSize);
 
 	void SendRoomBroadCast(const int roomID, void* buf, const int bufSize);
-	void SendRoomBroadCast(const int roomID, void (MainServer::* fp)(const int), const int playerID);
-	void SendRoomBroadCast(const int roomID, void (MainServer::* fp)(const int,void*), const int playerID, void* buf);
-	void SendRoomBroadCast(const int roomID, void (MainServer::* fp)(const int,const int), const int playerID,const int value2);
-	void SendRoomBroadCast(const int roomID, void (MainServer::* fp)(const int, const int, const bool, const float, const float, const float, const float),
-		const int player_id, const int value2, const bool value3, const float value4, const float value5, const float value6, const float value7);
-
-
 	void SendRoomSomeoneExcept(const int roomID, const int exceptID, void* buf, const int bufSize);
-	void SendRoomSomeoneExcept(const int roomID, const int exceptID, void(MainServer::* fp)(const int));
-	void SendRoomSomeoneExcept(const int roomID, const int exceptID, void(MainServer::* fp)(const int, void*), void* buf, const int bufSize);
-	void SendRoomSomeoneExcept(const int roomID, const int exceptID, void(MainServer::* fp)(const int, void*, const int), void* buf, const int bufSize);
-
 	void SendMySelf(const int receiverID, void* buf, const int bufSize);
 
 	//남의 정보를 나한테 줄 때는 이 함수를 사용, 대신 이 함수를 쓸 때는 패킷만드는 함수(make_~)를 id 하나로 사용할 수 있게끔 짠다.
