@@ -65,9 +65,9 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 		mServers[0].DoSend(&pac);
 		break;
 	}
-	case CL_JOIN:
+	case CL_SIGNUP:
 	{
-		CL_JOIN_PACKET* rp = reinterpret_cast<CL_JOIN_PACKET*>(cpacket);
+		CL_SIGNUP_PACKET* rp = reinterpret_cast<CL_SIGNUP_PACKET*>(cpacket);
 		LD_SIGNUP_PACKET sp;
 		sp.size = sizeof(sp);
 		sp.type = LD_SIGNUP;

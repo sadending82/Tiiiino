@@ -23,7 +23,7 @@ enum PacketType {
 
 	// Client To LobbyServer
 	CL_LOGIN,
-	CL_JOIN,
+	CL_SIGNUP,
 	CL_MATCH,
 	CL_MATCH_OUT,
 
@@ -87,7 +87,7 @@ struct CL_LOGIN_PACKET :public PACKET {
 	char password[MAX_NAME_SIZE];
 };
 
-struct CL_JOIN_PACKET :public PACKET {
+struct CL_SIGNUP_PACKET :public PACKET {
 	char id[MAX_NAME_SIZE];
 	char password[MAX_NAME_SIZE];
 };
