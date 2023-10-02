@@ -100,9 +100,9 @@ void Network::error_display(int err_no)
 
 void send_newaccount_packet(SOCKET& sock, const char* id, const char* passWord)
 {
-	CL_JOIN_PACKET packet;
+	CL_SIGNUP_PACKET packet;
 	packet.size = sizeof(packet);
-	packet.type = CL_JOIN;
+	packet.type = CL_SIGNUP;
 	strcpy_s(packet.id, id);
 	strcpy_s(packet.password, passWord);
 	//strcpy_s(packet.name, TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterName));
