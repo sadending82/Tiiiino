@@ -474,7 +474,7 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 	case CS_MOVE: {
 		CS_MOVE_PACKET* packet = reinterpret_cast<CS_MOVE_PACKET*>(p);
 		Player* player = dynamic_cast<Player*>(object);
-		if (player == nullptr) break;
+		if (player == nullptr) DEBUGMSGNOPARAM("player is nullptr.\n"); break;
 		Room* pRoom = mRooms[player->GetRoomID()];
 
 		player->SetMoveTime(packet->move_time);
@@ -490,7 +490,7 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 	case CS_GOAL: {
 		CS_GOAL_PACKET* packet = reinterpret_cast<CS_GOAL_PACKET*>(p);
 		Player* player = dynamic_cast<Player*>(object);
-		if (player == nullptr) break;
+		if (player == nullptr) DEBUGMSGNOPARAM("player is nullptr.\n"); break;
 
 		DEBUGMSGONEPARAM("player Num[%d] Arrive Overlapped Packet \n", player->GetSocketID());
 
@@ -510,7 +510,7 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 	case CS_PING: {
 		CS_PING_PACKET* packet = reinterpret_cast<CS_PING_PACKET*>(p);
 		Player* player = dynamic_cast<Player*>(object);
-		if (player == nullptr) break;
+		if (player == nullptr) DEBUGMSGNOPARAM("player is nullptr.\n"); break;
 		auto ping = chrono::duration_cast<chrono::milliseconds>(chrono::high_resolution_clock::now().time_since_epoch()).count() - packet->ping;
 		player->SetPing(ping);
 
