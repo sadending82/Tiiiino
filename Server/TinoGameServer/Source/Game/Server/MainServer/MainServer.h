@@ -31,7 +31,7 @@ public:
 	void SendPacketWithID(const int receiverID, void* buf, const int bufSize);
 	void send_login_ok_packet(const int player_id, const char* playername);
 	void send_login_ok_packet(const int player_id, void* buf);
-	SC_LOGIN_OK_PACKET make_login_ok_packet(const int player_id, const char* playername);
+	SC_LOGIN_OK_PACKET make_login_ok_packet(const int playerID, const char* playername);
 	void send_player_add_packet(const int playerID, void* buf, const int bufSize);
 	SC_ADD_PLAYER_PACKET make_player_add_packet(const int playerID);
 	void send_room_ready_packet(const int roomID);
@@ -43,11 +43,11 @@ public:
 	void send_game_countdown_start_packet(const int player_id);
 	SC_GAME_COUNTDOWN_START_PACKET make_game_countdown_start_packet();
 	SC_PING_PACKET make_ping_packet();
-
+	SC_ACTION_ANIM_PACKET make_action_packet(const int playerID, const char action);
+	SC_GAME_END_PACKET make_game_end_packet(const char record);
 
 	//-> 생각해보니 그냥 buffer에 담아서 void*로 보내고 send에서 변환하면 되잖아 ? 바로 진행시켜
 	void SendAllBroadCast(void* buf, const int bufSize);
-
 	void SendRoomBroadCast(const int roomID, void* buf, const int bufSize);
 	void SendRoomSomeoneExcept(const int roomID, const int exceptID, void* buf, const int bufSize);
 	void SendMySelf(const int receiverID, void* buf, const int bufSize);

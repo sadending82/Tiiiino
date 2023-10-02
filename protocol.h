@@ -20,6 +20,7 @@ enum PacketType {
     CS_CHAT,
 	CS_GOAL,
 	CS_PING,
+	CS_ACTION,
 
 	// Client To LobbyServer
 	CL_LOGIN,
@@ -34,9 +35,10 @@ enum PacketType {
 	SC_PLAYER_REMOVE,
 	SC_MOVE_PLAYER,
 	SC_PLAYER_ARRIVE,
-	SC_GAME_COUNTDOWN_START,
 	SC_GAME_END,
+	SC_GAME_COUNTDOWN_START,
 	SC_PING,
+	SC_ACTION_ANIM,
 
 	// Lobbyserver To Client
 	LC_LOGIN_OK,
@@ -80,6 +82,10 @@ struct CS_GOAL_PACKET : public PACKET {
 
 struct CS_PING_PACKET : public PACKET {
 	int		ping;
+};
+
+struct CS_ACTION_PACKET : public PACKET {
+	char action;		// 0 : none, 1 : jump, 2 : dive 
 };
 //-----------------------------------
 struct CL_LOGIN_PACKET :public PACKET {
@@ -139,6 +145,12 @@ struct SC_GAME_END_PACKET : public PACKET {
 
 struct SC_PING_PACKET : public PACKET {
 	long long	ping;
+};
+
+struct SC_ACTION_ANIM_PACKET : public PACKET {
+	// 0 : none, 1 : jump, 2 : dive 
+	char action;		
+	int id;
 };
 //---------------------------
 struct LC_LOGIN_OK_PACKET : public PACKET {

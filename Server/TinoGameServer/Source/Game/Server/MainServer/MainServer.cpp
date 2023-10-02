@@ -154,16 +154,16 @@ void MainServer::send_login_ok_packet(const int player_id, void* buf)
 	player->SendPacket(&packet, sizeof(packet));
 }
 
-SC_LOGIN_OK_PACKET MainServer::make_login_ok_packet(const int player_id,const char* playername)
+SC_LOGIN_OK_PACKET MainServer::make_login_ok_packet(const int playerID,const char* playername)
 {
-	auto player = dynamic_cast<Player*>(mObjects[player_id]);
+	auto player = dynamic_cast<Player*>(mObjects[playerID]);
 	SC_LOGIN_OK_PACKET packet;
 	memset(&packet, 0, sizeof(SC_LOGIN_OK_PACKET));
 
 	packet.size = sizeof(packet);
 	packet.type = SC_LOGIN_OK;
 
-	packet.id = player_id;
+	packet.id = playerID;
 	//wcscpy(packet.name, playername);
 	return packet;
 }
@@ -289,6 +289,24 @@ SC_PING_PACKET MainServer::make_ping_packet()
 	packet.size = sizeof(packet);
 	packet.type = SC_PING;
 	packet.ping = static_cast<unsigned>(chrono::duration_cast<chrono::milliseconds>(chrono::high_resolution_clock::now().time_since_epoch()).count());
+	return packet;
+}
+
+SC_ACTION_ANIM_PACKET MainServer::make_action_packet(const int playerID, const char action)
+{
+	SC_ACTION_ANIM_PACKET packet{};
+	packet.size = sizeof(packet);
+	packet.type = SC_ACTION_ANIM;
+	packet.id = playerID;
+	packet.action = action;
+	return packet;
+}
+
+SC_GAME_END_PACKET MainServer::make_game_end_packet(const char record)
+{
+	SC_GAME_END_PACKET packet{};
+	packet.size = sizeof(packet);
+	packet.type = SC_GAME_END;
 	return packet;
 }
 
@@ -516,6 +534,19 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 
 		break;
 	}
+	case CS_ACTION:
+	{
+		CS_ACTION_PACKET* packet = reinterpret_cast<CS_ACTION_PACKET*>(p);
+		Player* player = dynamic_cast<Player*>(object);
+		if (player == nullptr) DEBUGMSGNOPARAM("player is nullptr.\n"); break;
+		
+		{
+			auto sPacket = make_action_packet(player->GetSocketID(), packet->action);
+			SendRoomSomeoneExcept(player->GetRoomID(), player->GetSocketID(), (void*)&sPacket, sizeof(sPacket));
+		}
+
+		break;
+	}
 	}
 }
 
@@ -535,6 +566,7 @@ void MainServer::ProcessPacketLobby(const int serverID, unsigned char* p)
 			DEBUGMSGONEPARAM("%d번째 방 활성화 완료.\n", packet->roomID);
 			send_room_ready_packet(packet->roomID);
 			TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_PING, eEventType::TYPE_BROADCAST_ROOM, 3000, NULL, packet->roomID);
+			TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_COUNTDOWN_START, eEventType::TYPE_BROADCAST_ROOM, 2000, NULL, packet->roomID);
 			
 		}
 

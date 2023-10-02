@@ -127,11 +127,22 @@ void WorkerThread::doThread()
 		{
 			eEventType eventType = TimerThread::DeserializeEventType(wsa_ex->GetBuf());
 			int roomID = TimerThread::DeserializeReceiver(wsa_ex->GetBuf());
+			{
+				auto sPacket = mMainServer->make_game_end_packet(0);
+				mMainServer->SendRoomBroadCast(roomID, (void*)&sPacket, sizeof(sPacket));
+			}
+			break;
+		}
+		case eCOMMAND_IOCP::CMD_GAME_COUNTDOWN_START:
+		{
+			eEventType eventType = TimerThread::DeserializeEventType(wsa_ex->GetBuf());
+			int roomID = TimerThread::DeserializeReceiver(wsa_ex->GetBuf());
 			matchTimerType(eventType);
 			{
 				auto sPacket = mMainServer->make_game_countdown_start_packet();
 				mMainServer->SendRoomBroadCast(roomID, (void*)&sPacket, sizeof(sPacket));
 			}
+			TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_END, eEventType::TYPE_BROADCAST_ROOM, 10000, NULL, roomID);
 
 			break;
 		}
