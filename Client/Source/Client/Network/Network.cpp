@@ -20,6 +20,8 @@ Network::Network()
 	, mGeneratedID(0)
 	, isInit(false)
 	, bIsConnected(false)
+	, l_socket(INVALID_SOCKET)
+	, s_socket(INVALID_SOCKET)
 {
 	for (int i = 0; i < MAX_USER; ++i)
 	{
@@ -261,6 +263,35 @@ void Network::process_packet(unsigned char* p)
 
 		break;
 	}
+	case SC_ACTION_ANIM: {
+		SC_ACTION_ANIM_PACKET* packet = reinterpret_cast<SC_ACTION_ANIM_PACKET*>(p);
+		int id = packet->id;
+		if (nullptr != mOtherCharacter[id])
+		{
+		}
+		else {
+			switch (packet->action)
+			{
+			case 1:
+				//점프
+				break;
+			case 2:
+				//다이브
+				break;
+			default:
+				break;
+			}			
+		}
+		break;
+	}
+	case SC_GAME_END: {
+		SC_GAME_END_PACKET* packet = reinterpret_cast<SC_GAME_END_PACKET*>(p);
+		closesocket(s_socket);
+		UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("Lobby"));
+		packet->record; // << 이걸로 성공/실패 ui 띄우기.
+
+		break;
+	}
 	default:
 		break;
 	}
@@ -436,23 +467,6 @@ bool Network::ConnectServerGame()
 		return false;
 	}
 	return RecvPacketGame();
-	//DWORD recv_flag = 0;
-	//int ret = WSARecv(s_socket, &recv_expover.GetWsaBuf(), 1, NULL, &recv_flag, &recv_expover.GetWsaOver(), recv_Gamecallback);
-	//if (SOCKET_ERROR == ret)
-	//{
-	//	int err = WSAGetLastError();
-	//	if (err != WSA_IO_PENDING)
-	//	{
-	//		//error ! 
-	//		UE_LOG(LogTemp, Error, TEXT("return false"));
-	//		return false;
-	//	}
-	//	else {
-	//		UE_LOG(LogTemp, Error, TEXT("return true"));
-	//		return true;
-	//	}
-	//}
-	return true;
 }
 
 bool Network::ConnectServerLobby()
@@ -479,17 +493,4 @@ bool Network::ConnectServerLobby()
 	}
 
 	return RecvPacketLobby();
-	//DWORD recv_flag = 0;
-	//int ret = WSARecv(l_socket, &l_recv_expover.GetWsaBuf(), 1, NULL, &recv_flag, &l_recv_expover.GetWsaOver(), recv_Lobbycallback);
-	//if (SOCKET_ERROR == ret)
-	//{
-	//	int err = WSAGetLastError();
-	//	if (err != WSA_IO_PENDING)
-	//	{
-	//		int err_num = WSAGetLastError();
-	//		//error ! 
-	//		return false;
-	//	}
-	//}
-	return true;
 }
