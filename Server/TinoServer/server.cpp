@@ -143,18 +143,7 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		DL_LOGIN_OK_PACKET* p = reinterpret_cast<DL_LOGIN_OK_PACKET*>(spacket);
 
 		if (p->connState == TRUE) {
-			int disconnID = -1;
-			for (int i = MAXGAMESERVER; i < MAX_USER; ++i) {
-				mClients[i].mStateLock.lock();
-				if (mClients[i].mUID == p->uid) {
-					disconnID = i;
-					mClients[i].mStateLock.unlock();
-					break;
-				}
-				mClients[i].mStateLock.unlock();
-			}
-			if (disconnID != -1)
-				Disconnect(disconnID);
+			CheckDuplicateLogin(p->uid);
 		}
 
 		mClients[p->userKey].mStateLock.lock();
@@ -651,4 +640,37 @@ void Server::ProcessEvent(unsigned char* cmessage)
 		break;
 	}
 	}
+}
+
+void Server::CheckDuplicateLogin(int uid)
+{
+	int target = -1;
+	for (int i = MAXGAMESERVER; i < MAX_USER; ++i) {
+		mClients[i].mStateLock.lock();
+		if (mClients[i].mUID == uid) {
+			target = i;
+			mClients[i].mStateLock.unlock();
+			break;
+		}
+		mClients[i].mStateLock.unlock();
+	}
+	if (target != -1) {
+		if (mClients[target].mState == eSessionState::ST_INGAME) {
+			SendDiconnectPacketToGameServer(target, uid, mClients[target].mRoomID);
+		}
+		else {
+			Disconnect(target);
+		}
+	}
+}
+
+void Server::SendDiconnectPacketToGameServer(int key, int uid, int roomID)
+{
+	LG_USER_DISCONNECT_PACKET p;
+	p.size = sizeof(p);
+	p.type = LG_USER_DISCONNECT;
+	p.uID = uid;
+	p.roomID = roomID;
+	
+	mClients[key].DoSend(reinterpret_cast<char*>(&p));
 }

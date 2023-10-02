@@ -15,6 +15,8 @@ public:
 
 	void Setm_pDB(DB* pDB) { m_pDB = pDB; }
 
+	DB* Getm_pDB() { return m_pDB; }
+
 	bool CheckLogin(int key, const char* id, const char* password, int userid);
 
 	void SendUserDataAfterLogin(int key, int uid, string& nickname, double credit, int point, int state, int userid);
