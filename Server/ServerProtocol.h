@@ -22,6 +22,7 @@ enum SPacketType {
 
 	// LobbyServer To GameServer
 	LG_USER_INTO_GAME,
+	LG_USER_DISCONNECT,
 
 	// LobbyServer To DBServer
 	LD_LOGIN,
@@ -58,6 +59,11 @@ struct LG_USER_INTO_GAME_PACKET : public SPACKET {
 	int		uID;
 	int		roomID;
 	int		roomMax;	//�� �ִ� �ο�. (4���̼� �� ���� �����ϱ�)
+};
+
+struct LG_USER_DISCONNECT_PACKET : public SPACKET {
+	int		uID;
+	int		roomID;
 };
 
 struct LD_LOGIN_PACKET :public SPACKET {
