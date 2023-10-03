@@ -45,11 +45,12 @@ public:
 	SC_PING_PACKET make_ping_packet();
 	SC_ACTION_ANIM_PACKET make_action_packet(const int playerID, const char action);
 	SC_GAME_END_PACKET make_game_end_packet(const char record);
+	SC_GAME_DOORSYNC_PACKET make_game_doorsync_packet(const int objectID, const long long syncTime);
 
 	//-> 생각해보니 그냥 buffer에 담아서 void*로 보내고 send에서 변환하면 되잖아 ? 바로 진행시켜
 	void SendAllBroadCast(void* buf, const int bufSize);
 	void SendRoomBroadCast(const int roomID, void* buf, const int bufSize);
-	void SendRoomSomeoneExcept(const int roomID, const int exceptID, void* buf, const int bufSize);
+	void SendRoomSomeoneExcept(const int roomID, const int exceptSocketID, void* buf, const int bufSize);
 	void SendMySelf(const int receiverID, void* buf, const int bufSize);
 
 	//남의 정보를 나한테 줄 때는 이 함수를 사용, 대신 이 함수를 쓸 때는 패킷만드는 함수(make_~)를 id 하나로 사용할 수 있게끔 짠다.
@@ -59,6 +60,7 @@ public:
 private:
 	void connectLobbyServer();
 	bool setPlayerInRoom(class Player* player);
+	bool initRoom(const std::string& mapName);
 private:
 	std::array<class Object*, MAX_OBJECT> mObjects;
 	class Server* mLobbyServer;

@@ -1,6 +1,7 @@
 #include "WorkerThread.h"
 #include "../TimerThread/TimerThread.h"
 #include "../../Object/Player/Player.h"
+#include "../../Object/MapObject/MoveObject/M_Door/M_Door.h"
 #include "../../Server/MainServer/MainServer.h"
 #include "../../Network/Network.h"
 #include "../../Server/LobbyServer/LobbyServer.h"
@@ -156,6 +157,27 @@ void WorkerThread::doThread()
 				mMainServer->SendRoomBroadCast(roomID, (void*)&sPacket, sizeof(sPacket));
 				TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_PING, eEventType::TYPE_BROADCAST_ROOM, 1000, NULL, roomID);
 			}
+			break;
+		}
+		case eCOMMAND_IOCP::CMD_GAME_DOORSYNC:
+		{
+			eEventType eventType = TimerThread::DeserializeEventType(wsa_ex->GetBuf());
+			int roomID = TimerThread::DeserializeReceiver(wsa_ex->GetBuf());
+			int roomSyncID = client_id;
+			M_Door* obj = dynamic_cast<M_Door*>(mMainServer->GetRooms()[roomID]->GetObjectsRef()[roomSyncID]);
+			if (!obj)
+			{
+				DEBUGMSGONEPARAM("M_Door Doensn't exit [%d]", roomSyncID);
+				break;
+			}
+			for (Object*& Object : mMainServer->GetRooms()[roomID]->GetObjectsRef())
+			{
+				Player* player = dynamic_cast<Player*>(Object);
+				if (!player) break;
+				auto sPacket = mMainServer->make_game_doorsync_packet(obj->MeasureSyncTime(player->GetPing()), roomSyncID);
+				mMainServer->SendMySelf(player->GetSocketID(), (void*)&sPacket, sizeof(sPacket));
+			}
+			TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_DOORSYNC, eEventType::TYPE_BROADCAST_ROOM, obj->GetWaitTime(), roomSyncID, roomID);
 			break;
 		}
 		}

@@ -2,12 +2,14 @@
 
 Player::Player()
 	:mNickName("")
-	,mDepartment(0.0f)
-	,mEquipment(eEquipmentFlags::None)
-	,mRoomID(INVALID_ROOM_ID)
-	,mPlayerState(ePlayerState::ST_RUNNING)
-	,mUID(-1)
-	,mPing(0)
+	, mDepartment(0.0f)
+	, mEquipment(eEquipmentFlags::None)
+	, mRoomID(INVALID_ROOM_ID)
+	, mRoomSyncID(-1)
+	, mRank(-1)
+	, mPlayerState(ePlayerState::ST_RUNNING)
+	, mUID(-1)
+	, mPing(0)
 {
 }
 

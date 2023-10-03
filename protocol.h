@@ -39,6 +39,7 @@ enum PacketType {
 	SC_GAME_COUNTDOWN_START,
 	SC_PING,
 	SC_ACTION_ANIM,
+	SC_GAME_DOORSYNC,
 
 	// Lobbyserver To Client
 	LC_LOGIN_OK,
@@ -151,6 +152,11 @@ struct SC_ACTION_ANIM_PACKET : public PACKET {
 	// 0 : none, 1 : jump, 2 : dive 
 	char action;		
 	int id;
+};
+
+struct SC_GAME_DOORSYNC_PACKET : public PACKET {
+	long long	syncTime;
+	int			id;
 };
 //---------------------------
 struct LC_LOGIN_OK_PACKET : public PACKET {

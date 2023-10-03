@@ -125,19 +125,20 @@ bool Room::SettingRoomPlayer(const int uID, const std::string id, const int& pla
 	return false;
 }
 
-bool Room::FindPlayerInfo(const int uID, const std::string id)
+int Room::FindPlayerInfo(const int uID, const std::string id)
 {
 	//이 함수는 mPlayerInfo가 다 쓰여진 난 후에, 읽기만 하는 작업이므로 lock을 안걸어놓음
 	//최대 인원이 안들어왔으면 아직 쓰여질 가능성이 있기 때문에 절대 읽으면 안됨
 	//지금은 이럴 경우가 없게 설계해놨지만, 후에 혹시모르는 설계로 안되면 안되니까 assert걸음.
 	if (mPlayerInfo.size() != mPlayerMax)
 		assert(0);
-	if (id == mPlayerInfo.at(uID))
+	auto Iter = mPlayerInfo.find(uID);
+	if (Iter != mPlayerInfo.end())
 	{
-		return true;
+		return std::distance(mPlayerInfo.begin(), Iter);
 	}
 
-	return false;
+	return -1;
 }
 
 void Room::PlayerArrive(Player* player)

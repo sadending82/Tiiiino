@@ -1,3 +1,4 @@
+#include <fstream>
 #include "MainServer.h"
 
 #include "../LobbyServer/LobbyServer.h"
@@ -182,7 +183,7 @@ SC_ADD_PLAYER_PACKET MainServer::make_player_add_packet(const int playerID)
 {
 	Player* player = dynamic_cast<Player*>(mObjects[playerID]);
 	SC_ADD_PLAYER_PACKET sendpacket;
-	sendpacket.id = playerID;
+	sendpacket.id = player->GetRoomSyncID();
 	//strcpy_s(sendpacket.name, character->name);
 	sendpacket.size = sizeof(sendpacket);
 	sendpacket.type = SC_ADD_PLAYER;
@@ -313,6 +314,16 @@ SC_GAME_END_PACKET MainServer::make_game_end_packet(const char record)
 	return packet;
 }
 
+SC_GAME_DOORSYNC_PACKET MainServer::make_game_doorsync_packet(const int objectID, const long long syncTime)
+{
+	SC_GAME_DOORSYNC_PACKET packet{};
+	packet.size = sizeof(packet);
+	packet.type = SC_GAME_DOORSYNC;
+	packet.id = objectID;
+	packet.syncTime = syncTime;
+	return packet;
+}
+
 void MainServer::SendAllBroadCast(void* buf, const int bufSize)
 {
 	for (auto& other : mObjects) {
@@ -356,13 +367,13 @@ void MainServer::SendRoomBroadCast(const int roomID, void* buf, const int bufSiz
 }
 
 
-void MainServer::SendRoomSomeoneExcept(const int roomID, const int exceptID, void* buf, const int bufSize)
+void MainServer::SendRoomSomeoneExcept(const int roomID, const int exceptSocketID, void* buf, const int bufSize)
 {
 	Room* pRoom = mRooms[roomID];
 	for (auto& other : pRoom->GetObjectsRef()) {
 		Player* OtherPlayer = dynamic_cast<Player*>(other);
 		if (OtherPlayer == nullptr) break;
-		if (OtherPlayer->GetSocketID() == exceptID)continue; // 제외해줄 ID
+		if (OtherPlayer->GetSocketID() == exceptSocketID)continue; // 제외해줄 ID
 		if (OtherPlayer->GetSocketID() == INVALID_SOCKET_ID) continue;
 		OtherPlayer->GetStateLockRef().lock();
 		if (eSocketState::ST_INGAME == OtherPlayer->GetSocketState()) {
@@ -420,14 +431,27 @@ bool MainServer::setPlayerInRoom(Player* player)
 		auto& room = tRoom.second;
 		if (room->IsRoomReadyComplete())
 		{
-			if (room->FindPlayerInfo(player->GetUID(), player->GetID()))
+			int result = room->FindPlayerInfo(player->GetUID(), player->GetID());
+			if (0 <= result)
 			{
+				player->SetRoomSyncID(result);
 				player->SetRoomID(tRoom.first);
 				return true;
 			}
 		}
 	}
 	DEBUGMSGONEPARAM("플레이어와 방 매칭 도중 버그가 발생함[%d]번째플레이어", player->GetUID());
+	return false;
+}
+
+bool MainServer::initRoom(const std::string& mapName)
+{
+	std::ifstream is{ mapName };
+	if (!is.is_open())
+	{
+		DEBUGMSGONEPARAM("[%s]읽기 실패", mapName.c_str());
+	}
+	
 	return false;
 }
 
@@ -472,7 +496,7 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 		Room* pRoom = mRooms[player->GetRoomID()];
 		pRoom->AddObject(player);
 		{
-			SC_LOGIN_OK_PACKET sPacket = make_login_ok_packet(client_id, "none");
+			SC_LOGIN_OK_PACKET sPacket = make_login_ok_packet(player->GetRoomSyncID(), "none");
 			SendMySelf(client_id, (void*)&sPacket, sizeof(sPacket));
 			//send_login_ok_packet(client_id, "none");
 		}
@@ -484,8 +508,8 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 
 		//나를 상대에게
 		{
-			auto spacket = make_player_add_packet(client_id);
-			SendRoomSomeoneExcept(player->GetRoomID(), client_id, (void*)&spacket, sizeof(spacket));
+			auto spacket = make_player_add_packet(player->GetRoomSyncID());
+			SendRoomSomeoneExcept(player->GetRoomID(), player->GetSocketID(), (void*)&spacket, sizeof(spacket));
 		}
 
 		//방안의 모든 플레이어 정보를 나에게로
@@ -511,7 +535,7 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 		player->SetRotate(Vector4f(packet->rx, packet->ry, packet->rz, packet->rw));
 
 		{
-			auto sPacket = make_move_packet(player->GetSocketID(), packet->inair, packet->speed, packet->sx, packet->sy, packet->sz);
+			auto sPacket = make_move_packet(player->GetRoomSyncID(), packet->inair, packet->speed, packet->sx, packet->sy, packet->sz);
 			SendRoomBroadCast(player->GetRoomID(), (void*)&sPacket, sizeof(sPacket));
 		}
 		break;
@@ -535,7 +559,7 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 		DEBUGMSGONEPARAM("player Num[%d] Arrive Complete\n", player->GetSocketID());
 
 		{
-			auto sPacket = make_player_arrive_packet(player->GetSocketID());
+			auto sPacket = make_player_arrive_packet(player->GetRoomSyncID());
 			SendRoomSomeoneExcept(player->GetRoomID(), player->GetSocketID(), (void*)&sPacket, sizeof(sPacket));
 		}
 		break;
@@ -564,7 +588,7 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 		}
 
 		{
-			auto sPacket = make_action_packet(player->GetSocketID(), packet->action);
+			auto sPacket = make_action_packet(player->GetRoomSyncID(), packet->action);
 			SendRoomSomeoneExcept(player->GetRoomID(), player->GetSocketID(), (void*)&sPacket, sizeof(sPacket));
 		}
 

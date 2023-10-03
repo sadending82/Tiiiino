@@ -14,6 +14,9 @@ public:
 
     int GetRoomID() const { return mRoomID; }
     void SetRoomID(int roomID) { mRoomID = roomID; }
+    //client using this for own identify key
+    int GetRoomSyncID() const { return mRoomSyncID; }
+    void SetRoomSyncID(int roomSyncID) { mRoomSyncID = roomSyncID; }
 
     int GetRank() const { return mRank; }
     void SetRank(int rank) { mRank = rank; }
@@ -43,9 +46,12 @@ protected:
     eEquipmentFlags mEquipment;
     std::mutex      mPlayerStateLock;
     ePlayerState    mPlayerState;
-    int mRoomID;
+    int mRoomID;    // room number, check own mRooms[mRoomID]
+    //client using this for own identify key
+    // in room number, client use "Othercharacter[mRoomSyncID]"
+    int mRoomSyncID;
     int mRank;    //몇등?
-    int mUID;       //DB에서 부여해주는 ID
+    int mUID;       //DB에서 부여해주는 ID use for game result 
     long long mPing;    //milliseconds
 };
 

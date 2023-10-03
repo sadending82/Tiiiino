@@ -288,9 +288,11 @@ void Network::process_packet(unsigned char* p)
 			switch (packet->action)
 			{
 			case 1:
+				mOtherCharacter[id]->Jump();
 				//점프
 				break;
 			case 2:
+				mOtherCharacter[id]->Dive();
 				//다이브
 				break;
 			default:

@@ -28,7 +28,7 @@ public:
 	bool IsRoomReadyComplete();
 
 	bool SettingRoomPlayer(const int uID, const std::string id, const int& playerMaxNum);
-	bool FindPlayerInfo(const int uID, const std::string id);
+	int FindPlayerInfo(const int uID, const std::string id);
 	
 	void PlayerArrive(Player* player);
 	//Object order
