@@ -306,7 +306,7 @@ SC_ACTION_ANIM_PACKET MainServer::make_action_packet(const int playerID, const c
 	return packet;
 }
 
-SC_GAME_END_PACKET MainServer::make_game_end_packet(const char record)
+SC_GAME_END_PACKET MainServer::make_game_end_packet()
 {
 	SC_GAME_END_PACKET packet{};
 	packet.size = sizeof(packet);

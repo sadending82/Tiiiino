@@ -44,7 +44,7 @@ public:
 	SC_GAME_COUNTDOWN_START_PACKET make_game_countdown_start_packet();
 	SC_PING_PACKET make_ping_packet();
 	SC_ACTION_ANIM_PACKET make_action_packet(const int playerID, const char action);
-	SC_GAME_END_PACKET make_game_end_packet(const char record);
+	SC_GAME_END_PACKET make_game_end_packet();
 	SC_GAME_DOORSYNC_PACKET make_game_doorsync_packet(const int objectID, const long long syncTime);
 
 	//-> 생각해보니 그냥 buffer에 담아서 void*로 보내고 send에서 변환하면 되잖아 ? 바로 진행시켜

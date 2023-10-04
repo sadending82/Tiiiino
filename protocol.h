@@ -141,7 +141,7 @@ struct SC_GAME_COUNTDOWN_START_PACKET : public PACKET
 };
 
 struct SC_GAME_END_PACKET : public PACKET {
-	char	record;		//성공 실패
+	//char	record;		//성공 실패
 };
 
 struct SC_PING_PACKET : public PACKET {

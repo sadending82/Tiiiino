@@ -130,7 +130,7 @@ void WorkerThread::doThread()
 			DEBUGMSGNOPARAM("한번만 오는지 GAME END\n");
 			int roomID = TimerThread::DeserializeReceiver(wsa_ex->GetBuf());
 			{
-				auto sPacket = mMainServer->make_game_end_packet(0);
+				auto sPacket = mMainServer->make_game_end_packet();	//판정은 클라가 알아서.
 				mMainServer->SendRoomBroadCast(roomID, (void*)&sPacket, sizeof(sPacket));
 			}
 			break;
@@ -177,7 +177,8 @@ void WorkerThread::doThread()
 				auto sPacket = mMainServer->make_game_doorsync_packet(obj->MeasureSyncTime(player->GetPing()), roomSyncID);
 				mMainServer->SendMySelf(player->GetSocketID(), (void*)&sPacket, sizeof(sPacket));
 			}
-			TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_DOORSYNC, eEventType::TYPE_BROADCAST_ROOM, obj->GetWaitTime(), roomSyncID, roomID);
+			obj->Setting();
+			TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_DOORSYNC, eEventType::TYPE_BROADCAST_ROOM, obj->GetWaitMilliTime(), roomSyncID, roomID);
 			break;
 		}
 		}
