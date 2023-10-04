@@ -5,18 +5,20 @@
 #include "../Object/MapObject/MapObject.h"
 #include "../Thread/TimerThread/TimerThread.h"
 
-Room::Room()
+Room::Room(int id)
 	: mRoomStageKindof(eRoomStage::ST_AVOID)
-	,mObjects()
+	, mObjects()
 	, mPlayerInfo()
 	, mPlayerCnt(0)
 	, mPlayerMax(0)
 	, mRoomState(eRoomState::ST_FREE)
 	, mPlayerArrivedCnt(0)
 	, mGameEndTimer(false)
+	, mRoomID(id)
 {
 
 }
+
 
 Room::~Room()
 {
@@ -68,6 +70,13 @@ void Room::ResetGameRoom()
 	{
 		object = nullptr;
 	}
+	mRoomStageKindof = eRoomStage::ST_AVOID;
+	mPlayerInfo.clear();
+	mPlayerCnt = 0;
+	mPlayerMax = 0;
+	mRoomState = eRoomState::ST_FREE;
+	mPlayerArrivedCnt = 0;
+	mGameEndTimer = false;
 }
 
 
@@ -108,7 +117,7 @@ bool Room::IsRoomReady()
 bool Room::SettingRoomPlayer(const int uID, const std::string id, const int& playerMaxNum)
 {
 	int playerCnt = -1;
-	setPlayerInfoWithCnt(uID,id, playerMaxNum, playerCnt);
+	setPlayerInfoWithCnt(uID, id, playerMaxNum, playerCnt);
 	if (playerCnt == playerMaxNum)
 	{
 		mRoomStateLock.lock();
@@ -203,7 +212,7 @@ void Room::setPlayerInfo(const int uID, const std::string id, const int& playerM
 		mPlayerInfoLock.unlock();
 		return;
 	}
-	mPlayerInfo.insert(std::make_pair(uID,id));
+	mPlayerInfo.insert(std::make_pair(uID, id));
 	mPlayerCnt++;
 	mPlayerInfoLock.unlock();
 
@@ -219,7 +228,7 @@ void Room::setPlayerInfoWithCnt(const int uID, const std::string id, const int& 
 		mPlayerInfoLock.unlock();
 		return;
 	}
-	mPlayerInfo.insert(std::make_pair(uID,id));
+	mPlayerInfo.insert(std::make_pair(uID, id));
 	mPlayerCnt++;
 	playerCnt = mPlayerCnt;
 	mPlayerInfoLock.unlock();
@@ -231,6 +240,7 @@ void Room::setGameEndTimerStartOnce()
 	if (std::atomic_compare_exchange_strong(reinterpret_cast<std::atomic_bool*>(&mGameEndTimer), 0, 1))
 	{
 		DEBUGMSGNOPARAM("한 번 실행되야함");
-		TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_END, eEventType::TYPE_BROADCAST_ROOM, 2000, 1, 1);
+
+		TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_COUNTDOWN_START, eEventType::TYPE_BROADCAST_ROOM, 0, NULL, mRoomID);
 	}
 }

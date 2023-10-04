@@ -189,6 +189,15 @@ void send_ping_packet(SOCKET& sock, const long long ping)
 	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
 }
 
+void send_goal_packet(SOCKET& sock)
+{
+	CS_GOAL_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_GOAL;
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+}
+
 
 
 
@@ -297,7 +306,7 @@ void Network::process_packet(unsigned char* p)
 				break;
 			default:
 				break;
-			}			
+			}
 		}
 		break;
 	}
@@ -306,7 +315,28 @@ void Network::process_packet(unsigned char* p)
 		closesocket(s_socket);
 		UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("Lobby"));
 		bLevelOpenTriggerEnabled = true;
-		packet->record; // << 이걸로 성공/실패 ui 띄우기.
+		//packet->record; // << 이걸로 성공/실패 ui 띄우기.
+
+		break;
+	}
+	case SC_PLAYER_ARRIVE:
+	{
+		SC_PLAYER_ARRIVE_PACKET* packet = reinterpret_cast<SC_PLAYER_ARRIVE_PACKET*>(p);
+		if (nullptr != mOtherCharacter[packet->id])
+		{
+			mOtherCharacter[packet->id]->SetActorEnableCollision(false);
+			mOtherCharacter[packet->id]->SetActorHiddenInGame(true);
+			//
+			//UI에 도착한 인원 +1 Update
+			//
+		}
+		break;
+	}
+	case SC_GAME_COUNTDOWN_START:
+	{
+		SC_GAME_COUNTDOWN_START_PACKET* packet = reinterpret_cast<SC_GAME_COUNTDOWN_START_PACKET*>(p);
+
+		//카운트다운 UI 띄우기 (Appear CountDown UI)
 
 		break;
 	}

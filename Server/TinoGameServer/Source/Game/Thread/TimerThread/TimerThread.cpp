@@ -52,7 +52,6 @@ void TimerThread::doThread()
 
 				if (execEvent.execTime > chrono::system_clock::now() + 100ms)
 				{// 기다려야 하는 시간이 0.1초이상이라면 다른 더 중요한게 이 사이에 들어올 수 있으므로. 0.1초정도만 기다려줌. 그리고 다시 넣음.
-					//원래 1초였는데... 두리안 공격시간을 0.1초로 수정해주기 위해 이것도 자연스럽게... 줄어들음 ,,,
 					gTimerQueue.push(execEvent);
 					this_thread::sleep_for(100ms);
 				}

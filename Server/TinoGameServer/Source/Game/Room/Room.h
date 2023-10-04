@@ -12,7 +12,7 @@ class MapObject;
 class Room
 {
 public:
-	Room();
+	Room(int id);
 	~Room();
 
 	void Init();
@@ -56,9 +56,10 @@ protected:
 
 	std::mutex mRoomStateLock;
 	eRoomState mRoomState;
+	int	mRoomID;	//방 ID
 	int mPlayerCnt;	//현재 방에 player가 몇명 들어왔는지.
 	int mPlayerMax;	//방 최대 인원
-	bool mGameEndTimer;
+	bool mGameEndTimer;	//The Room Game is Over (Using CAS)
 
 	eRoomStage mRoomStageKindof;	//나중에 생길지 모르는 종류별 스테이지 대비용.
 
