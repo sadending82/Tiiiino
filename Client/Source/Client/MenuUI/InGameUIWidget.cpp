@@ -2,7 +2,7 @@
 
 
 #include "MenuUI/InGameUIWidget.h"
-
+#include "Components/EditableTextBox.h"
 
 void UInGameUIWidget::NativePreConstruct()
 {
@@ -21,4 +21,10 @@ void UInGameUIWidget::RankImageSwitcher()
 void UInGameUIWidget::SetGameTime(int32 GameTime)
 {
 	RestGameTime = GameTime;
+	
+}
+
+void UInGameUIWidget::EndGameTime()
+{
+
 }

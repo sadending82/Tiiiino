@@ -21,6 +21,14 @@ void ULobbyUIWidget::TryGameStart()
 
 }
 
+void ULobbyUIWidget::TryGameReady()
+{
+}
+
+void ULobbyUIWidget::TryGameReadyCancel()
+{
+}
+
 void ULobbyUIWidget::TryBack()
 {
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));

@@ -4,35 +4,39 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "LobbyUIWidget.generated.h"
+#include "FinishGameUIWidget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class CLIENT_API ULobbyUIWidget : public UUserWidget
+class CLIENT_API UFinishGameUIWidget : public UUserWidget
 {
 	GENERATED_BODY()
+
 public:
 	virtual void NativePreConstruct() override;
 	virtual void NativeDestruct() override;
 
 	UPROPERTY(meta = (BindWidget))
-	class UButton* GameStartButton;
+	class UButton* EnterLobbyButton;
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	void TryGameStart();
+	void EnterLobby();
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	void TryGameReady();
+	bool CheckResult() { return bCheckResult; }
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	void TryGameReadyCancel();
-
-	UPROPERTY(meta = (BindWidget))
-	class UButton* BackButton;
+	void SetCheckResult(bool bcheckresult);
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	void TryBack();
+	void SuccessGame();
 
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void FailedGame();
+
+private:
+	UPROPERTY(EditAnywhere, Category = "UMG_Game")
+	bool bCheckResult;
 };

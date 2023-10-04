@@ -20,13 +20,16 @@ public:
 	virtual void NativeDestruct() override;
 
 	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* GameTimeText;
+	class UEditableText* GameTimeText;
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void RankImageSwitcher();
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void SetGameTime(int32 GameTime);
+
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void EndGameTime();
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	int32 GetGameTime() { return RestGameTime; }
