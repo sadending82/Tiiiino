@@ -4,6 +4,7 @@
 #include "Actor/Obstacles/RotatingPole.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/Character.h"
+#include "Global.h"
 
 // Sets default values
 ARotatingPole::ARotatingPole()
@@ -28,7 +29,14 @@ void ARotatingPole::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimi
 
 	if (hitCharacter != nullptr)
 	{
-		hitCharacter->LaunchCharacter(-HitNormal * ElasticForce, false, false);
+		//혹시 밑으로 발사해서 문제인건가?
+		
+		//hitCharacter->LaunchCharacter(-HitNormal * ElasticForce, false, false);
+		
+		CLog::Log("Hit");
+
+		hitCharacter->LaunchCharacter(FVector(-HitNormal.X, -HitNormal.Y, fabs(HitNormal.Z))*ElasticForce, false, false);
+		
 	}
 }
 
