@@ -24,6 +24,9 @@ public:
 	
 	void CreateDummy();
 
+	void SetInputUIMode();
+	void SetInputGameMode();
+
 	//APlayerController* GetController();
 	TSubclassOf<UUserWidget> GetLobbyWidgetClass() const { return LobbyWidgetClass; }
 	TSubclassOf<UUserWidget> GetLoginWidgetClass() const { return StartingWidgetClass; }

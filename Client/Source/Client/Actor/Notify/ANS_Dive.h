@@ -22,15 +22,17 @@ private:
 	virtual void NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, 
 		float TotalDuration, const FAnimNotifyEventReference& EventReference) override;
 	
-	virtual void NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,
-		float FrameDeltaTime, const FAnimNotifyEventReference& EventReference) override;
-
 	virtual void NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, 
 		const FAnimNotifyEventReference& EventReference)override;
 
 private:
 
-	UPROPERTY(EditAnywhere,Category = "Speed")
+	UPROPERTY(EditAnywhere,Category = "DiveSetting")
 		float DiveSpeed;
+	UPROPERTY(EditAnywhere, Category = "DiveSetting")
+		float DiveSpeedZ;
+	UPROPERTY(EditAnywhere, Category = "DiveSetting")
+		float ChangeTumbleTime;
 
+		float OriginalTumbleTime;
 };

@@ -10,11 +10,11 @@
 #include "Animation/AnimMontage.h"
 
 ATinoCharacter::ATinoCharacter()
-	:MaxTumbledTime(0.5f),
+	:MaxTumbledTime(1.0f),
 	MovementState(EMovementState::EMS_Normal)
 {
 	PrimaryActorTick.bCanEverTick = true;
-	UHelpers::CreateComponent<USpringArmComponent>(this, &SpringArm, "SpringArm",GetCapsuleComponent());
+	UHelpers::CreateComponent<USpringArmComponent>(this, &SpringArm, "SpringArm", GetCapsuleComponent());
 	UHelpers::CreateComponent<UCameraComponent>(this, &Camera, "Camera", SpringArm);
 
 	bUseControllerRotationYaw = false;
@@ -37,7 +37,7 @@ void ATinoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction("CreateDummy", EInputEvent::IE_Pressed, this, &ATinoCharacter::CreateDummy);
 	PlayerInputComponent->BindAction("Align", EInputEvent::IE_Pressed, this, &ATinoCharacter::Align);
 	PlayerInputComponent->BindAction("Jump", EInputEvent::IE_Pressed, this, &ATinoCharacter::Jump);
-	PlayerInputComponent->BindAction("Jump", EInputEvent::IE_Released, this, &ATinoCharacter::StopJumping);
+	//PlayerInputComponent->BindAction("Jump", EInputEvent::IE_Released, this, &ATinoCharacter::StopJumping);
 	PlayerInputComponent->BindAction("Dive", EInputEvent::IE_Pressed, this, &ATinoCharacter::Dive);
 }
 
@@ -45,15 +45,19 @@ void ATinoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 void ATinoCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	if (GetController()->IsPlayerController())
+	if (!!GetController())
 	{
-	}
-	else
-	{
+		if (GetController()->IsPlayerController())
+		{
+		}
+		else
+		{
 			GetCharacterMovement()->BrakingDecelerationWalking = 0;
 			GetCharacterMovement()->BrakingFrictionFactor = 0;
 			GetCharacterMovement()->GravityScale = 0.0;
+		}
 	}
+
 }
 
 void ATinoCharacter::EndPlay(EEndPlayReason::Type Reason)
@@ -74,28 +78,38 @@ void ATinoCharacter::Tick(float DeltaTime)
 		float PitchClamp = FMath::ClampAngle(Rotation.Pitch, -45.f, 30.f);
 		FRotator RotationControl(PitchClamp, Rotation.Yaw, Rotation.Roll);
 		SleepEx(0, true);
-		if (GetController()->IsPlayerController() && Network::GetNetwork()->bIsConnected) {
-			
-			auto pos = GetTransform().GetLocation();
-			auto rot = GetTransform().GetRotation();
 
-			ServerSyncElapsedTime += DeltaTime;
-			if (ServerSyncDeltaTime < ServerSyncElapsedTime)
-			{
-				send_move_packet(Network::GetNetwork()->s_socket,GetCharacterMovement()->IsFalling(), pos.X, pos.Y, pos.Z, rot, GetVelocity().Size2D(), GetCharacterMovement()->Velocity);
-				ServerSyncElapsedTime = 0.0f;
+		if (Network::GetNetwork()->bIsConnected)
+		{
+			if (GetController()->IsPlayerController()) {
+
+				auto pos = GetTransform().GetLocation();
+				auto rot = GetTransform().GetRotation();
+
+				ServerSyncElapsedTime += DeltaTime;
+				if (ServerSyncDeltaTime < ServerSyncElapsedTime)
+				{
+					send_move_packet(Network::GetNetwork()->s_socket, GetCharacterMovement()->IsFalling(), pos.X, pos.Y, pos.Z, rot, GetVelocity().Size2D(), GetCharacterMovement()->Velocity);
+					ServerSyncElapsedTime = 0.0f;
+				}
+
+				float CharXYVelocity = ((ACharacter::GetCharacterMovement()->Velocity) * FVector(1.f, 1.f, 0.f)).Size();
+
 			}
-
-			float CharXYVelocity = ((ACharacter::GetCharacterMovement()->Velocity) * FVector(1.f, 1.f, 0.f)).Size();
-
-			
+			else {
+				//서버랑 연결 돼 있을 때만 상대 캐릭터 보간하려 시도. 
+				//Update GroundSpeedd (22-04-05)
+				//GroundSpeedd = ServerStoreGroundSpeed;
+				//Update Interpolation (23-09-27)
+				GetCharacterMovement()->Velocity = ServerCharMovingSpeed;
+			}
 		}
-		else {
-			//Update GroundSpeedd (22-04-05)
-			//GroundSpeedd = ServerStoreGroundSpeed;
-			//Update Interpolation (22-11-25)
-			//GetCharacterMovement()->Velocity = CharMovingSpeed;
-		}
+
+
+		// 10/04 가만히 있을 때 충돌하지 않는 부분을 해결하기 위한 코드 추가
+		FHitResult OutHit;
+		GetCharacterMovement()->SafeMoveUpdatedComponent(FVector(0.f, 0.f, 0.01f), GetActorRotation(), true, OutHit);
+		GetCharacterMovement()->SafeMoveUpdatedComponent(FVector(0.f, 0.f, -0.01f), GetActorRotation(), true, OutHit);
 
 	}
 }
@@ -104,7 +118,7 @@ bool ATinoCharacter::CanTumble(float DeltaTime)
 	bool ret = true;
 
 	ret &= GetCharacterMovement()->IsFalling();
-	ret &= (GetVelocity().Z < 0);
+	//ret &= (GetVelocity().Z != FMath::IsNearlyZero());
 	
 	if (ret && MaxTumbledTime > CurrentTumbledTime) CurrentTumbledTime += DeltaTime;
 	bCanTumbled = (CurrentTumbledTime >= MaxTumbledTime);
@@ -139,10 +153,23 @@ void ATinoCharacter::Align()
 	GetController()->SetControlRotation(GetActorForwardVector().Rotation());
 }
 
+void ATinoCharacter::DiveBegin()
+{
+}
+
+void ATinoCharacter::DiveEnd()
+{
+	bIsDiving = false;
+}
+
 void ATinoCharacter::Dive()
 {
-	if(DiveMontage)
+	if (DiveMontage && CanDive())
+	{
+		bIsDiving = true;
 		PlayAnimMontage(DiveMontage);
+		send_action_packet(Network::GetNetwork()->s_socket,2);
+	}
 }
 
 void ATinoCharacter::OnMoveForward(float Axis)
@@ -154,7 +181,7 @@ void ATinoCharacter::OnMoveForward(float Axis)
 
 		AddMovementInput(dir, Axis);
 	}
-	
+
 }
 
 void ATinoCharacter::OnMoveRight(float Axis)
@@ -166,7 +193,7 @@ void ATinoCharacter::OnMoveRight(float Axis)
 
 		AddMovementInput(dir, Axis);
 	}
-	
+
 }
 
 void ATinoCharacter::OnHorizonLock(float Axis)
@@ -186,15 +213,18 @@ void ATinoCharacter::CreateDummy()
 
 void ATinoCharacter::Jump()
 {
-	Super::Jump();
-	SetMovementState(EMovementState::EMS_Up);
+	if (CanMove()  && GetCharacterMovement()->IsFalling() == false)
+	{
+		Super::Jump();
+		send_action_packet(Network::GetNetwork()->s_socket,1);
+	}
+	
 }
 
 void ATinoCharacter::StopJumping()
 {
 	Super::StopJumping();
 	SetMovementState(EMovementState::EMS_Normal);
-
 }
 
 void ATinoCharacter::PlayTumbleMontage()
@@ -225,6 +255,24 @@ bool ATinoCharacter::CanMove()
 	default:
 		ret = false;
 	}
+	return ret;
+}
+
+bool ATinoCharacter::CanDive()
+{
+	bool ret = false;
+
+	switch (MovementState)
+	{
+	case EMovementState::EMS_Normal:
+	case EMovementState::EMS_Fall:
+		ret = true;
+		break;
+	default:
+		ret = false;
+		break;
+	}
+	ret &= (bIsDiving == false);
 	return ret;
 }
 

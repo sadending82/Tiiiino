@@ -5,7 +5,7 @@ class Server : public Network
 {
 public:
 	Server();
-	~Server();
+	virtual ~Server();
 
 private:
 

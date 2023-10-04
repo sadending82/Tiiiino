@@ -1,10 +1,15 @@
 #include "Player.h"
 
 Player::Player()
-	:mNickName(L"")
-	,mDepartment(0.0f)
-	,mItem(eItemFlags::None)
-	,mRoomID(INVALID_ROOM_ID)
+	:mNickName("")
+	, mDepartment(0.0f)
+	, mEquipment(eEquipmentFlags::None)
+	, mRoomID(INVALID_ROOM_ID)
+	, mRoomSyncID(-1)
+	, mRank(-1)
+	, mPlayerState(ePlayerState::ST_RUNNING)
+	, mUID(-1)
+	, mPing(0)
 {
 }
 
@@ -25,3 +30,43 @@ bool Player::CanMakeID()
 	mStateLock.unlock();
 	return false;
 }
+
+bool Player::IsPlayerArrived()
+{
+	mPlayerStateLock.lock();
+	if (mPlayerState == ePlayerState::ST_ARRIVED)
+	{
+		mPlayerStateLock.unlock();
+		return true;
+	}
+	mPlayerStateLock.unlock();
+	return false;
+}
+
+bool Player::CanPlayerArrive()
+{
+	mPlayerStateLock.lock();
+	if (mPlayerState == ePlayerState::ST_RUNNING)
+	{
+		ChangePlayerState(ePlayerState::ST_ARRIVED);
+		mPlayerStateLock.unlock();
+		return true;
+	}
+	mPlayerStateLock.unlock();
+	return false;
+}
+
+void Player::ChangePlayerState(const ePlayerState playerState)
+{
+	mPlayerState = playerState;
+}
+
+//void Player::PlayerArrive(int rank)
+//{
+//	mPlayerStateLock.lock();
+//	if (mPlayerState == ePlayerState::ST_RUNNING)
+//	{
+//		mPlayerState = ePlayerState::ST_ARRIVED;
+//	}
+//	mPlayerStateLock.unlock();
+//}

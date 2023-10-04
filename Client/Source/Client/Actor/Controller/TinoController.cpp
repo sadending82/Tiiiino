@@ -1,6 +1,7 @@
 #include "Actor/Controller/TinoController.h"
 #include "Actor/Character/TinoCharacter.h"
 #include "GameFramework/PlayerController.h"
+#include "Network/Network.h"
 #include "Global.h"
 
 ATinoController::ATinoController()
@@ -14,7 +15,13 @@ void ATinoController::BeginPlay()
 	Super::BeginPlay();
 	if (StartingWidgetClass != nullptr && UGameplayStatics::GetCurrentLevelName(GetWorld()) == "Lobby")
 	{
-		ChangeMenuWidget(StartingWidgetClass);
+		if (false == Network::GetNetwork()->bIsConnectedLobby)
+		{
+			ChangeMenuWidget(StartingWidgetClass);
+		}
+		else {
+			SetInputUIMode();
+		}
 	}
 	ChangeMenuWidget(StartingWidgetClass);
 }
@@ -52,4 +59,18 @@ void ATinoController::CreateDummy()
 			DummyArray.Add(Dummy);
 		}
 	}
+}
+
+void ATinoController::SetInputUIMode()
+{
+	FInputModeUIOnly LobbyInputMode;
+	SetInputMode(LobbyInputMode);
+	SetShowMouseCursor(true);
+}
+
+void ATinoController::SetInputGameMode()
+{
+	FInputModeGameOnly GameInputMode;
+	SetInputMode(GameInputMode);
+	SetShowMouseCursor(false);
 }

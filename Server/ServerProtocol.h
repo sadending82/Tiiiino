@@ -22,9 +22,11 @@ enum SPacketType {
 
 	// LobbyServer To GameServer
 	LG_USER_INTO_GAME,
+	LG_USER_DISCONNECT,
 
 	// LobbyServer To DBServer
 	LD_LOGIN,
+	LD_SIGNUP,
 
 	// DBServer To LobbyServer
 	DL_LOGIN_OK,
@@ -53,29 +55,42 @@ struct LG_LOGIN_OK_PACKET : public SPACKET {
 
 };
 struct LG_USER_INTO_GAME_PACKET : public SPACKET {
+	char	id[MAX_NAME_SIZE];	//player id Not UID
 	char	name[MAX_NAME_SIZE];
 	int		uID;
 	int		roomID;
-	int		roomMax;	//¹æ ÃÖ´ë ÀÎ¿ø. (4¸íÀÌ¼­ ÇÒ ¼öµµ ÀÖÀ¸´Ï±î)
+	int		roomMax;	//ï¿½ï¿½ ï¿½Ö´ï¿½ ï¿½Î¿ï¿½. (4ï¿½ï¿½ï¿½Ì¼ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï±ï¿½)
+};
+
+struct LG_USER_DISCONNECT_PACKET : public SPACKET {
+	int		uID;
+	int		roomID;
 };
 
 struct LD_LOGIN_PACKET :public SPACKET {
 	char	id[MAX_NAME_SIZE];
 	char	password[MAX_NAME_SIZE];
-	int		user_id;
+	int		userKey;
+};
+
+struct LD_SIGNUP_PACKET :public SPACKET {
+	char	id[MAX_NAME_SIZE];
+	char	password[MAX_NAME_SIZE];
 };
 
 struct DL_LOGIN_OK_PACKET :public SPACKET {
 	int		uid;
+	char	id[MAX_NAME_SIZE];
 	char	nickname[MAX_NAME_SIZE];
 	double	credit;
 	int		point;
-	int		user_id;
+	int		userKey;
+	double	tier;
 	bool	connState;
 };
 
 struct DL_LOGIN_FAIL_PACKET :public SPACKET {
-	int		user_id;
+	int		userKey;
 };
 
 #pragma pack (pop)

@@ -4,7 +4,7 @@
 #include "Actor/Level/CustomLevel_Test.h"
 #include "Network/Network.h"
 #include "Actor/Character/TinoCharacter.h"
-
+#include "Actor/Controller/TinoController.h"
 #include "Global.h"
 
 
@@ -58,10 +58,8 @@ bool ACustomLevel_Test::ConnGameServer()
 			CLog::Log("Connect Successfully");
 			send_movetogame_packet(Network::GetNetwork()->s_socket,Network::GetNetwork()->mDBUID,
 				TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterName), 0);
-			FInputModeGameOnly GameInputMode;
-			auto controller = GetWorld()->GetFirstPlayerController();
-			controller->SetInputMode(GameInputMode);
-			controller->SetShowMouseCursor(false);
+
+			GetWorld()->GetFirstPlayerController<ATinoController>()->SetInputGameMode();
 			
 			return true;
 		}
@@ -77,26 +75,25 @@ bool ACustomLevel_Test::ConnLobbyServer()
 {
 	auto player = Network::GetNetwork()->mMyCharacter;
 	if (nullptr == player) return false;
+	//이미 연결 되어있다면,
+	if (true == Network::GetNetwork()->bIsConnectedLobby)
+	{
+		auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+		if (TinoController == nullptr)
+		{
+			CLog::Log("TinoController is nullptr, Connect Lobby Against Is Fail");
+		}
+		else {
+			TinoController->ChangeMenuWidget(TinoController->GetLobbyWidgetClass());
+			CLog::Log("Connect Lobby Against Successfully");
+		}
+		return true;
+	}
+
 
 	if (true == Network::GetNetwork()->ConnectServerLobby())
 	{
-		FInputModeUIOnly LobbyInputMode;
-		auto Controller = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-		Controller->SetInputMode(LobbyInputMode);
-		Controller->bShowMouseCursor = true;
-		if (false == Network::GetNetwork()->bLoginFlag)
-		{
-
-			//send_login_packet(Network::GetNetwork()->l_socket, "dd", "Dd");
-			//player->ShowLoginHUD();
-		}
-		else
-		{
-			//const char* tmpid = TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterName);
-			//const char* tmppass = TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterPassWord);
-			//if (nullptr != Network::GetNetwork()->mMyCharacter)
-			//	send_login_lobby_packet(Network::GetNetwork()->mMyCharacter->l_socket, tmpid, tmppass);
-		}
+		GetWorld()->GetFirstPlayerController<ATinoController>()->SetInputUIMode();
 		CLog::Log("Connect Lobby Successfully");
 		return true;
 	}

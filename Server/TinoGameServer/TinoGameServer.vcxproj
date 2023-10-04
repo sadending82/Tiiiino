@@ -154,6 +154,7 @@
     <ClCompile Include="Source\Game\main.cpp" />
     <ClCompile Include="Source\Game\Thread\WorkerThread\WorkerThread.cpp" />
     <ClCompile Include="Source\Game\Thread\TinoThread.cpp" />
+    <ClCompile Include="Source\Game\Thread\TimerThread\TimerThread.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Game\Server\LobbyServer\LobbyServer.h" />
@@ -171,6 +172,7 @@
     <ClInclude Include="Source\Game\Object\Object.h" />
     <ClInclude Include="Source\Game\Thread\WorkerThread\WorkerThread.h" />
     <ClInclude Include="Source\Game\Thread\TinoThread.h" />
+    <ClInclude Include="Source\Game\Thread\TimerThread\TimerThread.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

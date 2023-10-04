@@ -33,3 +33,5 @@ constexpr int INVALIDKEY = -1;
 constexpr int BUFSIZE = 200;
 
 constexpr int STARTKEY = 1;
+
+constexpr int SALT_LENGTH = 10;
