@@ -16,9 +16,16 @@ public:
 	void DoWorker();
 	void Init();
 	void ProcessEvent(unsigned char* cmessage);
+
+	void CheckDuplicateLogin(int uid);
+
+	void SendDiconnectPacketToGameServer(int key, int uid, int roomID);
 public:
 	array <Session, MAX_USER> mClients;
 	array <Session, MAXGAMESERVER> mServers;
+	list <int> mMatchListHighTier;
+	list <int> mMatchListLowTier;
+	list <int> mReadytoGame;
 private:
 	SOCKET mListenSocket;
 	HANDLE mHCP;

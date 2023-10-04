@@ -43,6 +43,7 @@ public:
 public:
 
 	virtual void Jump() override;
+	void Dive();
 
 	void PlayTumbleMontage();
 
@@ -79,7 +80,6 @@ private:
 	void Align();
 
 
-	void Dive();
 
 private:
 

@@ -27,10 +27,14 @@ class ATinoCharacter;
 
 //lobby packet
 void send_login_packet(SOCKET& sock,const char* id, const char* passWord); 
+void send_newaccount_packet(SOCKET& sock, const char* id, const char* passWord);
 void send_match_packet(SOCKET& sock);
+void send_matchout_packet(SOCKET& sock);
 //game packet
 void send_movetogame_packet(SOCKET& sock,const int uID, const char* id, const int& roomID);
 void send_move_packet(SOCKET& sock, const bool& inair, const float& x, const float& y, const float& z, FQuat& rotate, const float& value, const FVector& speedVec);
+void send_ping_packet(SOCKET& sock, const long long ping);
+void send_goal_packet(SOCKET& sock);
 
 
 class WSA_OVER_EX {

@@ -14,7 +14,7 @@ ATinoCharacter::ATinoCharacter()
 	MovementState(EMovementState::EMS_Normal)
 {
 	PrimaryActorTick.bCanEverTick = true;
-	UHelpers::CreateComponent<USpringArmComponent>(this, &SpringArm, "SpringArm",GetCapsuleComponent());
+	UHelpers::CreateComponent<USpringArmComponent>(this, &SpringArm, "SpringArm", GetCapsuleComponent());
 	UHelpers::CreateComponent<UCameraComponent>(this, &Camera, "Camera", SpringArm);
 
 	bUseControllerRotationYaw = false;
@@ -57,7 +57,7 @@ void ATinoCharacter::BeginPlay()
 			GetCharacterMovement()->GravityScale = 0.0;
 		}
 	}
-	
+
 }
 
 void ATinoCharacter::EndPlay(EEndPlayReason::Type Reason)
@@ -78,27 +78,31 @@ void ATinoCharacter::Tick(float DeltaTime)
 		float PitchClamp = FMath::ClampAngle(Rotation.Pitch, -45.f, 30.f);
 		FRotator RotationControl(PitchClamp, Rotation.Yaw, Rotation.Roll);
 		SleepEx(0, true);
-		if (GetController()->IsPlayerController() && Network::GetNetwork()->bIsConnected) {
-			
-			auto pos = GetTransform().GetLocation();
-			auto rot = GetTransform().GetRotation();
 
-			ServerSyncElapsedTime += DeltaTime;
-			if (ServerSyncDeltaTime < ServerSyncElapsedTime)
-			{
-				send_move_packet(Network::GetNetwork()->s_socket,GetCharacterMovement()->IsFalling(), pos.X, pos.Y, pos.Z, rot, GetVelocity().Size2D(), GetCharacterMovement()->Velocity);
-				ServerSyncElapsedTime = 0.0f;
+		if (Network::GetNetwork()->bIsConnected)
+		{
+			if (GetController()->IsPlayerController()) {
+
+				auto pos = GetTransform().GetLocation();
+				auto rot = GetTransform().GetRotation();
+
+				ServerSyncElapsedTime += DeltaTime;
+				if (ServerSyncDeltaTime < ServerSyncElapsedTime)
+				{
+					send_move_packet(Network::GetNetwork()->s_socket, GetCharacterMovement()->IsFalling(), pos.X, pos.Y, pos.Z, rot, GetVelocity().Size2D(), GetCharacterMovement()->Velocity);
+					ServerSyncElapsedTime = 0.0f;
+				}
+
+				float CharXYVelocity = ((ACharacter::GetCharacterMovement()->Velocity) * FVector(1.f, 1.f, 0.f)).Size();
+
 			}
-
-			float CharXYVelocity = ((ACharacter::GetCharacterMovement()->Velocity) * FVector(1.f, 1.f, 0.f)).Size();
-
-			
-		}
-		else {
-			//Update GroundSpeedd (22-04-05)
-			//GroundSpeedd = ServerStoreGroundSpeed;
-			//Update Interpolation (22-11-25)
-			//GetCharacterMovement()->Velocity = CharMovingSpeed;
+			else {
+				//서버랑 연결 돼 있을 때만 상대 캐릭터 보간하려 시도. 
+				//Update GroundSpeedd (22-04-05)
+				//GroundSpeedd = ServerStoreGroundSpeed;
+				//Update Interpolation (23-09-27)
+				GetCharacterMovement()->Velocity = ServerCharMovingSpeed;
+			}
 		}
 
 
@@ -176,7 +180,7 @@ void ATinoCharacter::OnMoveForward(float Axis)
 
 		AddMovementInput(dir, Axis);
 	}
-	
+
 }
 
 void ATinoCharacter::OnMoveRight(float Axis)
@@ -188,7 +192,7 @@ void ATinoCharacter::OnMoveRight(float Axis)
 
 		AddMovementInput(dir, Axis);
 	}
-	
+
 }
 
 void ATinoCharacter::OnHorizonLock(float Axis)

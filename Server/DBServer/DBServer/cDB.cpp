@@ -5,7 +5,7 @@
 
 bool DB::ConnectDB()
 {
-	if (mysql_init(&mConn) == NULL) {
+	if (mysql_init(GetmConn()) == NULL) {
 #ifdef Test
 		std::cout << "Mysql Handle Init Fail" << std::endl;
 #endif 
@@ -13,27 +13,27 @@ bool DB::ConnectDB()
 		return false;
 	}
 
-	if (mysql_real_connect(&mConn, GetHost(), GetUser(), GetPassWord(), GetDBName(), GetPort(), (const char*)NULL, 0) != 0) {
+	if (mysql_real_connect(GetmConn(), GetHost(), GetUser(), GetPassWord(), GetDBName(), GetPort(), (const char*)NULL, 0) != 0) {
 #ifdef Test
 		std::cout << "DataBase Connect Success" << std::endl;
-		mysql_query(&mConn, "set names euckr");
+		mysql_query(GetmConn(), "set names euckr");
 #endif
 	}
-	else{
+	else {
 #ifdef Test
 		std::cout << "DataBase Connect Fail" << std::endl;
 #endif
 		return false;
 	}
 
-	if (mysql_select_db(&mConn, GetDBName())) {
+	if (mysql_select_db(GetmConn(), GetDBName())) {
 #ifdef Test
 		std::cout << "Select DataBase Fail" << std::endl;
 #endif
 		return false;
 	}
 
-	mStmt = mysql_stmt_init(&mConn);
+	SetmStmt(mysql_stmt_init(GetmConn()));
 
 
 	return true;
@@ -41,10 +41,10 @@ bool DB::ConnectDB()
 
 bool DB::ExecuteQuery()
 {
-	int state = mysql_stmt_execute(mStmt);
+	int state = mysql_stmt_execute(GetmStmt());
 	if (state != 0) {
 #ifdef Test
-		std::cout << "Query Execute error: " << mysql_stmt_error(mStmt) << std::endl;
+		std::cout << "Query Execute error: " << mysql_stmt_error(GetmStmt()) << std::endl;
 #endif
 		return false;
 	}
@@ -56,21 +56,21 @@ tuple<string, string, double, int> DB::SelectUserData(const int uid)
 {
 	string query = "SELECT id, nick, credit, point FROM userinfo WHERE uid = ?";
 
-	if (mysql_stmt_prepare(mStmt, query.c_str(), query.length()) != 0) {
+	if (mysql_stmt_prepare(GetmStmt(), query.c_str(), query.length()) != 0) {
 #ifdef Test
-		std::cout << "SelectUserData stmt prepare error: " << mysql_stmt_error(mStmt) << std::endl;
+		std::cout << "SelectUserData stmt prepare error: " << mysql_stmt_error(GetmStmt()) << std::endl;
 #endif
 		return tuple<string, string, double, int>();
 	}
 
 	MYSQL_BIND paramBind;
-	//memset(&paramBind, 0, sizeof(paramBind));
+	memset(&paramBind, 0, sizeof(paramBind));
 	paramBind.buffer_type = MYSQL_TYPE_LONG;
 	paramBind.buffer = (void*)&uid;
 
-	if (mysql_stmt_bind_param(mStmt, &paramBind) != 0) {
+	if (mysql_stmt_bind_param(GetmStmt(), &paramBind) != 0) {
 #ifdef Test
-		std::cout << "SelectUserData stmt param bind error: " << mysql_stmt_error(mStmt) << std::endl;
+		std::cout << "SelectUserData stmt param bind error: " << mysql_stmt_error(GetmStmt()) << std::endl;
 #endif
 		return tuple<string, string, double, int>();
 	}
@@ -99,9 +99,9 @@ tuple<string, string, double, int> DB::SelectUserData(const int uid)
 
 	}
 
-	if (mysql_stmt_bind_result(mStmt, resultBinds) != 0) {
+	if (mysql_stmt_bind_result(GetmStmt(), resultBinds) != 0) {
 #ifdef Test
-		std::cout << "SelectUserData stmt result bind error: " << mysql_stmt_error(mStmt) << std::endl;
+		std::cout << "SelectUserData stmt result bind error: " << mysql_stmt_error(GetmStmt()) << std::endl;
 #endif
 		return tuple<string, string, double, int>();
 	}
@@ -110,41 +110,35 @@ tuple<string, string, double, int> DB::SelectUserData(const int uid)
 		return tuple<string, string, double, int>();
 	}
 
-	if (mysql_stmt_fetch(mStmt) != 0) {
+	if (mysql_stmt_fetch(GetmStmt()) != 0) {
 		return tuple<string, string, double, int>();
 	}
-
-	cout << bindID << " // " << bindNickname << " // " << bindCredit << " // " << bindPoint << endl;
 
 	return make_tuple(bindID, bindNickname, bindCredit, bindPoint);
 }
 
-tuple<int, string, double, int, bool> DB::SelectUserDataForLogin(const string& id, const string& password)
+tuple<int, string, double, int, bool> DB::SelectUserDataForLogin(const string& id)
 {
-	string query = "SELECT UID, nick, credit, point FROM tiiiino.userinfo WHERE id = ? AND password = ?";
+	string query = "SELECT UID, nick, credit, point, state FROM tiiiino.userinfo WHERE id = ?";
 
-	if (mysql_stmt_prepare(mStmt, query.c_str(), query.length()) != 0) {
+	if (mysql_stmt_prepare(GetmStmt(), query.c_str(), query.length()) != 0) {
 #ifdef Test
-		std::cout << "SelectUserData stmt prepare error: " << mysql_stmt_error(mStmt) << std::endl;
+		std::cout << "SelectUserData stmt prepare error: " << mysql_stmt_error(GetmStmt()) << std::endl;
 #endif
 		return tuple<int, string, double, int, bool>();
 	}
 
-	const int paramColNum = 2;
-	MYSQL_BIND paramBinds[paramColNum];
-	memset(paramBinds, 0, sizeof(paramBinds));
+	MYSQL_BIND paramBind;
+	memset(&paramBind, 0, sizeof(paramBind));
 
-	paramBinds[0].buffer_type = MYSQL_TYPE_STRING;
-	paramBinds[0].buffer = (void*)id.c_str();
-	paramBinds[0].buffer_length = id.length();
+	paramBind.buffer_type = MYSQL_TYPE_STRING;
+	paramBind.buffer = (void*)id.c_str();
+	paramBind.buffer_length = id.length();
 
-	paramBinds[1].buffer_type = MYSQL_TYPE_STRING;
-	paramBinds[1].buffer = (void*)password.c_str();
-	paramBinds[1].buffer_length = password.length();
 
-	if (mysql_stmt_bind_param(mStmt, paramBinds) != 0) {
+	if (mysql_stmt_bind_param(GetmStmt(), &paramBind) != 0) {
 #ifdef Test
-			std::cout << "SelectUserData stmt param bind error: " << mysql_stmt_error(mStmt) << std::endl;
+		std::cout << "SelectUserData stmt param bind error: " << mysql_stmt_error(GetmStmt()) << std::endl;
 #endif
 		return tuple<int, string, double, int, bool>();
 	}
@@ -155,7 +149,7 @@ tuple<int, string, double, int, bool> DB::SelectUserDataForLogin(const string& i
 	int bindUID, bindPoint;
 	char bindNickname[MAX_NAME_SIZE];
 	double bindCredit;
-	bool bindState;
+	int bindState;
 	{
 		resultBinds[0].buffer_type = MYSQL_TYPE_LONG;
 		resultBinds[0].buffer = &bindUID;
@@ -174,9 +168,9 @@ tuple<int, string, double, int, bool> DB::SelectUserDataForLogin(const string& i
 		resultBinds[4].buffer = &bindState;
 	}
 
-	if (mysql_stmt_bind_result(mStmt, resultBinds) != 0) {
+	if (mysql_stmt_bind_result(GetmStmt(), resultBinds) != 0) {
 #ifdef Test
-		std::cout << "SelectUserData stmt result bind error: " << mysql_stmt_error(mStmt) << std::endl;
+		std::cout << "SelectUserData stmt result bind error: " << mysql_stmt_error(GetmStmt()) << std::endl;
 #endif
 		return tuple<int, string, double, int, bool>();
 	}
@@ -185,45 +179,102 @@ tuple<int, string, double, int, bool> DB::SelectUserDataForLogin(const string& i
 		return tuple<int, string, double, int, bool>();
 	}
 
-	if (mysql_stmt_fetch(mStmt) != 0) {
+	if (mysql_stmt_fetch(GetmStmt()) != 0) {
 		return tuple<int, string, double, int, bool>();
 	}
 
 	return make_tuple(bindUID, bindNickname, bindCredit, bindPoint, bindState);
 }
 
-bool DB::InsertNewUser(const string& id, const string& passWord, const string& nickname)
+vector<string> DB::SelectHash(const string& id)
 {
-	string query = "INSERT INTO userinfo (ID, PassWord, nick) VALUES (?, ?, ?)";
+	vector<string> result;
+	string query = "SELECT hashedPassword, salt FROM account WHERE ID = ?";
 
-	if (mysql_stmt_prepare(mStmt, query.c_str(), query.length()) != 0) {
+	if (mysql_stmt_prepare(GetmStmt(), query.c_str(), query.length()) != 0) {
 #ifdef Test
-		std::cout << "InsertNewUser stmt prepare error: " << mysql_stmt_error(mStmt) << std::endl;
+		std::cout << "SelectHash stmt prepare error: " << mysql_stmt_error(GetmStmt()) << std::endl;
+#endif
+		return vector<string>();
+	}
+
+	MYSQL_BIND paramBind;
+	memset(&paramBind, 0, sizeof(paramBind));
+
+	paramBind.buffer_type = MYSQL_TYPE_STRING;
+	paramBind.buffer = (void*)id.c_str();
+	paramBind.buffer_length = id.length();
+
+
+	if (mysql_stmt_bind_param(GetmStmt(), &paramBind) != 0) {
+#ifdef Test
+		std::cout << "SelectHash stmt param bind error: " << mysql_stmt_error(GetmStmt()) << std::endl;
+#endif
+		return vector<string>();
+	}
+
+	const int resColNum = 2;
+	MYSQL_BIND resultBinds[resColNum];
+	memset(resultBinds, 0, sizeof(resultBinds));
+	char bindHash[257];
+	char bindSalt[45];
+	{
+		resultBinds[0].buffer_type = MYSQL_TYPE_STRING;
+		resultBinds[0].buffer_length = sizeof(bindHash);
+		resultBinds[0].buffer = bindHash;
+
+		resultBinds[1].buffer_type = MYSQL_TYPE_STRING;
+		resultBinds[1].buffer_length = sizeof(bindSalt);
+		resultBinds[1].buffer = bindSalt;
+	}
+
+	if (mysql_stmt_bind_result(GetmStmt(), resultBinds) != 0) {
+#ifdef Test
+		std::cout << "SelectUserData stmt result bind error: " << mysql_stmt_error(GetmStmt()) << std::endl;
+#endif
+		return vector<string>();
+	}
+
+	if (ExecuteQuery() == false) {
+		return vector<string>();
+	}
+
+	if (mysql_stmt_fetch(GetmStmt()) != 0) {
+#ifdef Test
+		std::cout << "SelectUserData stmt result fetch error: " << mysql_stmt_error(GetmStmt()) << std::endl;
+#endif
+		return vector<string>();
+	}
+
+	result.push_back(bindHash);
+	result.push_back(bindSalt);
+
+	return result;
+}
+
+bool DB::InsertNewUser(const string& id)
+{
+	string query = "INSERT INTO userinfo (ID) VALUES (?)";
+
+	if (mysql_stmt_prepare(GetmStmt(), query.c_str(), query.length()) != 0) {
+#ifdef Test
+		std::cout << "InsertNewUser stmt prepare error: " << mysql_stmt_error(GetmStmt()) << std::endl;
 #endif
 		return false;
 	}
 
-	const int colNum = 3;
 
-	MYSQL_BIND binds[colNum];
-	memset(binds, 0, sizeof(binds));
+	MYSQL_BIND bind;
+	memset(&bind, 0, sizeof(bind));
 
-	binds[0].buffer_type = MYSQL_TYPE_STRING;
-	binds[0].buffer = (void*)id.c_str();
-	binds[0].buffer_length = id.length();
+	bind.buffer_type = MYSQL_TYPE_STRING;
+	bind.buffer = (void*)id.c_str();
+	bind.buffer_length = id.length();
 
-	binds[1].buffer_type = MYSQL_TYPE_STRING;
-	binds[1].buffer = (void*)passWord.c_str();
-	binds[1].buffer_length = passWord.length();
-
-	binds[2].buffer_type = MYSQL_TYPE_STRING;
-	binds[2].buffer = (void*)nickname.c_str();
-	binds[2].buffer_length = nickname.length();
-
-	if (mysql_stmt_bind_param(mStmt, binds) != 0) {
+	if (mysql_stmt_bind_param(GetmStmt(), &bind) != 0) {
 
 #ifdef Test
-			std::cout << "InsertNewUser stmt bind error: " << mysql_stmt_error(mStmt) << std::endl;
+		std::cout << "InsertNewUser stmt bind error: " << mysql_stmt_error(GetmStmt()) << std::endl;
 #endif
 		return false;
 	}
@@ -235,13 +286,59 @@ bool DB::InsertNewUser(const string& id, const string& passWord, const string& n
 	return true;
 }
 
-bool DB::UpdateUserConnectionState(const int uid, const bool state)
+bool DB::InsertNewAccount(const string& id, const string& password)
+{
+	string query = "INSERT INTO account (ID, hashedPassword, salt) VALUES (?, ?, ?)";
+
+	if (mysql_stmt_prepare(GetmStmt(), query.c_str(), query.length()) != 0) {
+#ifdef Test
+		std::cout << "InsertNewUser stmt prepare error: " << mysql_stmt_error(GetmStmt()) << std::endl;
+#endif
+		return false;
+	}
+
+	string salt = mSecurity->GenerateSalt();
+	string hash = mSecurity->HashingPassword(password, salt);
+
+	MYSQL_BIND binds[3];
+	memset(binds, 0, sizeof(binds));
+
+	{
+		binds[0].buffer_type = MYSQL_TYPE_STRING;
+		binds[0].buffer = (void*)id.c_str();
+		binds[0].buffer_length = id.length();
+
+		binds[1].buffer_type = MYSQL_TYPE_STRING;
+		binds[1].buffer = (void*)hash.c_str();
+		binds[1].buffer_length = hash.length();
+
+		binds[2].buffer_type = MYSQL_TYPE_STRING;
+		binds[2].buffer = (void*)salt.c_str();
+		binds[2].buffer_length = salt.length();
+	}
+
+	if (mysql_stmt_bind_param(GetmStmt(), binds) != 0) {
+
+#ifdef Test
+		std::cout << "InsertNewUser stmt bind error: " << mysql_stmt_error(GetmStmt()) << std::endl;
+#endif
+		return false;
+	}
+
+	if (ExecuteQuery() == false) {
+		return false;
+	}
+
+	return true;
+}
+
+bool DB::UpdateUserConnectionState(const int uid, const int state)
 {
 	string query = "UPDATE userinfo SET state = ? WHERE UID = ?";
 
-	if (mysql_stmt_prepare(mStmt, query.c_str(), query.length()) != 0) {
+	if (mysql_stmt_prepare(GetmStmt(), query.c_str(), query.length()) != 0) {
 #ifdef Test
-		std::cout << "InsertNewUser stmt prepare error: " << mysql_stmt_error(mStmt) << std::endl;
+		std::cout << "InsertNewUser stmt prepare error: " << mysql_stmt_error(GetmStmt()) << std::endl;
 #endif
 		return false;
 	}
@@ -257,10 +354,10 @@ bool DB::UpdateUserConnectionState(const int uid, const bool state)
 	binds[1].buffer_type = MYSQL_TYPE_LONG;
 	binds[1].buffer = (void*)&uid;
 
-	if (mysql_stmt_bind_param(mStmt, binds) != 0) {
+	if (mysql_stmt_bind_param(GetmStmt(), binds) != 0) {
 
 #ifdef Test
-		std::cout << "UpdateUserConnectionState stmt bind error: " << mysql_stmt_error(mStmt) << std::endl;
+		std::cout << "UpdateUserConnectionState stmt bind error: " << mysql_stmt_error(GetmStmt()) << std::endl;
 #endif
 		return false;
 	}
@@ -276,9 +373,9 @@ bool DB::UpdateUserNickname(const int uid, const string& nicknameToChange)
 {
 	string query = "UPDATE userinfo SET nick = ? WHERE UID = ?";
 
-	if (mysql_stmt_prepare(mStmt, query.c_str(), query.length()) != 0) {
+	if (mysql_stmt_prepare(GetmStmt(), query.c_str(), query.length()) != 0) {
 #ifdef Test
-		std::cout << "InsertNewUser stmt prepare error: " << mysql_stmt_error(mStmt) << std::endl;
+		std::cout << "InsertNewUser stmt prepare error: " << mysql_stmt_error(GetmStmt()) << std::endl;
 #endif
 		return false;
 	}
@@ -295,10 +392,10 @@ bool DB::UpdateUserNickname(const int uid, const string& nicknameToChange)
 	binds[1].buffer_type = MYSQL_TYPE_LONG;
 	binds[1].buffer = (void*)&uid;
 
-	if (mysql_stmt_bind_param(mStmt, binds) != 0) {
+	if (mysql_stmt_bind_param(GetmStmt(), binds) != 0) {
 
 #ifdef Test
-		std::cout << "UpdateUserNickname stmt bind error: " << mysql_stmt_error(mStmt) << std::endl;
+		std::cout << "UpdateUserNickname stmt bind error: " << mysql_stmt_error(GetmStmt()) << std::endl;
 #endif
 		return false;
 	}
@@ -314,9 +411,9 @@ bool DB::UpdateUserCredit(const int uid, double credit)
 {
 	string query = "UPDATE userinfo SET credit = ? WHERE UID = ?";
 
-	if (mysql_stmt_prepare(mStmt, query.c_str(), query.length()) != 0) {
+	if (mysql_stmt_prepare(GetmStmt(), query.c_str(), query.length()) != 0) {
 #ifdef Test
-		std::cout << "UpdateUserCredit stmt prepare error: " << mysql_stmt_error(mStmt) << std::endl;
+		std::cout << "UpdateUserCredit stmt prepare error: " << mysql_stmt_error(GetmStmt()) << std::endl;
 #endif
 		return false;
 	}
@@ -332,10 +429,10 @@ bool DB::UpdateUserCredit(const int uid, double credit)
 	binds[1].buffer_type = MYSQL_TYPE_LONG;
 	binds[1].buffer = (void*)&uid;
 
-	if (mysql_stmt_bind_param(mStmt, binds) != 0) {
+	if (mysql_stmt_bind_param(GetmStmt(), binds) != 0) {
 
 #ifdef Test
-		std::cout << "UpdateUserCredit stmt bind error: " << mysql_stmt_error(mStmt) << std::endl;
+		std::cout << "UpdateUserCredit stmt bind error: " << mysql_stmt_error(GetmStmt()) << std::endl;
 #endif
 		return false;
 	}
@@ -351,9 +448,9 @@ bool DB::UpdateUserPoint(const int uid, unsigned int point)
 {
 	string query = "UPDATE userinfo SET point = ? WHERE UID = ?";
 
-	if (mysql_stmt_prepare(mStmt, query.c_str(), query.length()) != 0) {
+	if (mysql_stmt_prepare(GetmStmt(), query.c_str(), query.length()) != 0) {
 #ifdef Test
-		std::cout << "UpdateUserPoint stmt prepare error: " << mysql_stmt_error(mStmt) << std::endl;
+		std::cout << "UpdateUserPoint stmt prepare error: " << mysql_stmt_error(GetmStmt()) << std::endl;
 #endif
 		return false;
 	}
@@ -369,10 +466,10 @@ bool DB::UpdateUserPoint(const int uid, unsigned int point)
 	binds[1].buffer_type = MYSQL_TYPE_LONG;
 	binds[1].buffer = (void*)&uid;
 
-	if (mysql_stmt_bind_param(mStmt, binds) != 0) {
+	if (mysql_stmt_bind_param(GetmStmt(), binds) != 0) {
 
 #ifdef Test
-		std::cout << "UpdateUserPoint stmt bind error: " << mysql_stmt_error(mStmt) << std::endl;
+		std::cout << "UpdateUserPoint stmt bind error: " << mysql_stmt_error(GetmStmt()) << std::endl;
 #endif
 		return false;
 	}
@@ -384,8 +481,69 @@ bool DB::UpdateUserPoint(const int uid, unsigned int point)
 	return true;
 }
 
+bool DB::DeleteAccount(const string& id)
+{
+	string query = "Delete FROM account WHERE ID = ?";
+
+	if (mysql_stmt_prepare(GetmStmt(), query.c_str(), query.length()) != 0) {
+#ifdef Test
+		std::cout << "Delete Account stmt prepare error: " << mysql_stmt_error(GetmStmt()) << std::endl;
+#endif
+		return false;
+	}
+
+	MYSQL_BIND bind;
+	memset(&bind, 0, sizeof(bind));
+
+	bind.buffer_type = MYSQL_TYPE_STRING;
+	bind.buffer = (void*)id.c_str();
+	bind.buffer_length = id.length();
+
+	if (mysql_stmt_bind_param(GetmStmt(), &bind) != 0) {
+
+#ifdef Test
+		std::cout << "Delete Account stmt bind error: " << mysql_stmt_error(GetmStmt()) << std::endl;
+#endif
+		return false;
+	}
+
+	if (ExecuteQuery() == false) {
+		return false;
+	}
+
+	return true;
+}
+
+bool DB::SignUpNewPlayer(const string& id, const string& password)
+{
+	bool res = InsertNewAccount(id, password);
+	if (res == false) return false;
+
+	res = InsertNewUser(id);
+	if (res == false) {
+		DeleteAccount(id);
+		return false;
+	}
+
+	return true;
+}
+
+bool DB::CheckVerifyUser(const string& id, const string& password)
+{
+	vector<string> selectRes = SelectHash(id);
+
+	if (selectRes.empty()) {
+		return false;
+	}
+
+	string hash = selectRes[0];
+	string salt = selectRes[1];
+
+	return GetmSecurity()->VerifyPassword(password, hash, salt);
+}
+
 void DB::DisconnectDB()
 {
-	mysql_stmt_close(mStmt);
-	mysql_close(&mConn);
+	mysql_stmt_close(GetmStmt());
+	mysql_close(GetmConn());
 }

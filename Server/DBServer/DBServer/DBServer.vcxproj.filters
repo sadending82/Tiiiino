@@ -15,24 +15,30 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="stdafx.h">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
     <ClCompile Include="cDB.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="cSocket.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
     <ClCompile Include="cExOver.h">
       <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.h">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="cSecurity.cpp">
+      <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cDB.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="cSession.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="cSocket.h">
@@ -41,10 +47,10 @@
     <ClInclude Include="..\..\ServerProtocol.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="cSession.h">
+    <ClInclude Include="..\..\..\protocol.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\protocol.h">
+    <ClInclude Include="cSecurity.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

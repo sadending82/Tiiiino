@@ -20,6 +20,8 @@ Network::Network()
 	, mGeneratedID(0)
 	, isInit(false)
 	, bIsConnected(false)
+	, l_socket(INVALID_SOCKET)
+	, s_socket(INVALID_SOCKET)
 {
 	for (int i = 0; i < MAX_USER; ++i)
 	{
@@ -57,8 +59,6 @@ void Network::release()
 	if (isInit)
 	{
 		mGeneratedID = 0;
-		bIsConnected = 0;
-		bIsConnectedLobby = 0;
 		mMyCharacter->bIsConnected = 0;
 		mMyCharacter = nullptr;
 		for (auto& p : mOtherCharacter)
@@ -73,6 +73,11 @@ void Network::release()
 			bLoginFlag = false;
 			//editor중지때문이니까 여기도 그냥 false로 다시 초기화.
 			bLevelOpenTriggerEnabled = false;
+			//editor 중지가 아니라 level 변경시 불리는 release에서 변경되지 말아야 할 값은 이 if문 안에 넣기.
+			bIsConnectedLobby = 0;
+			bIsConnected = 0;
+			closesocket(l_socket);
+			l_socket = INVALID_SOCKET;
 		}
 		isInit = false;
 	}
@@ -98,6 +103,18 @@ void Network::error_display(int err_no)
 	LocalFree(lpMsgBuf);
 }
 
+void send_newaccount_packet(SOCKET& sock, const char* id, const char* passWord)
+{
+	CL_SIGNUP_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = CL_SIGNUP;
+	strcpy_s(packet.id, id);
+	strcpy_s(packet.password, passWord);
+	//strcpy_s(packet.name, TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterName));
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+}
+
 void send_login_packet(SOCKET& sock, const char* id, const char* passWord)
 {
 	CL_LOGIN_PACKET packet;
@@ -115,6 +132,15 @@ void send_match_packet(SOCKET& sock)
 	CL_MATCH_PACKET packet;
 	packet.size = sizeof(packet);
 	packet.type = CL_MATCH;
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+}
+
+void send_matchout_packet(SOCKET& sock)
+{
+	CL_MATCH_OUT_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = CL_MATCH_OUT;
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
 	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
 }
@@ -153,6 +179,24 @@ void send_move_packet(SOCKET& sock, const bool& inair, const float& x, const flo
 	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
 }
 
+void send_ping_packet(SOCKET& sock, const long long ping)
+{
+	CS_PING_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PING;
+	packet.ping = ping;
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+}
+
+void send_goal_packet(SOCKET& sock)
+{
+	CS_GOAL_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_GOAL;
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+}
 
 
 
@@ -188,6 +232,7 @@ void Network::process_packet(unsigned char* p)
 				mOtherCharacter[move_id]->SetActorLocation(FVector(packet->x, packet->y, packet->z));
 				mOtherCharacter[move_id]->SetActorRotation(FQuat(packet->rx, packet->ry, packet->rz, packet->rw));
 				mOtherCharacter[move_id]->ServerSyncSpeed = packet->speed;
+				mOtherCharacter[move_id]->ServerCharMovingSpeed = FVector(packet->sx, packet->sy, packet->sz);
 				//mOtherCharacter[move_id]->ServerStoreGroundSpeed = packet->speed;
 				//mOtherCharacter[move_id]->CharMovingSpeed = FVector(packet->sx, packet->sy, packet->sz);
 				//mOtherCharacter[move_id]->GroundSpeedd = packet->speed;
@@ -236,6 +281,65 @@ void Network::process_packet(unsigned char* p)
 		}
 		break;
 	}
+	case SC_PING: {
+		SC_PING_PACKET* packet = reinterpret_cast<SC_PING_PACKET*>(p);
+		send_ping_packet(s_socket, packet->ping);
+
+		break;
+	}
+	case SC_ACTION_ANIM: {
+		SC_ACTION_ANIM_PACKET* packet = reinterpret_cast<SC_ACTION_ANIM_PACKET*>(p);
+		int id = packet->id;
+		if (nullptr != mOtherCharacter[id])
+		{
+		}
+		else {
+			switch (packet->action)
+			{
+			case 1:
+				mOtherCharacter[id]->Jump();
+				//점프
+				break;
+			case 2:
+				mOtherCharacter[id]->Dive();
+				//다이브
+				break;
+			default:
+				break;
+			}
+		}
+		break;
+	}
+	case SC_GAME_END: {
+		SC_GAME_END_PACKET* packet = reinterpret_cast<SC_GAME_END_PACKET*>(p);
+		closesocket(s_socket);
+		UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("Lobby"));
+		bLevelOpenTriggerEnabled = true;
+		//packet->record; // << 이걸로 성공/실패 ui 띄우기.
+
+		break;
+	}
+	case SC_PLAYER_ARRIVE:
+	{
+		SC_PLAYER_ARRIVE_PACKET* packet = reinterpret_cast<SC_PLAYER_ARRIVE_PACKET*>(p);
+		if (nullptr != mOtherCharacter[packet->id])
+		{
+			mOtherCharacter[packet->id]->SetActorEnableCollision(false);
+			mOtherCharacter[packet->id]->SetActorHiddenInGame(true);
+			//
+			//UI에 도착한 인원 +1 Update
+			//
+		}
+		break;
+	}
+	case SC_GAME_COUNTDOWN_START:
+	{
+		SC_GAME_COUNTDOWN_START_PACKET* packet = reinterpret_cast<SC_GAME_COUNTDOWN_START_PACKET*>(p);
+
+		//카운트다운 UI 띄우기 (Appear CountDown UI)
+
+		break;
+	}
 	default:
 		break;
 	}
@@ -270,6 +374,7 @@ void Network::l_process_packet(unsigned char* p)
 		LC_MATCH_RESPONSE_PACKET* packet = reinterpret_cast<LC_MATCH_RESPONSE_PACKET*>(p);
 		//게임서버 연결 코드 나중에 ip랑 포트넘버도 넘겨야함.
 		UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("Level1_ver1"));
+		bLevelOpenTriggerEnabled = true;
 		break;
 	}
 	default:
@@ -411,23 +516,6 @@ bool Network::ConnectServerGame()
 		return false;
 	}
 	return RecvPacketGame();
-	//DWORD recv_flag = 0;
-	//int ret = WSARecv(s_socket, &recv_expover.GetWsaBuf(), 1, NULL, &recv_flag, &recv_expover.GetWsaOver(), recv_Gamecallback);
-	//if (SOCKET_ERROR == ret)
-	//{
-	//	int err = WSAGetLastError();
-	//	if (err != WSA_IO_PENDING)
-	//	{
-	//		//error ! 
-	//		UE_LOG(LogTemp, Error, TEXT("return false"));
-	//		return false;
-	//	}
-	//	else {
-	//		UE_LOG(LogTemp, Error, TEXT("return true"));
-	//		return true;
-	//	}
-	//}
-	return true;
 }
 
 bool Network::ConnectServerLobby()
@@ -454,17 +542,4 @@ bool Network::ConnectServerLobby()
 	}
 
 	return RecvPacketLobby();
-	//DWORD recv_flag = 0;
-	//int ret = WSARecv(l_socket, &l_recv_expover.GetWsaBuf(), 1, NULL, &recv_flag, &l_recv_expover.GetWsaOver(), recv_Lobbycallback);
-	//if (SOCKET_ERROR == ret)
-	//{
-	//	int err = WSAGetLastError();
-	//	if (err != WSA_IO_PENDING)
-	//	{
-	//		int err_num = WSAGetLastError();
-	//		//error ! 
-	//		return false;
-	//	}
-	//}
-	return true;
 }

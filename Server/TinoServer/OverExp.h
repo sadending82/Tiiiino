@@ -1,7 +1,7 @@
 #pragma once
 #include "stdafx.h"
 
-enum class eCompType 
+enum eCompType
 { 
 	OP_ACCEPT, OP_RECV, OP_SEND, OP_EVENT, OP_SERVER_RECV
 };

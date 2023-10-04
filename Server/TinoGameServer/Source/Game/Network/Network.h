@@ -6,6 +6,7 @@
 
 #include "../Utility/Utility.h"
 #include "../../../../../protocol.h"
+#include "../../../../ServerProtocol.h"
 
 
 

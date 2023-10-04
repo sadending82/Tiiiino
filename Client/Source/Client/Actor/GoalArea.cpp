@@ -4,6 +4,7 @@
 #include "Actor/GoalArea.h"
 #include "GameFramework/Character.h"
 #include "Global.h"
+#include "Network/Network.h"
 
 // Sets default values
 AGoalArea::AGoalArea()
@@ -41,9 +42,9 @@ void AGoalArea::BoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 			if (Controller->IsPlayerController())
 			{
 				// 박스 컴포넌트에 내 캐릭터가 닿았다!
+				send_goal_packet(Network::GetNetwork()->s_socket);
 
 				// 캐릭터를 안보이게 하고 콜리젼도 off
-
 				PlayerDisable(OverlapCharacter);
 				// UI 타이머 생성과 UI 결과 출력은 인게임 UI가 완성되는 대로 추가
 				

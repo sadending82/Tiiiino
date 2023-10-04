@@ -3,7 +3,7 @@
 
 enum class eSessionState
 { 
-	ST_FREE, ST_ACCEPTED, ST_MATCH
+	ST_FREE, ST_ACCEPTED, ST_LOBBY, ST_MATCH, ST_INGAME
 };
 
 class Session
@@ -11,11 +11,17 @@ class Session
 public:
 	Session()
 	{
-		mPlayerID = -1;
+		mSocketID = -1;
 		mSocket = 0;
 		mState = eSessionState::ST_FREE;
 		mPrevRemain = 0;
 		mRoomID = -1;
+		mUID = 0;
+		ZeroMemory(mNickName, sizeof(mNickName));
+		mCredit = 0;
+		mPoint = 0;
+		mTier = 0;
+		mMatchStartTime = system_clock::now();
 	}
 	~Session() {}
 	void DoRecv()
@@ -36,12 +42,15 @@ public:
 	OverEXP mRecvOver;
 	mutex	mStateLock;
 	eSessionState mState;
-	int		mPlayerID;
+	int		mSocketID;
 	int		mUID;
+	char	mID[MAX_NAME_SIZE];
 	char	mNickName[MAX_NAME_SIZE];
 	double	mCredit;
 	int		mPoint;
-	SOCKET mSocket;
+	double	mTier;
+	system_clock::time_point mMatchStartTime;
+	SOCKET	mSocket;
 	int		mPrevRemain;
 	int		mRoomID;	//수민이 임시로 추가해놓음. 얘가 몇번 방에 있는지 확인하기 위함.
 };

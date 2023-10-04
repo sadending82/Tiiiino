@@ -9,6 +9,12 @@ void Server::Disconnect(int cID)
 		mClients[cID].mStateLock.unlock();
 		return;
 	}
+
+	cout << "DISCONNECT" << mClients[cID].mUID << endl;
+
+	mMatchListHighTier.remove(cID);
+	mMatchListLowTier.remove(cID);
+
 	closesocket(mClients[cID].mSocket);
 	mClients[cID].mState = eSessionState::ST_FREE;
 	mClients[cID].mStateLock.unlock();
@@ -44,7 +50,7 @@ int Server::GetNewServerID()
 
 void Server::ProcessPacket(int cID, unsigned char* cpacket)
 {
-	switch (cpacket[1]) 
+	switch (cpacket[1])
 	{
 	case CL_LOGIN:
 	{
@@ -52,44 +58,43 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 		LD_LOGIN_PACKET pac;
 		pac.type = LD_LOGIN;
 		pac.size = sizeof(LD_LOGIN_PACKET);
-		pac.user_id = cID;
+		pac.userKey = cID;
 		memcpy(pac.id, p->id, sizeof(pac.id));
 		memcpy(pac.password, p->password, sizeof(pac.password));
-		cout << pac.id << endl;
-		// db ¼­¹ö¿¡ Àü¼Û
+		// db ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 		mServers[0].DoSend(&pac);
+		break;
+	}
+	case CL_SIGNUP:
+	{
+		CL_SIGNUP_PACKET* rp = reinterpret_cast<CL_SIGNUP_PACKET*>(cpacket);
+		LD_SIGNUP_PACKET sp;
+		sp.size = sizeof(sp);
+		sp.type = LD_SIGNUP;
+		memcpy(sp.id, rp->id, sizeof(rp->id));
+		memcpy(sp.password, rp->password, sizeof(rp->password));
+		// db ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+		mServers[0].DoSend(&sp);
 		break;
 	}
 	case CL_MATCH:
 	{
-		CL_MATCH_PACKET* p = reinterpret_cast<CL_MATCH_PACKET*>(cpacket);
-		/*
-		Áö±ÝÀº!°ÔÀÓ¼­¹öÇÑÅ× ¹Ù·Î º¸³»ÁÖ¸é µÊ.
-		³ªÁß¿£ ÀÌ ÆÐÅ¶¿¡¼­ º¸³»ÁÖ´Â°Ô ¾Æ´Ï¶ó ¿©±â·Î µé¾î¿Â ÇÃ·¹ÀÌ¾îµéÀ» ¸ð¾Æ¼­
-		µû·Î ¸ÅÄª ·ÎÁ÷À» µ¹¸° ÈÄ¿¡ ¸ÅÄªÀÌ ¼º»ç µÇ¸é ±× ÇÔ¼ö¿¡¼­ ¾Æ·¡ÀÇ ÆÐÅ¶À» º¸³»ÁÖ¸é µÊ.
-		±×¸®°í ÀÌ ÆÐÅ¶ ÇÏ³ª Å©±â°¡ 46ÀÌ¶ó¼­ 8¸íÀ» ÇÑ²¨¹ø¿¡ º¸³»¸é 344¹ÙÀÌÆ®ÀÓ. ÇÑ¹ø¿¡ ¸øº¸³¿
-		Æ÷¹® µ¹·Á¼­ ÀÎ¿ø¼ö¸¸Å­ º¸³»ÁÖ¸é µÊ.
-		
-		LG_USER_INTO_GAME_PACKET packet;
-		packet.size = sizeof(packet);
-		packet.type = LG_USER_INTO_GAME;
-		packet.roomID = 0; //¿©±â¿¡ Room NumberÀÎµ¥~ ÀÌ°Ç ÀÌÁ¦ ·Îºñ¼­¹ö¿¡¼­ ¸ÅÄª ·ÎÁ÷ µ¹¸®¸é¼­ Á¤ÇØÁà¾ßÇÔ Áö±ÝÀº 0 ³ÖÀ¸¸é µÊ.
-		strcpy(packet.name, mClients[cID].GetName());
-		strcpy(packet.passWord, mClients[cID].GetPassWord());
-		packet.roomMax = 8;	//¿©±âµµ ¸î¸íÀÌ¼­ ÁøÇàÇÏ´ÂÁö ³Ö´Â °ª. Å×½ºÆ®¿¡´Â °ÅÀÇ 8¸íÀÌ¼­ ÇÒ °Å´Ï±î 8À» ³Ö¾îÁØ´Ù. 4¸íÀÌ¼­ ÇÏ¸é 4¸¦ ³Ö´Â´Ù.
-		sendToGameServer(packet);
-		*/
-
-		LG_USER_INTO_GAME_PACKET packet;
-		packet.size = sizeof(packet);
-		packet.type = LG_USER_INTO_GAME;
-		packet.roomID = 0;//¹æ ¹øÈ£ ÀÓ½Ã·Î 0À¸·Î ³Ö¾îµÒ
-		strcpy_s(packet.name, sizeof(mClients[cID].mNickName), mClients[cID].mNickName);
-		packet.uID = mClients[cID].mUID;
-		packet.roomMax = 2;
-		mClients[cID].mRoomID = packet.roomID;	
-		mServers[1].DoSend(&packet);
-
+		if (mClients[cID].mTier > 3.5)
+		{
+			mMatchListHighTier.push_back(cID);
+		}
+		else
+		{
+			mMatchListLowTier.push_back(cID);
+		}
+		mClients[cID].mState = eSessionState::ST_MATCH;
+		break;
+	}
+	case CL_MATCH_OUT:
+	{
+		mMatchListHighTier.remove(cID);
+		mMatchListLowTier.remove(cID);
+		mClients[cID].mState = eSessionState::ST_LOBBY;
 		break;
 	}
 	default:
@@ -101,14 +106,13 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 
 void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 {
-
 	switch (spacket[1])
 	{
 	case GL_LOGIN:
 	{
 		GL_LOGIN_PACKET* p = reinterpret_cast<GL_LOGIN_PACKET*>(spacket);
 
-		cout << "°ÔÀÓ ¼­¹ö Á¢¼Ó È®ÀÎ" << endl;
+		cout << "ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½" << endl;
 
 		break;
 	}
@@ -118,55 +122,63 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		LC_MATCH_RESPONSE_PACKET packet;
 		packet.size = sizeof(packet);
 		packet.type = LC_MATCH_RESPONSE;
-		for (auto& player : mClients)
+		memcpy(packet.gameServerIP, SERVERIP, sizeof(packet.gameServerIP));
+		packet.gameServerPortNum = GAMESERVERPORT;
+
+		for (auto& player : mReadytoGame)
 		{
-			if (player.mRoomID == p->roomID)
+			if (mClients[player].mRoomID == p->roomID)
 			{
-				player.DoSend(&packet);
+				mClients[player].DoSend(&packet);
+				mClients[player].mState = eSessionState::ST_INGAME;
 			}
 		}
-		//ÀÚ¸®¿¡ ¾øÀ¸¼Å¼­ ¸¸µç ºñÈ¿À²ÀûÀÎ ÄÚµå ³ªÁß¿¡ °íÃÄÁÖ½Ê¼î
-		
-
-		/*
-			ÆÐÅ¶ÀÇ roomID·Î roomÀ» ÁØºñ ¿Ï·á·Î ¹Ù²Ù°í, Å¬¶óÀÌ¾ðÆ®µé¿¡°Ô °ÔÀÓ¼­¹ö·Î °¡¶ó´Â ÆÐÅ¶À» º¸³¿.
-			LC_MATCH_RESPONSE_PACKET packet;
-			packet.size = sizeof(packet);
-			packet.type = LC_MATCH_RESPONSE;
-			packet.gameServerPortNum = GAMESERVERPORT + n;	//³ªÁß¿¡ °ÔÀÓ¼­¹ö ¿©·¯°³±îÁö °í·Á
-			strcpy(packet.gameServerIP,"127.0.0.1"´ëÃæ¾ÆÀÌÇÇ);
-			sendToClient(packet);
-
-		*/
 
 		break;
 	}
 	case DL_LOGIN_OK:
 	{
-		cout << "·Î±×ÀÎ ¼º°ø" << endl;
+		cout << "ï¿½Î±ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½" << endl;
 
 		DL_LOGIN_OK_PACKET* p = reinterpret_cast<DL_LOGIN_OK_PACKET*>(spacket);
-		mClients[p->user_id].mCredit = p->credit;
-		strcpy_s(mClients[p->user_id].mNickName, sizeof(p->nickname), p->nickname);
-		mClients[p->user_id].mPoint = p->point;
-		mClients[p->user_id].mUID = p->uid;
+
+		if (p->connState == TRUE) {
+			CheckDuplicateLogin(p->uid);
+		}
+
+		mClients[p->userKey].mStateLock.lock();
+		mClients[p->userKey].mCredit = p->credit;
+		strcpy_s(mClients[p->userKey].mNickName, sizeof(p->nickname), p->nickname);
+		strcpy_s(mClients[p->userKey].mID, sizeof(p->id), p->id);
+		mClients[p->userKey].mPoint = p->point;
+		mClients[p->userKey].mUID = p->uid;
+		mClients[p->userKey].mTier = p->tier;
+		mClients[p->userKey].mState = eSessionState::ST_LOBBY;
+		mClients[p->userKey].mStateLock.unlock();
 
 		LC_LOGIN_OK_PACKET pac;
 		pac.type = LC_LOGIN_OK;
 		pac.size = sizeof(LC_LOGIN_OK_PACKET);
-		pac.id = p->user_id;
+		pac.id = p->userKey;
 		pac.RoomID = 0;
-		pac.UID = mClients[p->user_id].mUID;
+		pac.UID = mClients[p->userKey].mUID;
 
-		mClients[p->user_id].DoSend(&pac);
-
-		// Å¬¶óÂÊ¿¡ ·Î±×ÀÎ ¼º°ø Çß´Ù°í ¾Ë·ÁÁà¾ß ÇÔ
+		mClients[p->userKey].DoSend(&pac);
 
 		break;
 	}
 	case DL_LOGIN_FAIL:
 	{
-		cout << "·Î±×ÀÎ ½ÇÆÐ" << endl;
+		cout << "ï¿½Î±ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½" << endl;
+
+		DL_LOGIN_FAIL_PACKET* p = reinterpret_cast<DL_LOGIN_FAIL_PACKET*>(spacket);
+
+		LC_LOGIN_FAIL_PACKET pac;
+		pac.size = sizeof(LC_LOGIN_FAIL_PACKET);
+		pac.type = LC_LOGIN_FAIL;
+
+		mClients[p->userKey].DoSend(&pac);
+
 		break;
 	}
 	default:
@@ -178,13 +190,6 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 
 void Server::DoWorker()
 {
-	/*EV_UpdateMatchPacket p;
-	p.size = sizeof(EV_UpdateMatchPacket);
-	p.type = 0;
-
-	pTimer->PushEvent(1, eEVENT_TYPE::EV_MATCH_UP, 5000, reinterpret_cast<char*>(&p));
-	*/
-
 	while (true)
 	{
 		DWORD numBytes;
@@ -211,7 +216,7 @@ void Server::DoWorker()
 			}
 		}
 
-		switch (exOver->mCompType) 
+		switch (exOver->mCompType)
 		{
 		case eCompType::OP_ACCEPT:
 		{
@@ -223,11 +228,11 @@ void Server::DoWorker()
 				int server_id = GetNewServerID();
 				if (server_id != INVALID_KEY)
 				{
-					mServers[server_id].mPlayerID = server_id;
+					mServers[server_id].mSocketID = server_id;
 					mServers[server_id].mRecvOver.mCompType = eCompType::OP_SERVER_RECV;
 					mServers[server_id].mPrevRemain = 0;
 					mServers[server_id].mSocket = cSocket;
-					
+
 					CreateIoCompletionPort(reinterpret_cast<HANDLE>(cSocket), mHCP, server_id, 0);
 					mServers[server_id].DoRecv();
 					cSocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
@@ -241,9 +246,9 @@ void Server::DoWorker()
 				ZeroMemory(&exOver->mOver, sizeof(exOver->mOver));
 				exOver->mWsaBuf.buf = reinterpret_cast<CHAR*>(cSocket);
 				int addr_size = sizeof(SOCKADDR_IN);
-				//°ÔÀÓ¼­¹ö°¡ ´õ ÄÑÁ®¾ß ÇÑ´Ù¸é
+				//ï¿½ï¿½ï¿½Ó¼ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ñ´Ù¸ï¿½
 				/*
-				if(mGameServerCnt < mMaxGameServerCnt) //<<µÎ°³ º¯¼ö Ãß°¡ÇØÁÖ°í
+				if(mGameServerCnt < mMaxGameServerCnt) //<<ï¿½Î°ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½ï¿½ï¿½ï¿½Ö°ï¿½
 					AcceptEx(mListenSocket, cSocket, exOver->mMessageBuf, BUF_SIZE - 8, addr_size + 16, addr_size + 16, 0, &exOver->mOver);
 				else
 				*/
@@ -253,7 +258,7 @@ void Server::DoWorker()
 				int client_id = GetNewClientID();
 				if (client_id != INVALID_KEY)
 				{
-					mClients[client_id].mPlayerID = client_id;
+					mClients[client_id].mSocketID = client_id;
 					mClients[client_id].mPrevRemain = 0;
 					mClients[client_id].mSocket = cSocket;
 					CreateIoCompletionPort(reinterpret_cast<HANDLE>(cSocket), mHCP, client_id, 0);
@@ -349,12 +354,12 @@ void Server::DoWorker()
 			delete exOver;
 			break;
 		}
-		case eCompType::OP_EVENT: 
+		case eCompType::OP_EVENT:
 		{
 			ProcessEvent((unsigned char*)exOver->mMessageBuf);
 			break;
 		}
-		default :
+		default:
 		{
 			break;
 		}
@@ -399,20 +404,20 @@ void Server::Init()
 	inet_pton(AF_INET, SERVERIP, &serverAddr.sin_addr);
 
 	if (connect(LDsocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR) {
-		cout << "DB¼­¹ö Ä¿³ØÆ® ½ÇÆÐ" << endl;
+		cout << "DBconnection failed" << endl;
 	}
 	else {
-		cout << "DB¼­¹ö Ä¿³ØÆ® ¼º°ø" << endl;
+		cout << "DBconnection success" << endl;
 		OverEXP ss_over;
 		ss_over.mCompType = eCompType::OP_ACCEPT;
 		ss_over.mWsaBuf.buf = reinterpret_cast<CHAR*>(LDsocket);
 
-		// ¹ÙÀÎµå °É¾î ÁÖ±â -> ±âÁ¸ Å¬¶ó ¸»°í ¼­¹ö ÂÊÀ¸·Î
+		// ï¿½ï¿½ï¿½Îµï¿½ ï¿½É¾ï¿½ ï¿½Ö±ï¿½ -> ï¿½ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 		int server_id = GetNewServerID();
 		if (server_id != INVALID_KEY)
 		{
-			mServers[server_id].mPlayerID = server_id;
+			mServers[server_id].mSocketID = server_id;
 			mServers[server_id].mRecvOver.mCompType = eCompType::OP_SERVER_RECV;
 			mServers[server_id].mPrevRemain = 0;
 			mServers[server_id].mSocket = LDsocket;
@@ -447,11 +452,11 @@ void Server::Init()
 
 	pTimer = new Timer;
 	pTimer->Init(mHCP);
-	delete pTimer;
 
 	for (auto& th : mWorkerThreads)
 		th.join();
 
+	delete pTimer;
 	closesocket(mListenSocket);
 	WSACleanup();
 }
@@ -459,19 +464,180 @@ void Server::Init()
 void Server::ProcessEvent(unsigned char* cmessage)
 {
 	switch (cmessage[1]) {
-	case static_cast<int> (eEVENT_TYPE::EV_MATCH_UP):
+	case eEVENT_TYPE::EV_MATCH_UP:
 	{
-		cout << "ÀÛµ¿ È®ÀÎ 0" << endl;
+		// ï¿½âº» Ç®ï¿½ï¿½ ï¿½ï¿½Äª ï¿½ï¿½ï¿½ï¿½
+		if (mMatchListHighTier.size() >= MAX_ROOM_USER)
+		{
+			for (int i = 0; i < MAX_ROOM_USER; ++i)
+			{
+				int player_id = mMatchListHighTier.front();
+
+				LG_USER_INTO_GAME_PACKET packet;
+				packet.size = sizeof(packet);
+				packet.type = LG_USER_INTO_GAME;
+				packet.roomID = 0;//ï¿½ï¿½ ï¿½ï¿½È£ ï¿½Ó½Ã·ï¿½ 0ï¿½ï¿½ï¿½ï¿½ ï¿½Ö¾ï¿½ï¿?
+				strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
+				strcpy_s(packet.id, sizeof(mClients[player_id].mID), mClients[player_id].mID);
+				packet.uID = mClients[player_id].mUID;
+				packet.roomMax = MAX_ROOM_USER;
+				mClients[player_id].mRoomID = packet.roomID;
+
+				mServers[1].DoSend(&packet);
+
+				mMatchListHighTier.pop_front();
+				mReadytoGame.push_back(player_id);
+			}
+		}
+		if (mMatchListLowTier.size() >= MAX_ROOM_USER)
+		{
+			for (int i = 0; i < MAX_ROOM_USER; ++i)
+			{
+				int player_id = mMatchListLowTier.front();
+
+				LG_USER_INTO_GAME_PACKET packet;
+				packet.size = sizeof(packet);
+				packet.type = LG_USER_INTO_GAME;
+				packet.roomID = 0;//ï¿½ï¿½ ï¿½ï¿½È£ ï¿½Ó½Ã·ï¿½ 0ï¿½ï¿½ï¿½ï¿½ ï¿½Ö¾ï¿½ï¿?
+				strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
+				strcpy_s(packet.id, sizeof(mClients[player_id].mID), mClients[player_id].mID);
+				packet.uID = mClients[player_id].mUID;
+				packet.roomMax = MAX_ROOM_USER;
+				mClients[player_id].mRoomID = packet.roomID;
+
+				mServers[1].DoSend(&packet);
+
+				
+				mMatchListLowTier.pop_front();
+				mReadytoGame.push_back(player_id);
+			}
+		}
+
+		// 4ï¿½ï¿½ ï¿½Ì»ï¿½ ï¿½ï¿½ï¿?
+		if (mMatchListHighTier.size() >= MAX_ROOM_USER / 2)
+		{
+			EV_CountDownPacket pac;
+			pac.size = sizeof(EV_CountDownPacket);
+			pac.type = eCompType::OP_EVENT;
+			pac.listnum = 0;
+			pTimer->PushEvent(1, eEVENT_TYPE::EV_COUNT_DOWN, 1000, reinterpret_cast<unsigned char*>(&pac));
+
+			mClients[mMatchListHighTier.front()].mMatchStartTime = system_clock::now();
+		}
+		if (mMatchListLowTier.size() >= MAX_ROOM_USER / 2)
+		{
+			EV_CountDownPacket pac;
+			pac.size = sizeof(EV_CountDownPacket);
+			pac.type = eCompType::OP_EVENT;
+			pac.listnum = 1;
+			pTimer->PushEvent(1, eEVENT_TYPE::EV_COUNT_DOWN, 1000, reinterpret_cast<unsigned char*>(&pac));
+
+			mClients[mMatchListLowTier.front()].mMatchStartTime = system_clock::now();
+		}
+
+		EV_UpdateMatchPacket p;
+		p.size = sizeof(EV_UpdateMatchPacket);
+		p.type = eCompType::OP_EVENT;
+		pTimer->PushEvent(1, eEVENT_TYPE::EV_MATCH_UP, 10000, reinterpret_cast<unsigned char*>(&p));
+
 		break;
 	}
-	case static_cast<int> (eEVENT_TYPE::EV_MATCH_IN):
+	case eEVENT_TYPE::EV_COUNT_DOWN:
 	{
-		cout << "ÀÛµ¿ È®ÀÎ 1" << endl;
-		break;
-	}
-	case static_cast<int> (eEVENT_TYPE::EV_MATCH_OUT):
-	{
-		cout << "ÀÛµ¿ È®ÀÎ 2" << endl;
+		EV_CountDownPacket* p = reinterpret_cast<EV_CountDownPacket*>(cmessage);
+
+		system_clock::time_point tTime = system_clock::now();
+
+		if (p->listnum == 0) // ï¿½ï¿½ï¿½ï¿½ Æ¼ï¿½ï¿½
+		{
+			if (mMatchListHighTier.size() < MAX_ROOM_USER / 2)
+			{
+				break;
+			}
+			else
+			{
+				if (tTime - mClients[mMatchListHighTier.front()].mMatchStartTime >= milliseconds(2000))
+				{
+					for (int i = 0; i < mMatchListHighTier.size(); ++i)
+					{
+						int player_id = mMatchListHighTier.front();
+
+						LG_USER_INTO_GAME_PACKET packet;
+						packet.size = sizeof(packet);
+						packet.type = LG_USER_INTO_GAME;
+						packet.roomID = 0;//ï¿½ï¿½ ï¿½ï¿½È£ ï¿½Ó½Ã·ï¿½ 0ï¿½ï¿½ï¿½ï¿½ ï¿½Ö¾ï¿½ï¿?
+						strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
+						strcpy_s(packet.id, sizeof(mClients[player_id].mID), mClients[player_id].mID);
+						packet.uID = mClients[player_id].mUID;
+						packet.roomMax = mMatchListHighTier.size();
+						mClients[player_id].mRoomID = packet.roomID;
+
+						mServers[1].DoSend(&packet);
+
+						mMatchListHighTier.pop_front();
+						mReadytoGame.push_back(player_id);
+					}
+				}
+				else
+				{
+					// Å¬ï¿½ï¿½ ï¿½Ã°ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ -> ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿?ï¿½Ã°ï¿½ ï¿½ï¿½ï¿½ï¿½
+					/*
+					   ï¿½ï¿½Å¶ ï¿½ï¿½ï¿½ï¿½
+					*/
+
+					EV_CountDownPacket pac;
+					pac.size = sizeof(EV_CountDownPacket);
+					pac.type = eCompType::OP_EVENT;
+					pac.listnum = 0;
+					pTimer->PushEvent(1, eEVENT_TYPE::EV_COUNT_DOWN, 1000, reinterpret_cast<unsigned char*>(&pac));
+				}
+			}
+		}
+		else // ï¿½ï¿½ï¿½ï¿½ Æ¼ï¿½ï¿½
+		{
+			if (mMatchListLowTier.size() < MAX_ROOM_USER / 2)
+			{
+				break;
+			}
+			else
+			{
+				if (tTime - mClients[mMatchListLowTier.front()].mMatchStartTime >= milliseconds(2000))
+				{
+					for (int i = 0; i < mMatchListLowTier.size(); ++i)
+					{
+						int player_id = mMatchListLowTier.front();
+
+						LG_USER_INTO_GAME_PACKET packet;
+						packet.size = sizeof(packet);
+						packet.type = LG_USER_INTO_GAME;
+						packet.roomID = 0;//ï¿½ï¿½ ï¿½ï¿½È£ ï¿½Ó½Ã·ï¿½ 0ï¿½ï¿½ï¿½ï¿½ ï¿½Ö¾ï¿½ï¿?
+						strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
+						strcpy_s(packet.id, sizeof(mClients[player_id].mID), mClients[player_id].mID);
+						packet.uID = mClients[player_id].mUID;
+						packet.roomMax = mMatchListLowTier.size();
+						mClients[player_id].mRoomID = packet.roomID;
+
+						mServers[1].DoSend(&packet);
+
+						mMatchListLowTier.pop_front();
+						mReadytoGame.push_back(player_id);
+					}
+				}
+				else
+				{
+					// Å¬ï¿½ï¿½ ï¿½Ã°ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ -> ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿?ï¿½Ã°ï¿½ ï¿½ï¿½ï¿½ï¿½
+					/*
+					   ï¿½ï¿½Å¶ ï¿½ï¿½ï¿½ï¿½
+					*/
+
+					EV_CountDownPacket pac;
+					pac.size = sizeof(EV_CountDownPacket);
+					pac.type = eCompType::OP_EVENT;
+					pac.listnum = 1;
+					pTimer->PushEvent(1, eEVENT_TYPE::EV_COUNT_DOWN, 1000, reinterpret_cast<unsigned char*>(&pac));
+				}
+			}
+		}
 		break;
 	}
 	default:
@@ -479,4 +645,37 @@ void Server::ProcessEvent(unsigned char* cmessage)
 		break;
 	}
 	}
+}
+
+void Server::CheckDuplicateLogin(int uid)
+{
+	int target = -1;
+	for (int i = MAXGAMESERVER; i < MAX_USER; ++i) {
+		mClients[i].mStateLock.lock();
+		if (mClients[i].mUID == uid) {
+			target = i;
+			mClients[i].mStateLock.unlock();
+			break;
+		}
+		mClients[i].mStateLock.unlock();
+	}
+	if (target != -1) {
+		if (mClients[target].mState == eSessionState::ST_INGAME) {
+			SendDiconnectPacketToGameServer(target, uid, mClients[target].mRoomID);
+		}
+		else {
+			Disconnect(target);
+		}
+	}
+}
+
+void Server::SendDiconnectPacketToGameServer(int key, int uid, int roomID)
+{
+	LG_USER_DISCONNECT_PACKET p;
+	p.size = sizeof(p);
+	p.type = LG_USER_DISCONNECT;
+	p.uID = uid;
+	p.roomID = roomID;
+	
+	mClients[key].DoSend(reinterpret_cast<char*>(&p));
 }
