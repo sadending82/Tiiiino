@@ -90,7 +90,7 @@ void MainServer::init()
 	}
 	for (int i = 0; i < MAX_ROOM; ++i)
 	{
-		Room* room = new Room();
+		Room* room = new Room(i);
 		room->Init();
 		mRooms.insert(make_pair(i, room));
 	}
