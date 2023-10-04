@@ -32,10 +32,10 @@ void AGoalArea::Tick(float DeltaTime)
 
 void AGoalArea::BoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	auto OverlapCharacter = Cast<ACharacter>(OtherComp->GetOwner());
+	ACharacter* OverlapCharacter = Cast<ACharacter>(OtherComp->GetOwner());
 	if (OverlapCharacter)
 	{
-		auto Controller = OverlapCharacter->GetController();
+		AController* Controller = OverlapCharacter->GetController();
 		if (!!Controller)
 		{
 			if (Controller->IsPlayerController())
@@ -43,9 +43,8 @@ void AGoalArea::BoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 				// 박스 컴포넌트에 내 캐릭터가 닿았다!
 
 				// 캐릭터를 안보이게 하고 콜리젼도 off
-				OverlapCharacter->SetActorEnableCollision(false);
-				OverlapCharacter->SetActorHiddenInGame(true);
 
+				PlayerDisable(OverlapCharacter);
 				// UI 타이머 생성과 UI 결과 출력은 인게임 UI가 완성되는 대로 추가
 				
 
@@ -56,5 +55,11 @@ void AGoalArea::BoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 		else
 			CLog::Log("Controller is nullptr");
 	}
+}
+
+void AGoalArea::PlayerDisable(ACharacter* Character)
+{
+	Character->SetActorEnableCollision(false);
+	Character->SetActorHiddenInGame(true);
 }
 
