@@ -104,6 +104,13 @@ void ATinoCharacter::Tick(float DeltaTime)
 				GetCharacterMovement()->Velocity = ServerCharMovingSpeed;
 			}
 		}
+
+
+		// 10/04 가만히 있을 때 충돌하지 않는 부분을 해결하기 위한 코드 추가
+		FHitResult OutHit;
+		GetCharacterMovement()->SafeMoveUpdatedComponent(FVector(0.f, 0.f, 0.01f), GetActorRotation(), true, OutHit);
+		GetCharacterMovement()->SafeMoveUpdatedComponent(FVector(0.f, 0.f, -0.01f), GetActorRotation(), true, OutHit);
+
 	}
 }
 bool ATinoCharacter::CanTumble(float DeltaTime)
