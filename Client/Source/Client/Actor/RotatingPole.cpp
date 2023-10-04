@@ -1,9 +1,16 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
+<<<<<<< Updated upstream:Client/Source/Client/Actor/RotatingPole.cpp
 #include "Actor/RotatingPole.h"
 #include "../Engine/Classes/Components/StaticMeshComponent.h"
 #include "../Engine/Classes//GameFramework/Character.h"
+=======
+#include "Actor/Obstacles/RotatingPole.h"
+#include "Components/StaticMeshComponent.h"
+#include "GameFramework/Character.h"
+#include "Global.h"
+>>>>>>> Stashed changes:Client/Source/Client/Actor/Obstacles/RotatingPole.cpp
 
 // Sets default values
 ARotatingPole::ARotatingPole()
@@ -26,7 +33,21 @@ void ARotatingPole::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimi
 {
 	ACharacter* hitCharacter = Cast<ACharacter>(Other);
 
+<<<<<<< Updated upstream:Client/Source/Client/Actor/RotatingPole.cpp
 	hitCharacter->LaunchCharacter(-HitNormal * ElasticForce, false, false);
+=======
+	if (hitCharacter != nullptr)
+	{
+		//혹시 밑으로 발사해서 문제인건가?
+		
+		//hitCharacter->LaunchCharacter(-HitNormal * ElasticForce, false, false);
+		
+		CLog::Log("Hit");
+
+		hitCharacter->LaunchCharacter(FVector(-HitNormal.X, -HitNormal.Y, fabs(HitNormal.Z))*ElasticForce, false, false);
+		
+	}
+>>>>>>> Stashed changes:Client/Source/Client/Actor/Obstacles/RotatingPole.cpp
 }
 
 

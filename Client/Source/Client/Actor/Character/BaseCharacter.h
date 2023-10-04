@@ -32,5 +32,16 @@ private:
 	UPROPERTY(EditAnywhere,Category = "Network")
 		int ClientID;
 
+<<<<<<< Updated upstream
+=======
+public:
+
+	float ServerSyncElapsedTime;	//몇초 마다 이동 동기화 보낼것인지.
+	float ServerSyncDeltaTime;		//몇초 마다 이동 동기화 보낼것인지.
+
+	bool bIsConnected;	//임시 변수
+	float ServerSyncSpeed;	//서버 동기화용 애니메이션 스피드.
+	FVector ServerCharMovingSpeed;	//서버 동기화 움직임 보간처리용 변수
+>>>>>>> Stashed changes
 
 };

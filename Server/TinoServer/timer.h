@@ -28,7 +28,6 @@ public:
 	{
 		mIsRun = cvalue; 
 	}
-
 private:
 	int mIsRun;
 	HANDLE mHiocp;

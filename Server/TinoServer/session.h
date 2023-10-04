@@ -3,7 +3,7 @@
 
 enum class eSessionState
 { 
-	ST_FREE, ST_ACCEPTED, ST_MATCH
+	ST_FREE, ST_ACCEPTED, ST_LOBBY, ST_MATCH, ST_INGAME
 };
 
 class Session
@@ -11,10 +11,20 @@ class Session
 public:
 	Session()
 	{
-		mPlayerID = -1;
+		mSocketID = -1;
 		mSocket = 0;
 		mState = eSessionState::ST_FREE;
 		mPrevRemain = 0;
+<<<<<<< Updated upstream
+=======
+		mRoomID = -1;
+		mUID = 0;
+		ZeroMemory(mNickName, sizeof(mNickName));
+		mCredit = 0;
+		mPoint = 0;
+		mTier = 0;
+		mMatchStartTime = system_clock::now();
+>>>>>>> Stashed changes
 	}
 	~Session() {}
 	void DoRecv()
@@ -35,7 +45,19 @@ public:
 	OverEXP mRecvOver;
 	mutex	mStateLock;
 	eSessionState mState;
+<<<<<<< Updated upstream
 	int mPlayerID;
 	SOCKET mSocket;
+=======
+	int		mSocketID;
+	int		mUID;
+	char	mID[MAX_NAME_SIZE];
+	char	mNickName[MAX_NAME_SIZE];
+	double	mCredit;
+	int		mPoint;
+	double	mTier;
+	system_clock::time_point mMatchStartTime;
+	SOCKET	mSocket;
+>>>>>>> Stashed changes
 	int		mPrevRemain;
 };

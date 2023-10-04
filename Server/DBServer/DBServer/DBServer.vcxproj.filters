@@ -15,6 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+<<<<<<< Updated upstream
     <ClCompile Include="main.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -22,19 +23,52 @@
       <Filter>헤더 파일</Filter>
     </ClCompile>
     <ClCompile Include="DB.cpp">
+=======
+    <ClCompile Include="cDB.cpp">
+>>>>>>> Stashed changes
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="cSocket.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+<<<<<<< Updated upstream
+=======
+    <ClCompile Include="main.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="cExOver.h">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.h">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="cSecurity.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+>>>>>>> Stashed changes
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DB.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="cSession.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
     <ClInclude Include="cSocket.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+<<<<<<< Updated upstream
+=======
+    <ClInclude Include="..\..\ServerProtocol.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\protocol.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="cSecurity.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+>>>>>>> Stashed changes
   </ItemGroup>
   <ItemGroup>
     <Text Include="schema.txt" />

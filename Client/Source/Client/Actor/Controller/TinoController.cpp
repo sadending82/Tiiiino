@@ -1,6 +1,12 @@
 #include "Actor/Controller/TinoController.h"
 #include "Actor/Character/TinoCharacter.h"
+<<<<<<< Updated upstream
 //#include "Global.h"
+=======
+#include "GameFramework/PlayerController.h"
+#include "Network/Network.h"
+#include "Global.h"
+>>>>>>> Stashed changes
 
 ATinoController::ATinoController()
 	:MaxDummyCount(8),
@@ -8,6 +14,42 @@ ATinoController::ATinoController()
 {
 }
 
+<<<<<<< Updated upstream
+=======
+void ATinoController::BeginPlay()
+{
+	Super::BeginPlay();
+	if (StartingWidgetClass != nullptr && UGameplayStatics::GetCurrentLevelName(GetWorld()) == "Lobby")
+	{
+		if (false == Network::GetNetwork()->bIsConnectedLobby)
+		{
+			ChangeMenuWidget(StartingWidgetClass);
+		}
+		else {
+			SetInputUIMode();
+		}
+	}
+}
+
+void ATinoController::ChangeMenuWidget(TSubclassOf<UUserWidget> NewWidgetClass)
+{
+	if (CurrentWidget != nullptr)
+	{
+		CurrentWidget->RemoveFromViewport();
+		CurrentWidget = nullptr;
+	}
+
+	if (NewWidgetClass != nullptr)
+	{
+		CurrentWidget = CreateWidget(GetWorld(), NewWidgetClass);
+		if (CurrentWidget != nullptr)
+		{
+			CurrentWidget->AddToViewport();
+		}
+	}
+}
+
+>>>>>>> Stashed changes
 void ATinoController::CreateDummy()
 {
 	if (TinoCharacterClass)

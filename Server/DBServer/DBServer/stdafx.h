@@ -25,5 +25,18 @@
 #pragma comment(lib, "MSWSock.lib")
 using namespace std;
 
+<<<<<<< Updated upstream
 #include <mysql.h>
 #pragma comment(lib, "libmysql.lib")
+=======
+#include "mysql.h"
+#pragma comment(lib, "libmysql.lib")
+
+constexpr int MAXLOBBY = 10;
+constexpr int INVALIDKEY = -1;
+constexpr int BUFSIZE = 200;
+
+constexpr int STARTKEY = 1;
+
+constexpr int SALT_LENGTH = 10;
+>>>>>>> Stashed changes
