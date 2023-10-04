@@ -179,6 +179,16 @@ void send_move_packet(SOCKET& sock, const bool& inair, const float& x, const flo
 	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
 }
 
+void send_action_packet(SOCKET& sock, const char action)
+{
+	CS_ACTION_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_ACTION;
+	packet.action = action;
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+}
+
 void send_ping_packet(SOCKET& sock, const long long ping)
 {
 	CS_PING_PACKET packet;
@@ -315,7 +325,6 @@ void Network::process_packet(unsigned char* p)
 		closesocket(s_socket);
 		UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("Lobby"));
 		bLevelOpenTriggerEnabled = true;
-		//packet->record; // << 이걸로 성공/실패 ui 띄우기.
 
 		break;
 	}

@@ -179,9 +179,9 @@ void MainServer::send_player_add_packet(const int playerID, void* buf, const int
 
 }
 
-SC_ADD_PLAYER_PACKET MainServer::make_player_add_packet(const int playerID)
+SC_ADD_PLAYER_PACKET MainServer::make_player_add_packet(const int playerSocketID)
 {
-	Player* player = dynamic_cast<Player*>(mObjects[playerID]);
+	Player* player = dynamic_cast<Player*>(mObjects[playerSocketID]);
 	SC_ADD_PLAYER_PACKET sendpacket;
 	sendpacket.id = player->GetRoomSyncID();
 	//strcpy_s(sendpacket.name, character->name);
@@ -236,21 +236,21 @@ void MainServer::send_move_packet(const int player_id,const int mover_id, const 
 	player->SendPacket(&packet, sizeof(packet));
 }
 
-SC_MOVE_PLAYER_PACKET MainServer::make_move_packet(const int moverID, const bool inair, const float value, const float sx, const float sy, const float sz)
+SC_MOVE_PLAYER_PACKET MainServer::make_move_packet(const int moverSocketID, const bool inair, const float value, const float sx, const float sy, const float sz)
 {
 	SC_MOVE_PLAYER_PACKET packet{};
-	packet.id = moverID;
+	auto mover = dynamic_cast<Player*>(mObjects[moverSocketID]);
+	packet.id = mover->GetRoomSyncID();
 	packet.size = sizeof(packet);
 	packet.type = SC_MOVE_PLAYER;
 	//packet.inair = inair;
-	packet.x = mObjects[moverID]->GetPosition().x;
-	packet.y = mObjects[moverID]->GetPosition().y;
-	packet.z = mObjects[moverID]->GetPosition().z;
-	packet.rx = mObjects[moverID]->GetRotate().x;
-	packet.ry = mObjects[moverID]->GetRotate().y;
-	packet.rz = mObjects[moverID]->GetRotate().z;
-	packet.rw = mObjects[moverID]->GetRotate().w;
-	auto mover = dynamic_cast<Player*>(mObjects[moverID]);
+	packet.x = mover->GetPosition().x;
+	packet.y = mover->GetPosition().y;
+	packet.z = mover->GetPosition().z;
+	packet.rx = mover->GetRotate().x;
+	packet.ry = mover->GetRotate().y;
+	packet.rz = mover->GetRotate().z;
+	packet.rw = mover->GetRotate().w;
 	if (mover)
 		packet.move_time = mover->GetMoveTime();
 	packet.speed = value;
@@ -496,6 +496,7 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 		Room* pRoom = mRooms[player->GetRoomID()];
 		pRoom->AddObject(player);
 		{
+			DEBUGMSGONEPARAM("[%d]\n", player->GetRoomSyncID());
 			SC_LOGIN_OK_PACKET sPacket = make_login_ok_packet(player->GetRoomSyncID(), "none");
 			SendMySelf(client_id, (void*)&sPacket, sizeof(sPacket));
 			//send_login_ok_packet(client_id, "none");
@@ -508,7 +509,7 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 
 		//나를 상대에게
 		{
-			auto spacket = make_player_add_packet(player->GetRoomSyncID());
+			auto spacket = make_player_add_packet(player->GetSocketID());
 			SendRoomSomeoneExcept(player->GetRoomID(), player->GetSocketID(), (void*)&spacket, sizeof(spacket));
 		}
 
@@ -530,12 +531,13 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 		}
 		Room* pRoom = mRooms[player->GetRoomID()];
 
+
 		player->SetMoveTime(packet->move_time);
 		player->SetPosition(Vector3f(packet->x, packet->y, packet->z));
 		player->SetRotate(Vector4f(packet->rx, packet->ry, packet->rz, packet->rw));
 
 		{
-			auto sPacket = make_move_packet(player->GetRoomSyncID(), packet->inair, packet->speed, packet->sx, packet->sy, packet->sz);
+			auto sPacket = make_move_packet(player->GetSocketID(), packet->inair, packet->speed, packet->sx, packet->sy, packet->sz);
 			SendRoomBroadCast(player->GetRoomID(), (void*)&sPacket, sizeof(sPacket));
 		}
 		break;

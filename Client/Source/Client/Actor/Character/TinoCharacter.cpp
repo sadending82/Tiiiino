@@ -168,6 +168,7 @@ void ATinoCharacter::Dive()
 	{
 		bIsDiving = true;
 		PlayAnimMontage(DiveMontage);
+		send_action_packet(Network::GetNetwork()->s_socket,2);
 	}
 }
 
@@ -215,6 +216,7 @@ void ATinoCharacter::Jump()
 	if (CanMove()  && GetCharacterMovement()->IsFalling() == false)
 	{
 		Super::Jump();
+		send_action_packet(Network::GetNetwork()->s_socket,1);
 	}
 	
 }

@@ -226,6 +226,7 @@ void Room::setPlayerInfoWithCnt(const int uID, const std::string id, const int& 
 	if (playerMaxNum == mPlayerCnt)
 	{
 		mPlayerInfoLock.unlock();
+		DEBUGMSGONEPARAM("심각한 오류!!!! [%d]", mPlayerCnt);
 		return;
 	}
 	mPlayerInfo.insert(std::make_pair(uID, id));
