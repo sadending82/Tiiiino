@@ -16,17 +16,23 @@ void ULobbyUIWidget::NativeDestruct()
 
 void ULobbyUIWidget::TryGameStart()
 {
-	// GameStart Button Onclicked
+	// If Ready Check
+	// Game Start
 	send_match_packet(Network::GetNetwork()->l_socket);
 
 }
 
 void ULobbyUIWidget::TryGameReady()
 {
+	// If not ready
+	// GameStart Button Onclicked
 }
 
 void ULobbyUIWidget::TryGameReadyCancel()
 {
+	// If ready
+	// GameStart Button Onclicked
+
 }
 
 void ULobbyUIWidget::TryBack()
