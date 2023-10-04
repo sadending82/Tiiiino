@@ -239,7 +239,7 @@ void Room::setGameEndTimerStartOnce()
 	bool expect = 0;
 	if (std::atomic_compare_exchange_strong(reinterpret_cast<std::atomic_bool*>(&mGameEndTimer), 0, 1))
 	{
-		DEBUGMSGNOPARAM("한 번 실행되야함");
+		DEBUGMSGNOPARAM("한 번 실행되야함\n");
 
 		TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_COUNTDOWN_START, eEventType::TYPE_BROADCAST_ROOM, 0, NULL, mRoomID);
 	}

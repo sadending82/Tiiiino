@@ -440,7 +440,7 @@ bool MainServer::setPlayerInRoom(Player* player)
 			}
 		}
 	}
-	DEBUGMSGONEPARAM("플레이어와 방 매칭 도중 버그가 발생함[%d]번째플레이어", player->GetUID());
+	DEBUGMSGONEPARAM("플레이어와 방 매칭 도중 버그가 발생함[%d]번째플레이어\n", player->GetUID());
 	return false;
 }
 
@@ -449,7 +449,7 @@ bool MainServer::initRoom(const std::string& mapName)
 	std::ifstream is{ mapName };
 	if (!is.is_open())
 	{
-		DEBUGMSGONEPARAM("[%s]읽기 실패", mapName.c_str());
+		DEBUGMSGONEPARAM("[%s]읽기 실패\n", mapName.c_str());
 	}
 	
 	return false;

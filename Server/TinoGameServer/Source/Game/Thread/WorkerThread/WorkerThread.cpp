@@ -167,7 +167,7 @@ void WorkerThread::doThread()
 			M_Door* obj = dynamic_cast<M_Door*>(mMainServer->GetRooms()[roomID]->GetObjectsRef()[roomSyncID]);
 			if (!obj)
 			{
-				DEBUGMSGONEPARAM("M_Door Doensn't exit [%d]", roomSyncID);
+				DEBUGMSGONEPARAM("M_Door Doensn't exit [%d]\n", roomSyncID);
 				break;
 			}
 			for (Object*& Object : mMainServer->GetRooms()[roomID]->GetObjectsRef())
