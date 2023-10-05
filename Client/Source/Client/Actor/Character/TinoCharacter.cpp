@@ -167,8 +167,9 @@ void ATinoCharacter::DiveEnd()
 
 void ATinoCharacter::OnAccelEffect()
 {
+	//비네트 값을 조절해 가속 이펙트를 킴
 	Camera->PostProcessSettings.bOverride_VignetteIntensity = true;
-	Camera->PostProcessSettings.VignetteIntensity = 1.0f;
+	Camera->PostProcessSettings.VignetteIntensity = CustomVignetteIntensity;
 }
 
 void ATinoCharacter::OffAccelEffect()
