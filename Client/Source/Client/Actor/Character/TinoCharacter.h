@@ -43,6 +43,8 @@ public:
 public:
 
 	virtual void Jump() override;
+
+	UFUNCTION(BlueprintCallable)
 	void Dive();
 
 	void PlayTumbleMontage();
@@ -52,6 +54,9 @@ public:
 
 	void DiveBegin();
 	void DiveEnd();
+
+	void OnAccelEffect();
+	void OffAccelEffect();
 	
 	FORCEINLINE void SetMovementState(EMovementState State) { MovementState = State; }
 	FORCEINLINE void SetMaxTumbleTime(float MaxTime) { MaxTumbledTime = MaxTime; }

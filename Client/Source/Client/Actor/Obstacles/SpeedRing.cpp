@@ -1,5 +1,6 @@
 #include "Actor/Obstacles/SpeedRing.h"
 //#include "Network/Network.h"
+#include "Actor/Character/TinoCharacter.h"
 #include "Global.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
@@ -37,7 +38,7 @@ void ASpeedRing::Tick(float DeltaTime)
 void ASpeedRing::BoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, 
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	auto OverlapCharacter = Cast<ACharacter>(OtherComp->GetOwner());
+	auto OverlapCharacter = Cast<ATinoCharacter>(OtherComp->GetOwner());
 	if (OverlapCharacter)
 	{
 		auto Controller = OverlapCharacter->GetController();
@@ -54,9 +55,11 @@ void ASpeedRing::BoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 					GetWorldTimerManager().ClearTimer(SpeedRingTImer);
 				}
 				OverlapCharacter->GetCharacterMovement()->MaxWalkSpeed = ChangeSpeed;
+				OverlapCharacter->OnAccelEffect();
 				GetWorldTimerManager().SetTimer(SpeedRingTImer, [this, OverlapCharacter]()
 					{
 						OverlapCharacter->GetCharacterMovement()->MaxWalkSpeed = OriginalSpeed;
+						OverlapCharacter->OffAccelEffect();
 					}
 				, DurationTime, false);
 

@@ -162,6 +162,18 @@ void ATinoCharacter::DiveEnd()
 	bIsDiving = false;
 }
 
+void ATinoCharacter::OnAccelEffect()
+{
+	Camera->PostProcessSettings.bOverride_VignetteIntensity = true;
+	Camera->PostProcessSettings.VignetteIntensity = 1.0f;
+}
+
+void ATinoCharacter::OffAccelEffect()
+{
+	Camera->PostProcessSettings.bOverride_VignetteIntensity = false;
+
+}
+
 void ATinoCharacter::Dive()
 {
 	if (DiveMontage && CanDive())
