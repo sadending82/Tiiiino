@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -64,7 +64,7 @@ public:
 	FORCEINLINE bool IsDivining() { return bIsDiving; }
 
 private:
-	//Ű�Է� ���� �Լ�
+	//키입력 관련 함수
 	void OnMoveForward(float Axis);
 	void OnMoveRight(float Axis);
 	void OnHorizonLock(float Axis);
@@ -103,6 +103,9 @@ private:
 		float CurrentTumbledTime;
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 		float MaxTumbledTime;
+
+	UPROPERTY(BlueprintReadWrite,EditAnywhere,meta = (AllowPrivateAccess = true, ToolTip="비네트 강도"), Category = "Effect")
+		float CustomVignetteIntensity;
 
 	UPROPERTY(VisibleAnywhere, Category = "Enums")
 		EMovementState MovementState;
