@@ -26,6 +26,8 @@ public:
 	void ActiveRoom();
 	bool IsRoomReady();
 	bool IsRoomReadyComplete();
+	bool IsAllPlayerReady();
+	void PlayerCntIncrease();
 
 	bool SettingRoomPlayer(const int uID, const std::string id, const int& playerMaxNum);
 	int FindPlayerInfo(const int uID, const std::string id);
@@ -57,7 +59,8 @@ protected:
 	std::mutex mRoomStateLock;
 	eRoomState mRoomState;
 	int	mRoomID;	//방 ID
-	int mPlayerCnt;	//현재 방에 player가 몇명 들어왔는지.
+	int mPlayerSettingCnt;	//현재 방에 player가 몇명 세팅 됐는지.
+	std::atomic_int mPlayerCnt;	//현재 방에 player가 몇 명 들어왔는지.
 	int mPlayerMax;	//방 최대 인원
 	bool mGameEndTimer;	//The Room Game is Over (Using CAS)
 

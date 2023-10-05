@@ -24,6 +24,7 @@ void CALLBACK recv_Lobbycallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED rec
 
 static std::shared_ptr<class Network> m_Network;
 class ATinoCharacter;
+class ABaseObstacle;
 
 //lobby packet
 void send_login_packet(SOCKET& sock,const char* id, const char* passWord); 
@@ -36,6 +37,7 @@ void send_move_packet(SOCKET& sock, const bool& inair, const float& x, const flo
 void send_action_packet(SOCKET& sock, const char action);
 void send_ping_packet(SOCKET& sock, const long long ping);
 void send_goal_packet(SOCKET& sock);
+void send_game_playerload_ack_packet(SOCKET& sock);
 
 
 class WSA_OVER_EX {
@@ -82,15 +84,15 @@ public:
 
 
 public:
-	WSADATA WSAData;
-	void error_display(int err_no);
-
+	void SetObjectNetID(ABaseObstacle* object, const int netID);
 
 	ATinoCharacter* mMyCharacter;
 	FString MyCharacterName;
 	FString MyCharacterPassWord;
 	UPROPERTY()
-		ATinoCharacter* mOtherCharacter[MAX_USER];
+	ATinoCharacter* mOtherCharacter[MAX_USER];
+	UPROPERTY()
+	ABaseObstacle* mObjects[MAX_OBJECT];
 	int mGeneratedID;
 	bool bLevelOpenTriggerEnabled = false;	//게임종료로 인한 초기화가 아닌, OpenLevel로 인한 초기화 일때 제한을 걸기 위함. 
 	bool bLoginFlag = false;	//로그인시 true, Game한판이 끝나고 다시 로비로 돌아올 때 
@@ -101,6 +103,8 @@ private:
 	bool isInit;
 
 public:
+	WSADATA WSAData;
+	void error_display(int err_no);
 	bool bIsConnected = false;	//게임서버랑 연결이 되었는지,
 	bool bIsConnectedLobby = false;		//로비서버랑 연결이 되었는지
 	int mDBUID;

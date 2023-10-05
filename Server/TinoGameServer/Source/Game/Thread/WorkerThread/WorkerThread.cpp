@@ -124,6 +124,17 @@ void WorkerThread::doThread()
 			AcceptEx(mMainServer->GetSocket(), c_socket, wsa_ex->GetBuf() + 8, 0, sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN) + 16, NULL, &wsa_ex->GetWsaOver());
 			break;
 		}
+		case eCOMMAND_IOCP::CMD_GAME_START:
+		{
+			eEventType eventType = TimerThread::DeserializeEventType(wsa_ex->GetBuf());
+			DEBUGMSGNOPARAM("한번만 오는지 GAME END\n");
+			int roomID = TimerThread::DeserializeReceiver(wsa_ex->GetBuf());
+			{
+				auto sPacket = mMainServer->make_game_start_packet();
+				mMainServer->SendRoomBroadCast(roomID, (void*)&sPacket, sizeof(sPacket));
+			}
+			break;
+		}
 		case eCOMMAND_IOCP::CMD_GAME_END:
 		{
 			eEventType eventType = TimerThread::DeserializeEventType(wsa_ex->GetBuf());

@@ -9,7 +9,8 @@ Room::Room(int id)
 	: mRoomStageKindof(eRoomStage::ST_AVOID)
 	, mObjects()
 	, mPlayerInfo()
-	, mPlayerCnt(0)
+	, mPlayerSettingCnt(0)
+	, mPlayerCnt(-1)
 	, mPlayerMax(0)
 	, mRoomState(eRoomState::ST_FREE)
 	, mPlayerArrivedCnt(0)
@@ -72,7 +73,7 @@ void Room::ResetGameRoom()
 	}
 	mRoomStageKindof = eRoomStage::ST_AVOID;
 	mPlayerInfo.clear();
-	mPlayerCnt = 0;
+	mPlayerSettingCnt = 0;
 	mPlayerMax = 0;
 	mRoomState = eRoomState::ST_FREE;
 	mPlayerArrivedCnt = 0;
@@ -100,6 +101,28 @@ bool Room::IsRoomReadyComplete()
 	}
 	mRoomStateLock.unlock();
 	return false;
+}
+
+bool Room::IsAllPlayerReady()
+{
+	if (mPlayerCnt != mPlayerMax) return false;
+	mRoomStateLock.lock();
+	if (mRoomState == eRoomState::ST_READY_COMPLETE)
+	{
+		mRoomState = eRoomState::ST_INGAME;
+		mRoomStateLock.unlock();
+		return true;
+	}
+	else {
+		mRoomStateLock.unlock();
+		return false;
+	}
+
+}
+
+void Room::PlayerCntIncrease()
+{
+	mPlayerCnt++;
 }
 
 bool Room::IsRoomReady()
@@ -144,6 +167,7 @@ int Room::FindPlayerInfo(const int uID, const std::string id)
 	auto Iter = mPlayerInfo.find(uID);
 	if (Iter != mPlayerInfo.end())
 	{
+
 		return std::distance(mPlayerInfo.begin(), Iter);
 	}
 
@@ -207,13 +231,13 @@ void Room::setPlayerInfo(const int uID, const std::string id, const int& playerM
 	bool flag = false;
 	mPlayerMax = playerMaxNum;
 	mPlayerInfoLock.lock();
-	if (playerMaxNum == mPlayerCnt)
+	if (playerMaxNum == mPlayerSettingCnt)
 	{
 		mPlayerInfoLock.unlock();
 		return;
 	}
 	mPlayerInfo.insert(std::make_pair(uID, id));
-	mPlayerCnt++;
+	mPlayerSettingCnt++;
 	mPlayerInfoLock.unlock();
 
 }
@@ -223,15 +247,15 @@ void Room::setPlayerInfoWithCnt(const int uID, const std::string id, const int& 
 	bool flag = false;
 	mPlayerMax = playerMaxNum;
 	mPlayerInfoLock.lock();
-	if (playerMaxNum == mPlayerCnt)
+	if (playerMaxNum == mPlayerSettingCnt)
 	{
 		mPlayerInfoLock.unlock();
-		DEBUGMSGONEPARAM("심각한 오류!!!! [%d]", mPlayerCnt);
+		DEBUGMSGONEPARAM("심각한 오류!!!! [%d]", mPlayerSettingCnt);
 		return;
 	}
 	mPlayerInfo.insert(std::make_pair(uID, id));
-	mPlayerCnt++;
-	playerCnt = mPlayerCnt;
+	mPlayerSettingCnt++;
+	playerCnt = mPlayerSettingCnt;
 	mPlayerInfoLock.unlock();
 }
 

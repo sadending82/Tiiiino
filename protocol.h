@@ -21,6 +21,7 @@ enum PacketType {
 	CS_GOAL,
 	CS_PING,
 	CS_ACTION,
+	CS_GAME_PLAYERLOAD_ACK,
 
 	// Client To LobbyServer
 	CL_LOGIN,
@@ -35,11 +36,14 @@ enum PacketType {
 	SC_PLAYER_REMOVE,
 	SC_MOVE_PLAYER,
 	SC_PLAYER_ARRIVE,
+	SC_GAME_WAITTING,
+	SC_GAME_START,
 	SC_GAME_END,
 	SC_GAME_COUNTDOWN_START,
 	SC_PING,
 	SC_ACTION_ANIM,
 	SC_GAME_DOORSYNC,
+	SC_GAME_PLAYERLOAD_OK,
 
 	// Lobbyserver To Client
 	LC_LOGIN_OK,
@@ -87,6 +91,10 @@ struct CS_PING_PACKET : public PACKET {
 
 struct CS_ACTION_PACKET : public PACKET {
 	char action;		// 0 : none, 1 : jump, 2 : dive 
+};
+
+struct CS_GAME_PLAYERLOAD_ACK_PACKET : public PACKET {
+
 };
 //-----------------------------------
 struct CL_LOGIN_PACKET :public PACKET {
@@ -140,6 +148,14 @@ struct SC_GAME_COUNTDOWN_START_PACKET : public PACKET
 
 };
 
+struct SC_GAME_WAITTING_PACKET : public PACKET {
+
+};
+
+struct SC_GAME_START_PACKET : public PACKET {
+
+};
+
 struct SC_GAME_END_PACKET : public PACKET {
 	//char	record;		//성공 실패
 };
@@ -157,6 +173,10 @@ struct SC_ACTION_ANIM_PACKET : public PACKET {
 struct SC_GAME_DOORSYNC_PACKET : public PACKET {
 	long long	syncTime;
 	int			id;
+};
+
+struct SC_GAME_PLAYERLOAD_OK_PACKET : public PACKET {
+
 };
 //---------------------------
 struct LC_LOGIN_OK_PACKET : public PACKET {

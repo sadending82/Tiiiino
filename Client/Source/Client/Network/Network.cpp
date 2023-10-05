@@ -2,6 +2,7 @@
 
 #include "Network.h"
 #include "Actor/Character/TinoCharacter.h"
+#include "Actor/Obstacles/BaseObstacle.h"
 #include "Actor/Controller/TinoController.h"
 #include "GameFramework/PlayerController.h"
 #include "Kismet/GameplayStatics.h"
@@ -27,6 +28,10 @@ Network::Network()
 	{
 		mOtherCharacter[i] = nullptr;
 	}
+	for (int i = 0; i < MAX_OBJECT; ++i)
+	{
+		mObjects[i] = nullptr;
+	}
 }
 
 Network::~Network()
@@ -42,6 +47,12 @@ std::shared_ptr<Network> Network::GetNetwork()
 	}
 	return m_Network;
 }
+
+void Network::SetObjectNetID(ABaseObstacle* object, const int netID)
+{
+	mObjects[netID] = object;
+}
+
 
 bool Network::init()
 {
@@ -62,6 +73,8 @@ void Network::release()
 		mMyCharacter->bIsConnected = 0;
 		mMyCharacter = nullptr;
 		for (auto& p : mOtherCharacter)
+			p = nullptr;
+		for (auto& p : mObjects)
 			p = nullptr;
 		//shutdown(s_socket, SD_BOTH);
 		closesocket(s_socket);
@@ -208,6 +221,15 @@ void send_goal_packet(SOCKET& sock)
 	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
 }
 
+void send_game_playerload_ack_packet(SOCKET& sock)
+{
+	CS_GAME_PLAYERLOAD_ACK_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_GAME_PLAYERLOAD_ACK;
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+}
+
 
 
 
@@ -223,6 +245,13 @@ void Network::process_packet(unsigned char* p)
 		mMyCharacter->SetClientID(packet->id);
 		//연결성공
 		bIsConnected = true;
+		break;
+	}
+	case SC_GAME_PLAYERLOAD_OK:
+	{		
+		SC_GAME_PLAYERLOAD_OK_PACKET* packet = reinterpret_cast<SC_GAME_PLAYERLOAD_OK_PACKET*>(p);
+
+		send_game_playerload_ack_packet(s_socket);
 		break;
 	}
 	case SC_MOVE_PLAYER:
@@ -318,6 +347,21 @@ void Network::process_packet(unsigned char* p)
 				break;
 			}
 		}
+		break;
+	}
+	case SC_GAME_WAITTING: {
+		SC_GAME_WAITTING_PACKET* packet = reinterpret_cast<SC_GAME_WAITTING_PACKET*>(p);
+
+		//
+		// 카운트다운 UI 띄우기및 object들 처음 동기화.
+		//
+		break;
+	}
+	case SC_GAME_START: {
+		SC_GAME_START_PACKET* packet = reinterpret_cast<SC_GAME_START_PACKET*>(p);
+		//
+		// 플레이어들 움직일 수 있게 하기.
+		//
 		break;
 	}
 	case SC_GAME_END: {

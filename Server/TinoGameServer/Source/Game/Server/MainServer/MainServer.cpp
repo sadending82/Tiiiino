@@ -306,6 +306,22 @@ SC_ACTION_ANIM_PACKET MainServer::make_action_packet(const int playerID, const c
 	return packet;
 }
 
+SC_GAME_WAITTING_PACKET MainServer::make_game_watting_packet()
+{
+	SC_GAME_WAITTING_PACKET packet{};
+	packet.size = sizeof(packet);
+	packet.type = SC_GAME_WAITTING;
+	return packet;
+}
+
+SC_GAME_START_PACKET MainServer::make_game_start_packet()
+{
+	SC_GAME_START_PACKET packet{};
+	packet.size = sizeof(packet);
+	packet.type = SC_GAME_START;
+	return packet;
+}
+
 SC_GAME_END_PACKET MainServer::make_game_end_packet()
 {
 	SC_GAME_END_PACKET packet{};
@@ -321,6 +337,14 @@ SC_GAME_DOORSYNC_PACKET MainServer::make_game_doorsync_packet(const int objectID
 	packet.type = SC_GAME_DOORSYNC;
 	packet.id = objectID;
 	packet.syncTime = syncTime;
+	return packet;
+}
+
+SC_GAME_PLAYERLOAD_OK_PACKET MainServer::make_game_playerload_ok_packet()
+{
+	SC_GAME_PLAYERLOAD_OK_PACKET packet{};
+	packet.size = sizeof(packet);
+	packet.type = SC_GAME_PLAYERLOAD_OK;
 	return packet;
 }
 
@@ -387,29 +411,29 @@ void MainServer::SendRoomSomeoneExcept(const int roomID, const int exceptSocketI
 	}
 }
 
-void MainServer::SendMySelf(const int receiverID, void* buf, const int bufSize)
+void MainServer::SendMySelf(const int receiverSocketID, void* buf, const int bufSize)
 {
 
-	auto player = dynamic_cast<Player*>(mObjects[receiverID]);
+	auto player = dynamic_cast<Player*>(mObjects[receiverSocketID]);
 	if (nullptr != player)
 		player->SendPacket(buf, bufSize);
 
 }
 
 template<class T>
-inline void MainServer::SendRoomOthersToMe(const int roomID, const int receiveID, const int exceptID, T(MainServer::* fp)(const int))
+inline void MainServer::SendRoomOthersToMe(const int roomID, const int receiverSocketID, const int exceptSocketID, T(MainServer::* fp)(const int))
 {
 	Room* pRoom = mRooms[roomID];
 	for (auto& other : pRoom->GetObjectsRef()) {
 		Player* OtherPlayer = dynamic_cast<Player*>(other);
 		if (OtherPlayer == nullptr) break;
-		if (OtherPlayer->GetSocketID() == exceptID)continue; // 제외해줄 ID
+		if (OtherPlayer->GetSocketID() == exceptSocketID)continue; // 제외해줄 ID
 		if (OtherPlayer->GetSocketID() == INVALID_SOCKET_ID) continue;
 		OtherPlayer->GetStateLockRef().lock();
 		if (eSocketState::ST_INGAME == OtherPlayer->GetSocketState()) {
 			OtherPlayer->GetStateLockRef().unlock();
 			T packet = (this->*fp)(OtherPlayer->GetSocketID());
-			SendPacketWithID(receiveID, (void*)(&packet), sizeof(T));
+			SendPacketWithID(receiverSocketID, (void*)(&packet), sizeof(T));
 			continue;
 		}
 		else {
@@ -507,18 +531,24 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 		}
 
 
+		player->GetStateLockRef().lock();
+		player->SetSocketState(eSocketState::ST_INGAME);
+		player->GetStateLockRef().unlock();
+
 		//나를 상대에게
 		{
 			auto spacket = make_player_add_packet(player->GetSocketID());
 			SendRoomSomeoneExcept(player->GetRoomID(), player->GetSocketID(), (void*)&spacket, sizeof(spacket));
 		}
 
+
 		//방안의 모든 플레이어 정보를 나에게로
 		SendRoomOthersToMe(player->GetRoomID(), player->GetSocketID(), player->GetSocketID(), &MainServer::make_player_add_packet);
 
-		player->GetStateLockRef().lock();
-		player->SetSocketState(eSocketState::ST_INGAME);
-		player->GetStateLockRef().unlock();
+		{
+			auto spacket = make_game_playerload_ok_packet();
+			SendMySelf(player->GetSocketID(), (void*)&spacket, sizeof(spacket));
+		}
 		break;
 	}
 	case CS_MOVE: {
@@ -592,6 +622,26 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 		{
 			auto sPacket = make_action_packet(player->GetRoomSyncID(), packet->action);
 			SendRoomSomeoneExcept(player->GetRoomID(), player->GetSocketID(), (void*)&sPacket, sizeof(sPacket));
+		}
+
+		break;
+	}
+	case CS_GAME_PLAYERLOAD_ACK:
+	{
+		CS_GAME_PLAYERLOAD_ACK_PACKET* packet = reinterpret_cast<CS_GAME_PLAYERLOAD_ACK_PACKET*>(p);
+		Player* player = dynamic_cast<Player*>(object);
+		if (player == nullptr)
+		{
+			DEBUGMSGNOPARAM("player is nullptr.\n");
+			break;
+		}
+		Room* pRoom = mRooms[player->GetRoomID()];
+		pRoom->PlayerCntIncrease();
+		if (pRoom->IsAllPlayerReady())
+		{
+			SC_GAME_WAITTING_PACKET spacket = make_game_watting_packet();
+			SendRoomBroadCast(player->GetRoomID(), (void*)&spacket, sizeof(spacket));
+			TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_START, eEventType::TYPE_BROADCAST_ROOM, 4000, NULL, player->GetRoomID());
 		}
 
 		break;
