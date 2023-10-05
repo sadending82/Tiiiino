@@ -198,13 +198,32 @@ SC_ADD_PLAYER_PACKET MainServer::make_player_add_packet(const int playerSocketID
 	return sendpacket;
 }
 
+SC_PLAYER_REMOVE_PACKET MainServer::make_player_remove_packet(const int playerRoomSyncID)
+{
+	SC_PLAYER_REMOVE_PACKET sendpacket;
+	sendpacket.size = sizeof(sendpacket);
+	sendpacket.type = SC_PLAYER_REMOVE;
+	sendpacket.id = playerRoomSyncID;
+	return sendpacket;
+}
+
 void MainServer::send_room_ready_packet(const int roomID)
 {
-	GL_ROOM_READY_PACKET packet;
+	GL_ROOM_READY_PACKET packet{};
 	memset(&packet, 0, sizeof(GL_ROOM_READY_PACKET));
 
 	packet.size = sizeof(packet);
 	packet.type = GL_ROOM_READY;
+	packet.roomID = roomID;
+
+	mLobbyServer->SendPacket(&packet, sizeof(packet));
+}
+
+void MainServer::send_room_reset_packet(const int roomID)
+{
+	GL_ROOM_RESET_PACKET packet{};
+	packet.size = sizeof(packet);
+	packet.type = GL_ROOM_RESET;
 	packet.roomID = roomID;
 
 	mLobbyServer->SendPacket(&packet, sizeof(packet));
@@ -462,6 +481,9 @@ bool MainServer::setPlayerInRoom(Player* player)
 				player->SetRoomID(tRoom.first);
 				return true;
 			}
+			else {
+				DEBUGMSGONEPARAM("플레이어가 방 매칭정보에 존재하지않음. [%d]번째플레이어\n", player->GetSocketID());
+			}
 		}
 	}
 	DEBUGMSGONEPARAM("플레이어와 방 매칭 도중 버그가 발생함[%d]번째플레이어\n", player->GetUID());
@@ -511,6 +533,11 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 
 		if (false == setPlayerInRoom(player))
 		{
+			DEBUGMSGONEPARAM("[%d]플레이어 부정접속. 접속 해제", player->GetSocketID());
+			player->DisConnect();
+			player->Reset();
+
+			break;
 			/*
 				나중에 여기에 제대로 된 방 id가 안나오면 접속을 끊어버려야함. 부정접속
 			*/
