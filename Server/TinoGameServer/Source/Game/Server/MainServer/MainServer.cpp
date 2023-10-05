@@ -348,6 +348,24 @@ SC_GAME_PLAYERLOAD_OK_PACKET MainServer::make_game_playerload_ok_packet()
 	return packet;
 }
 
+SC_GAME_BREAKDOOR_PACKET MainServer::make_game_breakdoor_packet(const int objectID)
+{
+	SC_GAME_BREAKDOOR_PACKET packet{};
+	packet.size = sizeof(packet);
+	packet.type = SC_GAME_BREAKDOOR;
+	packet.objectID = objectID;
+	return packet;
+}
+
+SC_GAME_BREAKPLATFORM_PACKET MainServer::make_game_breakplatform_packet(const int objectID)
+{
+	SC_GAME_BREAKPLATFORM_PACKET packet{};
+	packet.size = sizeof(packet);
+	packet.type = SC_GAME_BREAKPLATFORM;
+	packet.objectID = objectID;
+	return packet;
+}
+
 void MainServer::SendAllBroadCast(void* buf, const int bufSize)
 {
 	for (auto& other : mObjects) {
@@ -643,6 +661,32 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 			SendRoomBroadCast(player->GetRoomID(), (void*)&spacket, sizeof(spacket));
 			TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_START, eEventType::TYPE_BROADCAST_ROOM, 4000, NULL, player->GetRoomID());
 		}
+
+		break;
+	}
+	case CS_GAME_BREAKDOOR:
+	{
+		CS_GAME_BREAKDOOR_PACKET* packet = reinterpret_cast<CS_GAME_BREAKDOOR_PACKET*>(p);
+		Player* player = dynamic_cast<Player*>(object);
+		if (player == nullptr)
+		{
+			DEBUGMSGNOPARAM("player is nullptr.\n");
+			break;
+		}
+		TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_BREAKDOOR, eEventType::TYPE_BROADCAST_ROOM, DELAY_TIME_EXEC_BREAKDOOR, packet->id, player->GetRoomID());
+
+		break;
+	}
+	case CS_GAME_BREAKPLATFORM:
+	{
+		CS_GAME_BREAKPLATFORM_PACKET* packet = reinterpret_cast<CS_GAME_BREAKPLATFORM_PACKET*>(p);
+		Player* player = dynamic_cast<Player*>(object);
+		if (player == nullptr)
+		{
+			DEBUGMSGNOPARAM("player is nullptr.\n");
+			break;
+		}
+		TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_BREAKPLATFORM, eEventType::TYPE_BROADCAST_ROOM, DELAY_TIME_EXEC_BREAKPLATFORM, packet->id, player->GetRoomID());
 
 		break;
 	}

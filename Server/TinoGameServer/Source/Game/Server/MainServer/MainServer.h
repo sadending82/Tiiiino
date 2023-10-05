@@ -49,6 +49,9 @@ public:
 	SC_GAME_END_PACKET make_game_end_packet();
 	SC_GAME_DOORSYNC_PACKET make_game_doorsync_packet(const int objectID, const long long syncTime);
 	SC_GAME_PLAYERLOAD_OK_PACKET make_game_playerload_ok_packet();
+	SC_GAME_BREAKDOOR_PACKET make_game_breakdoor_packet(const int objectID);
+	SC_GAME_BREAKPLATFORM_PACKET make_game_breakplatform_packet(const int objectID);
+
 	//-> 생각해보니 그냥 buffer에 담아서 void*로 보내고 send에서 변환하면 되잖아 ? 바로 진행시켜
 	void SendAllBroadCast(void* buf, const int bufSize);
 	void SendRoomBroadCast(const int roomID, void* buf, const int bufSize);

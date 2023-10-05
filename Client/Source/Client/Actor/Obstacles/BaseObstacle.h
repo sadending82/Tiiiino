@@ -28,8 +28,12 @@ public:
 	const int GetObjectType() const { return ObjectType; }
 	void SetObjectType(const int Type) { ObjectType = Type; }
 
+	const int GetObjectID() const { return mObjectID; }
+	void SetObjectID(const int id) { mObjectID = id; }
+
 protected:
 
 	UPROPERTY(EditAnywhere, Category = "Network")
 		int ObjectType;
+	int mObjectID;
 };

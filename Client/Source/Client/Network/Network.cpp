@@ -232,6 +232,26 @@ void send_game_playerload_ack_packet(SOCKET& sock)
 	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
 }
 
+void send_game_breakdoor_packet(SOCKET& sock, const int objectID)
+{
+	CS_GAME_BREAKDOOR_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_GAME_BREAKDOOR;
+	packet.objectID = objectID;
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+}
+
+void send_game_breakplatform_packet(SOCKET& sock, const int objectID)
+{
+	CS_GAME_BREAKPLATFORM_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_GAME_BREAKPLATFORM;
+	packet.objectID = objectID;
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+}
+
 
 
 
@@ -399,6 +419,12 @@ void Network::process_packet(unsigned char* p)
 		SC_GAME_COUNTDOWN_START_PACKET* packet = reinterpret_cast<SC_GAME_COUNTDOWN_START_PACKET*>(p);
 
 		//카운트다운 UI 띄우기 (Appear CountDown UI)
+
+		break;
+	}
+	case SC_GAME_BREAKDOOR: 
+	{
+		SC_GAME_BREAKDOOR_PACKET* packet = reinterpret_cast<SC_GAME_BREAKDOOR_PACKET*>(p);
 
 		break;
 	}

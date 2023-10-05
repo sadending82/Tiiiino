@@ -38,6 +38,8 @@ void send_action_packet(SOCKET& sock, const char action);
 void send_ping_packet(SOCKET& sock, const long long ping);
 void send_goal_packet(SOCKET& sock);
 void send_game_playerload_ack_packet(SOCKET& sock);
+void send_game_breakdoor_packet(SOCKET& sock, const int objectID);
+void send_game_breakplatform_packet(SOCKET& sock, const int objectID);
 
 
 class WSA_OVER_EX {

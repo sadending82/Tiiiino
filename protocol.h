@@ -13,6 +13,10 @@ constexpr int MAX_NAME_SIZE = 20;	//닉네임, 중복검사 X
 constexpr int MAX_ROOM = 10;
 constexpr int MAX_ROOM_USER = 8;
 
+// Object Event Time
+constexpr int DELAY_TIME_EXEC_BREAKDOOR = 1000;
+constexpr int DELAY_TIME_EXEC_BREAKPLATFORM = 3000;
+
 enum PacketType {
 	// Client To GameServer
 	CS_LOGIN,
@@ -22,6 +26,8 @@ enum PacketType {
 	CS_PING,
 	CS_ACTION,
 	CS_GAME_PLAYERLOAD_ACK,
+	CS_GAME_BREAKDOOR,
+	CS_GAME_BREAKPLATFORM,
 
 	// Client To LobbyServer
 	CL_LOGIN,
@@ -44,6 +50,8 @@ enum PacketType {
 	SC_ACTION_ANIM,
 	SC_GAME_DOORSYNC,
 	SC_GAME_PLAYERLOAD_OK,
+	SC_GAME_BREAKDOOR,
+	SC_GAME_BREAKPLATFORM,
 
 	// Lobbyserver To Client
 	LC_LOGIN_OK,
@@ -96,6 +104,15 @@ struct CS_ACTION_PACKET : public PACKET {
 struct CS_GAME_PLAYERLOAD_ACK_PACKET : public PACKET {
 
 };
+
+struct CS_GAME_BREAKDOOR_PACKET : public PACKET {
+	int	objectID;
+};
+
+struct CS_GAME_BREAKPLATFORM_PACKET : public PACKET {
+	int	objectID;
+};
+
 //-----------------------------------
 struct CL_LOGIN_PACKET :public PACKET {
 	char id[MAX_NAME_SIZE];
@@ -179,7 +196,16 @@ struct SC_GAME_DOORSYNC_PACKET : public PACKET {
 struct SC_GAME_PLAYERLOAD_OK_PACKET : public PACKET {
 
 };
+
+struct SC_GAME_BREAKDOOR_PACKET : public PACKET {
+	int	objectID;
+};
+
+struct SC_GAME_BREAKPLATFORM_PACKET : public PACKET {
+	int	objectID;
+};
 //---------------------------
+
 struct LC_LOGIN_OK_PACKET : public PACKET {
 	int id;
 	int UID;

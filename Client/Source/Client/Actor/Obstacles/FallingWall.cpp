@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Components/StaticMeshComponent.h"
 #include "GeometryCollection/GeometryCollectionComponent.h"
+#include "Network/Network.h"
 
 AFallingWall::AFallingWall()
 {
@@ -54,7 +55,6 @@ void AFallingWall::MeshComponentHit(UPrimitiveComponent* HitComponent, AActor* O
 
 			if (Controller->IsPlayerController())
 			{
-				
 
 			}
 		}

@@ -192,6 +192,26 @@ void WorkerThread::doThread()
 			TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_DOORSYNC, eEventType::TYPE_BROADCAST_ROOM, obj->GetWaitMilliTime(), roomSyncID, roomID);
 			break;
 		}
+		case eCOMMAND_IOCP::CMD_GAME_BREAKDOOR:
+		{
+			eEventType eventType = TimerThread::DeserializeEventType(wsa_ex->GetBuf());
+			DEBUGMSGNOPARAM("break door\n");
+			int roomID = TimerThread::DeserializeReceiver(wsa_ex->GetBuf());
+			int objectID = client_id;
+			auto sPacket = mMainServer->make_game_breakdoor_packet(objectID);
+			mMainServer->SendRoomBroadCast(roomID, (void*)&sPacket, sizeof(sPacket));
+			break;
+		}
+		case eCOMMAND_IOCP::CMD_GAME_BREAKPLATFORM:
+		{
+			eEventType eventType = TimerThread::DeserializeEventType(wsa_ex->GetBuf());
+			DEBUGMSGNOPARAM("break platform\n");
+			int roomID = TimerThread::DeserializeReceiver(wsa_ex->GetBuf());
+			int objectID = client_id;
+			auto sPacket = mMainServer->make_game_breakdoor_packet(objectID);
+			mMainServer->SendRoomBroadCast(roomID, (void*)&sPacket, sizeof(sPacket));
+			break;
+		}
 		}
 	}
 }
