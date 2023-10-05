@@ -37,7 +37,7 @@ public:
 	Network();
 	virtual ~Network();
 
-	void DisConnect();
+	virtual void DisConnect();
 	void ErrorDisplay(int errNo);
 	void PreRecvPacket(unsigned char* remainMsg, int remainBytes);
 	void RecvPacket();

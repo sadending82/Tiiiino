@@ -310,6 +310,9 @@ void Network::process_packet(unsigned char* p)
 	{
 		SC_ADD_PLAYER_PACKET* packet = reinterpret_cast<SC_ADD_PLAYER_PACKET*>(p);
 		int id = packet->id;
+		//나와 같은 아이디라면 또 만들어줄 이유 없음. 탈출.
+		if (id == mMyCharacter->GetClientID())
+			break;
 		if (nullptr != mOtherCharacter[id])
 		{
 			mOtherCharacter[id]->GetMesh()->SetVisibility(true);
@@ -342,6 +345,17 @@ void Network::process_packet(unsigned char* p)
 				//mMyCharacter->mInventory->mMainWidget->mScoreWidget->UpdateRank();
 
 			}
+		}
+		break;
+	}
+	case SC_PLAYER_REMOVE:
+	{
+		SC_PLAYER_REMOVE_PACKET* packet = reinterpret_cast<SC_PLAYER_REMOVE_PACKET*>(p);
+		int id = packet->id;
+		if (nullptr != mOtherCharacter[id])
+		{
+			mOtherCharacter[id]->Destroy();
+			mOtherCharacter[id] = nullptr;
 		}
 		break;
 	}

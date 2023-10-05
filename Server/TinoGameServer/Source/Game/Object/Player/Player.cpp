@@ -1,4 +1,5 @@
 #include "Player.h"
+#include "../../Server/MainServer/MainServer.h"
 
 Player::Player()
 	:mNickName("")
@@ -15,6 +16,29 @@ Player::Player()
 
 Player::~Player()
 {
+}
+
+void Player::DisConnect()
+{
+	__super::DisConnect();
+	auto sPacket = gMainServer->make_player_remove_packet(mRoomSyncID);
+	gMainServer->SendRoomBroadCast(mRoomID, (void*)&sPacket, sizeof(sPacket));
+	Reset();
+}
+
+void Player::Reset()
+{
+	__super::Reset();
+
+	mNickName.clear();
+	mDepartment = 0.0f;
+	mEquipment = eEquipmentFlags::None;
+	mRoomID = INVALID_ROOM_ID;
+	mRoomSyncID = -1;
+	mRank = -1;
+	mPlayerState = ePlayerState::ST_RUNNING;
+	mUID = -1;
+	mPing = 0;
 }
 
 bool Player::CanMakeID()

@@ -69,15 +69,24 @@ void Room::ResetGameRoom()
 {
 	for (auto object : mObjects)
 	{
+		object->Reset();
+		Player* player = dynamic_cast<Player*>(object);
+		if (player)
+		{
+			player->DisConnect();
+		}
 		object = nullptr;
 	}
 	mRoomStageKindof = eRoomStage::ST_AVOID;
 	mPlayerInfo.clear();
 	mPlayerSettingCnt = 0;
 	mPlayerMax = 0;
-	mRoomState = eRoomState::ST_FREE;
 	mPlayerArrivedCnt = 0;
 	mGameEndTimer = false;
+
+	mRoomStateLock.lock();
+	mRoomState = eRoomState::ST_FREE;
+	mRoomStateLock.unlock();
 }
 
 
@@ -146,6 +155,7 @@ bool Room::SettingRoomPlayer(const int uID, const std::string id, const int& pla
 		mRoomStateLock.lock();
 		if (mRoomState == eRoomState::ST_READY || mRoomState == eRoomState::ST_FREE)
 		{
+			DEBUGMSGONEPARAM("방 준비 완료. 현재 대기 인원[%d]명", mPlayerInfo.size());
 			mRoomState = eRoomState::ST_READY_COMPLETE;
 			mRoomStateLock.unlock();
 			return true;
@@ -162,15 +172,27 @@ int Room::FindPlayerInfo(const int uID, const std::string id)
 	//이 함수는 mPlayerInfo가 다 쓰여진 난 후에, 읽기만 하는 작업이므로 lock을 안걸어놓음
 	//최대 인원이 안들어왔으면 아직 쓰여질 가능성이 있기 때문에 절대 읽으면 안됨
 	//지금은 이럴 경우가 없게 설계해놨지만, 후에 혹시모르는 설계로 안되면 안되니까 assert걸음.
+
+	//2023-10-05 추가 -> 자꾸 말도안되는 이유로 아래 assert에 걸림. 
+	// 이 함수는 room이 start가 되기 직전 최초로 mPlayerMax만큼 불리는 것 이기 떄문에
+	// lock을 걸어도 최대 8번 1게임당 8번정도 호출되는 것이기 때문에 부담이 없다고 판단되어
+	// 이상한 버그를 안 만드는게 더 최선이라 생각되어 락을 걸기로 결정.
+
+	mPlayerInfoLock.lock();
 	if (mPlayerInfo.size() != mPlayerMax)
+	{
+		mPlayerInfoLock.unlock();
 		assert(0);
+		return -1;
+	}
 	auto Iter = mPlayerInfo.find(uID);
 	if (Iter != mPlayerInfo.end())
 	{
-
-		return std::distance(mPlayerInfo.begin(), Iter);
+		auto dist = std::distance(mPlayerInfo.begin(), Iter);
+		mPlayerInfoLock.unlock();
+		return dist;
 	}
-
+	mPlayerInfoLock.unlock();
 	return -1;
 }
 

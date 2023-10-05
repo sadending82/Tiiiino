@@ -3,12 +3,15 @@
 #include "../../Network/Network.h"
 #include "../Object.h"
 
-
+class Room;
 class Player : public Object, public Network
 {
 public:
     Player();
     ~Player();
+
+    virtual void DisConnect() override;
+    virtual void Reset() override;
 
     bool CanMakeID();
 

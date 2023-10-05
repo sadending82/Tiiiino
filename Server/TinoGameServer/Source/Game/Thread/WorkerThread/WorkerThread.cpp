@@ -28,7 +28,7 @@ void WorkerThread::doThread()
 		WSA_OVER_EX* wsa_ex = reinterpret_cast<WSA_OVER_EX*>(overlapped);
 		if (FALSE == ret) {
 			int err_no = WSAGetLastError();
-			//std::cout << "GQCS Error";
+			DEBUGMSGNOPARAM("GQCS Error\n");
 			mMainServer->ErrorDisplay(err_no);
 			if (wsa_ex->GetCmd() == eCOMMAND_IOCP::CMD_SEND)
 				delete wsa_ex;
@@ -40,7 +40,6 @@ void WorkerThread::doThread()
 			if (bytes == 0) {
 				auto t = dynamic_cast<Player*>(mMainServer->GetObjects()[client_id]);
 				if (t) t->DisConnect();
-				//Disconnect(client_id);
 				break;
 			}
 
@@ -144,6 +143,16 @@ void WorkerThread::doThread()
 				auto sPacket = mMainServer->make_game_end_packet();	//판정은 클라가 알아서.
 				mMainServer->SendRoomBroadCast(roomID, (void*)&sPacket, sizeof(sPacket));
 			}
+			TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_RESET, eEventType::TYPE_TARGET, 10000, 0, roomID);
+			break;
+		}
+		case eCOMMAND_IOCP::CMD_GAME_RESET:
+		{
+			eEventType eventType = TimerThread::DeserializeEventType(wsa_ex->GetBuf());
+			int roomID = TimerThread::DeserializeReceiver(wsa_ex->GetBuf());
+			mMainServer->GetRooms()[roomID]->ResetGameRoom();
+			mMainServer->send_room_reset_packet(roomID);
+
 			break;
 		}
 		case eCOMMAND_IOCP::CMD_GAME_COUNTDOWN_START:

@@ -2,6 +2,7 @@
 #include "../MapObject.h"
 class BreakObject : public MapObject
 {
+public:
 	BreakObject();
 	virtual ~BreakObject();
 

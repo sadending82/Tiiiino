@@ -28,13 +28,18 @@ public:
 	void init();
 	void run();
 
+	//Server to Server
+	void send_room_ready_packet(const int roomID);
+	void send_room_reset_packet(const int roomID);
+
+	//Server to client
 	void SendPacketWithID(const int receiverID, void* buf, const int bufSize);
 	void send_login_ok_packet(const int player_id, const char* playername);
 	void send_login_ok_packet(const int player_id, void* buf);
 	SC_LOGIN_OK_PACKET make_login_ok_packet(const int playerID, const char* playername);
 	void send_player_add_packet(const int playerID, void* buf, const int bufSize);
 	SC_ADD_PLAYER_PACKET make_player_add_packet(const int playerSocketID);
-	void send_room_ready_packet(const int roomID);
+	SC_PLAYER_REMOVE_PACKET make_player_remove_packet(const int playerRoomSyncID);
 	void send_move_packet(const int player_id, const int mover_id, const bool inair, const float value, const float sx, const float sy, const float sz);
 	SC_MOVE_PLAYER_PACKET make_move_packet(const int moverSocketID, const bool inair, const float value, const float sx, const float sy, const float sz);
 	 
