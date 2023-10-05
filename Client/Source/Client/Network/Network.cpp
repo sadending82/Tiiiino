@@ -328,6 +328,17 @@ void Network::process_packet(unsigned char* p)
 		}
 		break;
 	}
+	case SC_PLAYER_REMOVE:
+	{
+		SC_PLAYER_REMOVE_PACKET* packet = reinterpret_cast<SC_PLAYER_REMOVE_PACKET*>(p);
+		int id = packet->id;
+		if (nullptr != mOtherCharacter[id])
+		{
+			mOtherCharacter[id]->Destroy();
+			mOtherCharacter[id] = nullptr;
+		}
+		break;
+	}
 	case SC_PING: {
 		SC_PING_PACKET* packet = reinterpret_cast<SC_PING_PACKET*>(p);
 		send_ping_packet(s_socket, packet->ping);
