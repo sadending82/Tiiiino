@@ -124,6 +124,7 @@ struct SC_MOVE_PLAYER_PACKET : public PACKET {
 	float x, y, z;
 	float rx, ry, rz, rw;
 	float speed;
+	bool	inair;
 	float sx, sy, sz;		//speed for interpolation
 	int		move_time;		//ping
 };
