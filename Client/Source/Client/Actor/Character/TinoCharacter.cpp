@@ -5,6 +5,7 @@
 #include "Network/Network.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Actor/Character/CharacterAnimInstance.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Animation/AnimMontage.h"
@@ -89,7 +90,7 @@ void ATinoCharacter::Tick(float DeltaTime)
 				ServerSyncElapsedTime += DeltaTime;
 				if (ServerSyncDeltaTime < ServerSyncElapsedTime)
 				{
-					send_move_packet(Network::GetNetwork()->s_socket, GetCharacterMovement()->IsFalling(), pos.X, pos.Y, pos.Z, rot, GetVelocity().Size2D(), GetCharacterMovement()->Velocity);
+					send_move_packet(Network::GetNetwork()->s_socket, Cast<UCharacterAnimInstance>(GetMesh()->GetAnimInstance())->bIsAir, pos.X, pos.Y, pos.Z, rot, GetVelocity().Size2D(), GetCharacterMovement()->Velocity);
 					ServerSyncElapsedTime = 0.0f;
 				}
 
@@ -137,6 +138,8 @@ void ATinoCharacter::PlayTumbleMontage(float DeltaTime)
 		{
 			CurrentTumbledTime = 0.f;
 			bCanTumbled = false;
+			if (GetController()->IsPlayerController())
+				send_action_packet(Network::GetNetwork()->s_socket, 3);
 			PlayAnimMontage(TumbleMontage);
 		}
 		else
@@ -162,13 +165,26 @@ void ATinoCharacter::DiveEnd()
 	bIsDiving = false;
 }
 
+void ATinoCharacter::OnAccelEffect()
+{
+	Camera->PostProcessSettings.bOverride_VignetteIntensity = true;
+	Camera->PostProcessSettings.VignetteIntensity = 1.0f;
+}
+
+void ATinoCharacter::OffAccelEffect()
+{
+	Camera->PostProcessSettings.bOverride_VignetteIntensity = false;
+
+}
+
 void ATinoCharacter::Dive()
 {
 	if (DiveMontage && CanDive())
 	{
 		bIsDiving = true;
+		if (GetController()->IsPlayerController())
+			send_action_packet(Network::GetNetwork()->s_socket, 2);
 		PlayAnimMontage(DiveMontage);
-		send_action_packet(Network::GetNetwork()->s_socket,2);
 	}
 }
 
@@ -213,12 +229,16 @@ void ATinoCharacter::CreateDummy()
 
 void ATinoCharacter::Jump()
 {
-	if (CanMove()  && GetCharacterMovement()->IsFalling() == false)
+	if (CanMove()  && GetCharacterMovement()->IsFalling()== false)
 	{
 		Super::Jump();
-		send_action_packet(Network::GetNetwork()->s_socket,1);
+		if (GetController()->IsPlayerController())
+			send_action_packet(Network::GetNetwork()->s_socket, 1);
 	}
-	
+	if (!GetController()->IsPlayerController())
+	{
+		Super::Jump();
+	}
 }
 
 void ATinoCharacter::StopJumping()

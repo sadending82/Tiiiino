@@ -9,6 +9,9 @@ void UCharacterAnimInstance::NativeBeginPlay()
 	Super::NativeBeginPlay();
 
 	OwnerCharacter = Cast<ACharacter>(TryGetPawnOwner());
+	auto Controller = OwnerCharacter->GetController();
+	if (Controller == nullptr) return;
+	bIsPossess = Controller->IsPlayerController();
 }
 
 void UCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)

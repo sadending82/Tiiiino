@@ -5,6 +5,8 @@
 #include "Actor/Obstacles/BaseObstacle.h"
 #include "Actor/Controller/TinoController.h"
 #include "GameFramework/PlayerController.h"
+#include "Components/CapsuleComponent.h"
+#include "Actor/Character/CharacterAnimInstance.h"
 #include "Kismet/GameplayStatics.h"
 #include "Utilities/CLog.h"
 
@@ -272,6 +274,8 @@ void Network::process_packet(unsigned char* p)
 				mOtherCharacter[move_id]->SetActorRotation(FQuat(packet->rx, packet->ry, packet->rz, packet->rw));
 				mOtherCharacter[move_id]->ServerSyncSpeed = packet->speed;
 				mOtherCharacter[move_id]->ServerCharMovingSpeed = FVector(packet->sx, packet->sy, packet->sz);
+				auto anim = Cast<UCharacterAnimInstance>(mOtherCharacter[move_id]->GetMesh()->GetAnimInstance());
+				anim->bIsAirForNetwork = packet->inair;
 				//mOtherCharacter[move_id]->ServerStoreGroundSpeed = packet->speed;
 				//mOtherCharacter[move_id]->CharMovingSpeed = FVector(packet->sx, packet->sy, packet->sz);
 				//mOtherCharacter[move_id]->GroundSpeedd = packet->speed;
@@ -310,6 +314,7 @@ void Network::process_packet(unsigned char* p)
 				mOtherCharacter[id] = mc;
 				mOtherCharacter[id]->GetMesh()->SetVisibility(true);
 				mOtherCharacter[id]->SetClientID(packet->id);
+				mOtherCharacter[id]->GetCapsuleComponent()->SetCollisionProfileName(TEXT("Empty"));
 				//mOtherCharacter[id]->CharacterName = FString(ANSI_TO_TCHAR(packet->name));
 				//mOtherCharacter[id]->skinType = packet->skintype;
 				//mOtherCharacter[id]->EquipSkin();
@@ -329,7 +334,7 @@ void Network::process_packet(unsigned char* p)
 	case SC_ACTION_ANIM: {
 		SC_ACTION_ANIM_PACKET* packet = reinterpret_cast<SC_ACTION_ANIM_PACKET*>(p);
 		int id = packet->id;
-		if (nullptr != mOtherCharacter[id])
+		if (nullptr == mOtherCharacter[id])
 		{
 		}
 		else {
@@ -342,6 +347,10 @@ void Network::process_packet(unsigned char* p)
 			case 2:
 				mOtherCharacter[id]->Dive();
 				//다이브
+				break;
+			case 3:				
+				mOtherCharacter[id]->PlayAnimMontage(mOtherCharacter[id]->TumbleMontage);
+				//mOtherCharacter[id]->Dive();
 				break;
 			default:
 				break;
@@ -426,7 +435,7 @@ void Network::l_process_packet(unsigned char* p)
 	{
 		LC_MATCH_RESPONSE_PACKET* packet = reinterpret_cast<LC_MATCH_RESPONSE_PACKET*>(p);
 		//게임서버 연결 코드 나중에 ip랑 포트넘버도 넘겨야함.
-		UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("Level1_ver1"));
+		UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("Level4"));
 		bLevelOpenTriggerEnabled = true;
 		break;
 	}

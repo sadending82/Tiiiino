@@ -218,7 +218,7 @@ void MainServer::send_move_packet(const int player_id,const int mover_id, const 
 	packet.id = mover_id;
 	packet.size = sizeof(packet);
 	packet.type = SC_MOVE_PLAYER;
-	//packet.inair = inair;
+	packet.inair = inair;
 	packet.x = mObjects[mover_id]->GetPosition().x;
 	packet.y = mObjects[mover_id]->GetPosition().y;
 	packet.z = mObjects[mover_id]->GetPosition().z;
@@ -243,7 +243,7 @@ SC_MOVE_PLAYER_PACKET MainServer::make_move_packet(const int moverSocketID, cons
 	packet.id = mover->GetRoomSyncID();
 	packet.size = sizeof(packet);
 	packet.type = SC_MOVE_PLAYER;
-	//packet.inair = inair;
+	packet.inair = inair;
 	packet.x = mover->GetPosition().x;
 	packet.y = mover->GetPosition().y;
 	packet.z = mover->GetPosition().z;
