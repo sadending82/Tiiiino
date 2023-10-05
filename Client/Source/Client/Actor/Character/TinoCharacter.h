@@ -84,7 +84,10 @@ private:
 
 	void Align();
 
+public:
 
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	class UAnimMontage* TumbleMontage;
 
 private:
 
@@ -93,8 +96,6 @@ private:
 	UPROPERTY(VisibleDefaultsOnly)
 		class UCameraComponent* Camera;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Animation")
-		class UAnimMontage* TumbleMontage;
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 		class UAnimMontage* DiveMontage;
 
