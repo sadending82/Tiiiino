@@ -20,6 +20,10 @@ public:
 public:
 	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly, Category = "Animation")
 	bool bIsAir;
+	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly, Category = "Animation")
+	bool bIsAirForNetwork = false;
+	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly, Category = "Animation")
+	bool bIsPossess = false;
 protected:
 
 	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly, Category = "Animation")

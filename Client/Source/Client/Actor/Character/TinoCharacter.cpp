@@ -102,8 +102,7 @@ void ATinoCharacter::Tick(float DeltaTime)
 				//Update GroundSpeedd (22-04-05)
 				//GroundSpeedd = ServerStoreGroundSpeed;
 				//Update Interpolation (23-09-27)
-				GetCharacterMovement()->Velocity.X = ServerCharMovingSpeed.X;
-				GetCharacterMovement()->Velocity.Y = ServerCharMovingSpeed.Y;
+				GetCharacterMovement()->Velocity = ServerCharMovingSpeed;
 			}
 		}
 
@@ -230,13 +229,16 @@ void ATinoCharacter::CreateDummy()
 
 void ATinoCharacter::Jump()
 {
-	if (CanMove()  && GetCharacterMovement()->IsFalling() == false)
+	if (CanMove()  && GetCharacterMovement()->IsFalling()== false)
 	{
 		Super::Jump();
 		if (GetController()->IsPlayerController())
 			send_action_packet(Network::GetNetwork()->s_socket, 1);
 	}
-	
+	if (!GetController()->IsPlayerController())
+	{
+		Super::Jump();
+	}
 }
 
 void ATinoCharacter::StopJumping()

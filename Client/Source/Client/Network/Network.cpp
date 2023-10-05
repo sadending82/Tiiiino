@@ -275,7 +275,7 @@ void Network::process_packet(unsigned char* p)
 				mOtherCharacter[move_id]->ServerSyncSpeed = packet->speed;
 				mOtherCharacter[move_id]->ServerCharMovingSpeed = FVector(packet->sx, packet->sy, packet->sz);
 				auto anim = Cast<UCharacterAnimInstance>(mOtherCharacter[move_id]->GetMesh()->GetAnimInstance());
-				anim->bIsAir = packet->inair;
+				anim->bIsAirForNetwork = packet->inair;
 				//mOtherCharacter[move_id]->ServerStoreGroundSpeed = packet->speed;
 				//mOtherCharacter[move_id]->CharMovingSpeed = FVector(packet->sx, packet->sy, packet->sz);
 				//mOtherCharacter[move_id]->GroundSpeedd = packet->speed;
