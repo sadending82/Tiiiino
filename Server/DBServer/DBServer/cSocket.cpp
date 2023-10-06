@@ -9,7 +9,7 @@ int Socket::SetKey()
     while (true) {
         if (cnt == MAXLOBBY)
             return INVALIDKEY;
-        if (eSessionState::ST_FREE == mSessions[cnt].mState) {
+        if (eSessionState::ST_FREE == mSessions[cnt].GetState()) {
             return cnt;
         }
         else
@@ -19,11 +19,11 @@ int Socket::SetKey()
 
 void Socket::Disconnect(int key)
 {
-    if (mSessions[key].mState == eSessionState::ST_FREE) {
+    if (mSessions[key].GetState() == eSessionState::ST_FREE) {
         return;
     }
-    closesocket(mSessions[key].mSocket);
-    mSessions[key].mState = eSessionState::ST_FREE;
+    closesocket(mSessions[key].GetSocket());
+    mSessions[key].SetState(eSessionState::ST_FREE);
 
 #ifdef Test
     cout << "Lobby Disconnect: " << key << endl;
@@ -52,12 +52,12 @@ void Socket::WorkerFunc()
             int newKey = SetKey();
             if (newKey != INVALIDKEY) {
                 SOCKET cSocket = reinterpret_cast<SOCKET>(exOver->mWsaBuf.buf);
-                mSessions[newKey].mSocket = cSocket;
-                mSessions[newKey].mExOver.mOpType = eOpType::OP_RECV;
-                mSessions[newKey].mPrevData = 0;
-                mSessions[newKey].mState = eSessionState::ST_ACCEPTED;
-                mSessions[newKey].mID = newKey;
-                CreateIoCompletionPort((HANDLE)mSessions[newKey].mSocket, mHcp, newKey, 0);
+                mSessions[newKey].SetSocket(cSocket);
+                mSessions[newKey].GetExOver().SetmOpType(eOpType::OP_RECV);
+                mSessions[newKey].SetPrevData(0);
+                mSessions[newKey].SetState(eSessionState::ST_ACCEPTED);
+                mSessions[newKey].SetID(newKey);
+                CreateIoCompletionPort((HANDLE)mSessions[newKey].GetSocket(), mHcp, newKey, 0);
 #ifdef Test
                 cout << "Lobby Accept: " << newKey << endl;
 #endif
@@ -87,7 +87,7 @@ void Socket::WorkerFunc()
         }
         case eOpType::OP_RECV: {
             unsigned char* packet_ptr = exOver->mMessageBuf;
-            int required_data = Transferred + mSessions[key].mPrevData;
+            int required_data = Transferred + mSessions[key].GetPrevData();
             int packet_size = packet_ptr[0];
             while (required_data >= packet_size) {
                 if (required_data >= BUFSIZE) break;
@@ -98,7 +98,7 @@ void Socket::WorkerFunc()
                 packet_size = packet_ptr[0];
             }
             packet_size = 0;
-            mSessions[key].mPrevData = 0;
+            mSessions[key].SetPrevData(0);
             if (0 != required_data)
                 memcpy(exOver->mMessageBuf, packet_ptr, required_data);
             mSessions[key].DoRecv();

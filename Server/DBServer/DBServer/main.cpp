@@ -16,8 +16,6 @@ int main(int argc, char* argv[])
 	pDB->SetmSecurity(pSecurity);
 	pDB->ConnectDB();
 
-	pDB->UpdateUserDepartment(9, 10);
-
 	pSocket->ServerReady(pDB);
 
 	pDB->DisconnectDB();

@@ -15,11 +15,16 @@ CREATE TABLE `userinfo` (
   UNIQUE KEY `ID_UNIQUE` (`ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-DROP TABLE IF EXISTS `account`;
+DROP TABLE IF EXISTS `userinfo`;
 
-CREATE TABLE `account` (
-  `ID` varchar(20) NOT NULL,
-  `hashedPassword` varchar(256) NOT NULL,
-  `salt` varchar(45) NOT NULL,
-  PRIMARY KEY (`ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+CREATE TABLE `userinfo` (
+  `UID` int NOT NULL AUTO_INCREMENT COMMENT 'Unique ID',
+  `ID` varchar(20) NOT NULL COMMENT 'account ID',
+  `nick` varchar(20) NOT NULL DEFAULT 'default' COMMENT 'user nickname',
+  `grade` decimal(2,1) NOT NULL DEFAULT '0.0' COMMENT 'mmr',
+  `point` int NOT NULL DEFAULT '0',
+  `state` int NOT NULL DEFAULT '0',
+  `department` tinyint NOT NULL DEFAULT '0',
+  PRIMARY KEY (`UID`),
+  UNIQUE KEY `ID_UNIQUE` (`ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
