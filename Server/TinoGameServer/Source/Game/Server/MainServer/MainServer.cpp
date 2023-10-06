@@ -279,13 +279,6 @@ SC_MOVE_PLAYER_PACKET MainServer::make_move_packet(const int moverSocketID, cons
 	return packet;
 }
 
-void MainServer::send_breakdoor_packet(const int roomID, const int objectID)
-{
-	auto packet = make_game_breakdoor_packet(objectID);
-
-	SendRoomBroadCast(roomID, (void*)(&packet), sizeof(packet));
-}
-
 void MainServer::send_player_arrive_packet(const int player_id, const int arrive_id)
 {
 }
@@ -708,7 +701,9 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 			break;
 		}
 		
-		send_breakdoor_packet(player->GetRoomID(), packet->objectID);
+		auto sPacket = make_game_breakdoor_packet(packet->objectID);
+		SendRoomBroadCast(player->GetRoomID(), (void*)(&sPacket), sizeof(sPacket));
+
 		break;
 	}
 	case CS_GAME_BREAKPLATFORM:
