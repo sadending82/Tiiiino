@@ -18,7 +18,7 @@ void UCreateAccountsWidget::NativeDestruct()
 void UCreateAccountsWidget::TryBack()
 {
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	TinoController->ChangeMenuWidget(TinoController->GetLoginWidgetClass());
+	TinoController->ChangeMenuWidget(TinoController->GetStartingWidgetClass());
 }
 
 void UCreateAccountsWidget::TryCreateAccounts()

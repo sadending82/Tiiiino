@@ -20,22 +20,7 @@ public:
 	virtual void NativeDestruct() override;
 
 	UPROPERTY(meta = (BindWidget))
-	class UEditableText* GameTimeText;
-
-	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	void RankImageSwitcher();
-
-	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	void SetGameTime(int32 GameTime);
-
-	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	void EndGameTime();
-
-	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	int32 GetGameTime() { return RestGameTime; }
-
-	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	UImage* GetImage() { return MyImage; }
+	class UTextBlock* GameTimeText;
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void LevelSuccess();
@@ -49,12 +34,29 @@ public:
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	bool GetbLevelClearCheck() { return bLevelClearCheck; }
 
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void TimerStart();
+
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void TimerEnd();
+
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void TimerRun();
+
+
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	int GetRestGameTime() const { return RestGameTime; }
+
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void DisconnectNetwork();
 
 private:
 	UPROPERTY(EditAnywhere, Category = "UMG_Game")
-	int32 RestGameTime;
+	int RestGameTime = 20;
+
 	UPROPERTY(EditAnywhere, Category = "UMG_Game")
 	UImage* MyImage;
+
 	UPROPERTY(EditAnywhere, Category = "UMG_Game")
 	bool bLevelClearCheck = false;
 	
