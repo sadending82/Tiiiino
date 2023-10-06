@@ -57,7 +57,7 @@ int Server::GetNewRoomID()
 			mRooms[i].mStateLock.unlock();
 			return i;
 		}
-		mServers[i].mStateLock.unlock();
+		mRooms[i].mStateLock.unlock();
 	}
 	return INVALID_KEY;
 }
@@ -160,6 +160,7 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		mRooms[p->roomID].mState = eRoomState::RS_INGAME;
 		mRooms[p->roomID].mStateLock.unlock();
 
+		vector<int> delPlayerVector;
 		for (auto& player : mReadytoGame)
 		{
 			if (mClients[player].mRoomID == p->roomID)
@@ -170,8 +171,12 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 
 				mRooms[mClients[player].mRoomID].UID[uidCount] = mClients[player].mUID;
 				uidCount++;
-				mReadytoGame.remove(player);
+				delPlayerVector.push_back(player);
 			}
+		}
+		for (auto player : delPlayerVector)
+		{
+			mReadytoGame.remove(player);
 		}
 
 		break;
@@ -497,6 +502,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 		// match room max
 		if (mMatchListHighTier.size() >= MAX_ROOM_USER)
 		{
+			int roomID = GetNewRoomID();
 			for (int i = 0; i < MAX_ROOM_USER; ++i)
 			{
 				int player_id = mMatchListHighTier.front();
@@ -504,7 +510,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 				LG_USER_INTO_GAME_PACKET packet;
 				packet.size = sizeof(packet);
 				packet.type = LG_USER_INTO_GAME;
-				packet.roomID = GetNewRoomID();// need update		
+				packet.roomID = roomID;// need update		
 				_itoa_s(rand() % 2'000'000'000, mClients[player_id].mHashs, 10);
 				strcpy_s(packet.hashs, mClients[player_id].mHashs);
 				strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
@@ -521,6 +527,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 		}
 		if (mMatchListLowTier.size() >= MAX_ROOM_USER)
 		{
+			int roomID = GetNewRoomID();
 			for (int i = 0; i < MAX_ROOM_USER; ++i)
 			{
 				int player_id = mMatchListLowTier.front();
@@ -528,7 +535,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 				LG_USER_INTO_GAME_PACKET packet;
 				packet.size = sizeof(packet);
 				packet.type = LG_USER_INTO_GAME;
-				packet.roomID = GetNewRoomID();// need update
+				packet.roomID = roomID;// need update
 				_itoa_s(rand() % 2'000'000'000, mClients[player_id].mHashs, 10);
 				strcpy_s(packet.hashs, mClients[player_id].mHashs);
 				strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
@@ -550,20 +557,22 @@ void Server::ProcessEvent(unsigned char* cmessage)
 		{
 			if (tTime - mClients[mMatchListHighTier.front()].mMatchStartTime >= milliseconds(20000))
 				{
-					for (int i = 0; i < mMatchListHighTier.size(); ++i)
+					int tSize = mMatchListHighTier.size();
+					int roomID = GetNewRoomID();
+					for (int i = 0; i < tSize; ++i)
 					{
 						int player_id = mMatchListHighTier.front();
 
 						LG_USER_INTO_GAME_PACKET packet;
 						packet.size = sizeof(packet);
 						packet.type = LG_USER_INTO_GAME;
-						packet.roomID = GetNewRoomID();//need update
+						packet.roomID = roomID;//need update
 						_itoa_s(rand() % 2'000'000'000, mClients[player_id].mHashs, 10);
 						strcpy_s(packet.hashs, mClients[player_id].mHashs);
 						strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
 						strcpy_s(packet.id, sizeof(mClients[player_id].mID), mClients[player_id].mID);
 						packet.uID = mClients[player_id].mUID;
-						packet.roomMax = mMatchListHighTier.size();
+						packet.roomMax = tSize;
 						mClients[player_id].mRoomID = packet.roomID;
 
 						mServers[1].DoSend(&packet);
@@ -581,21 +590,22 @@ void Server::ProcessEvent(unsigned char* cmessage)
 		{
 			if (tTime - mClients[mMatchListLowTier.front()].mMatchStartTime >= milliseconds(20000))
 			{
-				for (int i = 0; i < mMatchListLowTier.size(); ++i)
+				int tSize = mMatchListLowTier.size();
+				int roomID = GetNewRoomID();
+				for (int i = 0; i < tSize; ++i)
 				{
 					int player_id = mMatchListLowTier.front();
 
 					LG_USER_INTO_GAME_PACKET packet;
 					packet.size = sizeof(packet);
 					packet.type = LG_USER_INTO_GAME;
-					packet.roomID = GetNewRoomID();//need update
+					packet.roomID = roomID;//need update
 					strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
 					strcpy_s(packet.id, sizeof(mClients[player_id].mID), mClients[player_id].mID);
 					packet.uID = mClients[player_id].mUID;
-					packet.roomMax = mMatchListLowTier.size();
 					_itoa_s(rand() % 2'000'000'000, mClients[player_id].mHashs, 10);
 					strcpy_s(packet.hashs, mClients[player_id].mHashs);
-					packet.roomMax = mMatchListLowTier.size();
+					packet.roomMax = tSize;
 					mClients[player_id].mRoomID = packet.roomID;
 
 					mServers[1].DoSend(&packet);
