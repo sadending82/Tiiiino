@@ -66,6 +66,21 @@ void Room::RemovePlayer(Player* player)
 	}
 }
 
+void Room::DisablePlayer(Player* player)
+{
+	for (int i = 0; i < MAX_ROOM_USER; ++i)
+	{
+		Player* p = dynamic_cast<Player*>(mObjects[i]);
+		if (!p) break;
+		if (p->GetSocketID() == player->GetSocketID())
+		{
+			//player socket state는 disconnect을 먼저 하면서 free로 바뀜.
+			RemovePlayerInfo(p->GetUID());
+			return;
+		}
+	}
+}
+
 
 void Room::ResetGameRoom()
 {

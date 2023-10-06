@@ -23,7 +23,7 @@ Player::~Player()
 void Player::DisConnectAndReset()
 {
 	DisConnect();
-	gMainServer->GetRooms()[mRoomID]->RemovePlayer(this);
+	gMainServer->GetRooms()[mRoomID]->DisablePlayer(this);
 	auto sPacket = gMainServer->make_player_remove_packet(mRoomSyncID);
 	gMainServer->SendRoomBroadCast(mRoomID, (void*)&sPacket, sizeof(sPacket));
 	Reset();

@@ -48,6 +48,20 @@ int Server::GetNewServerID()
 	return INVALID_KEY;
 }
 
+int Server::GetNewRoomID()
+{
+	for (int i = 0; i < MAXGAMESERVER*10; ++i) {
+		mRooms[i].mStateLock.lock();
+		if (mRooms[i].mState == eRoomState::RS_FREE) {
+			mRooms[i].mState = eRoomState::RS_READY;
+			mRooms[i].mStateLock.unlock();
+			return i;
+		}
+		mRooms[i].mStateLock.unlock();
+	}
+	return INVALID_KEY;
+}
+
 void Server::ProcessPacket(int cID, unsigned char* cpacket)
 {
 	switch (cpacket[1])
@@ -61,7 +75,7 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 		pac.userKey = cID;
 		memcpy(pac.id, p->id, sizeof(pac.id));
 		memcpy(pac.password, p->password, sizeof(pac.password));
-		// db ������ ����
+		// send to db server
 		mServers[0].DoSend(&pac);
 		break;
 	}
@@ -73,7 +87,7 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 		sp.type = LD_SIGNUP;
 		memcpy(sp.id, rp->id, sizeof(rp->id));
 		memcpy(sp.password, rp->password, sizeof(rp->password));
-		// db ������ ����
+		// send to db server
 		mServers[0].DoSend(&sp);
 		break;
 	}
@@ -82,10 +96,18 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 		if (mClients[cID].mTier > 3.5)
 		{
 			mMatchListHighTier.push_back(cID);
+			if (mMatchListHighTier.size() == MAX_ROOM_USER / 2)
+			{
+				mClients[mMatchListHighTier.front()].mMatchStartTime = system_clock::now();
+			}
 		}
 		else
 		{
 			mMatchListLowTier.push_back(cID);
+			if (mMatchListLowTier.size() == MAX_ROOM_USER / 2)
+			{
+				mClients[mMatchListLowTier.front()].mMatchStartTime = system_clock::now();
+			}
 		}
 		mClients[cID].mState = eSessionState::ST_MATCH;
 		break;
@@ -94,6 +116,14 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 	{
 		mMatchListHighTier.remove(cID);
 		mMatchListLowTier.remove(cID);
+		if (mMatchListHighTier.size() > MAX_ROOM_USER / 2)
+		{
+			mClients[mMatchListHighTier.front()].mMatchStartTime = system_clock::now();
+		}
+		if (mMatchListLowTier.size() > MAX_ROOM_USER / 2)
+		{
+			mClients[mMatchListLowTier.front()].mMatchStartTime = system_clock::now();
+		}
 		mClients[cID].mState = eSessionState::ST_LOBBY;
 		break;
 	}
@@ -112,7 +142,7 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 	{
 		GL_LOGIN_PACKET* p = reinterpret_cast<GL_LOGIN_PACKET*>(spacket);
 
-		cout << "���� ���� ���� Ȯ��" << endl;
+		cout << "game server login" << endl;
 
 		break;
 	}
@@ -125,6 +155,12 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		memcpy(packet.gameServerIP, SERVERIP, sizeof(packet.gameServerIP));
 		packet.gameServerPortNum = GAMESERVERPORT;
 
+		int uidCount = 0;
+		mRooms[p->roomID].mStateLock.lock();
+		mRooms[p->roomID].mState = eRoomState::RS_INGAME;
+		mRooms[p->roomID].mStateLock.unlock();
+
+		vector<int> delPlayerVector;
 		for (auto& player : mReadytoGame)
 		{
 			if (mClients[player].mRoomID == p->roomID)
@@ -132,14 +168,22 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 				strcpy_s(packet.hashs, mClients[player].mHashs);
 				mClients[player].DoSend(&packet);
 				mClients[player].mState = eSessionState::ST_INGAME;
+
+				mRooms[mClients[player].mRoomID].UID[uidCount] = mClients[player].mUID;
+				uidCount++;
+				delPlayerVector.push_back(player);
 			}
+		}
+		for (auto player : delPlayerVector)
+		{
+			mReadytoGame.remove(player);
 		}
 
 		break;
 	}
 	case DL_LOGIN_OK:
 	{
-		cout << "�α��� ����" << endl;
+		cout << "player login ok" << endl;
 
 		DL_LOGIN_OK_PACKET* p = reinterpret_cast<DL_LOGIN_OK_PACKET*>(spacket);
 
@@ -169,7 +213,7 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 	}
 	case DL_LOGIN_FAIL:
 	{
-		cout << "�α��� ����" << endl;
+		cout << "player login fail" << endl;
 
 		DL_LOGIN_FAIL_PACKET* p = reinterpret_cast<DL_LOGIN_FAIL_PACKET*>(spacket);
 
@@ -246,9 +290,9 @@ void Server::DoWorker()
 				ZeroMemory(&exOver->mOver, sizeof(exOver->mOver));
 				exOver->mWsaBuf.buf = reinterpret_cast<CHAR*>(cSocket);
 				int addr_size = sizeof(SOCKADDR_IN);
-				//���Ӽ����� �� ������ �Ѵٸ�
+				// if gameserver num more than 1
 				/*
-				if(mGameServerCnt < mMaxGameServerCnt) //<<�ΰ� ���� �߰����ְ�
+				if(mGameServerCnt < mMaxGameServerCnt)
 					AcceptEx(mListenSocket, cSocket, exOver->mMessageBuf, BUF_SIZE - 8, addr_size + 16, addr_size + 16, 0, &exOver->mOver);
 				else
 				*/
@@ -412,7 +456,7 @@ void Server::Init()
 		ss_over.mCompType = eCompType::OP_ACCEPT;
 		ss_over.mWsaBuf.buf = reinterpret_cast<CHAR*>(LDsocket);
 
-		// ���ε� �ɾ� �ֱ� -> ���� Ŭ�� ���� ���� ������
+		// DB server setting
 
 		int server_id = GetNewServerID();
 		if (server_id != INVALID_KEY)
@@ -431,18 +475,6 @@ void Server::Init()
 		{
 			cout << "Max server exceeded.\n";
 		}
-
-		//ZeroMemory(&ss_over.mOver, sizeof(ss_over.mOver));
-		//ss_over.mWsaBuf.buf = reinterpret_cast<CHAR*>(LDsocket);
-		//int addr_size = sizeof(SOCKADDR_IN);
-		//AcceptEx(mListenSocket, LDsocket, ss_over.mMessageBuf, 0, addr_size + 16, addr_size + 16, 0, &ss_over.mOver);
-		//
-		//LD_LOGIN_PACKET p;
-		//p.size = sizeof(LD_LOGIN_PACKET);
-		//p.type = LD_LOGIN;
-		////p.testNum = 123;
-		//
-		//mServers[server_id].DoSend(&p);
 	}
 
 	SYSTEM_INFO si;
@@ -466,9 +498,10 @@ void Server::ProcessEvent(unsigned char* cmessage)
 	switch (cmessage[1]) {
 	case eEVENT_TYPE::EV_MATCH_UP:
 	{
-		// �⺻ Ǯ�� ��Ī ����
+		// match room max
 		if (mMatchListHighTier.size() >= MAX_ROOM_USER)
 		{
+			int roomID = GetNewRoomID();
 			for (int i = 0; i < MAX_ROOM_USER; ++i)
 			{
 				int player_id = mMatchListHighTier.front();
@@ -476,7 +509,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 				LG_USER_INTO_GAME_PACKET packet;
 				packet.size = sizeof(packet);
 				packet.type = LG_USER_INTO_GAME;
-				packet.roomID = 0;//�� ��ȣ �ӽ÷� 0���� �־��?				
+				packet.roomID = roomID;// need update		
 				_itoa_s(rand() % 2'000'000'000, mClients[player_id].mHashs, 10);
 				strcpy_s(packet.hashs, mClients[player_id].mHashs);
 				strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
@@ -493,6 +526,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 		}
 		if (mMatchListLowTier.size() >= MAX_ROOM_USER)
 		{
+			int roomID = GetNewRoomID();
 			for (int i = 0; i < MAX_ROOM_USER; ++i)
 			{
 				int player_id = mMatchListLowTier.front();
@@ -500,7 +534,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 				LG_USER_INTO_GAME_PACKET packet;
 				packet.size = sizeof(packet);
 				packet.type = LG_USER_INTO_GAME;
-				packet.roomID = 0;//�� ��ȣ �ӽ÷� 0���� �־��?
+				packet.roomID = roomID;// need update
 				_itoa_s(rand() % 2'000'000'000, mClients[player_id].mHashs, 10);
 				strcpy_s(packet.hashs, mClients[player_id].mHashs);
 				strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
@@ -510,72 +544,34 @@ void Server::ProcessEvent(unsigned char* cmessage)
 				mClients[player_id].mRoomID = packet.roomID;
 
 				mServers[1].DoSend(&packet);
-
 				
 				mMatchListLowTier.pop_front();
 				mReadytoGame.push_back(player_id);
 			}
 		}
 
-		// 4�� �̻� ���?
-		if (mMatchListHighTier.size() >= MAX_ROOM_USER / 2)
-		{
-			EV_CountDownPacket pac;
-			pac.size = sizeof(EV_CountDownPacket);
-			pac.type = eCompType::OP_EVENT;
-			pac.listnum = 0;
-			pTimer->PushEvent(1, eEVENT_TYPE::EV_COUNT_DOWN, 1000, reinterpret_cast<unsigned char*>(&pac));
-		
-			mClients[mMatchListHighTier.front()].mMatchStartTime = system_clock::now();
-		}
-		if (mMatchListLowTier.size() >= MAX_ROOM_USER / 2)
-		{
-			EV_CountDownPacket pac;
-			pac.size = sizeof(EV_CountDownPacket);
-			pac.type = eCompType::OP_EVENT;
-			pac.listnum = 1;
-			pTimer->PushEvent(1, eEVENT_TYPE::EV_COUNT_DOWN, 1000, reinterpret_cast<unsigned char*>(&pac));
-		
-			mClients[mMatchListLowTier.front()].mMatchStartTime = system_clock::now();
-		}
-
-		EV_UpdateMatchPacket p;
-		p.size = sizeof(EV_UpdateMatchPacket);
-		p.type = eCompType::OP_EVENT;
-		pTimer->PushEvent(1, eEVENT_TYPE::EV_MATCH_UP, 10000, reinterpret_cast<unsigned char*>(&p));
-
-		break;
-	}
-	case eEVENT_TYPE::EV_COUNT_DOWN:
-	{
-		EV_CountDownPacket* p = reinterpret_cast<EV_CountDownPacket*>(cmessage);
-
+		// half room max
 		system_clock::time_point tTime = system_clock::now();
-
-		if (p->listnum == 0) // ���� Ƽ��
+		if (mMatchListHighTier.size() >= MAX_ROOM_USER / 2) // high list
 		{
-			if (mMatchListHighTier.size() < MAX_ROOM_USER / 2)
-			{
-				break;
-			}
-			else
-			{
-				if (tTime - mClients[mMatchListHighTier.front()].mMatchStartTime >= milliseconds(2000))
+			if (tTime - mClients[mMatchListHighTier.front()].mMatchStartTime >= milliseconds(20000))
 				{
-					for (int i = 0; i < mMatchListHighTier.size(); ++i)
+					int tSize = mMatchListHighTier.size();
+					int roomID = GetNewRoomID();
+					for (int i = 0; i < tSize; ++i)
 					{
 						int player_id = mMatchListHighTier.front();
 
 						LG_USER_INTO_GAME_PACKET packet;
 						packet.size = sizeof(packet);
 						packet.type = LG_USER_INTO_GAME;
-						packet.roomID = 0;//�� ��ȣ �ӽ÷� 0���� �־��?
+						packet.roomID = roomID;//need update
 						_itoa_s(rand() % 2'000'000'000, mClients[player_id].mHashs, 10);
 						strcpy_s(packet.hashs, mClients[player_id].mHashs);
 						strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
 						strcpy_s(packet.id, sizeof(mClients[player_id].mID), mClients[player_id].mID);
 						packet.uID = mClients[player_id].mUID;
-						packet.roomMax = mMatchListHighTier.size();
+						packet.roomMax = tSize;
 						mClients[player_id].mRoomID = packet.roomID;
 
 						mServers[1].DoSend(&packet);
@@ -584,68 +580,54 @@ void Server::ProcessEvent(unsigned char* cmessage)
 						mReadytoGame.push_back(player_id);
 					}
 				}
-				else
+			else
 				{
-					// Ŭ�� �ð� �� ���� -> ���� ���?�ð� ����
-					/*
-					   ��Ŷ ����
-					*/
-
-					EV_CountDownPacket pac;
-					pac.size = sizeof(EV_CountDownPacket);
-					pac.type = eCompType::OP_EVENT;
-					pac.listnum = 0;
-					pTimer->PushEvent(1, eEVENT_TYPE::EV_COUNT_DOWN, 1000, reinterpret_cast<unsigned char*>(&pac));
+					// count down packet?
 				}
-			}
 		}
-		else // ���� Ƽ��
+		if (mMatchListLowTier.size() >= MAX_ROOM_USER / 2)
 		{
-			if (mMatchListLowTier.size() < MAX_ROOM_USER / 2)
+			if (tTime - mClients[mMatchListLowTier.front()].mMatchStartTime >= milliseconds(20000))
 			{
-				break;
+				int tSize = mMatchListLowTier.size();
+				int roomID = GetNewRoomID();
+				for (int i = 0; i < tSize; ++i)
+				{
+					int player_id = mMatchListLowTier.front();
+
+					LG_USER_INTO_GAME_PACKET packet;
+					packet.size = sizeof(packet);
+					packet.type = LG_USER_INTO_GAME;
+					packet.roomID = roomID;//need update
+					strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
+					strcpy_s(packet.id, sizeof(mClients[player_id].mID), mClients[player_id].mID);
+					packet.uID = mClients[player_id].mUID;
+					_itoa_s(rand() % 2'000'000'000, mClients[player_id].mHashs, 10);
+					strcpy_s(packet.hashs, mClients[player_id].mHashs);
+					packet.roomMax = tSize;
+					mClients[player_id].mRoomID = packet.roomID;
+
+					mServers[1].DoSend(&packet);
+
+					mMatchListLowTier.pop_front();
+					mReadytoGame.push_back(player_id);
+				}
 			}
 			else
 			{
-				if (tTime - mClients[mMatchListLowTier.front()].mMatchStartTime >= milliseconds(2000))
-				{
-					for (int i = 0; i < mMatchListLowTier.size(); ++i)
-					{
-						int player_id = mMatchListLowTier.front();
-
-						LG_USER_INTO_GAME_PACKET packet;
-						packet.size = sizeof(packet);
-						packet.type = LG_USER_INTO_GAME;
-						packet.roomID = 0;//�� ��ȣ �ӽ÷� 0���� �־��?
-						_itoa_s(rand() % 2'000'000'000, mClients[player_id].mHashs, 10);
-						strcpy_s(packet.hashs, mClients[player_id].mHashs);
-						strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
-						strcpy_s(packet.id, sizeof(mClients[player_id].mID), mClients[player_id].mID);
-						packet.uID = mClients[player_id].mUID;
-						packet.roomMax = mMatchListLowTier.size();
-						mClients[player_id].mRoomID = packet.roomID;
-
-						mServers[1].DoSend(&packet);
-
-						mMatchListLowTier.pop_front();
-						mReadytoGame.push_back(player_id);
-					}
-				}
-				else
-				{
-					// Ŭ�� �ð� �� ���� -> ���� ���?�ð� ����
-					/*
-					   ��Ŷ ����
-					*/
-
-					EV_CountDownPacket pac;
-					pac.size = sizeof(EV_CountDownPacket);
-					pac.type = eCompType::OP_EVENT;
-					pac.listnum = 1;
-					pTimer->PushEvent(1, eEVENT_TYPE::EV_COUNT_DOWN, 1000, reinterpret_cast<unsigned char*>(&pac));
-				}
+				// count down packet?
 			}
 		}
+
+		EV_UpdateMatchPacket p;
+		p.size = sizeof(EV_UpdateMatchPacket);
+		p.type = eCompType::OP_EVENT;
+		pTimer->PushEvent(1, eEVENT_TYPE::EV_MATCH_UP, 5000, reinterpret_cast<unsigned char*>(&p));
+
+		break;
+	}
+	case eEVENT_TYPE::EV_COUNT_DOWN:
+	{
 		break;
 	}
 	default:

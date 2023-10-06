@@ -25,18 +25,35 @@ public:
 	void EnterLobby();
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	bool CheckResult() { return bCheckResult; }
+	void ShowResult();
 
-	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	void SetCheckResult(bool bcheckresult);
 
-	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	void SuccessGame();
+	UPROPERTY(meta = (BindWidget))
+	class UEditableText* EditSTAGEText;
 
-	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	void FailedGame();
+	UPROPERTY(meta = (BindWidget))
+	class UEditableText* EditRANKText;
+
+	UPROPERTY(meta = (BindWidget))
+	class UEditableText* EditGradeText;
+
+	UPROPERTY(meta = (BindWidget))
+	class UEditableText* EditPointText;
+
 
 private:
 	UPROPERTY(EditAnywhere, Category = "UMG_Game")
-	bool bCheckResult;
+	bool bLevelClearCheck;
+
+	UPROPERTY(EditAnywhere, Category = "UMG_Game")
+	FString CurrentStage;
+
+	UPROPERTY(EditAnywhere, Category = "UMG_Game")
+	int CurrentRank;
+
+	UPROPERTY(EditAnywhere, Category = "UMG_Game")
+	float GainGrade;
+
+	UPROPERTY(EditAnywhere, Category = "UMG_Game")
+	int32 GainPoint;
 };

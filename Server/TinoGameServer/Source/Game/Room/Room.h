@@ -18,8 +18,10 @@ public:
 	void Init();
 	// Add Object - Player, MapObject, Anything else
 	void AddObject(Object* object);
-	// Remove Player - If Player Connection is Gone
+	// Remove Player - If Room want Reset
 	void RemovePlayer(Player* player);
+	// Disable Player - if Player Connection is Gone, player just disabled not remove
+	void DisablePlayer(Player* player);
 	//The Game Is End, Reset Room ex)clear mObjects
 	void ResetGameRoom();
 	
