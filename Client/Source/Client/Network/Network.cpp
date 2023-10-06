@@ -349,9 +349,13 @@ void Network::process_packet(unsigned char* p)
 				//´ÙÀÌºê
 				break;
 			case 3:				
-				mOtherCharacter[id]->PlayAnimMontage(mOtherCharacter[id]->TumbleMontage);
+				mOtherCharacter[id]->PlayTumbleMontage();
+				//ÂøÁö(ÅÒºí)
 				//mOtherCharacter[id]->Dive();
 				break;
+			case 4:
+				mOtherCharacter[id]->Grab();
+				//Àâ±â
 			default:
 				break;
 			}

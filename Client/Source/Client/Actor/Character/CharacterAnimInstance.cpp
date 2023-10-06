@@ -33,7 +33,9 @@ void UCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			if (otherplayer)
 			{
 				Speed = otherplayer->ServerSyncSpeed;
+
 			}
 		}
+		MovementState = Cast<ATinoCharacter>(OwnerCharacter)->GetMovementState();
 	}
 }

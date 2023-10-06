@@ -10,13 +10,15 @@
  * 
  */
 UENUM(BlueprintType)
-enum class EMovementState
+enum class EMovementState : uint8
 {
 	EMS_Normal UMETA(DisplayName = "Normal"),
 	EMS_Up UMETA(DisplayName = "Up"),
 	EMS_Fall UMETA(DisplayName = "Fall"),
 	EMS_Tumbled UMETA(DisplayName = "Tumbled"),
 	EMS_Dive UMETA(DisplayName = "Dive"),
+	EMS_Grabbing UMETA(DisplayName = "Grabbing"),
+	EMS_IsGrabbed UMETA(DisplayName = "IsGrabbed"),
 	EMS_MAX UMETA(DisplayName = "DefaultMAX")
 };
 
@@ -47,7 +49,17 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Dive();
 
+	//단순 재생용,서버 패킷을받아서 실행
 	void PlayTumbleMontage();
+
+	void Grab();
+	void SetNormalToGrabbed();
+	void SetGrabbedToNormal();
+
+
+	void GrabBegin();
+	void GrabOff();
+	void DetectTarget();
 
 	void DisableInputMode();
 	void EnableInputMode();
@@ -60,6 +72,7 @@ public:
 	
 	FORCEINLINE void SetMovementState(EMovementState State) { MovementState = State; }
 	FORCEINLINE void SetMaxTumbleTime(float MaxTime) { MaxTumbledTime = MaxTime; }
+	FORCEINLINE EMovementState GetMovementState() { return MovementState; }
 	FORCEINLINE float GetMaxTumbleTime() { return MaxTumbledTime; }
 	FORCEINLINE bool IsDivining() { return bIsDiving; }
 
@@ -78,16 +91,15 @@ private:
 
 	bool CanMove();
 	bool CanDive();
+	bool CanGrab();
 
 	bool CanTumble(float DeltaTime);
 	void PlayTumbleMontage(float DeltaTime);
 
 	void Align();
 
-public:
 
-	UPROPERTY(EditDefaultsOnly, Category = "Animation")
-	class UAnimMontage* TumbleMontage;
+	bool SendAnimPacket(int32 AnimType);
 
 private:
 
@@ -98,11 +110,30 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 		class UAnimMontage* DiveMontage;
-
-	UPROPERTY(VisibleAnywhere, Category = "Animation")
-		float CurrentTumbledTime;
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+		class UAnimMontage* TumbleMontage;
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+		class UAnimMontage* GrabMontage;
+
+	UPROPERTY(VisibleAnywhere, Category = "Animation | Tumble")
+		float CurrentTumbledTime;
+	UPROPERTY(EditDefaultsOnly, Category = "Animation | Tumble")
 		float MaxTumbledTime;
+	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "그랩 최대 유지시간"), Category = "Animation | Grab")
+		float MaxGrabTime;
+	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "그랩 재사용시간"), Category = "Animation | Grab")
+		float GrabCoolTime;
+	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "그랩시 감속량"), Category = "Animation | Grab")
+		float GrabbedSpeedRate;
+
+	UPROPERTY(EditDefaultsOnly,meta = (ToolTip="탐지 거리"), Category = "Animation | Grab")
+		float DetectDist;
+	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "탐지 범위(반지름)"), Category = "Animation | Grab")
+		float DetectRadius;
+	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "탐지 각도(정면 부채꼴)"), Category = "Animation | Grab")
+		float DetectAngle;
+	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "잡은 대상과의 간격"), Category = "Animation | Grab")
+		float TargetInterval;
 
 	UPROPERTY(BlueprintReadWrite,EditAnywhere,meta = (AllowPrivateAccess = true, ToolTip="비네트 강도"), Category = "Effect")
 		float CustomVignetteIntensity;
@@ -110,7 +141,22 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Enums")
 		EMovementState MovementState;
 
-	bool bCanTumbled;
+	UPROPERTY(VisibleAnywhere, Category = "Animation | Grab")
+		AActor* Target;
+
+	UPROPERTY(VisibleAnywhere, Category = "Animation")
+		bool bCanTumbled;
 	UPROPERTY(VisibleAnywhere, Category = "Animation")
 		bool bIsDiving;
+
+	UPROPERTY(VisibleAnywhere, Category = "Animation")
+		bool bIsGrabbing;
+	UPROPERTY(VisibleAnywhere, Category = "Animation")
+		bool bIsGrabCoolTime;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Animation | Grab")
+		bool bShowDebugTrace;
+
+	FTimerHandle GrabTimer;
+	FTimerHandle GrabCoolTimer;
 };
