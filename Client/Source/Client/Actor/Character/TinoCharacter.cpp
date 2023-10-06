@@ -82,32 +82,36 @@ void ATinoCharacter::Tick(float DeltaTime)
 
 		if (Network::GetNetwork()->bIsConnected)
 		{
-			if (!GetController()->IsPlayerController())
+			if (GetController())
 			{
-				//서버랑 연결 돼 있을 때만 상대 캐릭터 보간하려 시도. 
-				//Update GroundSpeedd (22-04-05)
-				//GroundSpeedd = ServerStoreGroundSpeed;
-				//Update Interpolation (23-09-27)
-				GetCharacterMovement()->Velocity = ServerCharMovingSpeed;
-
-			}
-			else {
-				if (Network::GetNetwork()->bGameIsStart)
+				if (!GetController()->IsPlayerController())
 				{
-					auto pos = GetTransform().GetLocation();
-					auto rot = GetTransform().GetRotation();
+					//서버랑 연결 돼 있을 때만 상대 캐릭터 보간하려 시도. 
+					//Update GroundSpeedd (22-04-05)
+					//GroundSpeedd = ServerStoreGroundSpeed;
+					//Update Interpolation (23-09-27)
+					GetCharacterMovement()->Velocity = ServerCharMovingSpeed;
 
-					ServerSyncElapsedTime += DeltaTime;
-					if (ServerSyncDeltaTime < ServerSyncElapsedTime)
+				}
+				else {
+					if (Network::GetNetwork()->bGameIsStart)
 					{
-						send_move_packet(Network::GetNetwork()->s_socket, Cast<UCharacterAnimInstance>(GetMesh()->GetAnimInstance())->bIsAir, pos.X, pos.Y, pos.Z, rot, GetVelocity().Size2D(), GetCharacterMovement()->Velocity);
-						ServerSyncElapsedTime = 0.0f;
+						auto pos = GetTransform().GetLocation();
+						auto rot = GetTransform().GetRotation();
+
+						ServerSyncElapsedTime += DeltaTime;
+						if (ServerSyncDeltaTime < ServerSyncElapsedTime)
+						{
+							send_move_packet(Network::GetNetwork()->s_socket, Cast<UCharacterAnimInstance>(GetMesh()->GetAnimInstance())->bIsAir, pos.X, pos.Y, pos.Z, rot, GetVelocity().Size2D(), GetCharacterMovement()->Velocity);
+							ServerSyncElapsedTime = 0.0f;
+						}
+
+						float CharXYVelocity = ((ACharacter::GetCharacterMovement()->Velocity) * FVector(1.f, 1.f, 0.f)).Size();
 					}
 
-					float CharXYVelocity = ((ACharacter::GetCharacterMovement()->Velocity) * FVector(1.f, 1.f, 0.f)).Size();
 				}
-
 			}
+			
 		}
 
 
@@ -124,7 +128,7 @@ bool ATinoCharacter::CanTumble(float DeltaTime)
 
 	ret &= GetCharacterMovement()->IsFalling();
 	//ret &= (GetVelocity().Z != FMath::IsNearlyZero());
-	
+
 	if (ret && MaxTumbledTime > CurrentTumbledTime) CurrentTumbledTime += DeltaTime;
 	bCanTumbled = (CurrentTumbledTime >= MaxTumbledTime);
 
@@ -142,8 +146,11 @@ void ATinoCharacter::PlayTumbleMontage(float DeltaTime)
 		{
 			CurrentTumbledTime = 0.f;
 			bCanTumbled = false;
-			if (GetController()->IsPlayerController())
-				send_action_packet(Network::GetNetwork()->s_socket, 3);
+			if (GetController())
+			{
+				if (GetController()->IsPlayerController())
+					send_action_packet(Network::GetNetwork()->s_socket, 3);
+			}
 			PlayAnimMontage(TumbleMontage);
 		}
 		else
@@ -234,15 +241,23 @@ void ATinoCharacter::CreateDummy()
 
 void ATinoCharacter::Jump()
 {
-	if (CanMove()  && GetCharacterMovement()->IsFalling()== false)
+	if (CanMove() && GetCharacterMovement()->IsFalling() == false)
 	{
 		Super::Jump();
-		if (GetController()->IsPlayerController())
-			send_action_packet(Network::GetNetwork()->s_socket, 1);
+		if (GetController())
+		{
+			if (GetController()->IsPlayerController())
+				send_action_packet(Network::GetNetwork()->s_socket, 1);
+		}
+
 	}
-	if (!GetController()->IsPlayerController())
+
+	if (GetController())
 	{
-		Super::Jump();
+		if (!GetController()->IsPlayerController())
+		{
+			Super::Jump();
+		}
 	}
 }
 
