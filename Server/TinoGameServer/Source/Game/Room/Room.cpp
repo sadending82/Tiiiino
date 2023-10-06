@@ -326,7 +326,7 @@ void Room::setPlayerInfoWithCnt(const sPlayerInfo& playerInfo, const int& player
 void Room::setGameEndTimerStartOnce()
 {
 	bool expect = 0;
-	if (std::atomic_compare_exchange_strong(reinterpret_cast<std::atomic_bool*>(&mGameEndTimer), 0, 1))
+	if (std::atomic_compare_exchange_strong(reinterpret_cast<std::atomic_bool*>(&mGameEndTimer), &expect, 1))
 	{
 		DEBUGMSGNOPARAM("한 번 실행되야함\n");
 

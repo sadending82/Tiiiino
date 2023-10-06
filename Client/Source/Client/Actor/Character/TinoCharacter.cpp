@@ -82,7 +82,7 @@ void ATinoCharacter::Tick(float DeltaTime)
 
 		if (Network::GetNetwork()->bIsConnected)
 		{
-			if (GetController()->IsPlayerController()) {
+			if (GetController()->IsPlayerController() && Network::GetNetwork()->bGameIsStart) {
 
 				auto pos = GetTransform().GetLocation();
 				auto rot = GetTransform().GetRotation();
