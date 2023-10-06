@@ -397,6 +397,7 @@ void Network::process_packet(unsigned char* p)
 	}
 	case SC_GAME_WAITTING: {
 		SC_GAME_WAITTING_PACKET* packet = reinterpret_cast<SC_GAME_WAITTING_PACKET*>(p);
+		bGameIsStart = true;
 		//
 		// 카운트다운 UI 띄우기및 object들 처음 동기화.
 		//
@@ -404,7 +405,6 @@ void Network::process_packet(unsigned char* p)
 	}
 	case SC_GAME_START: {
 		SC_GAME_START_PACKET* packet = reinterpret_cast<SC_GAME_START_PACKET*>(p);
-		bGameIsStart = true;
 
 		//
 		// 플레이어들 움직일 수 있게 하기.

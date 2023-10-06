@@ -194,8 +194,11 @@ void ATinoCharacter::Dive()
 	if (DiveMontage && CanDive())
 	{
 		bIsDiving = true;
-		if (GetController()->IsPlayerController())
-			send_action_packet(Network::GetNetwork()->s_socket, 2);
+		if (GetController())
+		{
+			if (GetController()->IsPlayerController())
+				send_action_packet(Network::GetNetwork()->s_socket, 2);
+		}
 		PlayAnimMontage(DiveMontage);
 	}
 }
