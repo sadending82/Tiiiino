@@ -82,27 +82,31 @@ void ATinoCharacter::Tick(float DeltaTime)
 
 		if (Network::GetNetwork()->bIsConnected)
 		{
-			if (GetController()->IsPlayerController() && Network::GetNetwork()->bGameIsStart) {
-
-				auto pos = GetTransform().GetLocation();
-				auto rot = GetTransform().GetRotation();
-
-				ServerSyncElapsedTime += DeltaTime;
-				if (ServerSyncDeltaTime < ServerSyncElapsedTime)
-				{
-					send_move_packet(Network::GetNetwork()->s_socket, Cast<UCharacterAnimInstance>(GetMesh()->GetAnimInstance())->bIsAir, pos.X, pos.Y, pos.Z, rot, GetVelocity().Size2D(), GetCharacterMovement()->Velocity);
-					ServerSyncElapsedTime = 0.0f;
-				}
-
-				float CharXYVelocity = ((ACharacter::GetCharacterMovement()->Velocity) * FVector(1.f, 1.f, 0.f)).Size();
-
-			}
-			else {
+			if (!GetController()->IsPlayerController())
+			{
 				//서버랑 연결 돼 있을 때만 상대 캐릭터 보간하려 시도. 
 				//Update GroundSpeedd (22-04-05)
 				//GroundSpeedd = ServerStoreGroundSpeed;
 				//Update Interpolation (23-09-27)
 				GetCharacterMovement()->Velocity = ServerCharMovingSpeed;
+
+			}
+			else {
+				if (Network::GetNetwork()->bGameIsStart)
+				{
+					auto pos = GetTransform().GetLocation();
+					auto rot = GetTransform().GetRotation();
+
+					ServerSyncElapsedTime += DeltaTime;
+					if (ServerSyncDeltaTime < ServerSyncElapsedTime)
+					{
+						send_move_packet(Network::GetNetwork()->s_socket, Cast<UCharacterAnimInstance>(GetMesh()->GetAnimInstance())->bIsAir, pos.X, pos.Y, pos.Z, rot, GetVelocity().Size2D(), GetCharacterMovement()->Velocity);
+						ServerSyncElapsedTime = 0.0f;
+					}
+
+					float CharXYVelocity = ((ACharacter::GetCharacterMovement()->Velocity) * FVector(1.f, 1.f, 0.f)).Size();
+				}
+
 			}
 		}
 
