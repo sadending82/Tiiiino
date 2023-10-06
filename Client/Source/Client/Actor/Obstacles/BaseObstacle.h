@@ -32,4 +32,10 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Network")
 		int ObjectType;
+
+		// 10/06 김혁동
+		// 이 부분은 네트워크 동기화를 위한 변수입니다.
+		// 타이밍을 맞춰야 하는 장애물들은 이 변수가 true가 되는 순간 움직이도록 설정해야 합니다. 
+	UPROPERTY(EditAnywhere, Category = "Network")
+		bool bIsStartMove = false;
 };
