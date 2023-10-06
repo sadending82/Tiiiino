@@ -47,6 +47,9 @@ public:
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	int GetRestGameTime() const { return RestGameTime; }
 
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void DisconnectNetwork();
+
 private:
 	UPROPERTY(EditAnywhere, Category = "UMG_Game")
 	int RestGameTime = 20;

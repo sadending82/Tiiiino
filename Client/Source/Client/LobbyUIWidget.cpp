@@ -41,3 +41,9 @@ void ULobbyUIWidget::TryBack()
 	send_matchout_packet(Network::GetNetwork()->l_socket);
 	TinoController->ChangeMenuWidget(TinoController->GetStartingWidgetClass());
 }
+
+void ULobbyUIWidget::DisconnectNetwork()
+{
+	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	TinoController->DisconnectNetwork();
+}
