@@ -24,6 +24,9 @@ void ADoor::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	// 네트워크 동기화시 true로 변경해 줄것.
+	// 현재는 임시 변수임.
+	bIsStartMove = true;
 }
 
 // Called every frame
@@ -31,62 +34,65 @@ void ADoor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	fCalcTime += DeltaTime;
-
-	if (fCalcTime > DoorOpenTerm)
+	if (bIsStartMove)
 	{
-		fCalcTime -= DoorOpenTerm;
+		fCalcTime += DeltaTime;
 
-		switch (OpenType)
+		if (fCalcTime > DoorOpenTerm)
 		{
-		case WaitToOpen:
-			SetStartOpenDoor();
-			OpenType = OpenToWait;
-			break;
-		case WaitToClose:
-			SetStartCloseDoor();
-			OpenType = CloseToWait;
-			break;
-		case OpenToWait:
-		case CloseToWait:
-		default:
-			break;
-		}
-	}
+			fCalcTime -= DoorOpenTerm;
 
-	if (bIsOpeningDoor) {
-		if (fRemainMoveDist > DoorMoveSpeed * DeltaTime)
-		{
-			LeftMesh->AddRelativeLocation(FVector(0.f, DoorMoveSpeed * DeltaTime, 0.f));
-			RightMesh->AddRelativeLocation(FVector(0.f, -DoorMoveSpeed * DeltaTime, 0.f));
-			fRemainMoveDist -= DoorMoveSpeed * DeltaTime;
+			switch (OpenType)
+			{
+			case WaitToOpen:
+				SetStartOpenDoor();
+				OpenType = OpenToWait;
+				break;
+			case WaitToClose:
+				SetStartCloseDoor();
+				OpenType = CloseToWait;
+				break;
+			case OpenToWait:
+			case CloseToWait:
+			default:
+				break;
+			}
 		}
-		else
-		{
-			LeftMesh->AddRelativeLocation(FVector(0.f, fRemainMoveDist, 0.f));
-			RightMesh->AddRelativeLocation(FVector(0.f, -fRemainMoveDist, 0.f));
-			fRemainMoveDist = 0.f;
-			bIsOpeningDoor = false;
-			OpenType = WaitToClose;
-		}
-	}
 
-	if (bIsClosingDoor) {
-		if (fRemainMoveDist > DoorMoveSpeed * DeltaTime)
-		{
-			LeftMesh->AddRelativeLocation(FVector(0.f, -DoorMoveSpeed * DeltaTime, 0.f));
-			RightMesh->AddRelativeLocation(FVector(0.f, DoorMoveSpeed * DeltaTime, 0.f));
-			fRemainMoveDist -= DoorMoveSpeed * DeltaTime;
+		if (bIsOpeningDoor) {
+			if (fRemainMoveDist > DoorMoveSpeed * DeltaTime)
+			{
+				LeftMesh->AddRelativeLocation(FVector(0.f, DoorMoveSpeed * DeltaTime, 0.f));
+				RightMesh->AddRelativeLocation(FVector(0.f, -DoorMoveSpeed * DeltaTime, 0.f));
+				fRemainMoveDist -= DoorMoveSpeed * DeltaTime;
+			}
+			else
+			{
+				LeftMesh->AddRelativeLocation(FVector(0.f, fRemainMoveDist, 0.f));
+				RightMesh->AddRelativeLocation(FVector(0.f, -fRemainMoveDist, 0.f));
+				fRemainMoveDist = 0.f;
+				bIsOpeningDoor = false;
+				OpenType = WaitToClose;
+			}
 		}
-		else
-		{
-			LeftMesh->AddRelativeLocation(FVector(0.f, -fRemainMoveDist, 0.f));
-			RightMesh->AddRelativeLocation(FVector(0.f, fRemainMoveDist, 0.f));
-			fRemainMoveDist = 0.f;
-			bIsClosingDoor = false;
-			OpenType = WaitToOpen;
+
+		if (bIsClosingDoor) {
+			if (fRemainMoveDist > DoorMoveSpeed * DeltaTime)
+			{
+				LeftMesh->AddRelativeLocation(FVector(0.f, -DoorMoveSpeed * DeltaTime, 0.f));
+				RightMesh->AddRelativeLocation(FVector(0.f, DoorMoveSpeed * DeltaTime, 0.f));
+				fRemainMoveDist -= DoorMoveSpeed * DeltaTime;
+			}
+			else
+			{
+				LeftMesh->AddRelativeLocation(FVector(0.f, -fRemainMoveDist, 0.f));
+				RightMesh->AddRelativeLocation(FVector(0.f, fRemainMoveDist, 0.f));
+				fRemainMoveDist = 0.f;
+				bIsClosingDoor = false;
+				OpenType = WaitToOpen;
+			}
+
 		}
-		
 	}
 	
 }
