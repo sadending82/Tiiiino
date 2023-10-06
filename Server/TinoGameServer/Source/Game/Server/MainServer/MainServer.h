@@ -42,6 +42,7 @@ public:
 	SC_PLAYER_REMOVE_PACKET make_player_remove_packet(const int playerRoomSyncID);
 	void send_move_packet(const int player_id, const int mover_id, const bool inair, const float value, const float sx, const float sy, const float sz);
 	SC_MOVE_PLAYER_PACKET make_move_packet(const int moverSocketID, const bool inair, const float value, const float sx, const float sy, const float sz);
+	void send_breakdoor_packet(const int roomID, const int objectID);
 	 
 	void send_player_arrive_packet(const int player_id,const int arrive_id);
 	SC_PLAYER_ARRIVE_PACKET make_player_arrive_packet(const int arriveID);
