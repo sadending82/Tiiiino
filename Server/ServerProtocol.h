@@ -61,9 +61,12 @@ struct LG_LOGIN_OK_PACKET : public SPACKET {
 struct LG_USER_INTO_GAME_PACKET : public SPACKET {
 	char	id[MAX_NAME_SIZE];	//player id Not UID
 	char	name[MAX_NAME_SIZE];
+	char	department;
 	int		uID;
 	int		roomID;
-	int		roomMax;	//�� �ִ� �ο�. (4���̼� �� ���� �����ϱ�)
+	int		roomMax;	// in room Max User
+	long long	equipmentflag;
+
 };
 
 struct LG_USER_DISCONNECT_PACKET : public SPACKET {

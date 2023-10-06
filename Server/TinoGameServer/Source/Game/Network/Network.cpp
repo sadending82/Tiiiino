@@ -74,7 +74,7 @@ void Network::PreRecvPacket(unsigned char* remainMsg, int remainBytes)
 	mWsaOverEx.GetWsaBuf().len = BUF_SIZE - mPrevSize;
 }
 
-void Network::RecvPacket()
+bool Network::RecvPacket()
 {
 	DWORD flags = 0;
 	int ret = WSARecv(mSocket, &mWsaOverEx.GetWsaBuf(), 1, 0, &flags, &mWsaOverEx.GetWsaOver(), NULL);
@@ -82,14 +82,16 @@ void Network::RecvPacket()
 		int err = WSAGetLastError();
 		if (ERROR_IO_PENDING != err)
 		{
-			DisConnect();
 			ErrorDisplay(err);
+			return false;
+			DisConnect();
 		}
 	}
+	return true;
 }
 
 
-void Network::SendPacket(void* packet, int bytes)
+bool Network::SendPacket(void* packet, int bytes)
 {
 	WSA_OVER_EX* wsa_ex = new WSA_OVER_EX(eCOMMAND_IOCP::CMD_SEND, bytes, packet);
 	int ret = WSASend(mSocket, &wsa_ex->GetWsaBuf(), 1, 0, 0, &wsa_ex->GetWsaOver(), NULL);
@@ -98,9 +100,11 @@ void Network::SendPacket(void* packet, int bytes)
 		if (ERROR_IO_PENDING != err)
 		{
 			ErrorDisplay(err);
+			return false;
 			DisConnect();
 		}
 	}
+	return true;
 }
 
 void Network::AcceptSetting(const eSocketState& socketState, const eCOMMAND_IOCP& commandIocp, SOCKET& socket)

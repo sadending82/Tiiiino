@@ -24,7 +24,7 @@ enum class eEventType : char
 
 enum class eCOMMAND_IOCP {
 	CMD_ACCEPT, CMD_RECV, CMD_SEND, CMD_SERVER_RECV, CMD_DBSERVER_RECV, //Basic
-	CMD_GAME_WAIT, CMD_GAME_START, CMD_GAME_END, CMD_GAME_RESET,CMD_GAME_COUNTDOWN_START, //Game Cycle
+	CMD_GAME_WAIT, CMD_GAME_START, CMD_GAME_END, CMD_GAME_RESET, CMD_GAME_COUNTDOWN_START, //Game Cycle
 	CMD_PING,
 	CMD_GAME_DOORSYNC, CMD_GAME_BREAKDOOR, CMD_GAME_BREAKPLATFORM	//Game Object
 };
@@ -53,10 +53,28 @@ enum class eRoomState
 	ST_INGAME			//게임중인 방
 };
 
+enum class eDepartment : char 
+{
+
+	None,
+	Game,
+	Ai,
+	Computer,
+	MechanicalEngine,
+	MechanicalDesign,
+	Mechatronics,
+	Electrionics,
+	AdvMaterial,
+	Chemical,
+	Nano,
+	EnergyElec,
+	Bussiness,
+	Design,
+};
 //Player Have Item BitFlag with int64
 enum class eEquipmentFlags : __int64
 {
-	None = 0
+	None = 0,
 };
 
 enum class ePlayerState
@@ -96,4 +114,13 @@ struct TimerEvent {
 	{
 		return (execTime > R.execTime);
 	}
+};
+
+struct sPlayerInfo {
+	std::string ID;
+	std::string NickName;
+	eDepartment Department;
+	eEquipmentFlags Equipment;
+	int RoomID;
+	int UID = -1;
 };

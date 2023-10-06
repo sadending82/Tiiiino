@@ -20,10 +20,9 @@ MainServer::MainServer()
 MainServer::~MainServer()
 {
 	for (auto& object : mObjects) {
-		if (dynamic_cast<Player*>(object) == nullptr) break;
-
 		auto player = reinterpret_cast<Player*>(object);
-		player->DisConnect();
+		if (!player) break;
+		player->DisConnectAndReset();
 	}
 
 	for (auto& object : mObjects)
@@ -187,7 +186,7 @@ SC_ADD_PLAYER_PACKET MainServer::make_player_add_packet(const int playerSocketID
 	//strcpy_s(sendpacket.name, character->name);
 	sendpacket.size = sizeof(sendpacket);
 	sendpacket.type = SC_ADD_PLAYER;
-
+	sendpacket.department = static_cast<char>(player->GetDepartment());
 	sendpacket.x = player->GetPosition().x;;
 	sendpacket.y = player->GetPosition().y;
 	sendpacket.z = player->GetPosition().z;
@@ -492,12 +491,27 @@ bool MainServer::setPlayerInRoom(Player* player)
 		auto& room = tRoom.second;
 		if (room->IsRoomReadyComplete())
 		{
-			int result = room->FindPlayerInfo(player->GetUID(), player->GetID());
+			int result = room->GetPlayerRoomSyncID(player->GetUID());
 			if (0 <= result)
 			{
-				player->SetRoomSyncID(result);
-				player->SetRoomID(tRoom.first);
-				return true;
+				sPlayerInfo pInfo = room->GetPlayerInfo(player->GetUID());
+				if (-1 != pInfo.UID)
+				{
+					if (pInfo.RoomID != tRoom.first)
+					{
+						DEBUGMSGONEPARAM("플레이어가 로비서버에게 받은 방이 아닌 다른곳에 존재함.(부정접속) [%d]번째플레이어\n", player->GetSocketID());
+						return false;
+					}
+					player->SetRoomSyncID(result);
+					player->SetRoomID(tRoom.first);
+					player->SetDepartment(pInfo.Department);
+					player->SetID(pInfo.ID);
+					player->SetNickName(pInfo.NickName);
+					return true;
+				}
+				else {
+					DEBUGMSGONEPARAM("플레이어정보가 방 매칭정보에 존재하지않음. [%d]번째플레이어\n", player->GetSocketID());
+				}
 			}
 			else {
 				DEBUGMSGONEPARAM("플레이어가 방 매칭정보에 존재하지않음. [%d]번째플레이어\n", player->GetSocketID());
@@ -540,25 +554,23 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 			DEBUGMSGNOPARAM("잘못된 방에 접속하려 시도함.\n");
 			break;
 		}
-		//로비랑 연결 안 됐을때는 아래 for문이 무시되므로 여기서 세팅
+		//로비랑 연결 안 됐을때는 아래 setPlayerInRoom is ignored, 여기서 세팅
 		//에디터에서 개발 편하게 하려고 넣은 코드
-		player->SetRoomID(0);
+		//player->SetRoomID(0);
 
 		//uid랑 name이랑 비교구분해서 검증작업 하기  
 		player->SetID(packet->name);
 		player->SetUID(packet->uID);
 		//
-
 		if (false == setPlayerInRoom(player))
 		{
-			DEBUGMSGONEPARAM("[%d]플레이어 부정접속. 접속 해제", player->GetSocketID());
-			player->DisConnect();
-			player->Reset();
-
-			break;
 			/*
 				나중에 여기에 제대로 된 방 id가 안나오면 접속을 끊어버려야함. 부정접속
 			*/
+			DEBUGMSGONEPARAM("[%d]플레이어 부정접속. 접속 해제", player->GetSocketID());
+			player->DisConnectAndReset();
+
+			break;
 		}
 
 
@@ -732,8 +744,8 @@ void MainServer::ProcessPacketLobby(const int serverID, unsigned char* p)
 		LG_USER_INTO_GAME_PACKET* packet = reinterpret_cast<LG_USER_INTO_GAME_PACKET*>(p);
 		Room* activeRoom = mRooms[packet->roomID];
 		mRooms[packet->roomID]->ActiveRoom();
-
-		if (true == activeRoom->SettingRoomPlayer(packet->uID, packet->id, packet->roomMax))
+		sPlayerInfo playerinfo{ packet->id,packet->name,static_cast<eDepartment>(packet->department),static_cast<eEquipmentFlags>(packet->equipmentflag),packet->roomID,packet->uID };
+		if (true == activeRoom->SettingRoomPlayer(playerinfo, packet->roomMax))
 		{
 			DEBUGMSGONEPARAM("%d번째 방 활성화 완료.\n", packet->roomID);
 			send_room_ready_packet(packet->roomID);

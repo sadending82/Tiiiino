@@ -71,7 +71,7 @@ struct CS_LOGIN_PACKET : public PACKET {
 	char	name[MAX_NAME_SIZE];
 	char	passWord[MAX_NAME_SIZE];
 	int		uID;
-	int		roomID;	//원래는 lobbyServer에서 줘야 하는 값. 나중에 '무조건' 빼야함.
+	int		roomID;	//원래는 lobbyServer에서 줘야 하는 값. 나중에 '무조건' 빼야함. 또는 서버에서 사용하면 절대 안됨.
 
 };
 
@@ -151,6 +151,8 @@ struct SC_ADD_PLAYER_PACKET : public PACKET {
 	float x, y, z;
 	float rx, ry, rz, rw;
 	char	name[MAX_NAME_SIZE];
+	char	department;
+
 };
 
 struct SC_PLAYER_REMOVE_PACKET : public PACKET {

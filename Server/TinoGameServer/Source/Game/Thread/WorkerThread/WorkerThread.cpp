@@ -39,7 +39,7 @@ void WorkerThread::doThread()
 		case eCOMMAND_IOCP::CMD_RECV: {
 			if (bytes == 0) {
 				auto t = dynamic_cast<Player*>(mMainServer->GetObjects()[client_id]);
-				if (t) t->DisConnect();
+				if (t) t->DisConnectAndReset();
 				break;
 			}
 
