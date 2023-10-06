@@ -43,10 +43,20 @@ public:
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void LevelFailed();
 
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void LevelClearCheck();
+
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	bool GetbLevelClearCheck() { return bLevelClearCheck; }
+
+
 private:
 	UPROPERTY(EditAnywhere, Category = "UMG_Game")
 	int32 RestGameTime;
 	UPROPERTY(EditAnywhere, Category = "UMG_Game")
 	UImage* MyImage;
+	UPROPERTY(EditAnywhere, Category = "UMG_Game")
+	bool bLevelClearCheck = false;
+	
 	
 };

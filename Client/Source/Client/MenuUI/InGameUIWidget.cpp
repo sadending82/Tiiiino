@@ -40,3 +40,11 @@ void UInGameUIWidget::LevelFailed()
 	// 완주 실패
 
 }
+
+void UInGameUIWidget::LevelClearCheck()
+{
+	// 완주 성공 실패 체크
+	// 성공시 bLevelClearCheck = true
+	// 실패시 bLevelClearCheck = false
+	
+}
