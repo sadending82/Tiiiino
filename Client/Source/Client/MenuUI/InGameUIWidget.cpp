@@ -28,3 +28,15 @@ void UInGameUIWidget::EndGameTime()
 {
 
 }
+
+void UInGameUIWidget::LevelSuccess()
+{
+	// 완주 성공
+
+}
+
+void UInGameUIWidget::LevelFailed()
+{
+	// 완주 실패
+
+}

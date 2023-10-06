@@ -37,6 +37,12 @@ public:
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	UImage* GetImage() { return MyImage; }
 
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void LevelSuccess();
+
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void LevelFailed();
+
 private:
 	UPROPERTY(EditAnywhere, Category = "UMG_Game")
 	int32 RestGameTime;
