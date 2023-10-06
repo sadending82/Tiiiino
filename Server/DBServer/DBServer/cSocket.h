@@ -20,10 +20,14 @@ public:
 	bool CheckLogin(int key, const char* id, const char* password, int userid);
 
 	void SendUserDataAfterLogin(int key, int uid, string& nickname, const char* id, double grade, int point, int state, int userid);
-	void SendLoginFail(int key, const char* id,  int userKey);
+	void SendLoginFail(int key, const char* id, int userKey);
+	void SendUpdateNicknameOK(int key, int userKey);
 
 	void ProcessPacket_Login(int key, unsigned char* buf);
 	void ProcessPacket_SignUp(unsigned char* buf);
+	void ProcessPacket_UpdateNickname(int key, unsigned char* buf); 
+	void ProcessPacket_UpdateGrade(int key, unsigned char* buf);
+
 
 private:
 	SOCKADDR_IN mServerAddr;

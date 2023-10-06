@@ -18,7 +18,7 @@ public:
 		mRoomID = -1;
 		mUID = 0;
 		ZeroMemory(mNickName, sizeof(mNickName));
-		mCredit = 0;
+		mGrade = 0;
 		mPoint = 0;
 		mTier = 0;
 		mMatchStartTime = system_clock::now();
@@ -46,7 +46,7 @@ public:
 	int		mUID;
 	char	mID[MAX_NAME_SIZE];
 	char	mNickName[MAX_NAME_SIZE];
-	double	mCredit;
+	double	mGrade;
 	int		mPoint;
 	double	mTier;
 	system_clock::time_point mMatchStartTime;

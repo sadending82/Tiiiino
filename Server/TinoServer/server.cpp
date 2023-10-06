@@ -148,12 +148,11 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		}
 
 		mClients[p->userKey].mStateLock.lock();
-		mClients[p->userKey].mCredit = p->grade;
+		mClients[p->userKey].mGrade = p->grade;
 		strcpy_s(mClients[p->userKey].mNickName, sizeof(p->nickname), p->nickname);
 		strcpy_s(mClients[p->userKey].mID, sizeof(p->id), p->id);
 		mClients[p->userKey].mPoint = p->point;
 		mClients[p->userKey].mUID = p->uid;
-		mClients[p->userKey].mTier = p->tier;
 		mClients[p->userKey].mState = eSessionState::ST_LOBBY;
 		mClients[p->userKey].mStateLock.unlock();
 

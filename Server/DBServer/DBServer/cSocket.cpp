@@ -171,8 +171,19 @@ void Socket::processPacket(int key, unsigned char* buf)
         ProcessPacket_SignUp(buf);
         break;
     }
+    case LD_UPDATE_NICKNAME: {
+        ProcessPacket_UpdateNickname(key, buf);
+        break;
+    }
+    case LD_UPDATE_GRADE: {
+        ProcessPacket_UpdateGrade(key, buf);
+        break;
+    }
     default:
     {
+#ifdef Test
+        cout << "Wrong Packet Received - sender: " << key << endl;
+#endif
         break;
     }
     }
@@ -225,7 +236,7 @@ void Socket::SendUserDataAfterLogin(int key, int uid, string& nickname, const ch
     p.connState = state;
     p.userKey = userKey;
 
-    mSessions[key].DoSend(reinterpret_cast<DL_LOGIN_OK_PACKET*>(&p));
+    mSessions[key].DoSend((void*)(&p));
 }
 
 void Socket::SendLoginFail(int key, const char* id, int userKey) {
@@ -234,7 +245,17 @@ void Socket::SendLoginFail(int key, const char* id, int userKey) {
     p.type = SPacketType::DL_LOGIN_FAIL;
     p.userKey = userKey;
 
-    mSessions[key].DoSend(reinterpret_cast<DL_LOGIN_FAIL_PACKET*>(&p));
+    mSessions[key].DoSend((void*)(&p));
+}
+
+void Socket::SendUpdateNicknameOK(int key, int userKey)
+{
+    DL_UPDATE_NICKNAME_OK_PACKET p;
+    p.size = sizeof(DL_UPDATE_NICKNAME_OK_PACKET);
+    p.type = SPacketType::DL_UPDATE_NICKNAME_OK;
+    p.userKey = userKey;
+
+    mSessions[key].DoSend((void*)(&p));
 }
 
 // ProcessPacket
@@ -252,7 +273,25 @@ void Socket::ProcessPacket_SignUp(unsigned char* buf)
 {
     LD_SIGNUP_PACKET* p = reinterpret_cast<LD_SIGNUP_PACKET*>(buf);
     bool bJoin = Getm_pDB()->SignUpNewPlayer(p->id, p->password);
-    if (bJoin == false) {
+    if (bJoin != true) {
         cout << "Sign Up new user failed\n";
+    }
+}
+
+void Socket::ProcessPacket_UpdateNickname(int key, unsigned char* buf)
+{
+    LD_UPDATE_NICKNAME_PACKET* p = reinterpret_cast<LD_UPDATE_NICKNAME_PACKET*>(buf);
+    bool bUpdate = Getm_pDB()->UpdateUserNickname(p->uid, p->nickname);
+    if (bUpdate == true) {
+        SendUpdateNicknameOK(key, p->userKey);
+    }
+}
+
+void Socket::ProcessPacket_UpdateGrade(int key, unsigned char* buf)
+{
+    LD_UPDATE_GRADE_PACKET* p = reinterpret_cast<LD_UPDATE_GRADE_PACKET*>(buf);
+    bool bUpdate = Getm_pDB()->UpdateUserGrade(p->uid, p->grade);
+    if (bUpdate != true) {
+        cout << "Update User Grade failed\n";
     }
 }

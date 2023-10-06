@@ -443,6 +443,12 @@ void Network::process_packet(unsigned char* p)
 
 		break;
 	}
+	case SC_GAME_BREAKPLATFORM:
+	{
+		SC_GAME_BREAKPLATFORM_PACKET* packet = reinterpret_cast<SC_GAME_BREAKPLATFORM_PACKET*>(p);
+
+		break;
+	}
 	default:
 		break;
 	}

@@ -407,7 +407,7 @@ bool DB::UpdateUserNickname(const int uid, const string& nicknameToChange)
 	return true;
 }
 
-bool DB::UpdateUsergrade(const int uid, double grade)
+bool DB::UpdateUserGrade(const int uid, double grade)
 {
 	string query = "UPDATE userinfo SET grade = ? WHERE UID = ?";
 
