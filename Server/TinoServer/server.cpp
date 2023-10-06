@@ -129,6 +129,7 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		{
 			if (mClients[player].mRoomID == p->roomID)
 			{
+				strcpy_s(packet.hashs, mClients[player].mHashs);
 				mClients[player].DoSend(&packet);
 				mClients[player].mState = eSessionState::ST_INGAME;
 			}
@@ -147,7 +148,7 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		}
 
 		mClients[p->userKey].mStateLock.lock();
-		mClients[p->userKey].mCredit = p->credit;
+		mClients[p->userKey].mCredit = p->grade;
 		strcpy_s(mClients[p->userKey].mNickName, sizeof(p->nickname), p->nickname);
 		strcpy_s(mClients[p->userKey].mID, sizeof(p->id), p->id);
 		mClients[p->userKey].mPoint = p->point;
@@ -476,7 +477,9 @@ void Server::ProcessEvent(unsigned char* cmessage)
 				LG_USER_INTO_GAME_PACKET packet;
 				packet.size = sizeof(packet);
 				packet.type = LG_USER_INTO_GAME;
-				packet.roomID = 0;//�� ��ȣ �ӽ÷� 0���� �־��?
+				packet.roomID = 0;//�� ��ȣ �ӽ÷� 0���� �־��?				
+				_itoa_s(rand() % 2'000'000'000, mClients[player_id].mHashs, 10);
+				strcpy_s(packet.hashs, mClients[player_id].mHashs);
 				strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
 				strcpy_s(packet.id, sizeof(mClients[player_id].mID), mClients[player_id].mID);
 				packet.uID = mClients[player_id].mUID;
@@ -499,6 +502,8 @@ void Server::ProcessEvent(unsigned char* cmessage)
 				packet.size = sizeof(packet);
 				packet.type = LG_USER_INTO_GAME;
 				packet.roomID = 0;//�� ��ȣ �ӽ÷� 0���� �־��?
+				_itoa_s(rand() % 2'000'000'000, mClients[player_id].mHashs, 10);
+				strcpy_s(packet.hashs, mClients[player_id].mHashs);
 				strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
 				strcpy_s(packet.id, sizeof(mClients[player_id].mID), mClients[player_id].mID);
 				packet.uID = mClients[player_id].mUID;
@@ -521,7 +526,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 			pac.type = eCompType::OP_EVENT;
 			pac.listnum = 0;
 			pTimer->PushEvent(1, eEVENT_TYPE::EV_COUNT_DOWN, 1000, reinterpret_cast<unsigned char*>(&pac));
-
+		
 			mClients[mMatchListHighTier.front()].mMatchStartTime = system_clock::now();
 		}
 		if (mMatchListLowTier.size() >= MAX_ROOM_USER / 2)
@@ -531,7 +536,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 			pac.type = eCompType::OP_EVENT;
 			pac.listnum = 1;
 			pTimer->PushEvent(1, eEVENT_TYPE::EV_COUNT_DOWN, 1000, reinterpret_cast<unsigned char*>(&pac));
-
+		
 			mClients[mMatchListLowTier.front()].mMatchStartTime = system_clock::now();
 		}
 
@@ -566,6 +571,8 @@ void Server::ProcessEvent(unsigned char* cmessage)
 						packet.size = sizeof(packet);
 						packet.type = LG_USER_INTO_GAME;
 						packet.roomID = 0;//�� ��ȣ �ӽ÷� 0���� �־��?
+						_itoa_s(rand() % 2'000'000'000, mClients[player_id].mHashs, 10);
+						strcpy_s(packet.hashs, mClients[player_id].mHashs);
 						strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
 						strcpy_s(packet.id, sizeof(mClients[player_id].mID), mClients[player_id].mID);
 						packet.uID = mClients[player_id].mUID;
@@ -611,6 +618,8 @@ void Server::ProcessEvent(unsigned char* cmessage)
 						packet.size = sizeof(packet);
 						packet.type = LG_USER_INTO_GAME;
 						packet.roomID = 0;//�� ��ȣ �ӽ÷� 0���� �־��?
+						_itoa_s(rand() % 2'000'000'000, mClients[player_id].mHashs, 10);
+						strcpy_s(packet.hashs, mClients[player_id].mHashs);
 						strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
 						strcpy_s(packet.id, sizeof(mClients[player_id].mID), mClients[player_id].mID);
 						packet.uID = mClients[player_id].mUID;

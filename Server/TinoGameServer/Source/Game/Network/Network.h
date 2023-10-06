@@ -40,8 +40,8 @@ public:
 	virtual void DisConnect();
 	void ErrorDisplay(int errNo);
 	void PreRecvPacket(unsigned char* remainMsg, int remainBytes);
-	void RecvPacket();
-	void SendPacket(void* packet, int bytes);
+	virtual bool RecvPacket();
+	virtual bool SendPacket(void* packet, int bytes);
 	
 	int GetPrevSize()const { return mPrevSize; }
 	SOCKET GetSocket() const { return mSocket; }

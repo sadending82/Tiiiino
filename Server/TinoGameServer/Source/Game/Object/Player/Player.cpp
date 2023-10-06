@@ -1,9 +1,11 @@
 #include "Player.h"
 #include "../../Server/MainServer/MainServer.h"
+#include "../../Room/Room.h"
 
 Player::Player()
 	:mNickName("")
-	, mDepartment(0.0f)
+	, mGrade(0.0f)
+	, mDepartment(eDepartment::None)
 	, mEquipment(eEquipmentFlags::None)
 	, mRoomID(INVALID_ROOM_ID)
 	, mRoomSyncID(-1)
@@ -18,12 +20,18 @@ Player::~Player()
 {
 }
 
-void Player::DisConnect()
+void Player::DisConnectAndReset()
 {
-	__super::DisConnect();
+	DisConnect();
+	gMainServer->GetRooms()[mRoomID]->RemovePlayer(this);
 	auto sPacket = gMainServer->make_player_remove_packet(mRoomSyncID);
 	gMainServer->SendRoomBroadCast(mRoomID, (void*)&sPacket, sizeof(sPacket));
 	Reset();
+}
+
+void Player::DisConnect()
+{
+	__super::DisConnect();
 }
 
 void Player::Reset()
@@ -31,14 +39,35 @@ void Player::Reset()
 	__super::Reset();
 
 	mNickName.clear();
-	mDepartment = 0.0f;
+	mDepartment = eDepartment::None;
 	mEquipment = eEquipmentFlags::None;
+	mGrade = 0.0f;
 	mRoomID = INVALID_ROOM_ID;
 	mRoomSyncID = -1;
 	mRank = -1;
 	mPlayerState = ePlayerState::ST_RUNNING;
 	mUID = -1;
 	mPing = 0;
+}
+
+bool Player::RecvPacket()
+{
+	if (false == __super::RecvPacket())
+	{
+		DisConnectAndReset();
+		return false;
+	}
+	return true;
+}
+
+bool Player::SendPacket(void* packet, int bytes)
+{
+	if (false == __super::SendPacket(packet, bytes))
+	{
+		DisConnectAndReset();
+		return false;
+	}
+	return true;
 }
 
 bool Player::CanMakeID()

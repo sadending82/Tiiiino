@@ -56,8 +56,10 @@ void Room::RemovePlayer(Player* player)
 	for (int i = 0; i < MAX_ROOM_USER; ++i)
 	{
 		Player* p = dynamic_cast<Player*>(mObjects[i]);
+		if (!p) break;
 		if (p->GetSocketID() == player->GetSocketID())
 		{
+			RemovePlayerInfo(p->GetUID());
 			mObjects[i] = nullptr;
 			return;
 		}
@@ -73,7 +75,7 @@ void Room::ResetGameRoom()
 		Player* player = dynamic_cast<Player*>(object);
 		if (player)
 		{
-			player->DisConnect();
+			player->DisConnectAndReset();
 		}
 		object = nullptr;
 	}
@@ -146,10 +148,10 @@ bool Room::IsRoomReady()
 	return false;
 }
 
-bool Room::SettingRoomPlayer(const int uID, const std::string id, const int& playerMaxNum)
+bool Room::SettingRoomPlayer(const sPlayerInfo& playerInfo, const int& playerMaxNum)
 {
 	int playerCnt = -1;
-	setPlayerInfoWithCnt(uID, id, playerMaxNum, playerCnt);
+	setPlayerInfoWithCnt(playerInfo, playerMaxNum, playerCnt);
 	if (playerCnt == playerMaxNum)
 	{
 		mRoomStateLock.lock();
@@ -167,7 +169,7 @@ bool Room::SettingRoomPlayer(const int uID, const std::string id, const int& pla
 	return false;
 }
 
-int Room::FindPlayerInfo(const int uID, const std::string id)
+int Room::GetPlayerRoomSyncID(const int uID)
 {
 	//이 함수는 mPlayerInfo가 다 쓰여진 난 후에, 읽기만 하는 작업이므로 lock을 안걸어놓음
 	//최대 인원이 안들어왔으면 아직 쓰여질 가능성이 있기 때문에 절대 읽으면 안됨
@@ -194,6 +196,24 @@ int Room::FindPlayerInfo(const int uID, const std::string id)
 	}
 	mPlayerInfoLock.unlock();
 	return -1;
+}
+
+sPlayerInfo Room::GetPlayerInfo(const int uID)
+{
+	//윗 함수와 마찬가지로 읽는 작업만 있기에 락을 안걸었음
+	//하지만 여기서도 자꾸 널포인터가 나오면 락 걸 생각임.
+	//2023-10-06 기획을 생각해보니 재접속이 없음. 그럼 나가면 playerInfo에서 플레이어를 빼주어야함.
+	//넣고 끝인줄 알았더니 도중에 나가는것도 존재하기 때문에 무조건 락을 걸어양함.
+	mPlayerInfoLock.lock();
+	auto Iter = mPlayerInfo.find(uID);
+	if (Iter != mPlayerInfo.end())
+	{
+		sPlayerInfo tmp = (*Iter).second;
+		mPlayerInfoLock.unlock();
+		return tmp;
+	}
+	mPlayerInfoLock.unlock();
+	return sPlayerInfo();
 }
 
 void Room::PlayerArrive(Player* player)
@@ -248,7 +268,14 @@ void Room::addMapObject(MapObject* mapObject)
 }
 
 
-void Room::setPlayerInfo(const int uID, const std::string id, const int& playerMaxNum)
+void Room::RemovePlayerInfo(const int& UID)
+{
+	mPlayerInfoLock.lock();
+	mPlayerInfo.erase(UID);
+	mPlayerInfoLock.unlock();
+}
+
+void Room::setPlayerInfo(const sPlayerInfo& playerInfo, const int& playerMaxNum)
 {
 	bool flag = false;
 	mPlayerMax = playerMaxNum;
@@ -258,13 +285,13 @@ void Room::setPlayerInfo(const int uID, const std::string id, const int& playerM
 		mPlayerInfoLock.unlock();
 		return;
 	}
-	mPlayerInfo.insert(std::make_pair(uID, id));
+	mPlayerInfo.insert(std::make_pair(playerInfo.UID, playerInfo));
 	mPlayerSettingCnt++;
 	mPlayerInfoLock.unlock();
 
 }
 
-void Room::setPlayerInfoWithCnt(const int uID, const std::string id, const int& playerMaxNum, int& playerCnt)
+void Room::setPlayerInfoWithCnt(const sPlayerInfo& playerInfo, const int& playerMaxNum, int& playerCnt)
 {
 	bool flag = false;
 	mPlayerMax = playerMaxNum;
@@ -275,7 +302,7 @@ void Room::setPlayerInfoWithCnt(const int uID, const std::string id, const int& 
 		DEBUGMSGONEPARAM("심각한 오류!!!! [%d]", mPlayerSettingCnt);
 		return;
 	}
-	mPlayerInfo.insert(std::make_pair(uID, id));
+	mPlayerInfo.insert(std::make_pair(playerInfo.UID, playerInfo));
 	mPlayerSettingCnt++;
 	playerCnt = mPlayerSettingCnt;
 	mPlayerInfoLock.unlock();

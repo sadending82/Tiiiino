@@ -168,6 +168,7 @@ void send_movetogame_packet(SOCKET& sock, const int uID, const char* id, const i
 	packet.roomID = roomID;
 	packet.uID = uID;
 	strcpy_s(packet.name, id);
+	strcpy_s(packet.hashs, Network::GetNetwork()->hashs);
 	//strcpy_s(packet.name, TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterName));
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
 	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
@@ -476,6 +477,7 @@ void Network::l_process_packet(unsigned char* p)
 		LC_MATCH_RESPONSE_PACKET* packet = reinterpret_cast<LC_MATCH_RESPONSE_PACKET*>(p);
 		//게임서버 연결 코드 나중에 ip랑 포트넘버도 넘겨야함.
 		UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("Level4"));
+		strcpy_s(hashs, packet->hashs);
 		bLevelOpenTriggerEnabled = true;
 		break;
 	}
