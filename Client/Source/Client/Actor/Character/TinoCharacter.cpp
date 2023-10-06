@@ -437,7 +437,7 @@ bool ATinoCharacter::CanMove()
 	{
 	case EMovementState::EMS_Normal:
 	case EMovementState::EMS_Fall:
-	case EMovementState::EMS_Grabbing:
+	case EMovementState::EMS_IsGrabbed:
 		ret = true;
 		break;
 	default:
