@@ -19,6 +19,7 @@ enum SPacketType {
 	// GameServer To LobbyServer
 	GL_LOGIN,
 	GL_ROOM_READY,
+	GL_ROOM_RESET,
 
 	// LobbyServer To GameServer
 	LG_USER_INTO_GAME,
@@ -50,6 +51,9 @@ struct GL_ROOM_READY_PACKET : public SPACKET {
 	int		roomID;
 };
 
+struct GL_ROOM_RESET_PACKET : public SPACKET {
+	int		roomID;
+};
 //---
 struct LG_LOGIN_OK_PACKET : public SPACKET {
 
@@ -57,9 +61,13 @@ struct LG_LOGIN_OK_PACKET : public SPACKET {
 struct LG_USER_INTO_GAME_PACKET : public SPACKET {
 	char	id[MAX_NAME_SIZE];	//player id Not UID
 	char	name[MAX_NAME_SIZE];
+	char	department;
+	char	hashs[MAX_NAME_SIZE];	//verification value
 	int		uID;
 	int		roomID;
-	int		roomMax;	//�� �ִ� �ο�. (4���̼� �� ���� �����ϱ�)
+	int		roomMax;	// in room Max User
+	long long	equipmentflag;
+
 };
 
 struct LG_USER_DISCONNECT_PACKET : public SPACKET {
@@ -82,7 +90,7 @@ struct DL_LOGIN_OK_PACKET :public SPACKET {
 	int		uid;
 	char	id[MAX_NAME_SIZE];
 	char	nickname[MAX_NAME_SIZE];
-	double	credit;
+	double	grade;
 	int		point;
 	int		userKey;
 	double	tier;

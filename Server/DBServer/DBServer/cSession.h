@@ -32,9 +32,22 @@ public:
 		BOOL ret = WSASend(mSocket, &sdata->mWsaBuf, 1, 0, 0, &sdata->mOver, 0);
 	}
 
+	ExOver GetExOver() { return mExOver; }
+	void SetExOver(ExOver over) { mExOver = over; }
 
+	eSessionState GetState() { return mState; }
+	void SetState(eSessionState state) { mState = state; }
 
-public:
+	int GetID() { return mID; }
+	void SetID(int id) { mID = id; }
+
+	SOCKET GetSocket() { return mSocket; }
+	void SetSocket(SOCKET sock) { mSocket = sock; }
+
+	int GetPrevData() { return mPrevData; }
+	void SetPrevData(int prevData) { mPrevData = prevData; }
+
+private:
 	ExOver mExOver;
 	mutex	mStateLock;
 	eSessionState mState;

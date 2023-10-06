@@ -168,6 +168,7 @@ void send_movetogame_packet(SOCKET& sock, const int uID, const char* id, const i
 	packet.roomID = roomID;
 	packet.uID = uID;
 	strcpy_s(packet.name, id);
+	strcpy_s(packet.hashs, Network::GetNetwork()->hashs);
 	//strcpy_s(packet.name, TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterName));
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
 	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
@@ -232,6 +233,26 @@ void send_game_playerload_ack_packet(SOCKET& sock)
 	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
 }
 
+void send_game_breakdoor_packet(SOCKET& sock, const int objectID)
+{
+	CS_GAME_BREAKDOOR_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_GAME_BREAKDOOR;
+	packet.objectID = objectID;
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+}
+
+void send_game_breakplatform_packet(SOCKET& sock, const int objectID)
+{
+	CS_GAME_BREAKPLATFORM_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_GAME_BREAKPLATFORM;
+	packet.objectID = objectID;
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+}
+
 
 
 
@@ -290,6 +311,9 @@ void Network::process_packet(unsigned char* p)
 	{
 		SC_ADD_PLAYER_PACKET* packet = reinterpret_cast<SC_ADD_PLAYER_PACKET*>(p);
 		int id = packet->id;
+		//나와 같은 아이디라면 또 만들어줄 이유 없음. 탈출.
+		if (id == mMyCharacter->GetClientID())
+			break;
 		if (nullptr != mOtherCharacter[id])
 		{
 			mOtherCharacter[id]->GetMesh()->SetVisibility(true);
@@ -322,6 +346,17 @@ void Network::process_packet(unsigned char* p)
 				//mMyCharacter->mInventory->mMainWidget->mScoreWidget->UpdateRank();
 
 			}
+		}
+		break;
+	}
+	case SC_PLAYER_REMOVE:
+	{
+		SC_PLAYER_REMOVE_PACKET* packet = reinterpret_cast<SC_PLAYER_REMOVE_PACKET*>(p);
+		int id = packet->id;
+		if (nullptr != mOtherCharacter[id])
+		{
+			mOtherCharacter[id]->Destroy();
+			mOtherCharacter[id] = nullptr;
 		}
 		break;
 	}
@@ -402,6 +437,12 @@ void Network::process_packet(unsigned char* p)
 
 		break;
 	}
+	case SC_GAME_BREAKDOOR: 
+	{
+		SC_GAME_BREAKDOOR_PACKET* packet = reinterpret_cast<SC_GAME_BREAKDOOR_PACKET*>(p);
+
+		break;
+	}
 	default:
 		break;
 	}
@@ -436,6 +477,7 @@ void Network::l_process_packet(unsigned char* p)
 		LC_MATCH_RESPONSE_PACKET* packet = reinterpret_cast<LC_MATCH_RESPONSE_PACKET*>(p);
 		//게임서버 연결 코드 나중에 ip랑 포트넘버도 넘겨야함.
 		UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("Level4"));
+		strcpy_s(hashs, packet->hashs);
 		bLevelOpenTriggerEnabled = true;
 		break;
 	}

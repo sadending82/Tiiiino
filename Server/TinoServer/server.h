@@ -1,6 +1,7 @@
 #pragma once
 #include "Session.h"
 #include "Timer.h"
+#include "room.h"
 #include "../ServerProtocol.h"
 
 constexpr int MAX_THREAD = 6;
@@ -11,6 +12,7 @@ public:
 	void Disconnect(int cID);
 	int GetNewClientID();
 	int GetNewServerID();
+	int GetNewRoomID();
 	void ProcessPacket(int cID, unsigned char* cpacket);
 	void ProcessPacketServer(int sID, unsigned char* spacket);
 	void DoWorker();
@@ -23,6 +25,7 @@ public:
 public:
 	array <Session, MAX_USER> mClients;
 	array <Session, MAXGAMESERVER> mServers;
+	array <Room, MAXGAMESERVER * 10> mRooms;
 	list <int> mMatchListHighTier;
 	list <int> mMatchListLowTier;
 	list <int> mReadytoGame;
