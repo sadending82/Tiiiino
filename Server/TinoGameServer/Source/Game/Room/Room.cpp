@@ -10,7 +10,7 @@ Room::Room(int id)
 	, mObjects()
 	, mPlayerInfo()
 	, mPlayerSettingCnt(0)
-	, mPlayerCnt(-1)
+	, mPlayerCnt(0)
 	, mPlayerMax(0)
 	, mRoomState(eRoomState::ST_FREE)
 	, mPlayerArrivedCnt(0)
@@ -99,6 +99,7 @@ void Room::ResetGameRoom()
 	mPlayerSettingCnt = 0;
 	mPlayerMax = 0;
 	mPlayerArrivedCnt = 0;
+	mPlayerCnt = 0;
 	mGameEndTimer = false;
 
 	mRoomStateLock.lock();

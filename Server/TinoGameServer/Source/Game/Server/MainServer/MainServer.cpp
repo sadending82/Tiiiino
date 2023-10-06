@@ -631,7 +631,7 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 			break;
 		}
 		Room* pRoom = mRooms[player->GetRoomID()];
-
+		
 
 		player->SetMoveTime(packet->move_time);
 		player->SetPosition(Vector3f(packet->x, packet->y, packet->z));
