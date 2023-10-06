@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Actor/Character/BaseCharacter.h"
+#include "MenuUI/InGameUIWidget.h"
 #include "TinoCharacter.generated.h"
 
 /**
@@ -53,6 +54,9 @@ public:
 	void DiveBegin();
 	void DiveEnd();
 	
+	void TimerStart();
+	void TimerEnd();
+
 	FORCEINLINE void SetMovementState(EMovementState State) { MovementState = State; }
 	FORCEINLINE void SetMaxTumbleTime(float MaxTime) { MaxTumbledTime = MaxTime; }
 	FORCEINLINE float GetMaxTumbleTime() { return MaxTumbledTime; }
@@ -104,4 +108,7 @@ private:
 	bool bCanTumbled;
 	UPROPERTY(VisibleAnywhere, Category = "Animation")
 		bool bIsDiving;
+
+	FTimerHandle InGameUITimerHandle;
+	UInGameUIWidget* InGameWidgetInstance = nullptr;
 };

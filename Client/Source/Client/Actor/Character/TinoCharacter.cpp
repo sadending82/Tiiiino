@@ -8,6 +8,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Animation/AnimMontage.h"
+#include "MenuUI/InGameUIWidget.h"
 
 ATinoCharacter::ATinoCharacter()
 	:MaxTumbledTime(1.0f),
@@ -49,6 +50,16 @@ void ATinoCharacter::BeginPlay()
 	{
 		if (GetController()->IsPlayerController())
 		{
+			UInGameUIWidget* InGameUIWidgetInstance = CreateWidget<UInGameUIWidget>(GetWorld(), UInGameUIWidget::StaticClass());
+			FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/MenuUI/InGame/InGameUI.InGameUI_C'"));
+			auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
+			if (nullptr == WidgetClass)
+			{
+
+			}
+
+			InGameWidgetInstance = CreateWidget<UInGameUIWidget>(GetWorld(), WidgetClass);
+			InGameWidgetInstance->AddToViewport();
 		}
 		else
 		{
@@ -160,6 +171,36 @@ void ATinoCharacter::DiveBegin()
 void ATinoCharacter::DiveEnd()
 {
 	bIsDiving = false;
+}
+
+void ATinoCharacter::TimerStart()
+{
+	UInGameUIWidget* InGameUIWidgetInstance = CreateWidget<UInGameUIWidget>(GetWorld(), UInGameUIWidget::StaticClass());
+	FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/MenuUI/InGame/InGameUI.InGameUI_C'"));
+	auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
+	if (nullptr == WidgetClass)
+	{
+		UE_LOG(LogTemp, Error, TEXT("TimerStart Error"));
+	}
+	GetWorldTimerManager().SetTimer(InGameUITimerHandle, this, &ATinoCharacter::TimerEnd, 1.f, true);
+	
+	
+}
+
+void ATinoCharacter::TimerEnd()
+{
+
+	// 유효성 확인
+	if (InGameWidgetInstance)
+	{
+		// UInGameUIWidget의 TimerRun 함수 호출
+		InGameWidgetInstance->TimerRun();
+	}
+	if (InGameWidgetInstance->GetRestGameTime() < 0)
+	{
+		InGameWidgetInstance->TimerEnd();
+		GetWorldTimerManager().ClearTimer(InGameUITimerHandle);
+	}
 }
 
 void ATinoCharacter::Dive()

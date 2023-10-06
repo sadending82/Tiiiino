@@ -27,9 +27,11 @@ public:
 	void SetInputUIMode();
 	void SetInputGameMode();
 
+	
+
 	//APlayerController* GetController();
 	TSubclassOf<UUserWidget> GetLobbyWidgetClass() const { return LobbyWidgetClass; }
-	TSubclassOf<UUserWidget> GetLoginWidgetClass() const { return StartingWidgetClass; }
+	TSubclassOf<UUserWidget> GetStartingWidgetClass() const { return StartingWidgetClass; }
 	TSubclassOf<UUserWidget> GetCreateAccountsWidgetClass() const { return CreateAccountsWidgetClass; }
 
 
@@ -45,13 +47,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
 	TSubclassOf<UUserWidget> CreateAccountsWidgetClass;
 
+
+
 	UPROPERTY()
 	UUserWidget* CurrentWidget;
 
+
 private:
 	
-
-
 	UPROPERTY(EditAnywhere, Category = "Test")
 		int32 MaxDummyCount;
 
@@ -63,6 +66,5 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "BPClass")
 		TSubclassOf<class ATinoCharacter> TinoCharacterClass;
-
-
+		
 };
