@@ -195,11 +195,11 @@ bool Socket::CheckLogin(int key, const char* id, const char* password, int userK
 
     int uid = get<0>(userData);
     string nickname = get<1>(userData);
-    double credit = get<2>(userData);
+    double grade = get<2>(userData);
     int point = get<3>(userData);
     int state = get<4>(userData);
 
-    SendUserDataAfterLogin(key, uid, nickname, id, credit, point, state, userKey);
+    SendUserDataAfterLogin(key, uid, nickname, id, grade, point, state, userKey);
 
     if (state == FALSE)
         Getm_pDB()->UpdateUserConnectionState(uid, true);
@@ -210,7 +210,7 @@ bool Socket::CheckLogin(int key, const char* id, const char* password, int userK
 }
 
 // SendPacket
-void Socket::SendUserDataAfterLogin(int key, int uid, string& nickname, const char* id, double credit, int point, int state, int userKey)
+void Socket::SendUserDataAfterLogin(int key, int uid, string& nickname, const char* id, double grade, int point, int state, int userKey)
 {
     DL_LOGIN_OK_PACKET p;
     p.size = sizeof(DL_LOGIN_OK_PACKET);
@@ -220,7 +220,7 @@ void Socket::SendUserDataAfterLogin(int key, int uid, string& nickname, const ch
     size_t lengthToCopy = min(nickname.size(), sizeof(p.nickname) - 1);
     memcpy(p.nickname, nickname.c_str(), lengthToCopy);
     p.nickname[lengthToCopy] = '\0';
-    p.credit = credit;
+    p.grade = grade;
     p.point = point;
     p.connState = state;
     p.userKey = userKey;

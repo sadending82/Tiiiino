@@ -89,7 +89,7 @@ struct DL_LOGIN_OK_PACKET :public SPACKET {
 	int		uid;
 	char	id[MAX_NAME_SIZE];
 	char	nickname[MAX_NAME_SIZE];
-	double	credit;
+	double	grade;
 	int		point;
 	int		userKey;
 	double	tier;
