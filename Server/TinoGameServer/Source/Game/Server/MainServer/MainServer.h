@@ -28,13 +28,18 @@ public:
 	void init();
 	void run();
 
+	//Server to Server
+	void send_room_ready_packet(const int roomID);
+	void send_room_reset_packet(const int roomID);
+
+	//Server to client
 	void SendPacketWithID(const int receiverID, void* buf, const int bufSize);
 	void send_login_ok_packet(const int player_id, const char* playername);
 	void send_login_ok_packet(const int player_id, void* buf);
 	SC_LOGIN_OK_PACKET make_login_ok_packet(const int playerID, const char* playername);
 	void send_player_add_packet(const int playerID, void* buf, const int bufSize);
 	SC_ADD_PLAYER_PACKET make_player_add_packet(const int playerSocketID);
-	void send_room_ready_packet(const int roomID);
+	SC_PLAYER_REMOVE_PACKET make_player_remove_packet(const int playerRoomSyncID);
 	void send_move_packet(const int player_id, const int mover_id, const bool inair, const float value, const float sx, const float sy, const float sz);
 	SC_MOVE_PLAYER_PACKET make_move_packet(const int moverSocketID, const bool inair, const float value, const float sx, const float sy, const float sz);
 	 
@@ -49,6 +54,9 @@ public:
 	SC_GAME_END_PACKET make_game_end_packet();
 	SC_GAME_DOORSYNC_PACKET make_game_doorsync_packet(const int objectID, const long long syncTime);
 	SC_GAME_PLAYERLOAD_OK_PACKET make_game_playerload_ok_packet();
+	SC_GAME_BREAKDOOR_PACKET make_game_breakdoor_packet(const int objectID);
+	SC_GAME_BREAKPLATFORM_PACKET make_game_breakplatform_packet(const int objectID);
+
 	//-> 생각해보니 그냥 buffer에 담아서 void*로 보내고 send에서 변환하면 되잖아 ? 바로 진행시켜
 	void SendAllBroadCast(void* buf, const int bufSize);
 	void SendRoomBroadCast(const int roomID, void* buf, const int bufSize);
@@ -61,7 +69,7 @@ public:
 	void SendRoomOthersToMe(const int roomID,const int receiverSocketID, const int exceptSocketID, T(MainServer::* fp)(const int));
 private:
 	void connectLobbyServer();
-	bool setPlayerInRoom(class Player* player);
+	bool setPlayerInRoom(class Player* player,const char verification[MAX_NAME_SIZE]);
 	bool initRoom(const std::string& mapName);
 private:
 	std::array<class Object*, MAX_OBJECT> mObjects;

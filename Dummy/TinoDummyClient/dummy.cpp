@@ -293,7 +293,7 @@ void Adjust_Number_Of_Client()
 	SOCKADDR_IN ServerAddr;
 	ZeroMemory(&ServerAddr, sizeof(SOCKADDR_IN));
 	ServerAddr.sin_family = AF_INET;
-	ServerAddr.sin_port = htons(SERVERPORT);
+	ServerAddr.sin_port = htons(GAMESERVERPORT);
 	ServerAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
 	int Result = WSAConnect(g_clients[num_connections].client_socket, (sockaddr*)&ServerAddr, sizeof(ServerAddr), NULL, NULL, NULL, NULL);

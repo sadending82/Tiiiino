@@ -28,10 +28,17 @@ public:
 	const int GetObjectType() const { return ObjectType; }
 	void SetObjectType(const int Type) { ObjectType = Type; }
 
+	const int GetObjectID() const { return mObjectID; }
+	void SetObjectID(const int id) { mObjectID = id; }
+
 protected:
 
 	UPROPERTY(EditAnywhere, Category = "Network")
 		int ObjectType;
+
+	//1006 이수민 이 mObjectID에 부서지는 발판및 부서지는 문은 기획이 넘버링을 해주어야함. "무조건"
+	UPROPERTY(EditAnywhere, Category = "Network")
+	int mObjectID;
 
 		// 10/06 김혁동
 		// 이 부분은 네트워크 동기화를 위한 변수입니다.

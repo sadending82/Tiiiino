@@ -18,8 +18,10 @@ public:
 	void Init();
 	// Add Object - Player, MapObject, Anything else
 	void AddObject(Object* object);
-	// Remove Player - If Player Connection is Gone
+	// Remove Player - If Room want Reset
 	void RemovePlayer(Player* player);
+	// Disable Player - if Player Connection is Gone, player just disabled not remove
+	void DisablePlayer(Player* player);
 	//The Game Is End, Reset Room ex)clear mObjects
 	void ResetGameRoom();
 	
@@ -29,8 +31,9 @@ public:
 	bool IsAllPlayerReady();
 	void PlayerCntIncrease();
 
-	bool SettingRoomPlayer(const int uID, const std::string id, const int& playerMaxNum);
-	int FindPlayerInfo(const int uID, const std::string id);
+	bool SettingRoomPlayer(const sPlayerInfo& playerInfo, const int& playerMaxNum);
+	int GetPlayerRoomSyncID(const int uID);
+	sPlayerInfo GetPlayerInfo(const int uID);
 	
 	void PlayerArrive(Player* player);
 	//Object order
@@ -42,8 +45,9 @@ protected:
 	void addMapObject(MapObject* mapObject);
 	//°ÔÀÓ ·ë »óÅÂ¸¦ Free¿¡¼­ ±ú¿öÁÜ.
 
-	void setPlayerInfo(const int uID, const std::string id, const int& playerMaxNum);
-	void setPlayerInfoWithCnt(const int uID,const std::string id, const int& playerMaxNum, int& playerCnt);
+	void RemovePlayerInfo(const int& UID);
+	void setPlayerInfo(const sPlayerInfo& playerInfo, const int& playerMaxNum);
+	void setPlayerInfoWithCnt(const sPlayerInfo& playerInfo, const int& playerMaxNum, int& playerCnt);
 
 	void setGameEndTimerStartOnce();
 protected:
@@ -51,7 +55,7 @@ protected:
 	std::array<Object*,MAX_OBJECT> mObjects;
 
 	std::mutex mPlayerInfoLock;
-	std::map<int, std::string> mPlayerInfo;
+	std::map<int, sPlayerInfo> mPlayerInfo;
 
 	std::mutex mPlayerArriveLock;
 	int	mPlayerArrivedCnt;	//°ñ¿¡ µµÂøÇÑ »ç¶÷ ¼ö

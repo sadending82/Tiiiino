@@ -13,6 +13,10 @@ constexpr int MAX_NAME_SIZE = 20;	//닉네임, 중복검사 X
 constexpr int MAX_ROOM = 10;
 constexpr int MAX_ROOM_USER = 8;
 
+// Object Event Time
+constexpr int DELAY_TIME_EXEC_BREAKDOOR = 1000;
+constexpr int DELAY_TIME_EXEC_BREAKPLATFORM = 3000;
+
 enum PacketType {
 	// Client To GameServer
 	CS_LOGIN,
@@ -22,6 +26,8 @@ enum PacketType {
 	CS_PING,
 	CS_ACTION,
 	CS_GAME_PLAYERLOAD_ACK,
+	CS_GAME_BREAKDOOR,
+	CS_GAME_BREAKPLATFORM,
 
 	// Client To LobbyServer
 	CL_LOGIN,
@@ -44,6 +50,8 @@ enum PacketType {
 	SC_ACTION_ANIM,
 	SC_GAME_DOORSYNC,
 	SC_GAME_PLAYERLOAD_OK,
+	SC_GAME_BREAKDOOR,
+	SC_GAME_BREAKPLATFORM,
 
 	// Lobbyserver To Client
 	LC_LOGIN_OK,
@@ -63,7 +71,8 @@ struct CS_LOGIN_PACKET : public PACKET {
 	char	name[MAX_NAME_SIZE];
 	char	passWord[MAX_NAME_SIZE];
 	int		uID;
-	int		roomID;	//원래는 lobbyServer에서 줘야 하는 값. 나중에 '무조건' 빼야함.
+	int		roomID;	//원래는 lobbyServer에서 줘야 하는 값. 나중에 '무조건' 빼야함. 또는 서버에서 사용하면 절대 안됨.
+	char	hashs[MAX_NAME_SIZE];	//암호화 값
 
 };
 
@@ -96,6 +105,15 @@ struct CS_ACTION_PACKET : public PACKET {
 struct CS_GAME_PLAYERLOAD_ACK_PACKET : public PACKET {
 
 };
+
+struct CS_GAME_BREAKDOOR_PACKET : public PACKET {
+	int	objectID;
+};
+
+struct CS_GAME_BREAKPLATFORM_PACKET : public PACKET {
+	int	objectID;
+};
+
 //-----------------------------------
 struct CL_LOGIN_PACKET :public PACKET {
 	char id[MAX_NAME_SIZE];
@@ -134,6 +152,8 @@ struct SC_ADD_PLAYER_PACKET : public PACKET {
 	float x, y, z;
 	float rx, ry, rz, rw;
 	char	name[MAX_NAME_SIZE];
+	char	department;
+
 };
 
 struct SC_PLAYER_REMOVE_PACKET : public PACKET {
@@ -179,7 +199,16 @@ struct SC_GAME_DOORSYNC_PACKET : public PACKET {
 struct SC_GAME_PLAYERLOAD_OK_PACKET : public PACKET {
 
 };
+
+struct SC_GAME_BREAKDOOR_PACKET : public PACKET {
+	int	objectID;
+};
+
+struct SC_GAME_BREAKPLATFORM_PACKET : public PACKET {
+	int	objectID;
+};
 //---------------------------
+
 struct LC_LOGIN_OK_PACKET : public PACKET {
 	int id;
 	int UID;
@@ -193,6 +222,7 @@ struct 	LC_LOGIN_FAIL_PACKET :public PACKET {
 struct LC_MATCH_RESPONSE_PACKET : public PACKET {
 	int gameServerPortNum;
 	unsigned char gameServerIP[16];	//IPv4에서 ip는 4바이트인데 글자로 표기하니까 최대 xxx.xxx.xxx.xxx  15 + 널문자 = 16
+	char	hashs[MAX_NAME_SIZE];	//암호화 값 이 값을 기반으로 client verification
 };
 
 //--------------------------
