@@ -25,6 +25,7 @@ void ATinoController::BeginPlay()
 			SetInputUIMode();
 		}
 	}
+	//ChangeMenuWidget(StartingWidgetClass);
 }
 
 void ATinoController::ChangeMenuWidget(TSubclassOf<UUserWidget> NewWidgetClass)

@@ -198,7 +198,7 @@ void ATinoCharacter::OffAccelEffect()
 {
 	Camera->PostProcessSettings.bOverride_VignetteIntensity = false;
 
-
+}
 void ATinoCharacter::TimerStart()
 {
 	UInGameUIWidget* InGameUIWidgetInstance = CreateWidget<UInGameUIWidget>(GetWorld(), UInGameUIWidget::StaticClass());
