@@ -154,8 +154,7 @@ void ATinoCharacter::PlayTumbleMontage(float DeltaTime)
 		{
 			CurrentTumbledTime = 0.f;
 			bCanTumbled = false;
-			if (GetController()->IsPlayerController())
-				send_action_packet(Network::GetNetwork()->s_socket, 3);
+			SendAnimPacket(3);
 			PlayAnimMontage(TumbleMontage);
 		}
 		else
@@ -303,6 +302,7 @@ void ATinoCharacter::Grab()
 	{
 		GrabOff();
 	}
+
 }
 
 void ATinoCharacter::SetNormalToGrabbed()
