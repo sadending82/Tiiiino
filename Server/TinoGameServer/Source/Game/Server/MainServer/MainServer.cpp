@@ -700,7 +700,7 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 			DEBUGMSGNOPARAM("player is nullptr.\n");
 			break;
 		}
-		TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_BREAKDOOR, eEventType::TYPE_BROADCAST_ROOM, DELAY_TIME_EXEC_BREAKDOOR, packet->id, player->GetRoomID());
+		TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_BREAKDOOR, eEventType::TYPE_BROADCAST_ROOM, DELAY_TIME_EXEC_BREAKDOOR, packet->objectID, player->GetRoomID());
 
 		break;
 	}
@@ -713,7 +713,7 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 			DEBUGMSGNOPARAM("player is nullptr.\n");
 			break;
 		}
-		TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_BREAKPLATFORM, eEventType::TYPE_BROADCAST_ROOM, DELAY_TIME_EXEC_BREAKPLATFORM, packet->id, player->GetRoomID());
+		TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_BREAKPLATFORM, eEventType::TYPE_BROADCAST_ROOM, DELAY_TIME_EXEC_BREAKPLATFORM, packet->objectID, player->GetRoomID());
 
 		break;
 	}
@@ -736,7 +736,6 @@ void MainServer::ProcessPacketLobby(const int serverID, unsigned char* p)
 			DEBUGMSGONEPARAM("%d번째 방 활성화 완료.\n", packet->roomID);
 			send_room_ready_packet(packet->roomID);
 			TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_PING, eEventType::TYPE_BROADCAST_ROOM, 3000, NULL, packet->roomID);
-			//TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_COUNTDOWN_START, eEventType::TYPE_BROADCAST_ROOM, 2000, NULL, packet->roomID);
 			
 		}
 

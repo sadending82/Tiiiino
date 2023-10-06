@@ -141,7 +141,6 @@
   <ItemGroup>
     <ClCompile Include="Source\Game\Object\MapObject\BreakObject\B_Door\B_Door.cpp" />
     <ClCompile Include="Source\Game\Object\MapObject\BreakObject\BreakObject.cpp" />
-    <ClCompile Include="Source\Game\Object\MapObject\BreakObject\B_Platform\B_Platform.cpp" />
     <ClCompile Include="Source\Game\Server\LobbyServer\LobbyServer.cpp" />
     <ClCompile Include="Source\Game\Room\Room.cpp" />
     <ClCompile Include="Source\Game\Server\MainServer\MainServer.cpp" />
@@ -162,7 +161,6 @@
   <ItemGroup>
     <ClInclude Include="Source\Game\Object\MapObject\BreakObject\B_Door\B_Door.h" />
     <ClInclude Include="Source\Game\Object\MapObject\BreakObject\BreakObject.h" />
-    <ClInclude Include="Source\Game\Object\MapObject\BreakObject\B_Platform\B_Platform.h" />
     <ClInclude Include="Source\Game\Server\LobbyServer\LobbyServer.h" />
     <ClInclude Include="Source\Game\Utility\Utility.h" />
     <ClInclude Include="Source\Game\Room\Room.h" />

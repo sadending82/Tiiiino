@@ -35,6 +35,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Network")
 		int ObjectType;
+
+	//1006 이수민 이 mObjectID에 부서지는 발판및 부서지는 문은 기획이 넘버링을 해주어야함. "무조건"
+	UPROPERTY(EditAnywhere, Category = "Network")
 	int mObjectID;
 
 		// 10/06 김혁동
