@@ -279,6 +279,13 @@ SC_MOVE_PLAYER_PACKET MainServer::make_move_packet(const int moverSocketID, cons
 	return packet;
 }
 
+void MainServer::send_breakdoor_packet(const int roomID, const int objectID)
+{
+	auto packet = make_game_breakdoor_packet(objectID);
+
+	SendRoomBroadCast(roomID, (void*)(&packet), sizeof(packet));
+}
+
 void MainServer::send_player_arrive_packet(const int player_id, const int arrive_id)
 {
 }
@@ -700,8 +707,8 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 			DEBUGMSGNOPARAM("player is nullptr.\n");
 			break;
 		}
-		TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_BREAKDOOR, eEventType::TYPE_BROADCAST_ROOM, DELAY_TIME_EXEC_BREAKDOOR, packet->objectID, player->GetRoomID());
-
+		
+		send_breakdoor_packet(player->GetRoomID(), packet->objectID);
 		break;
 	}
 	case CS_GAME_BREAKPLATFORM:
