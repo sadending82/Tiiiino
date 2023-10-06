@@ -8,7 +8,7 @@ CREATE TABLE `userinfo` (
   `UID` int NOT NULL AUTO_INCREMENT COMMENT 'Unique ID',
   `ID` varchar(20) NOT NULL COMMENT 'account ID',
   `nick` varchar(20) NOT NULL DEFAULT 'default' COMMENT 'user nickname',
-  `credit` decimal(2,1) NOT NULL DEFAULT '0.0' COMMENT 'mmr',
+  `grade` decimal(2,1) NOT NULL DEFAULT '0.0' COMMENT 'mmr',
   `point` int NOT NULL DEFAULT '0',
   `state` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`UID`),
