@@ -69,7 +69,7 @@ public:
 	void SendRoomOthersToMe(const int roomID,const int receiverSocketID, const int exceptSocketID, T(MainServer::* fp)(const int));
 private:
 	void connectLobbyServer();
-	bool setPlayerInRoom(class Player* player);
+	bool setPlayerInRoom(class Player* player,const char verification[MAX_NAME_SIZE]);
 	bool initRoom(const std::string& mapName);
 private:
 	std::array<class Object*, MAX_OBJECT> mObjects;

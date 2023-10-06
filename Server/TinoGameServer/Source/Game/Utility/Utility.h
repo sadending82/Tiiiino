@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <chrono>
+#include "../../../../../protocol.h"
 constexpr int INVALID_SOCKET_ID = -1;
 constexpr int INVALID_ROOM_ID = -1;
 
@@ -123,4 +124,5 @@ struct sPlayerInfo {
 	eEquipmentFlags Equipment;
 	int RoomID;
 	int UID = -1;
+	char	hashs[MAX_NAME_SIZE];
 };

@@ -62,6 +62,7 @@ struct LG_USER_INTO_GAME_PACKET : public SPACKET {
 	char	id[MAX_NAME_SIZE];	//player id Not UID
 	char	name[MAX_NAME_SIZE];
 	char	department;
+	char	hashs[MAX_NAME_SIZE];	//verification value
 	int		uID;
 	int		roomID;
 	int		roomMax;	// in room Max User

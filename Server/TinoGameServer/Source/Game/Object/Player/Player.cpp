@@ -55,7 +55,9 @@ bool Player::RecvPacket()
 	if (false == __super::RecvPacket())
 	{
 		DisConnectAndReset();
+		return false;
 	}
+	return true;
 }
 
 bool Player::SendPacket(void* packet, int bytes)
@@ -63,7 +65,9 @@ bool Player::SendPacket(void* packet, int bytes)
 	if (false == __super::SendPacket(packet, bytes))
 	{
 		DisConnectAndReset();
+		return false;
 	}
+	return true;
 }
 
 bool Player::CanMakeID()

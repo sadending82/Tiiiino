@@ -484,7 +484,7 @@ void MainServer::connectLobbyServer()
 	dynamic_cast<LobbyServer*>(mLobbyServer)->init();
 }
 
-bool MainServer::setPlayerInRoom(Player* player)
+bool MainServer::setPlayerInRoom(Player* player,const char verification[MAX_NAME_SIZE])
 {
 	for (auto& tRoom : mRooms)
 	{
@@ -497,6 +497,11 @@ bool MainServer::setPlayerInRoom(Player* player)
 				sPlayerInfo pInfo = room->GetPlayerInfo(player->GetUID());
 				if (-1 != pInfo.UID)
 				{
+					if (0 != strcmp(pInfo.hashs, verification))
+					{
+						DEBUGMSGONEPARAM("검증값이 다름.(부정접속) [%d]번째플레이어\n", player->GetSocketID());
+						return false;
+					}
 					if (pInfo.RoomID != tRoom.first)
 					{
 						DEBUGMSGONEPARAM("플레이어가 로비서버에게 받은 방이 아닌 다른곳에 존재함.(부정접속) [%d]번째플레이어\n", player->GetSocketID());
@@ -561,8 +566,18 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 		//uid랑 name이랑 비교구분해서 검증작업 하기  
 		player->SetID(packet->name);
 		player->SetUID(packet->uID);
+		// 단순 검증 말고, hash를 이용한 검증이라던가 가 필요함.
+		// 너무 보안적으로 취약함.. 뭘믿고 클라에서 보내는 데이터를 신용하지?
+		// 로비서버가 암호화된 키를 게임서버에게 줌. 저장.
+		// 로비서버가 클라한테 겜서버로 가라고 할 때 이 암호화된것을 줌.
+		// 클라가 암호화된 무언가를 겜서버로 담아 보냄.
+		// 겜서버는 로비서버가 준 암호화랑 클라가 보낸 암호화랑 비교함 다르면 부정접속.
+		// UID를 먼저 받고, uid로 playerInfo에서 암호화된 값과, packet의 암호화된 값을 비교하면 그나마 좀 안정적일것임.
+		// 이유: 해킹범이 uid를 변조했을 때, 이 암호화 된 무언가의 랜덤값 또한 맞춰야함. 그런데 진짜 로비서버에서 랜덤으로 생성해서 주면 어떻게 맞출건데? 
+
 		//
-		if (false == setPlayerInRoom(player))
+		cout << packet->hashs << endl;
+		if (false == setPlayerInRoom(player,packet->hashs))
 		{
 			/*
 				나중에 여기에 제대로 된 방 id가 안나오면 접속을 끊어버려야함. 부정접속
@@ -744,7 +759,9 @@ void MainServer::ProcessPacketLobby(const int serverID, unsigned char* p)
 		LG_USER_INTO_GAME_PACKET* packet = reinterpret_cast<LG_USER_INTO_GAME_PACKET*>(p);
 		Room* activeRoom = mRooms[packet->roomID];
 		mRooms[packet->roomID]->ActiveRoom();
-		sPlayerInfo playerinfo{ packet->id,packet->name,static_cast<eDepartment>(packet->department),static_cast<eEquipmentFlags>(packet->equipmentflag),packet->roomID,packet->uID };
+		sPlayerInfo playerinfo{ packet->id,packet->name,static_cast<eDepartment>(packet->department),static_cast<eEquipmentFlags>(packet->equipmentflag),packet->roomID};
+		playerinfo.UID = packet->uID;
+		strcpy_s(playerinfo.hashs, packet->hashs);
 		if (true == activeRoom->SettingRoomPlayer(playerinfo, packet->roomMax))
 		{
 			DEBUGMSGONEPARAM("%d번째 방 활성화 완료.\n", packet->roomID);

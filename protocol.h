@@ -72,6 +72,7 @@ struct CS_LOGIN_PACKET : public PACKET {
 	char	passWord[MAX_NAME_SIZE];
 	int		uID;
 	int		roomID;	//원래는 lobbyServer에서 줘야 하는 값. 나중에 '무조건' 빼야함. 또는 서버에서 사용하면 절대 안됨.
+	char	hashs[MAX_NAME_SIZE];	//암호화 값
 
 };
 
@@ -221,6 +222,7 @@ struct 	LC_LOGIN_FAIL_PACKET :public PACKET {
 struct LC_MATCH_RESPONSE_PACKET : public PACKET {
 	int gameServerPortNum;
 	unsigned char gameServerIP[16];	//IPv4에서 ip는 4바이트인데 글자로 표기하니까 최대 xxx.xxx.xxx.xxx  15 + 널문자 = 16
+	char	hashs[MAX_NAME_SIZE];	//암호화 값 이 값을 기반으로 client verification
 };
 
 //--------------------------
