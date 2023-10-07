@@ -52,13 +52,13 @@ public:
 	//단순 재생용,서버 패킷을받아서 실행
 	void PlayTumbleMontage();
 
-	void Grab();
+	void OnGrab();
+	void OffGrab();
 	void SetNormalToGrabbed();
 	void SetGrabbedToNormal();
 
 
 	void GrabBegin();
-	void GrabOff();
 	void DetectTarget();
 
 	void DisableInputMode();
@@ -75,6 +75,11 @@ public:
 	FORCEINLINE EMovementState GetMovementState() { return MovementState; }
 	FORCEINLINE float GetMaxTumbleTime() { return MaxTumbledTime; }
 	FORCEINLINE bool IsDivining() { return bIsDiving; }
+
+	bool GetIsAirForNetwork();
+	void SetIsAirForNetwork(bool val);
+
+	class UCharacterAnimInstance* GetTinoAnimInstance();
 
 private:
 	//키입력 관련 함수

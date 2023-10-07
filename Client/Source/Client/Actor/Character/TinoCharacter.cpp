@@ -46,8 +46,8 @@ void ATinoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction("CreateDummy", EInputEvent::IE_Pressed, this, &ATinoCharacter::CreateDummy);
 	PlayerInputComponent->BindAction("Align", EInputEvent::IE_Pressed, this, &ATinoCharacter::Align);
 	PlayerInputComponent->BindAction("Jump", EInputEvent::IE_Pressed, this, &ATinoCharacter::Jump);
-	PlayerInputComponent->BindAction("Grab", EInputEvent::IE_Pressed, this, &ATinoCharacter::Grab);
-	PlayerInputComponent->BindAction("Grab", EInputEvent::IE_Released, this, &ATinoCharacter::GrabOff);
+	PlayerInputComponent->BindAction("Grab", EInputEvent::IE_Pressed, this, &ATinoCharacter::OnGrab);
+	PlayerInputComponent->BindAction("Grab", EInputEvent::IE_Released, this, &ATinoCharacter::OffGrab);
 	//PlayerInputComponent->BindAction("Jump", EInputEvent::IE_Released, this, &ATinoCharacter::StopJumping);
 	PlayerInputComponent->BindAction("Dive", EInputEvent::IE_Pressed, this, &ATinoCharacter::Dive);
 }
@@ -81,7 +81,7 @@ void ATinoCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	
+
 	if (Controller != nullptr)
 	{
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -222,6 +222,30 @@ void ATinoCharacter::Dive()
 	}
 }
 
+bool ATinoCharacter::GetIsAirForNetwork()
+{
+	auto AnimInstance = GetTinoAnimInstance();
+	if (!!AnimInstance)
+	{
+		return AnimInstance->bIsAirForNetwork;
+	}
+	return false;
+}
+
+void ATinoCharacter::SetIsAirForNetwork(bool val)
+{
+	auto AnimInstance = GetTinoAnimInstance();
+	if (!!AnimInstance)
+	{
+		AnimInstance->bIsAirForNetwork = val;
+	}
+}
+
+UCharacterAnimInstance* ATinoCharacter::GetTinoAnimInstance()
+{
+	return Cast<UCharacterAnimInstance>(GetMesh()->GetAnimInstance());
+}
+
 void ATinoCharacter::OnMoveForward(float Axis)
 {
 	if (CanMove())
@@ -285,23 +309,46 @@ void ATinoCharacter::PlayTumbleMontage()
 	PlayAnimMontage(TumbleMontage);
 }
 
-void ATinoCharacter::Grab()
+void ATinoCharacter::OnGrab()
 {
 	if (GrabMontage == nullptr || (CanGrab() == false)) return;
 
-	bIsGrabbing = !bIsGrabbing;
+	bIsGrabbing = true;
 
-
-	if (bIsGrabbing)
-	{
-		SendAnimPacket(4);
-		PlayAnimMontage(GrabMontage);
+	SendAnimPacket(4);
+	PlayAnimMontage(GrabMontage);
+	if (GetController() && GetController()->IsPlayerController())
 		CLog::Print("GrabOn");
+	
+
+}
+
+void ATinoCharacter::OffGrab()
+{
+	SendAnimPacket(5);
+
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+
+	StopAnimMontage(GrabMontage);
+	SetMovementState(EMovementState::EMS_Normal);
+	SetGrabbedToNormal();
+
+
+	bIsGrabbing = false;
+	bIsGrabCoolTime = true;
+
+	if (GetWorldTimerManager().IsTimerActive(GrabCoolTimer) == false)
+	{	//그랩 쿨타임 시작
+		GetWorldTimerManager().SetTimer(GrabCoolTimer, [this]()
+			{
+				bIsGrabCoolTime = false;
+			}
+		, GrabCoolTime, false);
 	}
-	else
-	{
-		GrabOff();
-	}
+
+	if (GetController() && GetController()->IsPlayerController())
+		CLog::Print("GrabOff");
+
 
 }
 
@@ -321,6 +368,8 @@ void ATinoCharacter::SetGrabbedToNormal()
 {
 	if (!!Target)
 	{
+		if(GetController() && GetController()->IsPlayerController())
+			CLog::Print("Target Remove");
 		auto Other = Cast<ATinoCharacter>(Target);
 		Other->SetMovementState(EMovementState::EMS_Normal);
 		Other->GetCharacterMovement()->MaxWalkSpeed = 400.f;
@@ -333,38 +382,11 @@ void ATinoCharacter::SetGrabbedToNormal()
 void ATinoCharacter::GrabBegin()
 {
 	//잡고있은 지 3초지나면 자동해제
-	CLog::Print("Grab Timer ON");
-	GetWorldTimerManager().SetTimer(GrabTimer, this, &ATinoCharacter::GrabOff, MaxGrabTime, false);
+	if (GetController() && GetController()->IsPlayerController())
+		CLog::Print("Grab Timer ON");
+	GetWorldTimerManager().SetTimer(GrabTimer, this, &ATinoCharacter::OffGrab, MaxGrabTime, false);
 }
 
-void ATinoCharacter::GrabOff()
-{
-	SendAnimPacket(4);
-
-	if (GetWorldTimerManager().IsTimerActive(GrabCoolTimer) == false)
-	{
-		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-
-		StopAnimMontage(GrabMontage);
-		SetMovementState(EMovementState::EMS_Normal);
-		SetGrabbedToNormal();
-		
-
-		bIsGrabbing = false;
-		bIsGrabCoolTime = true;
-
-		//그랩 쿨타임 시작
-		GetWorldTimerManager().SetTimer(GrabCoolTimer, [this]()
-			{
-				bIsGrabCoolTime = false;
-			}
-		, GrabCoolTime, false);
-
-		CLog::Print("GrabOff");
-
-	}
-
-}
 
 void ATinoCharacter::DetectTarget()
 {
@@ -382,10 +404,10 @@ void ATinoCharacter::DetectTarget()
 	FHitResult HitResult;
 	bool result = UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(),
 		start, end, DetectRadius,
-		ObjectTypes, 
-		false, 
-		IgnoreActors, 
-		bShowDebugTrace ? EDrawDebugTrace::ForDuration : EDrawDebugTrace::None, 
+		ObjectTypes,
+		false,
+		IgnoreActors,
+		bShowDebugTrace ? EDrawDebugTrace::ForDuration : EDrawDebugTrace::None,
 		HitResult,
 		true);
 

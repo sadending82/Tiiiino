@@ -295,8 +295,7 @@ void Network::process_packet(unsigned char* p)
 				mOtherCharacter[move_id]->SetActorRotation(FQuat(packet->rx, packet->ry, packet->rz, packet->rw));
 				mOtherCharacter[move_id]->ServerSyncSpeed = packet->speed;
 				mOtherCharacter[move_id]->ServerCharMovingSpeed = FVector(packet->sx, packet->sy, packet->sz);
-				auto anim = Cast<UCharacterAnimInstance>(mOtherCharacter[move_id]->GetMesh()->GetAnimInstance());
-				anim->bIsAirForNetwork = packet->inair;
+				mOtherCharacter[move_id]->SetIsAirForNetwork(packet->inair);
 				//mOtherCharacter[move_id]->ServerStoreGroundSpeed = packet->speed;
 				//mOtherCharacter[move_id]->CharMovingSpeed = FVector(packet->sx, packet->sy, packet->sz);
 				//mOtherCharacter[move_id]->GroundSpeedd = packet->speed;
@@ -389,8 +388,11 @@ void Network::process_packet(unsigned char* p)
 				//mOtherCharacter[id]->Dive();
 				break;
 			case 4:
-				mOtherCharacter[id]->Grab();
+				mOtherCharacter[id]->OnGrab();
 				//잡기
+			case 5:
+				mOtherCharacter[id]->OffGrab();
+				//잡기취소
 			default:
 				break;
 			}
