@@ -162,7 +162,6 @@ void Socket::processPacket(int key, unsigned char* buf)
 {
     switch (buf[1])
     {
-        // 로그인 요청
     case LD_LOGIN: {
         ProcessPacket_Login(key, buf);
         break;
@@ -177,6 +176,10 @@ void Socket::processPacket(int key, unsigned char* buf)
     }
     case LD_UPDATE_GRADE: {
         ProcessPacket_UpdateGrade(key, buf);
+        break;
+    }
+    case LD_CHANGE_DEPARTMENT: {
+        ProcessPacket_ChangeDepartment(key, buf);
         break;
     }
     default:
@@ -209,8 +212,9 @@ bool Socket::CheckLogin(int key, const char* id, const char* password, int userK
     double grade = get<2>(userData);
     int point = get<3>(userData);
     int state = get<4>(userData);
+    char department = get<5>(userData);
 
-    SendUserDataAfterLogin(key, uid, nickname, id, grade, point, state, userKey);
+    SendUserDataAfterLogin(key, uid, nickname, id, grade, point, state, department, userKey);
 
     if (state == FALSE)
         Getm_pDB()->UpdateUserConnectionState(uid, true);
@@ -221,7 +225,8 @@ bool Socket::CheckLogin(int key, const char* id, const char* password, int userK
 }
 
 // SendPacket
-void Socket::SendUserDataAfterLogin(int key, int uid, string& nickname, const char* id, double grade, int point, int state, int userKey)
+void Socket::SendUserDataAfterLogin(int key, int uid, string& nickname, const char* id
+    , double grade, int point, int state, char department, int userKey)
 {
     DL_LOGIN_OK_PACKET p;
     p.size = sizeof(DL_LOGIN_OK_PACKET);
@@ -234,6 +239,7 @@ void Socket::SendUserDataAfterLogin(int key, int uid, string& nickname, const ch
     p.grade = grade;
     p.point = point;
     p.connState = state;
+    p.department = department;
     p.userKey = userKey;
 
     mSessions[key].DoSend((void*)(&p));
@@ -294,4 +300,9 @@ void Socket::ProcessPacket_UpdateGrade(int key, unsigned char* buf)
     if (bUpdate != true) {
         cout << "Update User Grade failed\n";
     }
+}
+
+void Socket::ProcessPacket_ChangeDepartment(int key, unsigned char* buf)
+{
+
 }
