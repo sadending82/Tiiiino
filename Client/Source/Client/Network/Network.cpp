@@ -334,6 +334,7 @@ void Network::process_packet(unsigned char* p)
 			{
 				mc->SpawnDefaultController();
 				mc->AutoPossessPlayer = EAutoReceiveInput::Disabled;
+				mc->bIsControlledPlayer = false;
 				mc->FinishSpawning(trans);
 				mOtherCharacter[id] = mc;
 				mOtherCharacter[id]->GetMesh()->SetVisibility(true);
@@ -509,6 +510,7 @@ void CALLBACK recv_Gamecallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv
 	WSA_OVER_EX* over = reinterpret_cast<WSA_OVER_EX*>(recv_over);
 	auto Game = Network::GetNetwork();
 	if (nullptr == Game->mMyCharacter) return;
+	if (num_bytes == 0)return;
 
 	int to_process_data = num_bytes + Game->_prev_size;
 	unsigned char* packet = over->GetBuf();
@@ -533,6 +535,7 @@ void CALLBACK recv_Lobbycallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED rec
 	WSA_OVER_EX* over = reinterpret_cast<WSA_OVER_EX*>(recv_over);
 	auto Game = Network::GetNetwork();
 	if (nullptr == Game->mMyCharacter) return;
+	if (num_bytes == 0)return;
 
 	int to_process_data = num_bytes + Game->l_prev_size;
 	unsigned char* packet = over->GetBuf();

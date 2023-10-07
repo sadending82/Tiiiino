@@ -84,7 +84,11 @@ void ATinoCharacter::BeginPlay()
 
 void ATinoCharacter::EndPlay(EEndPlayReason::Type Reason)
 {
-	Network::GetNetwork()->release();
+	if (bIsControlledPlayer)
+	{
+		Network::GetNetwork()->release();
+	}
+
 }
 
 // Called every frame
