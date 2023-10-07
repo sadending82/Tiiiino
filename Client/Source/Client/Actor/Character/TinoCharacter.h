@@ -62,6 +62,19 @@ public:
 	void TimerStart();
 	void TimerEnd();
 
+	void MakeAndShowHUD();	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
+	TSubclassOf<UInGameUIWidget> InGameWidgetClass;
+	UPROPERTY()
+	UInGameUIWidget* InGameWidgetInstance = nullptr;
+
+
+	void MakeAndShowDialog();
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
+	TSubclassOf<class UDialogUIWidget> DialogWidgetClass;
+	UPROPERTY()
+	class UDialogUIWidget* DialogWidget = nullptr;
+
 	FORCEINLINE void SetMovementState(EMovementState State) { MovementState = State; }
 	FORCEINLINE void SetMaxTumbleTime(float MaxTime) { MaxTumbledTime = MaxTime; }
 	FORCEINLINE float GetMaxTumbleTime() { return MaxTumbledTime; }
@@ -119,5 +132,4 @@ private:
 		bool bIsDiving;
 
 	FTimerHandle InGameUITimerHandle;
-	UInGameUIWidget* InGameWidgetInstance = nullptr;
 };

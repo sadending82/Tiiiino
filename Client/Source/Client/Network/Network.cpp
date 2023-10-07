@@ -4,6 +4,7 @@
 #include "Actor/Character/TinoCharacter.h"
 #include "Actor/Obstacles/BaseObstacle.h"
 #include "Actor/Controller/TinoController.h"
+#include "MenuUI/InGameUIWidget.h"
 #include "GameFramework/PlayerController.h"
 #include "Components/CapsuleComponent.h"
 #include "Actor/Character/CharacterAnimInstance.h"
@@ -399,6 +400,7 @@ void Network::process_packet(unsigned char* p)
 	case SC_GAME_WAITTING: {
 		SC_GAME_WAITTING_PACKET* packet = reinterpret_cast<SC_GAME_WAITTING_PACKET*>(p);
 		bGameIsStart = true;
+		mMyCharacter->MakeAndShowHUD();
 		//
 		// 카운트다운 UI 띄우기및 object들 처음 동기화.
 		//
@@ -406,7 +408,6 @@ void Network::process_packet(unsigned char* p)
 	}
 	case SC_GAME_START: {
 		SC_GAME_START_PACKET* packet = reinterpret_cast<SC_GAME_START_PACKET*>(p);
-
 		//
 		// 플레이어들 움직일 수 있게 하기.
 		//
@@ -437,6 +438,7 @@ void Network::process_packet(unsigned char* p)
 	{
 		SC_GAME_COUNTDOWN_START_PACKET* packet = reinterpret_cast<SC_GAME_COUNTDOWN_START_PACKET*>(p);
 
+		mMyCharacter->InGameWidgetInstance->TimerStart();
 		//카운트다운 UI 띄우기 (Appear CountDown UI)
 
 		break;
@@ -568,6 +570,7 @@ bool Network::RecvPacketGame()
 		{
 			//error ! 
 			UE_LOG(LogTemp, Error, TEXT("return false"));
+			mMyCharacter->MakeAndShowDialog();
 			return false;
 		}
 		else {
@@ -593,6 +596,7 @@ bool Network::RecvPacketLobby()
 		{
 			//error ! 
 			UE_LOG(LogTemp, Error, TEXT("return false"));
+			mMyCharacter->MakeAndShowDialog();
 			return false;
 		}
 		else {

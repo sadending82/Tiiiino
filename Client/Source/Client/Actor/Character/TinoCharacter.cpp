@@ -10,6 +10,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Animation/AnimMontage.h"
 #include "MenuUI/InGameUIWidget.h"
+#include "MenuUI/DialogUIWidget.h"
 
 ATinoCharacter::ATinoCharacter()
 	:MaxTumbledTime(1.0f),
@@ -51,16 +52,7 @@ void ATinoCharacter::BeginPlay()
 	{
 		if (GetController()->IsPlayerController())
 		{
-			UInGameUIWidget* InGameUIWidgetInstance = CreateWidget<UInGameUIWidget>(GetWorld(), UInGameUIWidget::StaticClass());
-			FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/MenuUI/InGame/InGameUI.InGameUI_C'"));
-			auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
-			if (nullptr == WidgetClass)
-			{
-
-			}
-
-			InGameWidgetInstance = CreateWidget<UInGameUIWidget>(GetWorld(), WidgetClass);
-			InGameWidgetInstance->AddToViewport();
+			
 		}
 		else
 		{
@@ -182,6 +174,19 @@ void ATinoCharacter::Align()
 	GetController()->SetControlRotation(GetActorForwardVector().Rotation());
 }
 
+void ATinoCharacter::MakeAndShowHUD()
+{
+	InGameWidgetInstance = CreateWidget<UInGameUIWidget>(GetWorld(), InGameWidgetClass);
+	InGameWidgetInstance->AddToViewport();
+
+}
+
+void ATinoCharacter::MakeAndShowDialog()
+{
+	DialogWidget = CreateWidget<UDialogUIWidget>(GetWorld(), DialogWidgetClass);
+	DialogWidget->AddToViewport();
+}
+
 void ATinoCharacter::DiveBegin()
 {
 }
@@ -205,13 +210,7 @@ void ATinoCharacter::OffAccelEffect()
 }
 void ATinoCharacter::TimerStart()
 {
-	UInGameUIWidget* InGameUIWidgetInstance = CreateWidget<UInGameUIWidget>(GetWorld(), UInGameUIWidget::StaticClass());
-	FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/MenuUI/InGame/InGameUI.InGameUI_C'"));
-	auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
-	if (nullptr == WidgetClass)
-	{
-		UE_LOG(LogTemp, Error, TEXT("TimerStart Error"));
-	}
+
 	GetWorldTimerManager().SetTimer(InGameUITimerHandle, this, &ATinoCharacter::TimerEnd, 1.f, true);
 	
 	
