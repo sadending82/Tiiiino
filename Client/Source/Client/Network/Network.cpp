@@ -4,6 +4,7 @@
 #include "Actor/Character/TinoCharacter.h"
 #include "Actor/Obstacles/BaseObstacle.h"
 #include "Actor/Controller/TinoController.h"
+#include "MenuUI/InGameUIWidget.h"
 #include "GameFramework/PlayerController.h"
 #include "Components/CapsuleComponent.h"
 #include "Actor/Character/CharacterAnimInstance.h"
@@ -336,6 +337,7 @@ void Network::process_packet(unsigned char* p)
 			{
 				mc->SpawnDefaultController();
 				mc->AutoPossessPlayer = EAutoReceiveInput::Disabled;
+				mc->bIsControlledPlayer = false;
 				mc->FinishSpawning(trans);
 				mOtherCharacter[id] = mc;
 				mOtherCharacter[id]->GetMesh()->SetVisibility(true);
@@ -398,6 +400,7 @@ void Network::process_packet(unsigned char* p)
 	case SC_GAME_WAITTING: {
 		SC_GAME_WAITTING_PACKET* packet = reinterpret_cast<SC_GAME_WAITTING_PACKET*>(p);
 		bGameIsStart = true;
+		mMyCharacter->MakeAndShowHUD();
 		//
 		// 카운트다운 UI 띄우기및 object들 처음 동기화.
 		//
@@ -405,7 +408,6 @@ void Network::process_packet(unsigned char* p)
 	}
 	case SC_GAME_START: {
 		SC_GAME_START_PACKET* packet = reinterpret_cast<SC_GAME_START_PACKET*>(p);
-
 		//
 		// 플레이어들 움직일 수 있게 하기.
 		//
@@ -436,6 +438,7 @@ void Network::process_packet(unsigned char* p)
 	{
 		SC_GAME_COUNTDOWN_START_PACKET* packet = reinterpret_cast<SC_GAME_COUNTDOWN_START_PACKET*>(p);
 
+		mMyCharacter->InGameWidgetInstance->TimerStart();
 		//카운트다운 UI 띄우기 (Appear CountDown UI)
 
 		break;
@@ -510,6 +513,7 @@ void CALLBACK recv_Gamecallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv
 	WSA_OVER_EX* over = reinterpret_cast<WSA_OVER_EX*>(recv_over);
 	auto Game = Network::GetNetwork();
 	if (nullptr == Game->mMyCharacter) return;
+	if (num_bytes == 0)return;
 
 	int to_process_data = num_bytes + Game->_prev_size;
 	unsigned char* packet = over->GetBuf();
@@ -534,6 +538,7 @@ void CALLBACK recv_Lobbycallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED rec
 	WSA_OVER_EX* over = reinterpret_cast<WSA_OVER_EX*>(recv_over);
 	auto Game = Network::GetNetwork();
 	if (nullptr == Game->mMyCharacter) return;
+	if (num_bytes == 0)return;
 
 	int to_process_data = num_bytes + Game->l_prev_size;
 	unsigned char* packet = over->GetBuf();
@@ -571,6 +576,7 @@ bool Network::RecvPacketGame()
 		{
 			//error ! 
 			UE_LOG(LogTemp, Error, TEXT("return false"));
+			mMyCharacter->MakeAndShowDialog();
 			return false;
 		}
 		else {
@@ -596,6 +602,7 @@ bool Network::RecvPacketLobby()
 		{
 			//error ! 
 			UE_LOG(LogTemp, Error, TEXT("return false"));
+			mMyCharacter->MakeAndShowDialog();
 			return false;
 		}
 		else {

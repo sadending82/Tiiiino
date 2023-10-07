@@ -516,10 +516,12 @@ bool MainServer::setPlayerInRoom(Player* player,const char verification[MAX_NAME
 				}
 				else {
 					DEBUGMSGONEPARAM("플레이어정보가 방 매칭정보에 존재하지않음. [%d]번째플레이어\n", player->GetSocketID());
+					return false;
 				}
 			}
 			else {
 				DEBUGMSGONEPARAM("플레이어가 방 매칭정보에 존재하지않음. [%d]번째플레이어\n", player->GetSocketID());
+				return false;
 			}
 		}
 	}

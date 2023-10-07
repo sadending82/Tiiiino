@@ -55,7 +55,7 @@ void Network::ErrorDisplay(int errNo)
 		NULL, errNo,
 		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
 		(LPTSTR)&lpMsgBuf, 0, 0);
-	std::wcout << lpMsgBuf << std::endl;
+	std::wcout << errNo <<","<<lpMsgBuf << std::endl;
 	//while (true);
 	LocalFree(lpMsgBuf);
 }
