@@ -9,6 +9,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Animation/AnimMontage.h"
+#include "MenuUI/InGameUIWidget.h"
 
 ATinoCharacter::ATinoCharacter()
 	:MaxTumbledTime(1.0f),
@@ -60,6 +61,16 @@ void ATinoCharacter::BeginPlay()
 	{
 		if (GetController()->IsPlayerController())
 		{
+			UInGameUIWidget* InGameUIWidgetInstance = CreateWidget<UInGameUIWidget>(GetWorld(), UInGameUIWidget::StaticClass());
+			FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/MenuUI/InGame/InGameUI.InGameUI_C'"));
+			auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
+			if (nullptr == WidgetClass)
+			{
+
+			}
+
+			InGameWidgetInstance = CreateWidget<UInGameUIWidget>(GetWorld(), WidgetClass);
+			InGameWidgetInstance->AddToViewport();
 		}
 		else
 		{
@@ -92,28 +103,36 @@ void ATinoCharacter::Tick(float DeltaTime)
 
 		if (Network::GetNetwork()->bIsConnected)
 		{
-			if (GetController()->IsPlayerController()) {
-
-				auto pos = GetTransform().GetLocation();
-				auto rot = GetTransform().GetRotation();
-
-				ServerSyncElapsedTime += DeltaTime;
-				if (ServerSyncDeltaTime < ServerSyncElapsedTime)
+			if (GetController())
+			{
+				if (!GetController()->IsPlayerController())
 				{
-					send_move_packet(Network::GetNetwork()->s_socket, Cast<UCharacterAnimInstance>(GetMesh()->GetAnimInstance())->bIsAir, pos.X, pos.Y, pos.Z, rot, GetVelocity().Size2D(), GetCharacterMovement()->Velocity);
-					ServerSyncElapsedTime = 0.0f;
+					//서버랑 연결 돼 있을 때만 상대 캐릭터 보간하려 시도. 
+					//Update GroundSpeedd (22-04-05)
+					//GroundSpeedd = ServerStoreGroundSpeed;
+					//Update Interpolation (23-09-27)
+					GetCharacterMovement()->Velocity = ServerCharMovingSpeed;
+
 				}
+				else {
+					if (Network::GetNetwork()->bGameIsStart)
+					{
+						auto pos = GetTransform().GetLocation();
+						auto rot = GetTransform().GetRotation();
 
-				float CharXYVelocity = ((ACharacter::GetCharacterMovement()->Velocity) * FVector(1.f, 1.f, 0.f)).Size();
+						ServerSyncElapsedTime += DeltaTime;
+						if (ServerSyncDeltaTime < ServerSyncElapsedTime)
+						{
+							send_move_packet(Network::GetNetwork()->s_socket, Cast<UCharacterAnimInstance>(GetMesh()->GetAnimInstance())->bIsAir, pos.X, pos.Y, pos.Z, rot, GetVelocity().Size2D(), GetCharacterMovement()->Velocity);
+							ServerSyncElapsedTime = 0.0f;
+						}
 
+						float CharXYVelocity = ((ACharacter::GetCharacterMovement()->Velocity) * FVector(1.f, 1.f, 0.f)).Size();
+					}
+
+				}
 			}
-			else {
-				//서버랑 연결 돼 있을 때만 상대 캐릭터 보간하려 시도. 
-				//Update GroundSpeedd (22-04-05)
-				//GroundSpeedd = ServerStoreGroundSpeed;
-				//Update Interpolation (23-09-27)
-				GetCharacterMovement()->Velocity = ServerCharMovingSpeed;
-			}
+			
 		}
 
 		PlayTumbleMontage(DeltaTime);
@@ -212,6 +231,37 @@ void ATinoCharacter::OffAccelEffect()
 
 }
 
+void ATinoCharacter::TimerStart()
+{
+	UInGameUIWidget* InGameUIWidgetInstance = CreateWidget<UInGameUIWidget>(GetWorld(), UInGameUIWidget::StaticClass());
+	FSoftClassPath WidgetSource(TEXT("WidgetBlueprint'/Game/MenuUI/InGame/InGameUI.InGameUI_C'"));
+	auto WidgetClass = WidgetSource.TryLoadClass<UUserWidget>();
+	if (nullptr == WidgetClass)
+	{
+		UE_LOG(LogTemp, Error, TEXT("TimerStart Error"));
+	}
+	GetWorldTimerManager().SetTimer(InGameUITimerHandle, this, &ATinoCharacter::TimerEnd, 1.f, true);
+	
+	
+}
+
+void ATinoCharacter::TimerEnd()
+{
+
+	// 유효성 확인
+	if (InGameWidgetInstance)
+	{
+		// UInGameUIWidget의 TimerRun 함수 호출
+		InGameWidgetInstance->TimerRun();
+	}
+	if (InGameWidgetInstance->GetRestGameTime() < 0)
+	{
+		InGameWidgetInstance->TimerEnd();
+		GetWorldTimerManager().ClearTimer(InGameUITimerHandle);
+	}
+
+}
+
 void ATinoCharacter::Dive()
 {
 	if (DiveMontage && CanDive())
@@ -292,9 +342,13 @@ void ATinoCharacter::Jump()
 		Super::Jump();
 		SendAnimPacket(1);
 	}
-	if (!GetController()->IsPlayerController())
+
+	if (GetController())
 	{
-		Super::Jump();
+		if (!GetController()->IsPlayerController())
+		{
+			Super::Jump();
+		}
 	}
 }
 
@@ -330,7 +384,10 @@ void ATinoCharacter::OffGrab()
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
 	StopAnimMontage(GrabMontage);
-	SetMovementState(EMovementState::EMS_Normal);
+	if (GetController() && GetController()->IsPlayerController())
+		SetMovementState(EMovementState::EMS_Normal);
+
+	CLog::Print(GetName());
 	SetGrabbedToNormal();
 
 
@@ -411,7 +468,7 @@ void ATinoCharacter::DetectTarget()
 		HitResult,
 		true);
 
-	if (result)
+	if (result && bIsGrabCoolTime == false)
 	{
 		Target = HitResult.GetActor();
 		float ScalarValue = GetActorForwardVector().Dot(Target->GetActorForwardVector());
@@ -501,7 +558,8 @@ bool ATinoCharacter::CanGrab()
 		ret = false;
 		break;
 	}
-	ret &= (bIsGrabCoolTime == false);
+	if(bIsGrabCoolTime == true)
+		ret = false;
 
 	return ret;
 }

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Actor/Character/BaseCharacter.h"
+#include "MenuUI/InGameUIWidget.h"
 #include "TinoCharacter.generated.h"
 
 /**
@@ -70,6 +71,9 @@ public:
 	void OnAccelEffect();
 	void OffAccelEffect();
 	
+	void TimerStart();
+	void TimerEnd();
+
 	FORCEINLINE void SetMovementState(EMovementState State) { MovementState = State; }
 	FORCEINLINE void SetMaxTumbleTime(float MaxTime) { MaxTumbledTime = MaxTime; }
 	FORCEINLINE EMovementState GetMovementState() { return MovementState; }
@@ -164,4 +168,7 @@ private:
 
 	FTimerHandle GrabTimer;
 	FTimerHandle GrabCoolTimer;
+	FTimerHandle InGameUITimerHandle;
+	
+	UInGameUIWidget* InGameWidgetInstance = nullptr;
 };

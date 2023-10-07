@@ -10,7 +10,7 @@ Room::Room(int id)
 	, mObjects()
 	, mPlayerInfo()
 	, mPlayerSettingCnt(0)
-	, mPlayerCnt(-1)
+	, mPlayerCnt(0)
 	, mPlayerMax(0)
 	, mRoomState(eRoomState::ST_FREE)
 	, mPlayerArrivedCnt(0)
@@ -99,6 +99,7 @@ void Room::ResetGameRoom()
 	mPlayerSettingCnt = 0;
 	mPlayerMax = 0;
 	mPlayerArrivedCnt = 0;
+	mPlayerCnt = 0;
 	mGameEndTimer = false;
 
 	mRoomStateLock.lock();
@@ -326,7 +327,7 @@ void Room::setPlayerInfoWithCnt(const sPlayerInfo& playerInfo, const int& player
 void Room::setGameEndTimerStartOnce()
 {
 	bool expect = 0;
-	if (std::atomic_compare_exchange_strong(reinterpret_cast<std::atomic_bool*>(&mGameEndTimer), 0, 1))
+	if (std::atomic_compare_exchange_strong(reinterpret_cast<std::atomic_bool*>(&mGameEndTimer), &expect, 1))
 	{
 		DEBUGMSGNOPARAM("한 번 실행되야함\n");
 

@@ -71,6 +71,7 @@ void Network::release()
 {
 	if (isInit)
 	{
+		bGameIsStart = false;
 		mGeneratedID = 0;
 		mMyCharacter->bIsConnected = 0;
 		mMyCharacter = nullptr;
@@ -401,7 +402,7 @@ void Network::process_packet(unsigned char* p)
 	}
 	case SC_GAME_WAITTING: {
 		SC_GAME_WAITTING_PACKET* packet = reinterpret_cast<SC_GAME_WAITTING_PACKET*>(p);
-
+		bGameIsStart = true;
 		//
 		// 카운트다운 UI 띄우기및 object들 처음 동기화.
 		//
@@ -409,6 +410,7 @@ void Network::process_packet(unsigned char* p)
 	}
 	case SC_GAME_START: {
 		SC_GAME_START_PACKET* packet = reinterpret_cast<SC_GAME_START_PACKET*>(p);
+
 		//
 		// 플레이어들 움직일 수 있게 하기.
 		//
@@ -482,7 +484,7 @@ void Network::l_process_packet(unsigned char* p)
 	{
 		LC_MATCH_RESPONSE_PACKET* packet = reinterpret_cast<LC_MATCH_RESPONSE_PACKET*>(p);
 		//게임서버 연결 코드 나중에 ip랑 포트넘버도 넘겨야함.
-		UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("Level4"));
+		UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("Level1_ver1"));
 		strcpy_s(hashs, packet->hashs);
 		bLevelOpenTriggerEnabled = true;
 		break;

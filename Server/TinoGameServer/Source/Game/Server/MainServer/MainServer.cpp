@@ -576,7 +576,6 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 		// 이유: 해킹범이 uid를 변조했을 때, 이 암호화 된 무언가의 랜덤값 또한 맞춰야함. 그런데 진짜 로비서버에서 랜덤으로 생성해서 주면 어떻게 맞출건데? 
 
 		//
-		cout << packet->hashs << endl;
 		if (false == setPlayerInRoom(player,packet->hashs))
 		{
 			/*
@@ -632,7 +631,7 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 			break;
 		}
 		Room* pRoom = mRooms[player->GetRoomID()];
-
+		
 
 		player->SetMoveTime(packet->move_time);
 		player->SetPosition(Vector3f(packet->x, packet->y, packet->z));
