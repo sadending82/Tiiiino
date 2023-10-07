@@ -38,6 +38,8 @@ enum SPacketType {
 	DL_LOGIN_FAIL,
 	DL_UPDATE_NICKNAME_OK,
 	DL_CHANGE_DEPARTMENT_OK,
+	DL_SIGNUP_OK,
+	DL_SIGNUP_FAIL
 };
 
 
@@ -95,6 +97,7 @@ struct LD_LOGIN_PACKET :public SPACKET {
 struct LD_SIGNUP_PACKET :public SPACKET {
 	char	id[MAX_NAME_SIZE];
 	char	password[MAX_NAME_SIZE];
+	int		userKey;
 };
 
 struct LD_UPDATE_NICKNAME_PACKET :public SPACKET {
@@ -129,6 +132,14 @@ struct DL_LOGIN_FAIL_PACKET :public SPACKET {
 };
 
 struct DL_UPDATE_NICKNAME_OK_PACKET :public SPACKET {
+	int		userKey;
+};
+
+struct DL_SIGNUP_OK_PACKET :public SPACKET {
+	int		userKey;
+};
+
+struct DL_SIGNUP_FAIL_PACKET :public SPACKET {
 	int		userKey;
 };
 

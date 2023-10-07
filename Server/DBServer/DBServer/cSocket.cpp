@@ -167,7 +167,7 @@ void Socket::processPacket(int key, unsigned char* buf)
         break;
     }
     case LD_SIGNUP: {
-        ProcessPacket_SignUp(buf);
+        ProcessPacket_SignUp(key, buf);
         break;
     }
     case LD_UPDATE_NICKNAME: {
@@ -214,7 +214,7 @@ bool Socket::CheckLogin(int key, const char* id, const char* password, int userK
     int state = get<4>(userData);
     char department = get<5>(userData);
 
-    SendUserDataAfterLogin(key, uid, nickname, id, grade, point, state, department, userKey);
+    SendLoginOK(key, uid, nickname, id, grade, point, state, department, userKey);
 
     if (state == FALSE)
         Getm_pDB()->UpdateUserConnectionState(uid, true);
@@ -225,7 +225,7 @@ bool Socket::CheckLogin(int key, const char* id, const char* password, int userK
 }
 
 // SendPacket
-void Socket::SendUserDataAfterLogin(int key, int uid, string& nickname, const char* id
+void Socket::SendLoginOK(int key, int uid, string& nickname, const char* id
     , double grade, int point, int state, char department, int userKey)
 {
     DL_LOGIN_OK_PACKET p;
@@ -254,6 +254,26 @@ void Socket::SendLoginFail(int key, const char* id, int userKey) {
     mSessions[key].DoSend((void*)(&p));
 }
 
+void Socket::SendSignUpOK(int key, int userKey)
+{
+    DL_SIGNUP_OK_PACKET p;
+    p.size = sizeof(DL_SIGNUP_OK_PACKET);
+    p.type = SPacketType::DL_SIGNUP_OK;
+    p.userKey = userKey;
+
+    mSessions[key].DoSend((void*)(&p));
+}
+
+void Socket::SendSignUpFail(int key, int userKey)
+{
+    DL_SIGNUP_FAIL_PACKET p;
+    p.size = sizeof(DL_SIGNUP_FAIL_PACKET);
+    p.type = SPacketType::DL_SIGNUP_FAIL;
+    p.userKey = userKey;
+
+    mSessions[key].DoSend((void*)(&p));
+}
+
 void Socket::SendUpdateNicknameOK(int key, int userKey)
 {
     DL_UPDATE_NICKNAME_OK_PACKET p;
@@ -275,13 +295,16 @@ void Socket::ProcessPacket_Login(int key, unsigned char* buf)
     }
 }
 
-void Socket::ProcessPacket_SignUp(unsigned char* buf)
+void Socket::ProcessPacket_SignUp(int key, unsigned char* buf)
 {
     LD_SIGNUP_PACKET* p = reinterpret_cast<LD_SIGNUP_PACKET*>(buf);
     bool bJoin = Getm_pDB()->SignUpNewPlayer(p->id, p->password);
     if (bJoin != true) {
         cout << "Sign Up new user failed\n";
+        SendSignUpFail(key, p->userKey);
+        return;
     }
+    SendSignUpOK(key, p->userKey);
 }
 
 void Socket::ProcessPacket_UpdateNickname(int key, unsigned char* buf)
