@@ -2,7 +2,12 @@
 
 
 #include "MenuUI/InGameUIWidget.h"
-#include "Components/EditableTextBox.h"
+#include "Components/EditableText.h"
+#include "Components/TextBlock.h"
+#include "Actor/Controller/TinoController.h"
+#include "Actor/Character/TinoCharacter.h"
+
+#include "Global.h"
 
 void UInGameUIWidget::NativePreConstruct()
 {
@@ -13,25 +18,10 @@ void UInGameUIWidget::NativeDestruct()
 {
 }
 
-void UInGameUIWidget::RankImageSwitcher()
-{
-
-}
-
-void UInGameUIWidget::SetGameTime(int32 GameTime)
-{
-	RestGameTime = GameTime;
-	
-}
-
-void UInGameUIWidget::EndGameTime()
-{
-
-}
-
 void UInGameUIWidget::LevelSuccess()
 {
 	// 완주 성공
+	
 
 }
 
@@ -48,3 +38,40 @@ void UInGameUIWidget::LevelClearCheck()
 	// 실패시 bLevelClearCheck = false
 	
 }
+
+void UInGameUIWidget::TimerStart()
+{
+
+	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	auto TinoCharacter = TinoController->GetPawn<ATinoCharacter>();
+	if (TinoCharacter)
+	{
+		// ATinoCharacter 인스턴스를 사용하여 TimerStart 함수를 호출
+		TinoCharacter->TimerStart();
+	}
+}
+
+void UInGameUIWidget::TimerEnd()
+{
+	// 게임오버 타이머 종료
+	RestGameTime = 20;
+	
+}
+
+void UInGameUIWidget::TimerRun()
+{
+	// 게임오버 타이머 진행
+
+	FText RestGameTimeText = FText::AsNumber(RestGameTime);
+	GameTimeText->SetText(RestGameTimeText);
+	RestGameTime--;
+	
+
+}
+
+void UInGameUIWidget::DisconnectNetwork()
+{
+	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	TinoController->DisconnectNetwork();
+}
+

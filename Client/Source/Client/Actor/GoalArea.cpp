@@ -3,6 +3,7 @@
 
 #include "Actor/GoalArea.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Global.h"
 #include "Network/Network.h"
 
@@ -62,5 +63,7 @@ void AGoalArea::PlayerDisable(ACharacter* Character)
 {
 	Character->SetActorEnableCollision(false);
 	Character->SetActorHiddenInGame(true);
+	Character->GetCharacterMovement()->StopMovementImmediately();
+	Character->GetCharacterMovement()->GravityScale = 0.f;
 }
 

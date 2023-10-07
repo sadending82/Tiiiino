@@ -22,6 +22,16 @@ Player::~Player()
 
 void Player::DisConnectAndReset()
 {
+	mStateLock.lock();
+	if (mSocketState == eSocketState::ST_FREE)
+	{
+		mStateLock.unlock();
+		return;
+	}
+	else {
+		mSocketState = eSocketState::ST_FREE;
+		mStateLock.unlock();
+	}
 	DisConnect();
 	gMainServer->GetRooms()[mRoomID]->DisablePlayer(this);
 	auto sPacket = gMainServer->make_player_remove_packet(mRoomSyncID);
