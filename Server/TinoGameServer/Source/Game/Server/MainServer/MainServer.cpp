@@ -228,6 +228,17 @@ void MainServer::send_room_reset_packet(const int roomID)
 	mLobbyServer->SendPacket(&packet, sizeof(packet));
 }
 
+void MainServer::send_player_result_packet(const int uID, const int rank)
+{
+	GL_PLAYER_RESULT_PACKET packet{};
+	packet.size = sizeof(packet);
+	packet.type = GL_PLAYER_RESULT;
+	packet.uID = uID;
+	packet.rank = rank;
+
+	mLobbyServer->SendPacket(&packet, sizeof(packet));
+}
+
 
 void MainServer::send_move_packet(const int player_id,const int mover_id, const bool inair,const float value, const float sx, const float sy, const float sz)
 {
@@ -667,6 +678,8 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 			auto sPacket = make_player_arrive_packet(player->GetRoomSyncID());
 			SendRoomSomeoneExcept(player->GetRoomID(), player->GetSocketID(), (void*)&sPacket, sizeof(sPacket));
 		}
+		send_player_result_packet(player->GetUID(), player->GetRank());
+
 		break;
 	}
 	case CS_PING: {
