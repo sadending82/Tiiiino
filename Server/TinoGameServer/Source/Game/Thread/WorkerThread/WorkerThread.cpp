@@ -28,7 +28,7 @@ void WorkerThread::doThread()
 		WSA_OVER_EX* wsa_ex = reinterpret_cast<WSA_OVER_EX*>(overlapped);
 		if (FALSE == ret) {
 			int err_no = WSAGetLastError();
-			//std::cout << "GQCS Error";
+			DEBUGMSGNOPARAM("GQCS Error\n");
 			mMainServer->ErrorDisplay(err_no);
 			if (wsa_ex->GetCmd() == eCOMMAND_IOCP::CMD_SEND)
 				delete wsa_ex;
@@ -39,8 +39,7 @@ void WorkerThread::doThread()
 		case eCOMMAND_IOCP::CMD_RECV: {
 			if (bytes == 0) {
 				auto t = dynamic_cast<Player*>(mMainServer->GetObjects()[client_id]);
-				if (t) t->DisConnect();
-				//Disconnect(client_id);
+				if (t) t->DisConnectAndReset();
 				break;
 			}
 
@@ -124,6 +123,17 @@ void WorkerThread::doThread()
 			AcceptEx(mMainServer->GetSocket(), c_socket, wsa_ex->GetBuf() + 8, 0, sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN) + 16, NULL, &wsa_ex->GetWsaOver());
 			break;
 		}
+		case eCOMMAND_IOCP::CMD_GAME_START:
+		{
+			eEventType eventType = TimerThread::DeserializeEventType(wsa_ex->GetBuf());
+			DEBUGMSGNOPARAM("한번만 오는지 GAME END\n");
+			int roomID = TimerThread::DeserializeReceiver(wsa_ex->GetBuf());
+			{
+				auto sPacket = mMainServer->make_game_start_packet();
+				mMainServer->SendRoomBroadCast(roomID, (void*)&sPacket, sizeof(sPacket));
+			}
+			break;
+		}
 		case eCOMMAND_IOCP::CMD_GAME_END:
 		{
 			eEventType eventType = TimerThread::DeserializeEventType(wsa_ex->GetBuf());
@@ -133,12 +143,23 @@ void WorkerThread::doThread()
 				auto sPacket = mMainServer->make_game_end_packet();	//판정은 클라가 알아서.
 				mMainServer->SendRoomBroadCast(roomID, (void*)&sPacket, sizeof(sPacket));
 			}
+			TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_RESET, eEventType::TYPE_TARGET, 10000, 0, roomID);
+			break;
+		}
+		case eCOMMAND_IOCP::CMD_GAME_RESET:
+		{
+			eEventType eventType = TimerThread::DeserializeEventType(wsa_ex->GetBuf());
+			int roomID = TimerThread::DeserializeReceiver(wsa_ex->GetBuf());
+			mMainServer->GetRooms()[roomID]->ResetGameRoom();
+			mMainServer->send_room_reset_packet(roomID);
+
 			break;
 		}
 		case eCOMMAND_IOCP::CMD_GAME_COUNTDOWN_START:
 		{
 			eEventType eventType = TimerThread::DeserializeEventType(wsa_ex->GetBuf());
 			int roomID = TimerThread::DeserializeReceiver(wsa_ex->GetBuf());
+			std::cout << "카운트다운 시작\n";
 			matchTimerType(eventType);
 			{
 				auto sPacket = mMainServer->make_game_countdown_start_packet();
@@ -179,6 +200,26 @@ void WorkerThread::doThread()
 			}
 			obj->Setting();
 			TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_DOORSYNC, eEventType::TYPE_BROADCAST_ROOM, obj->GetWaitMilliTime(), roomSyncID, roomID);
+			break;
+		}
+		case eCOMMAND_IOCP::CMD_GAME_BREAKDOOR:
+		{
+			eEventType eventType = TimerThread::DeserializeEventType(wsa_ex->GetBuf());
+			DEBUGMSGNOPARAM("break door\n");
+			int roomID = TimerThread::DeserializeReceiver(wsa_ex->GetBuf());
+			int objectID = client_id;
+			auto sPacket = mMainServer->make_game_breakdoor_packet(objectID);
+			mMainServer->SendRoomBroadCast(roomID, (void*)&sPacket, sizeof(sPacket));
+			break;
+		}
+		case eCOMMAND_IOCP::CMD_GAME_BREAKPLATFORM:
+		{
+			eEventType eventType = TimerThread::DeserializeEventType(wsa_ex->GetBuf());
+			DEBUGMSGNOPARAM("break platform\n");
+			int roomID = TimerThread::DeserializeReceiver(wsa_ex->GetBuf());
+			int objectID = client_id;
+			auto sPacket = mMainServer->make_game_breakdoor_packet(objectID);
+			mMainServer->SendRoomBroadCast(roomID, (void*)&sPacket, sizeof(sPacket));
 			break;
 		}
 		}

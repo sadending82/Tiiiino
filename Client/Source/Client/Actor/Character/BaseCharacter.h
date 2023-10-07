@@ -2,11 +2,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "Interface/Network.h"
 #include "BaseCharacter.generated.h"
 
 UCLASS()
-class CLIENT_API ABaseCharacter : public ACharacter, public INetwork
+class CLIENT_API ABaseCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
@@ -27,13 +26,11 @@ public:
 	const int GetClientID() const { return ClientID; }
 	void SetClientID(const int id) { ClientID = id; }
 
-private:
+protected:
 	//Server
 	UPROPERTY(EditAnywhere,Category = "Network")
 		int ClientID;
 
-<<<<<<< Updated upstream
-=======
 public:
 
 	float ServerSyncElapsedTime;	//몇초 마다 이동 동기화 보낼것인지.
@@ -42,6 +39,7 @@ public:
 	bool bIsConnected;	//임시 변수
 	float ServerSyncSpeed;	//서버 동기화용 애니메이션 스피드.
 	FVector ServerCharMovingSpeed;	//서버 동기화 움직임 보간처리용 변수
->>>>>>> Stashed changes
+
+	bool bIsControlledPlayer = true;		//껍데기인지 플레이어인지 구분하는 변수(네트워크 종료를 위함) 껍데기는 false, 기본은 true
 
 };

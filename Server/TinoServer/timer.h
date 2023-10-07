@@ -22,7 +22,7 @@ class Timer
 public:
 	priority_queue<TimerEvent> mTimerQueue;
 	void Init(HANDLE cHCP);
-	void PushEvent(int ckey, eEVENT_TYPE ceventType, int cdelayStartTime, char* cmessage);
+	void PushEvent(int ckey, eEVENT_TYPE ceventType, int cdelayStartTime,unsigned char* cmessage);
 	void TimerMain();
 	void SetIsRun(bool cvalue) 
 	{

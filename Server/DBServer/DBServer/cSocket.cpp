@@ -1,8 +1,6 @@
 #pragma once
 #include "cSocket.h"
 
-<<<<<<< Updated upstream
-=======
 #define Test
 
 int Socket::SetKey()
@@ -11,7 +9,7 @@ int Socket::SetKey()
     while (true) {
         if (cnt == MAXLOBBY)
             return INVALIDKEY;
-        if (eSessionState::ST_FREE == mSessions[cnt].mState) {
+        if (eSessionState::ST_FREE == mSessions[cnt].GetState()) {
             return cnt;
         }
         else
@@ -21,11 +19,11 @@ int Socket::SetKey()
 
 void Socket::Disconnect(int key)
 {
-    if (mSessions[key].mState == eSessionState::ST_FREE) {
+    if (mSessions[key].GetState() == eSessionState::ST_FREE) {
         return;
     }
-    closesocket(mSessions[key].mSocket);
-    mSessions[key].mState = eSessionState::ST_FREE;
+    closesocket(mSessions[key].GetSocket());
+    mSessions[key].SetState(eSessionState::ST_FREE);
 
 #ifdef Test
     cout << "Lobby Disconnect: " << key << endl;
@@ -54,12 +52,12 @@ void Socket::WorkerFunc()
             int newKey = SetKey();
             if (newKey != INVALIDKEY) {
                 SOCKET cSocket = reinterpret_cast<SOCKET>(exOver->mWsaBuf.buf);
-                mSessions[newKey].mSocket = cSocket;
-                mSessions[newKey].mExOver.mOpType = eOpType::OP_RECV;
-                mSessions[newKey].mPrevData = 0;
-                mSessions[newKey].mState = eSessionState::ST_ACCEPTED;
-                mSessions[newKey].mID = newKey;
-                CreateIoCompletionPort((HANDLE)mSessions[newKey].mSocket, mHcp, newKey, 0);
+                mSessions[newKey].SetSocket(cSocket);
+                mSessions[newKey].GetExOver().SetmOpType(eOpType::OP_RECV);
+                mSessions[newKey].SetPrevData(0);
+                mSessions[newKey].SetState(eSessionState::ST_ACCEPTED);
+                mSessions[newKey].SetID(newKey);
+                CreateIoCompletionPort((HANDLE)mSessions[newKey].GetSocket(), mHcp, newKey, 0);
 #ifdef Test
                 cout << "Lobby Accept: " << newKey << endl;
 #endif
@@ -89,7 +87,7 @@ void Socket::WorkerFunc()
         }
         case eOpType::OP_RECV: {
             unsigned char* packet_ptr = exOver->mMessageBuf;
-            int required_data = Transferred + mSessions[key].mPrevData;
+            int required_data = Transferred + mSessions[key].GetPrevData();
             int packet_size = packet_ptr[0];
             while (required_data >= packet_size) {
                 if (required_data >= BUFSIZE) break;
@@ -100,7 +98,7 @@ void Socket::WorkerFunc()
                 packet_size = packet_ptr[0];
             }
             packet_size = 0;
-            mSessions[key].mPrevData = 0;
+            mSessions[key].SetPrevData(0);
             if (0 != required_data)
                 memcpy(exOver->mMessageBuf, packet_ptr, required_data);
             mSessions[key].DoRecv();
@@ -197,11 +195,11 @@ bool Socket::CheckLogin(int key, const char* id, const char* password, int userK
 
     int uid = get<0>(userData);
     string nickname = get<1>(userData);
-    double credit = get<2>(userData);
+    double grade = get<2>(userData);
     int point = get<3>(userData);
     int state = get<4>(userData);
 
-    SendUserDataAfterLogin(key, uid, nickname, id, credit, point, state, userKey);
+    SendUserDataAfterLogin(key, uid, nickname, id, grade, point, state, userKey);
 
     if (state == FALSE)
         Getm_pDB()->UpdateUserConnectionState(uid, true);
@@ -212,7 +210,7 @@ bool Socket::CheckLogin(int key, const char* id, const char* password, int userK
 }
 
 // SendPacket
-void Socket::SendUserDataAfterLogin(int key, int uid, string& nickname, const char* id, double credit, int point, int state, int userKey)
+void Socket::SendUserDataAfterLogin(int key, int uid, string& nickname, const char* id, double grade, int point, int state, int userKey)
 {
     DL_LOGIN_OK_PACKET p;
     p.size = sizeof(DL_LOGIN_OK_PACKET);
@@ -222,7 +220,7 @@ void Socket::SendUserDataAfterLogin(int key, int uid, string& nickname, const ch
     size_t lengthToCopy = min(nickname.size(), sizeof(p.nickname) - 1);
     memcpy(p.nickname, nickname.c_str(), lengthToCopy);
     p.nickname[lengthToCopy] = '\0';
-    p.credit = credit;
+    p.grade = grade;
     p.point = point;
     p.connState = state;
     p.userKey = userKey;
@@ -258,4 +256,3 @@ void Socket::ProcessPacket_SignUp(unsigned char* buf)
         cout << "Sign Up new user failed\n";
     }
 }
->>>>>>> Stashed changes

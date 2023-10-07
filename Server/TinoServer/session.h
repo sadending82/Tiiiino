@@ -15,8 +15,6 @@ public:
 		mSocket = 0;
 		mState = eSessionState::ST_FREE;
 		mPrevRemain = 0;
-<<<<<<< Updated upstream
-=======
 		mRoomID = -1;
 		mUID = 0;
 		ZeroMemory(mNickName, sizeof(mNickName));
@@ -24,7 +22,6 @@ public:
 		mPoint = 0;
 		mTier = 0;
 		mMatchStartTime = system_clock::now();
->>>>>>> Stashed changes
 	}
 	~Session() {}
 	void DoRecv()
@@ -32,7 +29,7 @@ public:
 		DWORD recvFlag = 0;
 		memset(&mRecvOver.mOver, 0, sizeof(mRecvOver.mOver));
 		mRecvOver.mWsaBuf.len = BUF_SIZE - mPrevRemain;
-		mRecvOver.mWsaBuf.buf = mRecvOver.mMessageBuf + mPrevRemain;
+		mRecvOver.mWsaBuf.buf = reinterpret_cast<char*>(mRecvOver.mMessageBuf + mPrevRemain);
 		WSARecv(mSocket, &mRecvOver.mWsaBuf, 1, 0, &recvFlag, &mRecvOver.mOver, 0);
 	}
 	void DoSend(void* packet)
@@ -45,10 +42,6 @@ public:
 	OverEXP mRecvOver;
 	mutex	mStateLock;
 	eSessionState mState;
-<<<<<<< Updated upstream
-	int mPlayerID;
-	SOCKET mSocket;
-=======
 	int		mSocketID;
 	int		mUID;
 	char	mID[MAX_NAME_SIZE];
@@ -58,6 +51,7 @@ public:
 	double	mTier;
 	system_clock::time_point mMatchStartTime;
 	SOCKET	mSocket;
->>>>>>> Stashed changes
 	int		mPrevRemain;
+	int		mRoomID;	//수민이 임시로 추가해놓음. 얘가 몇번 방에 있는지 확인하기 위함.
+	char		mHashs[MAX_NAME_SIZE];	//수민이 추가함. 이 hash값을 사용하여 겜서버에서 클라 검증을 할 예정.
 };

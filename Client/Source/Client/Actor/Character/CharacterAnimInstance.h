@@ -13,10 +13,17 @@ class CLIENT_API UCharacterAnimInstance : public UAnimInstance
 	GENERATED_BODY()
 
 public:
+
 	virtual void NativeBeginPlay() override;
 
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
-
+public:
+	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly, Category = "Animation")
+	bool bIsAir;
+	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly, Category = "Animation")
+	bool bIsAirForNetwork = false;
+	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly, Category = "Animation")
+	bool bIsPossess = false;
 protected:
 
 	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly, Category = "Animation")
@@ -26,8 +33,6 @@ protected:
 	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly, Category = "Animation")
 		float Direction;
 
-	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly, Category = "Animation")
-		bool bIsAir;
 
 private:
 	UPROPERTY()

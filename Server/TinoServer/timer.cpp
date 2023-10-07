@@ -6,26 +6,19 @@ void Timer::Init(HANDLE cHCP)
 
 	priority_queue<TimerEvent> empty_queue;
 	swap(mTimerQueue, empty_queue);
-
+	
 	mIsRun = TRUE;
 
-<<<<<<< Updated upstream
-=======
 	EV_UpdateMatchPacket p;
 	p.size = sizeof(EV_UpdateMatchPacket);
 	p.type = eCompType::OP_EVENT;
 	PushEvent(1, eEVENT_TYPE::EV_MATCH_UP, 10000, reinterpret_cast<unsigned char*>(&p));
 	
->>>>>>> Stashed changes
 	thread timer_thread{ (thread(&Timer::TimerMain, this)) };
 	timer_thread.join();
 }
 
-<<<<<<< Updated upstream
-void Timer::PushEvent(int ckey, eEVENT_TYPE ceventType, int cdelayStartTime, char* cmessage)
-=======
 void Timer::PushEvent(int ckey, eEVENT_TYPE ceventType, int cdelayStartTime, unsigned char* cmessage)
->>>>>>> Stashed changes
 {
 	mTimerLock.lock();
 	TimerEvent te;

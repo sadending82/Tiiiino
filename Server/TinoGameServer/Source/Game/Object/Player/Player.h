@@ -3,12 +3,19 @@
 #include "../../Network/Network.h"
 #include "../Object.h"
 
+class Room;
 
 class Player : public Object, public Network
 {
 public:
     Player();
     ~Player();
+
+    void DisConnectAndReset();
+    virtual void DisConnect() override;
+    virtual void Reset() override;
+    virtual bool RecvPacket() override;
+    virtual bool SendPacket(void* packet, int bytes) override;
 
     bool CanMakeID();
 
@@ -34,6 +41,11 @@ public:
 
     long long GetPing() const { return mPing; }
     void SetPing(const long long ping) { mPing = ping; }
+
+    float GetGrade() const { return mGrade; }
+    void SetGrade(const float grade) { mGrade = grade; }
+    eDepartment GetDepartment() const { return mDepartment; }
+    void SetDepartment(const eDepartment department) { mDepartment = department; }
 protected:
     //Be sure to use it below the function that calls the lock. ex)CanPlayerArrive()
     //반드시 락을 불러주는 함수 하위에서 쓸 것
@@ -42,7 +54,8 @@ protected:
 protected:
     std::string mID;
     std::string mNickName;
-    float mDepartment;
+    float   mGrade;   //학점
+    eDepartment    mDepartment; //학과.
     eEquipmentFlags mEquipment;
     std::mutex      mPlayerStateLock;
     ePlayerState    mPlayerState;

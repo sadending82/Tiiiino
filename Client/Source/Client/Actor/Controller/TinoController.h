@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "Blueprint/UserWidget.h"
 #include "TinoController.generated.h"
 
 /**
@@ -18,11 +19,52 @@ public:
 	ATinoController();
 
 public:
-
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void ChangeMenuWidget(TSubclassOf<UUserWidget> NewWidgetClass);
+	
 	void CreateDummy();
 
-private:
+	void SetInputUIMode();
+	void SetInputGameMode();
 
+	
+	
+
+	//APlayerController* GetController();
+	TSubclassOf<UUserWidget> GetLobbyWidgetClass() const { return LobbyWidgetClass; }
+	TSubclassOf<UUserWidget> GetStartingWidgetClass() const { return StartingWidgetClass; }
+	TSubclassOf<UUserWidget> GetCreateAccountsWidgetClass() const { return CreateAccountsWidgetClass; }
+
+public:
+	// Network ¿¬°á ²÷±è
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void DisconnectNetwork();
+
+	UPROPERTY(BlueprintReadOnly, Category = "UMG_Game")
+	class UDialogUIWidget* DialogUI;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
+	class TSubclassOf<UDialogUIWidget> DialogUIClass;
+
+protected:
+	virtual void BeginPlay() override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
+	TSubclassOf<UUserWidget> StartingWidgetClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
+	TSubclassOf<UUserWidget> LobbyWidgetClass;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
+	TSubclassOf<UUserWidget> CreateAccountsWidgetClass;
+
+
+
+	UPROPERTY()
+	UUserWidget* CurrentWidget;
+
+
+private:
+	
 	UPROPERTY(EditAnywhere, Category = "Test")
 		int32 MaxDummyCount;
 
@@ -34,5 +76,5 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "BPClass")
 		TSubclassOf<class ATinoCharacter> TinoCharacterClass;
-
+		
 };

@@ -9,6 +9,9 @@ void UCharacterAnimInstance::NativeBeginPlay()
 	Super::NativeBeginPlay();
 
 	OwnerCharacter = Cast<ACharacter>(TryGetPawnOwner());
+	auto Controller = OwnerCharacter->GetController();
+	if (Controller == nullptr) return;
+	bIsPossess = Controller->IsPlayerController();
 }
 
 void UCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -17,9 +20,20 @@ void UCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	if (OwnerCharacter)
 	{
-		Velocity = OwnerCharacter->GetVelocity();
-		Speed = OwnerCharacter->GetVelocity().Size2D();
-		Direction = UKismetAnimationLibrary::CalculateDirection(OwnerCharacter->GetVelocity(), OwnerCharacter->GetControlRotation());
-		bIsAir = OwnerCharacter->GetCharacterMovement()->IsFalling();
+		auto Controller = OwnerCharacter->GetController();
+		if (Controller == nullptr) return;
+		if ( Controller->IsPlayerController()) {
+			Velocity = OwnerCharacter->GetVelocity();
+			Speed = OwnerCharacter->GetVelocity().Size2D();
+			Direction = UKismetAnimationLibrary::CalculateDirection(OwnerCharacter->GetVelocity(), OwnerCharacter->GetControlRotation());
+			bIsAir = OwnerCharacter->GetCharacterMovement()->IsFalling();
+		}
+		else {
+			auto otherplayer = Cast<ABaseCharacter>(OwnerCharacter);
+			if (otherplayer)
+			{
+				Speed = otherplayer->ServerSyncSpeed;
+			}
+		}
 	}
 }

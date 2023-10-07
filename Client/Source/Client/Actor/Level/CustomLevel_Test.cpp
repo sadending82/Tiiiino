@@ -2,8 +2,6 @@
 
 
 #include "Actor/Level/CustomLevel_Test.h"
-<<<<<<< Updated upstream
-=======
 #include "Network/Network.h"
 #include "Actor/Character/TinoCharacter.h"
 #include "Actor/Controller/TinoController.h"
@@ -116,5 +114,4 @@ bool ACustomLevel_Test::ConnLobbyServer()
 
 
 
->>>>>>> Stashed changes
 

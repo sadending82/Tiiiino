@@ -1,12 +1,10 @@
 #include "Actor/Controller/TinoController.h"
 #include "Actor/Character/TinoCharacter.h"
-<<<<<<< Updated upstream
-//#include "Global.h"
-=======
 #include "GameFramework/PlayerController.h"
 #include "Network/Network.h"
+#include "MenuUI/DialogUIWidget.h"
+
 #include "Global.h"
->>>>>>> Stashed changes
 
 ATinoController::ATinoController()
 	:MaxDummyCount(8),
@@ -14,8 +12,6 @@ ATinoController::ATinoController()
 {
 }
 
-<<<<<<< Updated upstream
-=======
 void ATinoController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -29,6 +25,7 @@ void ATinoController::BeginPlay()
 			SetInputUIMode();
 		}
 	}
+	//ChangeMenuWidget(StartingWidgetClass);
 }
 
 void ATinoController::ChangeMenuWidget(TSubclassOf<UUserWidget> NewWidgetClass)
@@ -49,7 +46,6 @@ void ATinoController::ChangeMenuWidget(TSubclassOf<UUserWidget> NewWidgetClass)
 	}
 }
 
->>>>>>> Stashed changes
 void ATinoController::CreateDummy()
 {
 	if (TinoCharacterClass)
@@ -65,4 +61,27 @@ void ATinoController::CreateDummy()
 			DummyArray.Add(Dummy);
 		}
 	}
+}
+
+void ATinoController::SetInputUIMode()
+{
+	FInputModeUIOnly LobbyInputMode;
+	SetInputMode(LobbyInputMode);
+	SetShowMouseCursor(true);
+}
+
+void ATinoController::SetInputGameMode()
+{
+	FInputModeGameOnly GameInputMode;
+	SetInputMode(GameInputMode);
+	SetShowMouseCursor(false);
+}
+
+void ATinoController::DisconnectNetwork()
+{
+	// ¼­¹ö ¿¬°á ²÷±è
+
+	DialogUI = Cast<UDialogUIWidget>(CreateWidget(GetWorld(), DialogUIClass));
+	DialogUI->AddToViewport();
+	
 }

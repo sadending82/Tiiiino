@@ -9,6 +9,7 @@ Room::Room(int id)
 	: mRoomStageKindof(eRoomStage::ST_AVOID)
 	, mObjects()
 	, mPlayerInfo()
+	, mPlayerSettingCnt(0)
 	, mPlayerCnt(0)
 	, mPlayerMax(0)
 	, mRoomState(eRoomState::ST_FREE)
@@ -55,9 +56,26 @@ void Room::RemovePlayer(Player* player)
 	for (int i = 0; i < MAX_ROOM_USER; ++i)
 	{
 		Player* p = dynamic_cast<Player*>(mObjects[i]);
+		if (!p) break;
 		if (p->GetSocketID() == player->GetSocketID())
 		{
+			RemovePlayerInfo(p->GetUID());
 			mObjects[i] = nullptr;
+			return;
+		}
+	}
+}
+
+void Room::DisablePlayer(Player* player)
+{
+	for (int i = 0; i < MAX_ROOM_USER; ++i)
+	{
+		Player* p = dynamic_cast<Player*>(mObjects[i]);
+		if (!p) break;
+		if (p->GetSocketID() == player->GetSocketID())
+		{
+			//player socket state는 disconnect을 먼저 하면서 free로 바뀜.
+			RemovePlayerInfo(p->GetUID());
 			return;
 		}
 	}
@@ -68,15 +86,26 @@ void Room::ResetGameRoom()
 {
 	for (auto object : mObjects)
 	{
+		if (!object) continue;
+		object->Reset();
+		Player* player = dynamic_cast<Player*>(object);
+		if (player)
+		{
+			player->DisConnectAndReset();
+		}
 		object = nullptr;
 	}
 	mRoomStageKindof = eRoomStage::ST_AVOID;
 	mPlayerInfo.clear();
-	mPlayerCnt = 0;
+	mPlayerSettingCnt = 0;
 	mPlayerMax = 0;
-	mRoomState = eRoomState::ST_FREE;
 	mPlayerArrivedCnt = 0;
+	mPlayerCnt = 0;
 	mGameEndTimer = false;
+
+	mRoomStateLock.lock();
+	mRoomState = eRoomState::ST_FREE;
+	mRoomStateLock.unlock();
 }
 
 
@@ -102,6 +131,28 @@ bool Room::IsRoomReadyComplete()
 	return false;
 }
 
+bool Room::IsAllPlayerReady()
+{
+	if (mPlayerCnt != mPlayerMax) return false;
+	mRoomStateLock.lock();
+	if (mRoomState == eRoomState::ST_READY_COMPLETE)
+	{
+		mRoomState = eRoomState::ST_INGAME;
+		mRoomStateLock.unlock();
+		return true;
+	}
+	else {
+		mRoomStateLock.unlock();
+		return false;
+	}
+
+}
+
+void Room::PlayerCntIncrease()
+{
+	mPlayerCnt++;
+}
+
 bool Room::IsRoomReady()
 {
 	mRoomStateLock.lock();
@@ -114,15 +165,16 @@ bool Room::IsRoomReady()
 	return false;
 }
 
-bool Room::SettingRoomPlayer(const int uID, const std::string id, const int& playerMaxNum)
+bool Room::SettingRoomPlayer(const sPlayerInfo& playerInfo, const int& playerMaxNum)
 {
 	int playerCnt = -1;
-	setPlayerInfoWithCnt(uID, id, playerMaxNum, playerCnt);
+	setPlayerInfoWithCnt(playerInfo, playerMaxNum, playerCnt);
 	if (playerCnt == playerMaxNum)
 	{
 		mRoomStateLock.lock();
 		if (mRoomState == eRoomState::ST_READY || mRoomState == eRoomState::ST_FREE)
 		{
+			DEBUGMSGONEPARAM("방 준비 완료. 현재 대기 인원[%d]명", mPlayerInfo.size());
 			mRoomState = eRoomState::ST_READY_COMPLETE;
 			mRoomStateLock.unlock();
 			return true;
@@ -134,20 +186,52 @@ bool Room::SettingRoomPlayer(const int uID, const std::string id, const int& pla
 	return false;
 }
 
-int Room::FindPlayerInfo(const int uID, const std::string id)
+int Room::GetPlayerRoomSyncID(const int uID)
 {
 	//이 함수는 mPlayerInfo가 다 쓰여진 난 후에, 읽기만 하는 작업이므로 lock을 안걸어놓음
 	//최대 인원이 안들어왔으면 아직 쓰여질 가능성이 있기 때문에 절대 읽으면 안됨
 	//지금은 이럴 경우가 없게 설계해놨지만, 후에 혹시모르는 설계로 안되면 안되니까 assert걸음.
-	if (mPlayerInfo.size() != mPlayerMax)
-		assert(0);
+
+	//2023-10-05 추가 -> 자꾸 말도안되는 이유로 아래 assert에 걸림. 
+	// 이 함수는 room이 start가 되기 직전 최초로 mPlayerMax만큼 불리는 것 이기 떄문에
+	// lock을 걸어도 최대 8번 1게임당 8번정도 호출되는 것이기 때문에 부담이 없다고 판단되어
+	// 이상한 버그를 안 만드는게 더 최선이라 생각되어 락을 걸기로 결정.
+
+	mPlayerInfoLock.lock();
+	//어차피 아래서 iter가 못찾을것이므로 여기서 검사해주는 의미가 없음. 물론 여기서 버그가 터지긴한다만..
+	//if (mPlayerInfo.size() != mPlayerMax)
+	//{
+	//	mPlayerInfoLock.unlock();
+	//	assert(0);
+	//	return -1;
+	//}
 	auto Iter = mPlayerInfo.find(uID);
 	if (Iter != mPlayerInfo.end())
 	{
-		return std::distance(mPlayerInfo.begin(), Iter);
+		auto dist = std::distance(mPlayerInfo.begin(), Iter);
+		mPlayerInfoLock.unlock();
+		return dist;
 	}
-
+	mPlayerInfoLock.unlock();
 	return -1;
+}
+
+sPlayerInfo Room::GetPlayerInfo(const int uID)
+{
+	//윗 함수와 마찬가지로 읽는 작업만 있기에 락을 안걸었음
+	//하지만 여기서도 자꾸 널포인터가 나오면 락 걸 생각임.
+	//2023-10-06 기획을 생각해보니 재접속이 없음. 그럼 나가면 playerInfo에서 플레이어를 빼주어야함.
+	//넣고 끝인줄 알았더니 도중에 나가는것도 존재하기 때문에 무조건 락을 걸어양함.
+	mPlayerInfoLock.lock();
+	auto Iter = mPlayerInfo.find(uID);
+	if (Iter != mPlayerInfo.end())
+	{
+		sPlayerInfo tmp = (*Iter).second;
+		mPlayerInfoLock.unlock();
+		return tmp;
+	}
+	mPlayerInfoLock.unlock();
+	return sPlayerInfo();
 }
 
 void Room::PlayerArrive(Player* player)
@@ -202,45 +286,53 @@ void Room::addMapObject(MapObject* mapObject)
 }
 
 
-void Room::setPlayerInfo(const int uID, const std::string id, const int& playerMaxNum)
+void Room::RemovePlayerInfo(const int& UID)
+{
+	mPlayerInfoLock.lock();
+	mPlayerInfo.erase(UID);
+	mPlayerInfoLock.unlock();
+}
+
+void Room::setPlayerInfo(const sPlayerInfo& playerInfo, const int& playerMaxNum)
 {
 	bool flag = false;
 	mPlayerMax = playerMaxNum;
 	mPlayerInfoLock.lock();
-	if (playerMaxNum == mPlayerCnt)
+	if (playerMaxNum == mPlayerSettingCnt)
 	{
 		mPlayerInfoLock.unlock();
 		return;
 	}
-	mPlayerInfo.insert(std::make_pair(uID, id));
-	mPlayerCnt++;
+	mPlayerInfo.insert(std::make_pair(playerInfo.UID, playerInfo));
+	mPlayerSettingCnt++;
 	mPlayerInfoLock.unlock();
 
 }
 
-void Room::setPlayerInfoWithCnt(const int uID, const std::string id, const int& playerMaxNum, int& playerCnt)
+void Room::setPlayerInfoWithCnt(const sPlayerInfo& playerInfo, const int& playerMaxNum, int& playerCnt)
 {
 	bool flag = false;
 	mPlayerMax = playerMaxNum;
 	mPlayerInfoLock.lock();
-	if (playerMaxNum == mPlayerCnt)
+	if (playerMaxNum == mPlayerSettingCnt)
 	{
 		mPlayerInfoLock.unlock();
+		DEBUGMSGONEPARAM("심각한 오류!!!! [%d]", mPlayerSettingCnt);
 		return;
 	}
-	mPlayerInfo.insert(std::make_pair(uID, id));
-	mPlayerCnt++;
-	playerCnt = mPlayerCnt;
+	mPlayerInfo.insert(std::make_pair(playerInfo.UID, playerInfo));
+	mPlayerSettingCnt++;
+	playerCnt = mPlayerSettingCnt;
 	mPlayerInfoLock.unlock();
 }
 
 void Room::setGameEndTimerStartOnce()
 {
 	bool expect = 0;
-	if (std::atomic_compare_exchange_strong(reinterpret_cast<std::atomic_bool*>(&mGameEndTimer), 0, 1))
+	if (std::atomic_compare_exchange_strong(reinterpret_cast<std::atomic_bool*>(&mGameEndTimer), &expect, 1))
 	{
 		DEBUGMSGNOPARAM("한 번 실행되야함\n");
 
-		TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_COUNTDOWN_START, eEventType::TYPE_BROADCAST_ROOM, 0, NULL, mRoomID);
+		TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_COUNTDOWN_START, eEventType::TYPE_BROADCAST_ROOM, 1000, NULL, mRoomID);
 	}
 }

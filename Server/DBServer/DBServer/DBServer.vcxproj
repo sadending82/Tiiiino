@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{8de786f5-0439-4f26-8009-4aafa00d8da8}</ProjectGuid>
+    <ProjectGuid>{DD7DC940-9F0F-4687-8FB3-3953E8C581B5}</ProjectGuid>
     <RootNamespace>DBServer</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
@@ -71,14 +71,6 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-<<<<<<< Updated upstream
-    <IncludePath>..\MySQL Server 8.0\include;..\MySQL Server 8.0;$(IncludePath)</IncludePath>
-    <LibraryPath>..\MySQL Server 8.0\include;..\MySQL Server 8.0;$(LibraryPath)</LibraryPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>..\MySQL Server 8.0\include;..\MySQL Server 8.0;$(IncludePath)</IncludePath>
-    <LibraryPath>..\MySQL Server 8.0\include;..\MySQL Server 8.0;$(LibraryPath)</LibraryPath>
-=======
     <IncludePath>C:\Program Files\OpenSSL-Win64\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Program Files\OpenSSL-Win64\lib\VC;C:\Program Files\OpenSSL-Win64\lib;C:\Program Files\MySQL\MySQL Server 8.0\lib;$(LibraryPath)</LibraryPath>
     <ExecutablePath>C:\Program Files\MySQL\MySQL Server 8.0\include;C:\Program Files\MySQL\MySQL Server 8.0\lib;C:\Program Files\MySQL\MySQL Server 8.0\include\mysql;C:\Program Files\MySQL\MySQL Server 8.0;$(ExecutablePath)</ExecutablePath>
@@ -89,7 +81,6 @@
     <LibraryPath>C:\Program Files\OpenSSL-Win64\lib\VC;C:\Program Files\OpenSSL-Win64\lib;C:\Program Files\MySQL\MySQL Server 8.0\lib;$(LibraryPath)</LibraryPath>
     <ExecutablePath>C:\Program Files\MySQL\MySQL Server 8.0\include;C:\Program Files\MySQL\MySQL Server 8.0\lib;C:\Program Files\MySQL\MySQL Server 8.0\include\mysql;C:\Program Files\MySQL\MySQL Server 8.0;$(ExecutablePath)</ExecutablePath>
     <ExternalIncludePath>$(ExternalIncludePath)</ExternalIncludePath>
->>>>>>> Stashed changes
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -125,20 +116,15 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files\MySQL\MySQL Server 8.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-<<<<<<< Updated upstream
-      <AdditionalLibraryDirectories>C:\Users\HH\Desktop\boost_1_72_0\boost_1_72_0\libs;C:\Program Files\MySQL\Connector C++ 8.0\lib64\vs14;..\MySQL Server 8.0\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-=======
       <AdditionalDependencies>libcrypto64MD.lib;libcrypto64MDd.lib;libcrypto64MT.lib;libcrypto64MTd.lib;libssl64MD.lib;libssl64MDd.lib;libssl64MT.lib;libssl64MTd.lib;capi.lib;dasync.lib;ec_internal_test.lib;libapps.lib;libcrypto.lib;libcrypto_static.lib;libssl.lib;libssl_static.lib;libtestutil.lib;openssl.lib;ossltest.lib;padlock.lib;uitest.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\Program Files\MySQL\MySQL Server 8.0\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <StackReserveSize>
       </StackReserveSize>
->>>>>>> Stashed changes
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -149,41 +135,34 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files\MySQL\MySQL Server 8.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-<<<<<<< Updated upstream
-      <AdditionalLibraryDirectories>C:\Users\HH\Desktop\boost_1_72_0\boost_1_72_0\libs;C:\Program Files\MySQL\Connector C++ 8.0\lib64\vs14;..\MySQL Server 8.0\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-=======
       <AdditionalDependencies>libcrypto64MD.lib;libcrypto64MDd.lib;libcrypto64MT.lib;libcrypto64MTd.lib;libssl64MD.lib;libssl64MDd.lib;libssl64MT.lib;libssl64MTd.lib;capi.lib;dasync.lib;ec_internal_test.lib;libapps.lib;libcrypto.lib;libcrypto_static.lib;libssl.lib;libssl_static.lib;libtestutil.lib;openssl.lib;ossltest.lib;padlock.lib;uitest.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\Program Files\MySQL\MySQL Server 8.0\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <StackReserveSize>
       </StackReserveSize>
->>>>>>> Stashed changes
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="cSecurity.cpp" />
     <ClCompile Include="cSocket.cpp" />
-    <ClCompile Include="DB.cpp" />
+    <ClCompile Include="cDB.cpp" />
+    <ClCompile Include="cExOver.h" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-<<<<<<< Updated upstream
-=======
     <ClInclude Include="..\..\..\protocol.h" />
     <ClInclude Include="..\..\ServerProtocol.h" />
     <ClInclude Include="cSecurity.h" />
     <ClInclude Include="cSession.h" />
->>>>>>> Stashed changes
     <ClInclude Include="cSocket.h" />
-    <ClInclude Include="DB.h" />
+    <ClInclude Include="cDB.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="schema.txt" />

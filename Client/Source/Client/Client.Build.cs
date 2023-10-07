@@ -10,13 +10,11 @@ public class Client : ModuleRules
 
 		PublicDependencyModuleNames.AddRange(new string[] { 
 			"Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay",
-<<<<<<< Updated upstream
-			"EnhancedInput", "AnimGraphRuntime" });
-=======
 			"EnhancedInput", "AnimGraphRuntime", "UMG","GeometryCollectionEngine" });
->>>>>>> Stashed changes
 
         //상대경로로 등록가능
         PublicIncludePaths.Add(ModuleDirectory);
+
+        bUseUnity = false;
     }
 }

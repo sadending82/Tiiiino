@@ -2,8 +2,12 @@
 
 #include "Network.h"
 #include "Actor/Character/TinoCharacter.h"
+#include "Actor/Obstacles/BaseObstacle.h"
 #include "Actor/Controller/TinoController.h"
+#include "MenuUI/InGameUIWidget.h"
 #include "GameFramework/PlayerController.h"
+#include "Components/CapsuleComponent.h"
+#include "Actor/Character/CharacterAnimInstance.h"
 #include "Kismet/GameplayStatics.h"
 #include "Utilities/CLog.h"
 
@@ -27,6 +31,10 @@ Network::Network()
 	{
 		mOtherCharacter[i] = nullptr;
 	}
+	for (int i = 0; i < MAX_OBJECT; ++i)
+	{
+		mObjects[i] = nullptr;
+	}
 }
 
 Network::~Network()
@@ -43,6 +51,12 @@ std::shared_ptr<Network> Network::GetNetwork()
 	return m_Network;
 }
 
+void Network::SetObjectNetID(ABaseObstacle* object, const int netID)
+{
+	mObjects[netID] = object;
+}
+
+
 bool Network::init()
 {
 	if (!isInit)
@@ -58,10 +72,13 @@ void Network::release()
 {
 	if (isInit)
 	{
+		bGameIsStart = false;
 		mGeneratedID = 0;
 		mMyCharacter->bIsConnected = 0;
 		mMyCharacter = nullptr;
 		for (auto& p : mOtherCharacter)
+			p = nullptr;
+		for (auto& p : mObjects)
 			p = nullptr;
 		//shutdown(s_socket, SD_BOTH);
 		closesocket(s_socket);
@@ -153,6 +170,7 @@ void send_movetogame_packet(SOCKET& sock, const int uID, const char* id, const i
 	packet.roomID = roomID;
 	packet.uID = uID;
 	strcpy_s(packet.name, id);
+	strcpy_s(packet.hashs, Network::GetNetwork()->hashs);
 	//strcpy_s(packet.name, TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterName));
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
 	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
@@ -179,6 +197,16 @@ void send_move_packet(SOCKET& sock, const bool& inair, const float& x, const flo
 	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
 }
 
+void send_action_packet(SOCKET& sock, const char action)
+{
+	CS_ACTION_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_ACTION;
+	packet.action = action;
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+}
+
 void send_ping_packet(SOCKET& sock, const long long ping)
 {
 	CS_PING_PACKET packet;
@@ -194,6 +222,35 @@ void send_goal_packet(SOCKET& sock)
 	CS_GOAL_PACKET packet;
 	packet.size = sizeof(packet);
 	packet.type = CS_GOAL;
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+}
+
+void send_game_playerload_ack_packet(SOCKET& sock)
+{
+	CS_GAME_PLAYERLOAD_ACK_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_GAME_PLAYERLOAD_ACK;
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+}
+
+void send_game_breakdoor_packet(SOCKET& sock, const int objectID)
+{
+	CS_GAME_BREAKDOOR_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_GAME_BREAKDOOR;
+	packet.objectID = objectID;
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+}
+
+void send_game_breakplatform_packet(SOCKET& sock, const int objectID)
+{
+	CS_GAME_BREAKPLATFORM_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_GAME_BREAKPLATFORM;
+	packet.objectID = objectID;
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
 	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
 }
@@ -215,6 +272,13 @@ void Network::process_packet(unsigned char* p)
 		bIsConnected = true;
 		break;
 	}
+	case SC_GAME_PLAYERLOAD_OK:
+	{		
+		SC_GAME_PLAYERLOAD_OK_PACKET* packet = reinterpret_cast<SC_GAME_PLAYERLOAD_OK_PACKET*>(p);
+
+		send_game_playerload_ack_packet(s_socket);
+		break;
+	}
 	case SC_MOVE_PLAYER:
 	{
 		SC_MOVE_PLAYER_PACKET* packet = reinterpret_cast<SC_MOVE_PLAYER_PACKET*>(p);
@@ -233,6 +297,9 @@ void Network::process_packet(unsigned char* p)
 				mOtherCharacter[move_id]->SetActorRotation(FQuat(packet->rx, packet->ry, packet->rz, packet->rw));
 				mOtherCharacter[move_id]->ServerSyncSpeed = packet->speed;
 				mOtherCharacter[move_id]->ServerCharMovingSpeed = FVector(packet->sx, packet->sy, packet->sz);
+				auto anim = Cast<UCharacterAnimInstance>(mOtherCharacter[move_id]->GetMesh()->GetAnimInstance());
+				if(anim)
+					anim->bIsAirForNetwork = packet->inair;
 				//mOtherCharacter[move_id]->ServerStoreGroundSpeed = packet->speed;
 				//mOtherCharacter[move_id]->CharMovingSpeed = FVector(packet->sx, packet->sy, packet->sz);
 				//mOtherCharacter[move_id]->GroundSpeedd = packet->speed;
@@ -247,6 +314,9 @@ void Network::process_packet(unsigned char* p)
 	{
 		SC_ADD_PLAYER_PACKET* packet = reinterpret_cast<SC_ADD_PLAYER_PACKET*>(p);
 		int id = packet->id;
+		//나와 같은 아이디라면 또 만들어줄 이유 없음. 탈출.
+		if (id == mMyCharacter->GetClientID())
+			break;
 		if (nullptr != mOtherCharacter[id])
 		{
 			mOtherCharacter[id]->GetMesh()->SetVisibility(true);
@@ -267,10 +337,12 @@ void Network::process_packet(unsigned char* p)
 			{
 				mc->SpawnDefaultController();
 				mc->AutoPossessPlayer = EAutoReceiveInput::Disabled;
+				mc->bIsControlledPlayer = false;
 				mc->FinishSpawning(trans);
 				mOtherCharacter[id] = mc;
 				mOtherCharacter[id]->GetMesh()->SetVisibility(true);
 				mOtherCharacter[id]->SetClientID(packet->id);
+				mOtherCharacter[id]->GetCapsuleComponent()->SetCollisionProfileName(TEXT("Empty"));
 				//mOtherCharacter[id]->CharacterName = FString(ANSI_TO_TCHAR(packet->name));
 				//mOtherCharacter[id]->skinType = packet->skintype;
 				//mOtherCharacter[id]->EquipSkin();
@@ -278,6 +350,17 @@ void Network::process_packet(unsigned char* p)
 				//mMyCharacter->mInventory->mMainWidget->mScoreWidget->UpdateRank();
 
 			}
+		}
+		break;
+	}
+	case SC_PLAYER_REMOVE:
+	{
+		SC_PLAYER_REMOVE_PACKET* packet = reinterpret_cast<SC_PLAYER_REMOVE_PACKET*>(p);
+		int id = packet->id;
+		if (nullptr != mOtherCharacter[id])
+		{
+			mOtherCharacter[id]->Destroy();
+			mOtherCharacter[id] = nullptr;
 		}
 		break;
 	}
@@ -290,7 +373,7 @@ void Network::process_packet(unsigned char* p)
 	case SC_ACTION_ANIM: {
 		SC_ACTION_ANIM_PACKET* packet = reinterpret_cast<SC_ACTION_ANIM_PACKET*>(p);
 		int id = packet->id;
-		if (nullptr != mOtherCharacter[id])
+		if (nullptr == mOtherCharacter[id])
 		{
 		}
 		else {
@@ -304,10 +387,30 @@ void Network::process_packet(unsigned char* p)
 				mOtherCharacter[id]->Dive();
 				//다이브
 				break;
+			case 3:				
+				mOtherCharacter[id]->PlayAnimMontage(mOtherCharacter[id]->TumbleMontage);
+				//mOtherCharacter[id]->Dive();
+				break;
 			default:
 				break;
 			}
 		}
+		break;
+	}
+	case SC_GAME_WAITTING: {
+		SC_GAME_WAITTING_PACKET* packet = reinterpret_cast<SC_GAME_WAITTING_PACKET*>(p);
+		bGameIsStart = true;
+		mMyCharacter->MakeAndShowHUD();
+		//
+		// 카운트다운 UI 띄우기및 object들 처음 동기화.
+		//
+		break;
+	}
+	case SC_GAME_START: {
+		SC_GAME_START_PACKET* packet = reinterpret_cast<SC_GAME_START_PACKET*>(p);
+		//
+		// 플레이어들 움직일 수 있게 하기.
+		//
 		break;
 	}
 	case SC_GAME_END: {
@@ -315,7 +418,6 @@ void Network::process_packet(unsigned char* p)
 		closesocket(s_socket);
 		UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("Lobby"));
 		bLevelOpenTriggerEnabled = true;
-		//packet->record; // << 이걸로 성공/실패 ui 띄우기.
 
 		break;
 	}
@@ -336,7 +438,14 @@ void Network::process_packet(unsigned char* p)
 	{
 		SC_GAME_COUNTDOWN_START_PACKET* packet = reinterpret_cast<SC_GAME_COUNTDOWN_START_PACKET*>(p);
 
+		mMyCharacter->InGameWidgetInstance->TimerStart();
 		//카운트다운 UI 띄우기 (Appear CountDown UI)
+
+		break;
+	}
+	case SC_GAME_BREAKDOOR: 
+	{
+		SC_GAME_BREAKDOOR_PACKET* packet = reinterpret_cast<SC_GAME_BREAKDOOR_PACKET*>(p);
 
 		break;
 	}
@@ -374,6 +483,7 @@ void Network::l_process_packet(unsigned char* p)
 		LC_MATCH_RESPONSE_PACKET* packet = reinterpret_cast<LC_MATCH_RESPONSE_PACKET*>(p);
 		//게임서버 연결 코드 나중에 ip랑 포트넘버도 넘겨야함.
 		UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("Level1_ver1"));
+		strcpy_s(hashs, packet->hashs);
 		bLevelOpenTriggerEnabled = true;
 		break;
 	}
@@ -397,6 +507,7 @@ void CALLBACK recv_Gamecallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv
 	WSA_OVER_EX* over = reinterpret_cast<WSA_OVER_EX*>(recv_over);
 	auto Game = Network::GetNetwork();
 	if (nullptr == Game->mMyCharacter) return;
+	if (num_bytes == 0)return;
 
 	int to_process_data = num_bytes + Game->_prev_size;
 	unsigned char* packet = over->GetBuf();
@@ -421,6 +532,7 @@ void CALLBACK recv_Lobbycallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED rec
 	WSA_OVER_EX* over = reinterpret_cast<WSA_OVER_EX*>(recv_over);
 	auto Game = Network::GetNetwork();
 	if (nullptr == Game->mMyCharacter) return;
+	if (num_bytes == 0)return;
 
 	int to_process_data = num_bytes + Game->l_prev_size;
 	unsigned char* packet = over->GetBuf();
@@ -458,6 +570,7 @@ bool Network::RecvPacketGame()
 		{
 			//error ! 
 			UE_LOG(LogTemp, Error, TEXT("return false"));
+			mMyCharacter->MakeAndShowDialog();
 			return false;
 		}
 		else {
@@ -483,6 +596,7 @@ bool Network::RecvPacketLobby()
 		{
 			//error ! 
 			UE_LOG(LogTemp, Error, TEXT("return false"));
+			mMyCharacter->MakeAndShowDialog();
 			return false;
 		}
 		else {

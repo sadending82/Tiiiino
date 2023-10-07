@@ -16,8 +16,22 @@ void ULobbyUIWidget::NativeDestruct()
 
 void ULobbyUIWidget::TryGameStart()
 {
-	// GameStart Button Onclicked
+	// If Ready Check
+	// Game Start
 	send_match_packet(Network::GetNetwork()->l_socket);
+
+}
+
+void ULobbyUIWidget::TryGameReady()
+{
+	// If not ready
+	// GameStart Button Onclicked
+}
+
+void ULobbyUIWidget::TryGameReadyCancel()
+{
+	// If ready
+	// GameStart Button Onclicked
 
 }
 
@@ -25,5 +39,11 @@ void ULobbyUIWidget::TryBack()
 {
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	send_matchout_packet(Network::GetNetwork()->l_socket);
-	TinoController->ChangeMenuWidget(TinoController->GetLoginWidgetClass());
+	TinoController->ChangeMenuWidget(TinoController->GetStartingWidgetClass());
+}
+
+void ULobbyUIWidget::DisconnectNetwork()
+{
+	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	TinoController->DisconnectNetwork();
 }
