@@ -35,4 +35,7 @@ public:
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void TryBack();
 
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void DisconnectNetwork();
+
 };

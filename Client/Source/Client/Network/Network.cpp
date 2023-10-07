@@ -4,6 +4,7 @@
 #include "Actor/Character/TinoCharacter.h"
 #include "Actor/Obstacles/BaseObstacle.h"
 #include "Actor/Controller/TinoController.h"
+#include "MenuUI/InGameUIWidget.h"
 #include "GameFramework/PlayerController.h"
 #include "Components/CapsuleComponent.h"
 #include "Actor/Character/CharacterAnimInstance.h"
@@ -71,6 +72,7 @@ void Network::release()
 {
 	if (isInit)
 	{
+		bGameIsStart = false;
 		mGeneratedID = 0;
 		mMyCharacter->bIsConnected = 0;
 		mMyCharacter = nullptr;
@@ -296,7 +298,8 @@ void Network::process_packet(unsigned char* p)
 				mOtherCharacter[move_id]->ServerSyncSpeed = packet->speed;
 				mOtherCharacter[move_id]->ServerCharMovingSpeed = FVector(packet->sx, packet->sy, packet->sz);
 				auto anim = Cast<UCharacterAnimInstance>(mOtherCharacter[move_id]->GetMesh()->GetAnimInstance());
-				anim->bIsAirForNetwork = packet->inair;
+				if(anim)
+					anim->bIsAirForNetwork = packet->inair;
 				//mOtherCharacter[move_id]->ServerStoreGroundSpeed = packet->speed;
 				//mOtherCharacter[move_id]->CharMovingSpeed = FVector(packet->sx, packet->sy, packet->sz);
 				//mOtherCharacter[move_id]->GroundSpeedd = packet->speed;
@@ -334,6 +337,7 @@ void Network::process_packet(unsigned char* p)
 			{
 				mc->SpawnDefaultController();
 				mc->AutoPossessPlayer = EAutoReceiveInput::Disabled;
+				mc->bIsControlledPlayer = false;
 				mc->FinishSpawning(trans);
 				mOtherCharacter[id] = mc;
 				mOtherCharacter[id]->GetMesh()->SetVisibility(true);
@@ -395,7 +399,8 @@ void Network::process_packet(unsigned char* p)
 	}
 	case SC_GAME_WAITTING: {
 		SC_GAME_WAITTING_PACKET* packet = reinterpret_cast<SC_GAME_WAITTING_PACKET*>(p);
-
+		bGameIsStart = true;
+		mMyCharacter->MakeAndShowHUD();
 		//
 		// 카운트다운 UI 띄우기및 object들 처음 동기화.
 		//
@@ -433,6 +438,7 @@ void Network::process_packet(unsigned char* p)
 	{
 		SC_GAME_COUNTDOWN_START_PACKET* packet = reinterpret_cast<SC_GAME_COUNTDOWN_START_PACKET*>(p);
 
+		mMyCharacter->InGameWidgetInstance->TimerStart();
 		//카운트다운 UI 띄우기 (Appear CountDown UI)
 
 		break;
@@ -482,7 +488,7 @@ void Network::l_process_packet(unsigned char* p)
 	{
 		LC_MATCH_RESPONSE_PACKET* packet = reinterpret_cast<LC_MATCH_RESPONSE_PACKET*>(p);
 		//게임서버 연결 코드 나중에 ip랑 포트넘버도 넘겨야함.
-		UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("Level4"));
+		UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("Level1_ver1"));
 		strcpy_s(hashs, packet->hashs);
 		bLevelOpenTriggerEnabled = true;
 		break;
@@ -507,6 +513,7 @@ void CALLBACK recv_Gamecallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv
 	WSA_OVER_EX* over = reinterpret_cast<WSA_OVER_EX*>(recv_over);
 	auto Game = Network::GetNetwork();
 	if (nullptr == Game->mMyCharacter) return;
+	if (num_bytes == 0)return;
 
 	int to_process_data = num_bytes + Game->_prev_size;
 	unsigned char* packet = over->GetBuf();
@@ -531,6 +538,7 @@ void CALLBACK recv_Lobbycallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED rec
 	WSA_OVER_EX* over = reinterpret_cast<WSA_OVER_EX*>(recv_over);
 	auto Game = Network::GetNetwork();
 	if (nullptr == Game->mMyCharacter) return;
+	if (num_bytes == 0)return;
 
 	int to_process_data = num_bytes + Game->l_prev_size;
 	unsigned char* packet = over->GetBuf();
@@ -568,6 +576,7 @@ bool Network::RecvPacketGame()
 		{
 			//error ! 
 			UE_LOG(LogTemp, Error, TEXT("return false"));
+			mMyCharacter->MakeAndShowDialog();
 			return false;
 		}
 		else {
@@ -593,6 +602,7 @@ bool Network::RecvPacketLobby()
 		{
 			//error ! 
 			UE_LOG(LogTemp, Error, TEXT("return false"));
+			mMyCharacter->MakeAndShowDialog();
 			return false;
 		}
 		else {

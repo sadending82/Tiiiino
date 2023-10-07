@@ -2,6 +2,8 @@
 #include "Actor/Character/TinoCharacter.h"
 #include "GameFramework/PlayerController.h"
 #include "Network/Network.h"
+#include "MenuUI/DialogUIWidget.h"
+
 #include "Global.h"
 
 ATinoController::ATinoController()
@@ -23,6 +25,7 @@ void ATinoController::BeginPlay()
 			SetInputUIMode();
 		}
 	}
+	//ChangeMenuWidget(StartingWidgetClass);
 }
 
 void ATinoController::ChangeMenuWidget(TSubclassOf<UUserWidget> NewWidgetClass)
@@ -72,4 +75,13 @@ void ATinoController::SetInputGameMode()
 	FInputModeGameOnly GameInputMode;
 	SetInputMode(GameInputMode);
 	SetShowMouseCursor(false);
+}
+
+void ATinoController::DisconnectNetwork()
+{
+	// ¼­¹ö ¿¬°á ²÷±è
+
+	DialogUI = Cast<UDialogUIWidget>(CreateWidget(GetWorld(), DialogUIClass));
+	DialogUI->AddToViewport();
+	
 }

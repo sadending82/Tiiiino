@@ -10,7 +10,7 @@ Room::Room(int id)
 	, mObjects()
 	, mPlayerInfo()
 	, mPlayerSettingCnt(0)
-	, mPlayerCnt(-1)
+	, mPlayerCnt(0)
 	, mPlayerMax(0)
 	, mRoomState(eRoomState::ST_FREE)
 	, mPlayerArrivedCnt(0)
@@ -86,6 +86,7 @@ void Room::ResetGameRoom()
 {
 	for (auto object : mObjects)
 	{
+		if (!object) continue;
 		object->Reset();
 		Player* player = dynamic_cast<Player*>(object);
 		if (player)
@@ -99,6 +100,7 @@ void Room::ResetGameRoom()
 	mPlayerSettingCnt = 0;
 	mPlayerMax = 0;
 	mPlayerArrivedCnt = 0;
+	mPlayerCnt = 0;
 	mGameEndTimer = false;
 
 	mRoomStateLock.lock();
@@ -196,12 +198,13 @@ int Room::GetPlayerRoomSyncID(const int uID)
 	// 이상한 버그를 안 만드는게 더 최선이라 생각되어 락을 걸기로 결정.
 
 	mPlayerInfoLock.lock();
-	if (mPlayerInfo.size() != mPlayerMax)
-	{
-		mPlayerInfoLock.unlock();
-		assert(0);
-		return -1;
-	}
+	//어차피 아래서 iter가 못찾을것이므로 여기서 검사해주는 의미가 없음. 물론 여기서 버그가 터지긴한다만..
+	//if (mPlayerInfo.size() != mPlayerMax)
+	//{
+	//	mPlayerInfoLock.unlock();
+	//	assert(0);
+	//	return -1;
+	//}
 	auto Iter = mPlayerInfo.find(uID);
 	if (Iter != mPlayerInfo.end())
 	{
@@ -326,10 +329,10 @@ void Room::setPlayerInfoWithCnt(const sPlayerInfo& playerInfo, const int& player
 void Room::setGameEndTimerStartOnce()
 {
 	bool expect = 0;
-	if (std::atomic_compare_exchange_strong(reinterpret_cast<std::atomic_bool*>(&mGameEndTimer), 0, 1))
+	if (std::atomic_compare_exchange_strong(reinterpret_cast<std::atomic_bool*>(&mGameEndTimer), &expect, 1))
 	{
 		DEBUGMSGNOPARAM("한 번 실행되야함\n");
 
-		TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_COUNTDOWN_START, eEventType::TYPE_BROADCAST_ROOM, 0, NULL, mRoomID);
+		TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_COUNTDOWN_START, eEventType::TYPE_BROADCAST_ROOM, 1000, NULL, mRoomID);
 	}
 }

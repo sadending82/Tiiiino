@@ -111,6 +111,7 @@ public:
 	bool bIsConnectedLobby = false;		//로비서버랑 연결이 되었는지
 	int mDBUID;
 	int ClientID;
+	bool bGameIsStart = false;
 	char hashs[MAX_NAME_SIZE];	// 서버 검증 값
 	bool ConnectServerGame();
 	bool ConnectServerLobby();

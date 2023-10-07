@@ -21,6 +21,9 @@ void ARotatingPole::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	// 임시적으로 true로 설정하였음
+	// 실제로는 동기화 패킷이 도착했을 때에 변경해 주어야 함.
+	bIsStartMove = true;
 }
 
 void ARotatingPole::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
@@ -46,9 +49,12 @@ void ARotatingPole::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	// 일단은 임시적으로 RotateSpeed를 설정하여 계속해서 돌기만 하도록 설정한다.
-	// 동기화를 하는 경우는 SetActorRotation을 통해 직접 각도를 계산하여 넣어야 할 것으로 보인다.
-	// FRotator는 pitch, yaw, roll의 순서임을 까먹으면 안됨.
-	AddActorLocalRotation(FRotator(0.0f, RotateSpeed * DeltaTime, 0.0f));
+	if (bIsStartMove)
+	{
+		// 일단은 임시적으로 RotateSpeed를 설정하여 계속해서 돌기만 하도록 설정한다.
+		// 동기화를 하는 경우는 SetActorRotation을 통해 직접 각도를 계산하여 넣어야 할 것으로 보인다.
+		// FRotator는 pitch, yaw, roll의 순서임을 까먹으면 안됨.
+		AddActorLocalRotation(FRotator(0.0f, RotateSpeed * DeltaTime, 0.0f));
+	}
 }
 

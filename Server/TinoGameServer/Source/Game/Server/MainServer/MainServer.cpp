@@ -228,6 +228,17 @@ void MainServer::send_room_reset_packet(const int roomID)
 	mLobbyServer->SendPacket(&packet, sizeof(packet));
 }
 
+void MainServer::send_player_result_packet(const int uID, const int rank)
+{
+	GL_PLAYER_RESULT_PACKET packet{};
+	packet.size = sizeof(packet);
+	packet.type = GL_PLAYER_RESULT;
+	packet.uID = uID;
+	packet.rank = rank;
+
+	mLobbyServer->SendPacket(&packet, sizeof(packet));
+}
+
 
 void MainServer::send_move_packet(const int player_id,const int mover_id, const bool inair,const float value, const float sx, const float sy, const float sz)
 {
@@ -516,10 +527,12 @@ bool MainServer::setPlayerInRoom(Player* player,const char verification[MAX_NAME
 				}
 				else {
 					DEBUGMSGONEPARAM("플레이어정보가 방 매칭정보에 존재하지않음. [%d]번째플레이어\n", player->GetSocketID());
+					return false;
 				}
 			}
 			else {
 				DEBUGMSGONEPARAM("플레이어가 방 매칭정보에 존재하지않음. [%d]번째플레이어\n", player->GetSocketID());
+				return false;
 			}
 		}
 	}
@@ -576,7 +589,6 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 		// 이유: 해킹범이 uid를 변조했을 때, 이 암호화 된 무언가의 랜덤값 또한 맞춰야함. 그런데 진짜 로비서버에서 랜덤으로 생성해서 주면 어떻게 맞출건데? 
 
 		//
-		cout << packet->hashs << endl;
 		if (false == setPlayerInRoom(player,packet->hashs))
 		{
 			/*
@@ -632,7 +644,7 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 			break;
 		}
 		Room* pRoom = mRooms[player->GetRoomID()];
-
+		
 
 		player->SetMoveTime(packet->move_time);
 		player->SetPosition(Vector3f(packet->x, packet->y, packet->z));
@@ -666,6 +678,8 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 			auto sPacket = make_player_arrive_packet(player->GetRoomSyncID());
 			SendRoomSomeoneExcept(player->GetRoomID(), player->GetSocketID(), (void*)&sPacket, sizeof(sPacket));
 		}
+		send_player_result_packet(player->GetUID(), player->GetRank());
+
 		break;
 	}
 	case CS_PING: {
