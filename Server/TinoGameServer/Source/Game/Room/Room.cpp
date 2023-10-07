@@ -86,6 +86,7 @@ void Room::ResetGameRoom()
 {
 	for (auto object : mObjects)
 	{
+		if (!object) continue;
 		object->Reset();
 		Player* player = dynamic_cast<Player*>(object);
 		if (player)
@@ -331,6 +332,6 @@ void Room::setGameEndTimerStartOnce()
 	{
 		DEBUGMSGNOPARAM("한 번 실행되야함\n");
 
-		TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_COUNTDOWN_START, eEventType::TYPE_BROADCAST_ROOM, 0, NULL, mRoomID);
+		TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_COUNTDOWN_START, eEventType::TYPE_BROADCAST_ROOM, 1000, NULL, mRoomID);
 	}
 }

@@ -159,6 +159,7 @@ void WorkerThread::doThread()
 		{
 			eEventType eventType = TimerThread::DeserializeEventType(wsa_ex->GetBuf());
 			int roomID = TimerThread::DeserializeReceiver(wsa_ex->GetBuf());
+			std::cout << "카운트다운 시작\n";
 			matchTimerType(eventType);
 			{
 				auto sPacket = mMainServer->make_game_countdown_start_packet();
