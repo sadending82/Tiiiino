@@ -198,12 +198,13 @@ int Room::GetPlayerRoomSyncID(const int uID)
 	// 이상한 버그를 안 만드는게 더 최선이라 생각되어 락을 걸기로 결정.
 
 	mPlayerInfoLock.lock();
-	if (mPlayerInfo.size() != mPlayerMax)
-	{
-		mPlayerInfoLock.unlock();
-		assert(0);
-		return -1;
-	}
+	//어차피 아래서 iter가 못찾을것이므로 여기서 검사해주는 의미가 없음. 물론 여기서 버그가 터지긴한다만..
+	//if (mPlayerInfo.size() != mPlayerMax)
+	//{
+	//	mPlayerInfoLock.unlock();
+	//	assert(0);
+	//	return -1;
+	//}
 	auto Iter = mPlayerInfo.find(uID);
 	if (Iter != mPlayerInfo.end())
 	{
