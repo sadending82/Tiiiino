@@ -147,6 +147,8 @@ private:
 		float GrabCoolTime;
 	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "그랩시 감속량"), Category = "Animation | Grab")
 		float GrabbedSpeedRate;
+	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "그랩시 회전 감속량"), Category = "Animation | Grab")
+		float GrabbedRotationSpeedRate;
 
 	UPROPERTY(EditDefaultsOnly,meta = (ToolTip="탐지 거리"), Category = "Animation | Grab")
 		float DetectDist;
@@ -159,6 +161,9 @@ private:
 
 	UPROPERTY(BlueprintReadWrite,EditAnywhere,meta = (AllowPrivateAccess = true, ToolTip="비네트 강도"), Category = "Effect")
 		float CustomVignetteIntensity;
+
+	float OriginalSpeed;
+	FRotator OriginalRotationSpeed;
 
 	UPROPERTY(VisibleAnywhere, Category = "Enums")
 		EMovementState MovementState;

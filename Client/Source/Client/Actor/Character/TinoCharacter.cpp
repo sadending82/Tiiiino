@@ -30,7 +30,8 @@ ATinoCharacter::ATinoCharacter()
 
 	bUseControllerRotationYaw = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-
+	OriginalSpeed = GetCharacterMovement()->MaxWalkSpeed;
+	OriginalRotationSpeed = GetCharacterMovement()->RotationRate;
 	SpringArm->bDoCollisionTest = false;
 	SpringArm->bUsePawnControlRotation = true;
 }
@@ -132,10 +133,11 @@ void ATinoCharacter::Tick(float DeltaTime)
 		}
 
 		PlayTumbleMontage(DeltaTime);
+		
 		if (MovementState == EMovementState::EMS_Grabbing && Target != nullptr)
 		{
-			SetActorLocation(Target->GetActorLocation() - Target->GetActorForwardVector() * TargetInterval);
-			SetActorRotation(Target->GetActorRotation());
+			SetActorLocation(Target->GetActorLocation() - GetActorForwardVector() * TargetInterval);
+			//SetActorRotation(Target->GetActorRotation());
 		}
 
 		// 10/04 가만히 있을 때 충돌하지 안흔 부분을 해결하기 위한 코드 추가
@@ -374,8 +376,8 @@ void ATinoCharacter::OnGrab()
 
 	SendAnimPacket(4);
 	PlayAnimMontage(GrabMontage);
-	if (GetController() && GetController()->IsPlayerController())
-		CLog::Print("GrabOn");
+	//if (GetController() && GetController()->IsPlayerController())
+		//CLog::Print("GrabOn");
 	
 
 }
@@ -405,8 +407,8 @@ void ATinoCharacter::OffGrab()
 		, GrabCoolTime, false);
 	}
 
-	if (GetController() && GetController()->IsPlayerController())
-		CLog::Print("GrabOff");
+	//if (GetController() && GetController()->IsPlayerController())
+		//CLog::Print("GrabOff");
 
 
 }
@@ -418,6 +420,7 @@ void ATinoCharacter::SetNormalToGrabbed()
 		auto Other = Cast<ATinoCharacter>(Target);
 		Other->SetMovementState(EMovementState::EMS_IsGrabbed);
 		Other->GetCharacterMovement()->MaxWalkSpeed *= (GrabbedSpeedRate * 0.01);
+		Other->GetCharacterMovement()->RotationRate *= (GrabbedRotationSpeedRate * 0.01);
 	}
 	else
 		CLog::Log("Target is Nullptr");
@@ -427,11 +430,12 @@ void ATinoCharacter::SetGrabbedToNormal()
 {
 	if (!!Target)
 	{
-		if(GetController() && GetController()->IsPlayerController())
-			CLog::Print("Target Remove");
+		//if(GetController() && GetController()->IsPlayerController())
+			//CLog::Print("Target Remove");
 		auto Other = Cast<ATinoCharacter>(Target);
 		Other->SetMovementState(EMovementState::EMS_Normal);
-		Other->GetCharacterMovement()->MaxWalkSpeed = 400.f;
+		Other->GetCharacterMovement()->MaxWalkSpeed = OriginalSpeed;
+		Other->GetCharacterMovement()->RotationRate = OriginalRotationSpeed;
 		Target = nullptr;
 	}
 	else
@@ -441,8 +445,8 @@ void ATinoCharacter::SetGrabbedToNormal()
 void ATinoCharacter::GrabBegin()
 {
 	//그랩 쿨타임 시작
-	if (GetController() && GetController()->IsPlayerController())
-		CLog::Print("Grab Timer ON");
+	//if (GetController() && GetController()->IsPlayerController())
+		//CLog::Print("Grab Timer ON");
 	GetWorldTimerManager().SetTimer(GrabTimer, this, &ATinoCharacter::OffGrab, MaxGrabTime, false);
 }
 
@@ -473,30 +477,32 @@ void ATinoCharacter::DetectTarget()
 	if (result && bIsGrabCoolTime == false)
 	{
 		Target = HitResult.GetActor();
-		float ScalarValue = GetActorForwardVector().Dot(Target->GetActorForwardVector());
-		//앞뒤 판정
-		if (ScalarValue > 0)
+		//float ScalarValue = GetActorForwardVector().Dot(Target->GetActorForwardVector());
+		
+		FVector DirVec = Target->GetActorLocation() - GetActorLocation();
+		double angle = FMath::Acos(static_cast<double>(GetActorForwardVector().Dot(DirVec.GetUnsafeNormal())));
+		angle = FMath::RadiansToDegrees(angle);
+		if (angle < DetectAngle / 2.f)
 		{
-			FVector DirVec = Target->GetActorLocation() - GetActorLocation();
-			double angle = FMath::Acos(static_cast<double>(GetActorForwardVector().Dot(DirVec.GetUnsafeNormal())));
-			angle = FMath::RadiansToDegrees(angle);
-			if (angle < DetectAngle / 2.f)
-			{
-				SetMovementState(EMovementState::EMS_Grabbing);
-				GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-				SetNormalToGrabbed();
-			}
-			else
-			{
-				CLog::Log("Target is bigger than DetectAngle, Go to Location In DectectAngle");
-				Target = nullptr;
-			}
+			SetMovementState(EMovementState::EMS_Grabbing);
+			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			SetNormalToGrabbed();
+		}
+		else
+		{
+			CLog::Log("Target is bigger than DetectAngle, Go to Location In DectectAngle");
+			Target = nullptr;
+		}
+		//앞뒤 판정
+		/*if (ScalarValue > 0)
+		{
+			
 		}
 		else
 		{
 			CLog::Log("Target is front, Go to the Target's Back");
 			Target = nullptr;
-		}
+		}*/
 	}
 }
 
