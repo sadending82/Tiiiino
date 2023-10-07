@@ -23,7 +23,7 @@ public:
 
 	void SendLoginOK(int key, int uid, string& nickname, const char* id, double grade
 		, int point, int state, char department, int userid);
-	void SendLoginFail(int key, const char* id, int userKey);
+	void SendLoginFail(int key, int userKey);
 	void SendSignUpOK(int key, int userKey);
 	void SendSignUpFail(int key, int userKey);
 	void SendUpdateNicknameOK(int key, int userKey);
@@ -35,6 +35,8 @@ public:
 
 	void ProcessPacket_ChangeDepartment(int key, unsigned char* buf);
 
+	int SetAdminUID();
+	void Admin_Login(int key, unsigned char* buf);
 
 private:
 	SOCKADDR_IN mServerAddr;
@@ -46,5 +48,5 @@ private:
 
 	array<Session, MAXLOBBY + 1> mSessions;
 
-
+	bool bAdminLogin[11];
 };

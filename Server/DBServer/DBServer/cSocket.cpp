@@ -245,7 +245,7 @@ void Socket::SendLoginOK(int key, int uid, string& nickname, const char* id
     mSessions[key].DoSend((void*)(&p));
 }
 
-void Socket::SendLoginFail(int key, const char* id, int userKey) {
+void Socket::SendLoginFail(int key, int userKey) {
     DL_LOGIN_FAIL_PACKET p;
     p.size = sizeof(DL_LOGIN_FAIL_PACKET);
     p.type = SPacketType::DL_LOGIN_FAIL;
@@ -289,9 +289,14 @@ void Socket::ProcessPacket_Login(int key, unsigned char* buf)
 {
     LD_LOGIN_PACKET* p = reinterpret_cast<LD_LOGIN_PACKET*>(buf);
 
+    if (strcmp(p->id, ADMIN_ID) == 0) {
+        Admin_Login(key, buf);
+        return;
+    }
+
     bool bCheckLogin = CheckLogin(key, p->id, p->password, p->userKey);
     if (bCheckLogin == false) {
-        SendLoginFail(key, p->id, p->userKey);
+        SendLoginFail(key, p->userKey);
     }
 }
 
@@ -327,5 +332,39 @@ void Socket::ProcessPacket_UpdateGrade(int key, unsigned char* buf)
 
 void Socket::ProcessPacket_ChangeDepartment(int key, unsigned char* buf)
 {
+
+}
+
+
+// ADMIN
+int Socket::SetAdminUID()
+{
+    int cnt = ADMIN_START_UID;
+    while (true) {
+        if (cnt == ADMIN_LAST_UID)
+            return INVALIDKEY;
+        if (bAdminLogin[cnt] == false) {
+            return cnt;
+        }
+        else
+            ++cnt;
+    }
+}
+
+void Socket::Admin_Login(int key, unsigned char* buf)
+{
+    LD_LOGIN_PACKET* p = reinterpret_cast<LD_LOGIN_PACKET*>(buf);
+
+    int uid = atoi(p->password);
+
+    if (uid < 1 && 10 < uid) {
+        SendLoginFail(key, p->userKey);
+        return;
+    }
+
+    string id = string(ADMIN_ID) + string(p->password);
+
+    SendLoginOK(key, uid, id, id.c_str()
+        , 3.0, 100000, 1, 0, p->userKey);
 
 }
