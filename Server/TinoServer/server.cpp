@@ -156,6 +156,7 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		packet.gameServerPortNum = GAMESERVERPORT;
 
 		int uidCount = 0;
+		double userGradeSum = 0;
 		mRooms[p->roomID].mStateLock.lock();
 		mRooms[p->roomID].mState = eRoomState::RS_INGAME;
 		mRooms[p->roomID].mStateLock.unlock();
@@ -168,17 +169,111 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 				strcpy_s(packet.hashs, mClients[player].mHashs);
 				mClients[player].DoSend(&packet);
 				mClients[player].mState = eSessionState::ST_INGAME;
+				userGradeSum += mClients[player].mGrade;
 
-				mRooms[mClients[player].mRoomID].UID[uidCount] = mClients[player].mUID;
+				mRooms[mClients[player].mRoomID].mUID[uidCount] = mClients[player].mUID;
+				mRooms[mClients[player].mRoomID].mSockID[uidCount] = player;
+				mRooms[mClients[player].mRoomID].mGrade[uidCount] = mClients[player].mGrade;
 				uidCount++;
 				delPlayerVector.push_back(player);
 			}
 		}
+		mRooms[p->roomID].mUserNum = uidCount;
+		mRooms[p->roomID].mGradeAvg = userGradeSum / uidCount;
 		for (auto player : delPlayerVector)
 		{
 			mReadytoGame.remove(player);
 		}
 
+		break;
+	}
+	case GL_ROOM_RESET:
+	{
+		break;
+	}
+	case GL_PLAYER_RESULT:
+	{
+		GL_PLAYER_RESULT_PACKET* p = reinterpret_cast<GL_PLAYER_RESULT_PACKET*>(spacket);
+		int cnt = 0;
+		for (int i = 0; i < mRooms[p->RoomID].mUserNum; i++)
+		{
+			cnt++;
+			if (mRooms[p->RoomID].mUID[i] == p->uID)
+			{
+				if (mClients[mRooms[p->RoomID].mSockID[i]].mUID == mRooms[p->RoomID].mUID[i]) // player connected lobby server
+				{
+					double GradePerRank = GRADE_FOR_SCORE[mRooms[p->RoomID].mUserNum - MIN_USER][p->rank - 1]; // 등수 가중치
+					if (p->retire = true)
+					{
+						GradePerRank = -5;
+					}
+					double GAP = mRooms[p->RoomID].mGradeAvg - mClients[mRooms[p->RoomID].mSockID[i]].mGrade;
+					if (GAP < -4)
+					{
+						GAP = -4;
+					}
+					double temp = mRooms[p->RoomID].mUserNum * GRADE_CON_NUM * (GradePerRank + GAP);
+					if (temp < 0)
+					{
+						temp *= mClients[mRooms[p->RoomID].mSockID[i]].mGrade / 5;
+					}
+					mClients[mRooms[p->RoomID].mSockID[i]].mStateLock.lock();
+					mClients[mRooms[p->RoomID].mSockID[i]].mGrade += temp;
+					mClients[mRooms[p->RoomID].mSockID[i]].mState = eSessionState::ST_LOBBY;
+					mClients[mRooms[p->RoomID].mSockID[i]].mStateLock.unlock();
+					// to db server update
+					LD_UPDATE_GRADE_PACKET packet;
+					packet.grade = mClients[mRooms[p->RoomID].mSockID[i]].mGrade;
+					packet.uid = mClients[mRooms[p->RoomID].mSockID[i]].mUID;
+					packet.size = sizeof(LD_UPDATE_GRADE_PACKET);
+					packet.type = LD_UPDATE_GRADE;
+					mServers[0].DoSend(&packet);
+					mRooms[p->RoomID].mUpdateCount++;
+					break;
+				}
+				else // player disconnected lobby server
+				{
+
+					double GradePerRank = GRADE_FOR_SCORE[mRooms[p->RoomID].mUserNum - MIN_USER][p->rank - 1]; // 등수 가중치
+					if (p->retire = true)
+					{
+						GradePerRank = -5;
+					}
+					double GAP = mRooms[p->RoomID].mGradeAvg - mRooms[p->RoomID].mGrade[i];
+					if (GAP < -4)
+					{
+						GAP = -4;
+					}
+					double temp = mRooms[p->RoomID].mUserNum * GRADE_CON_NUM * (GradePerRank + GAP);
+					if (temp < 0)
+					{
+						temp *= mRooms[p->RoomID].mGrade[i] / 5;
+					}
+					// to db server update
+					LD_UPDATE_GRADE_PACKET packet;
+					packet.grade = mRooms[p->RoomID].mGrade[i];
+					packet.uid = mRooms[p->RoomID].mUID[i];
+					packet.size = sizeof(LD_UPDATE_GRADE_PACKET);
+					packet.type = LD_UPDATE_GRADE;
+					mServers[0].DoSend(&packet);
+					mRooms[p->RoomID].mUpdateCount++;
+					break;
+				}
+			}
+		}
+
+		if (mRooms[p->RoomID].mUpdateCount == mRooms[p->RoomID].mUserNum)	// need room reset
+		{
+			mRooms[p->RoomID].mStateLock.lock();
+			mRooms[p->RoomID].mState = eRoomState::RS_FREE;
+			ZeroMemory(mRooms[p->RoomID].mUID, sizeof(mRooms[p->RoomID].mUID));
+			ZeroMemory(mRooms[p->RoomID].mSockID, sizeof(mRooms[p->RoomID].mSockID));
+			ZeroMemory(mRooms[p->RoomID].mGrade, sizeof(mRooms[p->RoomID].mGrade));
+			mRooms[p->RoomID].mUserNum = 0;
+			mRooms[p->RoomID].mGradeAvg = 0;
+			mRooms[p->RoomID].mUpdateCount = 0;
+			mRooms[p->RoomID].mStateLock.unlock();
+		}
 		break;
 	}
 	case DL_LOGIN_OK:

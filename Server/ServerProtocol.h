@@ -64,6 +64,8 @@ struct GL_ROOM_RESET_PACKET : public SPACKET {
 struct GL_PLAYER_RESULT_PACKET : public SPACKET {
 	int		uID;
 	int		rank;
+	int		RoomID;
+	bool	retire;
 };
 //---
 struct LG_LOGIN_OK_PACKET : public SPACKET {
