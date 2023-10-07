@@ -103,7 +103,7 @@ void ATinoCharacter::Tick(float DeltaTime)
 			{
 				if (!GetController()->IsPlayerController())
 				{
-					//������ ���� �� ���� ���� ��� ĳ���� �����Ϸ� �õ�. 
+					//서버랑 연결 돼 있을 때만 상대 캐릭터 보간하려
 					//Update GroundSpeedd (22-04-05)
 					//GroundSpeedd = ServerStoreGroundSpeed;
 					//Update Interpolation (23-09-27)
@@ -138,7 +138,7 @@ void ATinoCharacter::Tick(float DeltaTime)
 			SetActorRotation(Target->GetActorRotation());
 		}
 
-		// 10/04 ������ ���� �� �浹���� �ʴ� �κ��� �ذ��ϱ� ���� �ڵ� �߰�
+		// 10/04 가만히 있을 때 충돌하지 안흔 부분을 해결하기 위한 코드 추가
 		FHitResult OutHit;
 		GetCharacterMovement()->SafeMoveUpdatedComponent(FVector(0.f, 0.f, 0.01f), GetActorRotation(), true, OutHit);
 		GetCharacterMovement()->SafeMoveUpdatedComponent(FVector(0.f, 0.f, -0.01f), GetActorRotation(), true, OutHit);
@@ -229,7 +229,7 @@ void ATinoCharacter::DiveEnd()
 
 void ATinoCharacter::OnAccelEffect()
 {
-	//���Ʈ ���� ������ ���� ����Ʈ�� Ŵ
+	//비네트 값을 조절해 가속 이펙트를 킴
 	Camera->PostProcessSettings.bOverride_VignetteIntensity = true;
 	Camera->PostProcessSettings.VignetteIntensity = CustomVignetteIntensity;
 }
@@ -251,10 +251,10 @@ void ATinoCharacter::TimerStart()
 void ATinoCharacter::TimerEnd()
 {
 
-	// ��ȿ�� Ȯ��
+	// 유효성 확인
 	if (InGameWidgetInstance)
 	{
-		// UInGameUIWidget�� TimerRun �Լ� ȣ��
+		// UInGameUIWidget의 TimerRun 함수 호출
 		InGameWidgetInstance->TimerRun();
 	}
 	if (InGameWidgetInstance->GetRestGameTime() < 0)
@@ -390,7 +390,6 @@ void ATinoCharacter::OffGrab()
 	if (GetController() && GetController()->IsPlayerController())
 		SetMovementState(EMovementState::EMS_Normal);
 
-	CLog::Print(GetName());
 	SetGrabbedToNormal();
 
 
@@ -398,7 +397,7 @@ void ATinoCharacter::OffGrab()
 	bIsGrabCoolTime = true;
 
 	if (GetWorldTimerManager().IsTimerActive(GrabCoolTimer) == false)
-	{	//�׷� ��Ÿ�� ����
+	{	//그랩 쿨타임 시작
 		GetWorldTimerManager().SetTimer(GrabCoolTimer, [this]()
 			{
 				bIsGrabCoolTime = false;
@@ -441,7 +440,7 @@ void ATinoCharacter::SetGrabbedToNormal()
 
 void ATinoCharacter::GrabBegin()
 {
-	//������� �� 3�������� �ڵ�����
+	//그랩 쿨타임 시작
 	if (GetController() && GetController()->IsPlayerController())
 		CLog::Print("Grab Timer ON");
 	GetWorldTimerManager().SetTimer(GrabTimer, this, &ATinoCharacter::OffGrab, MaxGrabTime, false);
@@ -458,7 +457,7 @@ void ATinoCharacter::DetectTarget()
 	ObjectTypes.Add(Pawn);
 
 	TArray<AActor*> IgnoreActors;
-	//�ڱ��ڽ��� �浹�˻� X
+	//자기자신은 충돌검사 X
 	IgnoreActors.Add(this);
 
 	FHitResult HitResult;
@@ -475,7 +474,7 @@ void ATinoCharacter::DetectTarget()
 	{
 		Target = HitResult.GetActor();
 		float ScalarValue = GetActorForwardVector().Dot(Target->GetActorForwardVector());
-		//�յ� ����
+		//앞뒤 판정
 		if (ScalarValue > 0)
 		{
 			FVector DirVec = Target->GetActorLocation() - GetActorLocation();

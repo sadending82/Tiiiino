@@ -392,10 +392,13 @@ void Network::process_packet(unsigned char* p)
 				break;
 			case 4:
 				mOtherCharacter[id]->OnGrab();
+				break;
 				//잡기
 			case 5:
 				mOtherCharacter[id]->OffGrab();
 				//잡기취소
+				break;
+
 			default:
 				break;
 			}
