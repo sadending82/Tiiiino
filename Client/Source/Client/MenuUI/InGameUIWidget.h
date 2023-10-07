@@ -50,6 +50,9 @@ public:
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void DisconnectNetwork();
 
+	UPROPERTY(EditAnywhere, Category = "UMG_Game")
+	bool bLevelClearCheck = false;
+
 private:
 	UPROPERTY(EditAnywhere, Category = "UMG_Game")
 	int RestGameTime = 20;
@@ -57,8 +60,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = "UMG_Game")
 	UImage* MyImage;
 
-	UPROPERTY(EditAnywhere, Category = "UMG_Game")
-	bool bLevelClearCheck = false;
+
 	
 	
 };
