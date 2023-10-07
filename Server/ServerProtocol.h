@@ -28,6 +28,7 @@ enum SPacketType {
 
 	// LobbyServer To DBServer
 	LD_LOGIN,
+	LD_LOGOUT,
 	LD_SIGNUP,
 	LD_UPDATE_NICKNAME,
 	LD_UPDATE_GRADE,
@@ -94,6 +95,10 @@ struct LD_LOGIN_PACKET :public SPACKET {
 	char	id[MAX_NAME_SIZE];
 	char	password[MAX_NAME_SIZE];
 	int		userKey;
+};
+
+struct LD_LOGOUT_PACKET :public SPACKET {
+	int		uid;
 };
 
 struct LD_SIGNUP_PACKET :public SPACKET {

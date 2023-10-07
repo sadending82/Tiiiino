@@ -29,6 +29,7 @@ public:
 	void SendUpdateNicknameOK(int key, int userKey);
 
 	void ProcessPacket_Login(int key, unsigned char* buf);
+	void ProcessPacket_Logout(unsigned char* buf);
 	void ProcessPacket_SignUp(int key, unsigned char* buf);
 	void ProcessPacket_UpdateNickname(int key, unsigned char* buf); 
 	void ProcessPacket_UpdateGrade(int key, unsigned char* buf);

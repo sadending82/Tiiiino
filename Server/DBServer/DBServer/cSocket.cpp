@@ -166,6 +166,10 @@ void Socket::processPacket(int key, unsigned char* buf)
         ProcessPacket_Login(key, buf);
         break;
     }
+    case LD_LOGOUT: {
+        ProcessPacket_Logout(buf);
+        break;
+    }
     case LD_SIGNUP: {
         ProcessPacket_SignUp(key, buf);
         break;
@@ -294,17 +298,23 @@ void Socket::ProcessPacket_Login(int key, unsigned char* buf)
         return;
     }
 
-    bool bCheckLogin = CheckLogin(key, p->id, p->password, p->userKey);
-    if (bCheckLogin == false) {
+    bool bResult = CheckLogin(key, p->id, p->password, p->userKey);
+    if (bResult == false) {
         SendLoginFail(key, p->userKey);
     }
+}
+
+void Socket::ProcessPacket_Logout(unsigned char* buf)
+{
+    LD_LOGOUT_PACKET* p = reinterpret_cast<LD_LOGOUT_PACKET*>(buf);
+    Getm_pDB()->UpdateUserConnectionState(p->uid, 0);
 }
 
 void Socket::ProcessPacket_SignUp(int key, unsigned char* buf)
 {
     LD_SIGNUP_PACKET* p = reinterpret_cast<LD_SIGNUP_PACKET*>(buf);
-    bool bJoin = Getm_pDB()->SignUpNewPlayer(p->id, p->password);
-    if (bJoin != true) {
+    bool bResult = Getm_pDB()->SignUpNewPlayer(p->id, p->password);
+    if (bResult != true) {
         cout << "Sign Up new user failed\n";
         SendSignUpFail(key, p->userKey);
         return;
@@ -315,8 +325,8 @@ void Socket::ProcessPacket_SignUp(int key, unsigned char* buf)
 void Socket::ProcessPacket_UpdateNickname(int key, unsigned char* buf)
 {
     LD_UPDATE_NICKNAME_PACKET* p = reinterpret_cast<LD_UPDATE_NICKNAME_PACKET*>(buf);
-    bool bUpdate = Getm_pDB()->UpdateUserNickname(p->uid, p->nickname);
-    if (bUpdate == true) {
+    bool bResult = Getm_pDB()->UpdateUserNickname(p->uid, p->nickname);
+    if (bResult == true) {
         SendUpdateNicknameOK(key, p->userKey);
     }
 }
@@ -324,15 +334,19 @@ void Socket::ProcessPacket_UpdateNickname(int key, unsigned char* buf)
 void Socket::ProcessPacket_UpdateGrade(int key, unsigned char* buf)
 {
     LD_UPDATE_GRADE_PACKET* p = reinterpret_cast<LD_UPDATE_GRADE_PACKET*>(buf);
-    bool bUpdate = Getm_pDB()->UpdateUserGrade(p->uid, p->grade);
-    if (bUpdate != true) {
+    bool bResult = Getm_pDB()->UpdateUserGrade(p->uid, p->grade);
+    if (bResult != true) {
         cout << "Update User Grade failed\n";
     }
 }
 
 void Socket::ProcessPacket_ChangeDepartment(int key, unsigned char* buf)
 {
+    LD_CHANGE_DEPARTMENT_PACKET* p = reinterpret_cast<LD_CHANGE_DEPARTMENT_PACKET*>(buf);
+    bool bResult = Getm_pDB()->UpdateUserDepartment(p->uid, p->department);
+    if (bResult != true) {
 
+    }
 }
 
 
@@ -366,5 +380,4 @@ void Socket::Admin_Login(int key, unsigned char* buf)
 
     SendLoginOK(key, uid, id, id.c_str()
         , 3.0, 100000, 1, 0, p->userKey);
-
 }
