@@ -26,8 +26,6 @@ public:
 
 	void SetInputUIMode();
 	void SetInputGameMode();
-
-	
 	
 
 	//APlayerController* GetController();
