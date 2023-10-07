@@ -36,6 +36,8 @@ void UCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 			}
 		}
-		MovementState = Cast<ATinoCharacter>(OwnerCharacter)->GetMovementState();
+		auto Owner = Cast<ATinoCharacter>(OwnerCharacter);
+		if(Owner != nullptr)
+			MovementState = Owner->GetMovementState();
 	}
 }
