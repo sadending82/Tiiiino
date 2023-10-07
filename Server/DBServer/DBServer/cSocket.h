@@ -8,6 +8,8 @@ class Socket {
 public:
 
 	int SetKey();
+	void SetIsConnectDB(bool b) { bIsConnectDB = b; }
+	bool GetIsConnectDB() { return bIsConnectDB; }
 	void Disconnect(int key);
 	void WorkerFunc();
 	void ServerReady(DB* pDB);
@@ -40,6 +42,7 @@ private:
 	SOCKET mListenSocket;
 
 	DB* m_pDB = NULL;
+	bool bIsConnectDB = false;
 
 	array<Session, MAXLOBBY + 1> mSessions;
 
