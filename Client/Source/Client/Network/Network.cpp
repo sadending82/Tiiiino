@@ -276,6 +276,7 @@ void Network::process_packet(unsigned char* p)
 	{		
 		SC_GAME_PLAYERLOAD_OK_PACKET* packet = reinterpret_cast<SC_GAME_PLAYERLOAD_OK_PACKET*>(p);
 
+		UE_LOG(LogTemp, Error, TEXT("PLAYERLOAD PACKET COME IN"));
 		send_game_playerload_ack_packet(s_socket);
 		break;
 	}
@@ -490,6 +491,7 @@ void Network::l_process_packet(unsigned char* p)
 	{
 		LC_MATCH_RESPONSE_PACKET* packet = reinterpret_cast<LC_MATCH_RESPONSE_PACKET*>(p);
 		//게임서버 연결 코드 나중에 ip랑 포트넘버도 넘겨야함.
+		UE_LOG(LogTemp, Error, TEXT("Game Match Responed"));
 		UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("Level1_ver1"));
 		strcpy_s(hashs, packet->hashs);
 		bLevelOpenTriggerEnabled = true;
