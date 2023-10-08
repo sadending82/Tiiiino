@@ -1,7 +1,7 @@
 #pragma once
 #include "cDB.h"
 
-#define Test
+#ifdef RUN_DB
 
 bool DB::ConnectDB()
 {
@@ -591,3 +591,5 @@ void DB::DisconnectDB()
 	mysql_stmt_close(GetmStmt());
 	mysql_close(GetmConn());
 }
+
+#endif

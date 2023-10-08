@@ -3,6 +3,8 @@
 #include "stdafx.h"
 #include "cSecurity.h"
 
+#ifdef RUN_DB
+
 class DB {
 
 public:
@@ -56,3 +58,5 @@ private:
 
 	Security* mSecurity = NULL;
 };
+
+#endif
