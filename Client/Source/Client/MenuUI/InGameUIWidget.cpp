@@ -70,13 +70,6 @@ void UInGameUIWidget::TimerRun()
 
 }
 
-void UInGameUIWidget::DisconnectNetwork()
-{
-	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	if(!!TinoController)
-		TinoController->DisconnectNetwork();
-}
-
 void UInGameUIWidget::OpenInGameUI()
 {
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));

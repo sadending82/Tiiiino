@@ -70,9 +70,3 @@ void ULoginUIWidget::InputLoginPassword(const FText& Text)
 	// UE_LOG(LogTemp, Error, TEXT("UnExpected Tree PasswordInput"));
 }
 
-void ULoginUIWidget::DisconnectNetwork()
-{
-	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	if (!!TinoController)
-		TinoController->DisconnectNetwork();
-}

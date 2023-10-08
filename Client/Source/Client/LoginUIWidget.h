@@ -45,9 +45,6 @@ public:
 	UFUNCTION()
 	void InputLoginPassword(const FText& Text);
 
-	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	void DisconnectNetwork();
-
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
 	TSubclassOf<UUserWidget> NextWidgetClass;
