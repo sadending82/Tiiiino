@@ -532,6 +532,8 @@ bool MainServer::setPlayerInRoom(Player* player, const char verification[MAX_NAM
 					player->SetDepartment(pInfo.Department);
 					player->SetID(pInfo.ID);
 					player->SetNickName(pInfo.NickName);
+					//한명이라도 들어오면 일단 타이머 세팅
+					room->setGameStartTimerStartOnce();
 					return true;
 				}
 				else {
@@ -741,14 +743,16 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 		Room* pRoom = mRooms[player->GetRoomID()];
 		DEBUGMSGNOPARAM("TheGameIsWaitting\n");
 		cout << player->GetID() << endl;
-		if (pRoom->IsAllPlayerReady())
-		{
-			DEBUGMSGNOPARAM("TheGameIsWaitting Packet Come In \n");
-			SC_GAME_WAITTING_PACKET spacket = make_game_watting_packet();
-			SendRoomBroadCast(player->GetRoomID(), (void*)&spacket, sizeof(spacket));
-			TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_START, eEventType::TYPE_BROADCAST_ROOM, 4000, NULL, player->GetRoomID());
-		}
-
+		pRoom->PlayerCntIncrease();
+		//--
+		//if (pRoom->IsAllPlayerReady())
+		//{
+		//	DEBUGMSGNOPARAM("TheGameIsWaitting Packet Come In \n");
+		//	SC_GAME_WAITTING_PACKET spacket = make_game_watting_packet();
+		//	SendRoomBroadCast(player->GetRoomID(), (void*)&spacket, sizeof(spacket));
+		//	TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_START, eEventType::TYPE_BROADCAST_ROOM, 4000, NULL, player->GetRoomID());
+		//}
+		//--
 		break;
 	}
 	case CS_GAME_BREAKDOOR:

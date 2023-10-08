@@ -15,6 +15,7 @@ Room::Room(int id)
 	, mRoomState(eRoomState::ST_FREE)
 	, mPlayerArrivedCnt(0)
 	, mGameEndTimer(false)
+	, mGameStartTimer(false)
 	, mRoomID(id)
 {
 
@@ -140,7 +141,6 @@ bool Room::IsRoomReadyComplete()
 bool Room::IsAllPlayerReady()
 {
 	mRoomReadyLock.lock();
-	PlayerCntIncrease();
 	if (mPlayerCnt != mPlayerMax) {
 		mRoomReadyLock.unlock();
 		return false;
@@ -172,6 +172,11 @@ void Room::SetRoomEnd()
 void Room::PlayerCntIncrease()
 {
 	mPlayerCnt++;
+}
+
+void Room::PlayerMaxDecrease()
+{
+	mPlayerMax--;
 }
 
 bool Room::IsRoomReady()
@@ -352,8 +357,19 @@ void Room::setGameEndTimerStartOnce()
 	bool expect = 0;
 	if (std::atomic_compare_exchange_strong(reinterpret_cast<std::atomic_bool*>(&mGameEndTimer), &expect, 1))
 	{
-		DEBUGMSGNOPARAM("한 번 실행되야함\n");
+		DEBUGMSGNOPARAM("게임 엔드 한 번 실행되야함\n");
 
 		TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_COUNTDOWN_START, eEventType::TYPE_BROADCAST_ROOM, 1000, NULL, mRoomID);
+	}
+}
+
+void Room::setGameStartTimerStartOnce()
+{
+	bool expect = 0;
+	if (std::atomic_compare_exchange_strong(reinterpret_cast<std::atomic_bool*>(&mGameStartTimer), &expect, 1))
+	{
+		DEBUGMSGNOPARAM("게임 스타트 한 번 실행되야함\n");
+
+		TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_WAIT, eEventType::TYPE_BROADCAST_ROOM, 1000, NULL, mRoomID);
 	}
 }
