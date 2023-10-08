@@ -211,11 +211,16 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 			{
 				if (mClients[mRooms[p->roomID].mSockID[i]].mUID == mRooms[p->roomID].mUID[i]) // player connected lobby server
 				{
-					double GradePerRank = GRADE_FOR_SCORE[mRooms[p->roomID].mUserNum - MIN_USER][p->rank - 1]; // 등수 가중치
+					double GradePerRank;
 					if (p->retire == true)
 					{
 						GradePerRank = -5;
 					}
+					else
+					{
+						GradePerRank = GRADE_FOR_SCORE[mRooms[p->roomID].mUserNum - MIN_USER][p->rank - 1]; // 등수 가중치
+					}
+					
 					double GAP = mRooms[p->roomID].mGradeAvg - mClients[mRooms[p->roomID].mSockID[i]].mGrade;
 					if (GAP < -4)
 					{
