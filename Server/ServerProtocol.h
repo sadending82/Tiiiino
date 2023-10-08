@@ -21,6 +21,7 @@ enum SPacketType {
 	GL_ROOM_READY,
 	GL_ROOM_RESET,
 	GL_PLAYER_RESULT,
+	GL_ROOM_END,
 
 	// LobbyServer To GameServer
 	LG_USER_INTO_GAME,
@@ -69,6 +70,10 @@ struct GL_PLAYER_RESULT_PACKET : public SPACKET {
 	int		rank;
 	int		RoomID;
 	bool	retire;
+};
+
+struct GL_ROOM_END_PACKET : public SPACKET {
+	int roomID;
 };
 //---
 struct LG_LOGIN_OK_PACKET : public SPACKET {

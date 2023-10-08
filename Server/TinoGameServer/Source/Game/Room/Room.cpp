@@ -108,6 +108,12 @@ void Room::ResetGameRoom()
 	mRoomStateLock.unlock();
 }
 
+std::mutex& Room::GetRoomStateLockRef()
+{
+	return mRoomStateLock;
+	// TODO: 여기에 return 문을 삽입합니다.
+}
+
 
 void Room::ActiveRoom()
 {
@@ -154,6 +160,14 @@ bool Room::IsAllPlayerReady()
 	}
 
 }
+
+void Room::SetRoomEnd()
+{
+	mRoomStateLock.lock();
+	mRoomState = eRoomState::ST_FREE;
+	mRoomStateLock.unlock();
+}
+
 
 void Room::PlayerCntIncrease()
 {

@@ -239,6 +239,16 @@ void MainServer::send_player_result_packet(const int uID, const int rank)
 	mLobbyServer->SendPacket(&packet, sizeof(packet));
 }
 
+void MainServer::send_room_end_packet(const int roomID)
+{
+	GL_ROOM_END_PACKET packet{};
+	packet.size = sizeof(packet);
+	packet.type = GL_ROOM_END;
+	packet.roomID = roomID;
+
+	mLobbyServer->SendPacket(&packet, sizeof(packet));
+}
+
 
 void MainServer::send_move_packet(const int player_id, const int mover_id, const bool inair, const float value, const float sx, const float sy, const float sz)
 {
@@ -665,14 +675,21 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 			DEBUGMSGNOPARAM("player is nullptr.\n");
 			break;
 		}
+		Room* pRoom = mRooms[player->GetRoomID()];
+		
 
 		DEBUGMSGONEPARAM("player Num[%d] Arrive Overlapped Packet \n", player->GetSocketID());
-
 		if (false == player->CanPlayerArrive()) break;	//한 번 도착했으면 패킷 무시
 
-		Room* pRoom = mRooms[player->GetRoomID()];
-
+		pRoom->GetRoomStateLockRef().lock();
+		if (pRoom->GetRoomState() != eRoomState::ST_INGAME)
+		{
+			pRoom->GetRoomStateLockRef().unlock();
+			break;			
+		}
 		pRoom->PlayerArrive(player);
+		pRoom->GetRoomStateLockRef().unlock();
+
 		DEBUGMSGONEPARAM("player Num[%d] Arrive Complete\n", player->GetSocketID());
 
 		{

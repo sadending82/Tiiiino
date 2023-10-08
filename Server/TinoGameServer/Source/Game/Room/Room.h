@@ -24,11 +24,14 @@ public:
 	void DisablePlayer(Player* player);
 	//The Game Is End, Reset Room ex)clear mObjects
 	void ResetGameRoom();
-	
+	std::mutex& GetRoomStateLockRef();
 	void ActiveRoom();
 	bool IsRoomReady();
 	bool IsRoomReadyComplete();
 	bool IsAllPlayerReady();
+	void SetRoomEnd();
+	//이 함수는 락을 걸고 사용해야함.
+	eRoomState GetRoomState() const { return mRoomState; }
 	void PlayerCntIncrease();
 
 	bool SettingRoomPlayer(const sPlayerInfo& playerInfo, const int& playerMaxNum);
