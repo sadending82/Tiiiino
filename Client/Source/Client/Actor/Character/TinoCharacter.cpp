@@ -213,6 +213,13 @@ void ATinoCharacter::MakeAndShowDialog()
 	DialogWidget->AddToViewport();
 }
 
+void ATinoCharacter::SetDepartmentClothes(const int department)
+{
+	auto DynamicMaterialMesh = GetMesh()->CreateDynamicMaterialInstance(0);
+	DynamicMaterialMesh->SetTextureParameterValue(TEXT("Department"), GetTinoDepartTexture(department));
+	GetMesh()->SetMaterial(0, DynamicMaterialMesh);
+}
+
 
 bool ATinoCharacter::SendAnimPacket(int32 AnimType)
 {
@@ -540,6 +547,55 @@ void ATinoCharacter::DisableInputMode()
 void ATinoCharacter::EnableInputMode()
 {
 	EnableInput(GetController<APlayerController>());
+}
+
+UTexture* ATinoCharacter::GetTinoDepartTexture(int department)
+{
+	UTexture* pTexture = nullptr;
+	switch (department)
+	{
+	case 1:
+		break;
+	case 2:
+		UHelpers::GetAssetDynamic(&pTexture, "Engine.Texture2D'/Game/Characters/Tino/Cloth/Texture/DepartmentTestTexture/Tino_A.Tino_A'");
+		break;
+	case 3:
+		UHelpers::GetAssetDynamic(&pTexture, "Engine.Texture2D'/Game/Characters/Tino/Cloth/Texture/DepartmentTestTexture/Tino_B.Tino_B'");
+		break;
+	case 4:
+		UHelpers::GetAssetDynamic(&pTexture, "Engine.Texture2D'/Game/Characters/Tino/Cloth/Texture/DepartmentTestTexture/Tino_C.Tino_C'");
+		break;
+	case 5:
+		UHelpers::GetAssetDynamic(&pTexture, "Engine.Texture2D'/Game/Characters/Tino/Cloth/Texture/DepartmentTestTexture/Tino_D.Tino_D'");
+		break;
+	case 6:
+		UHelpers::GetAssetDynamic(&pTexture, "Engine.Texture2D'/Game/Characters/Tino/Cloth/Texture/DepartmentTestTexture/Tino_E.Tino_E'");
+		break;
+	case 7:
+		UHelpers::GetAssetDynamic(&pTexture, "Engine.Texture2D'/Game/Characters/Tino/Cloth/Texture/DepartmentTestTexture/Tino_F.Tino_F'");
+		break;
+	case 8:
+		UHelpers::GetAssetDynamic(&pTexture, "Engine.Texture2D'/Game/Characters/Tino/Cloth/Texture/DepartmentTestTexture/Tino_G.Tino_G'");
+		break;
+	case 9:
+		UHelpers::GetAssetDynamic(&pTexture, "Engine.Texture2D'/Game/Characters/Tino/Cloth/Texture/DepartmentTestTexture/Tino_H.Tino_H'");
+		break;
+	case 10:
+		UHelpers::GetAssetDynamic(&pTexture, "Engine.Texture2D'/Game/Characters/Tino/Cloth/Texture/DepartmentTestTexture/Tino_I.Tino_I'");
+		break;
+	case 11:
+		UHelpers::GetAssetDynamic(&pTexture, "Engine.Texture2D'/Game/Characters/Tino/Cloth/Texture/DepartmentTestTexture/Tino_J.Tino_J'");
+		break;
+	case 12:
+		UHelpers::GetAssetDynamic(&pTexture, "Engine.Texture2D'/Game/Characters/Tino/Cloth/Texture/DepartmentTestTexture/Tino_K.Tino_K'");
+		break;
+	case 13:
+		UHelpers::GetAssetDynamic(&pTexture, "Engine.Texture2D'/Game/Characters/Tino/Cloth/Texture/DepartmentTestTexture/Tino_L.Tino_L'");
+		break;
+
+	}
+
+	return pTexture;
 }
 
 bool ATinoCharacter::CanMove()
