@@ -341,6 +341,7 @@ void Network::process_packet(unsigned char* p)
 				mc->AutoPossessPlayer = EAutoReceiveInput::Disabled;
 				mc->bIsControlledPlayer = false;
 				mc->FinishSpawning(trans);
+				mc->SetDepartmentClothes(packet->department);
 				mOtherCharacter[id] = mc;
 				mOtherCharacter[id]->GetMesh()->SetVisibility(true);
 				mOtherCharacter[id]->SetClientID(packet->id);
