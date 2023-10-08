@@ -143,6 +143,7 @@ struct CL_LOGIN_PACKET :public PACKET {
 struct CL_SIGNUP_PACKET :public PACKET {
 	char id[MAX_NAME_SIZE];
 	char password[MAX_NAME_SIZE];
+	char department;
 };
 
 struct CL_MATCH_PACKET : public PACKET {

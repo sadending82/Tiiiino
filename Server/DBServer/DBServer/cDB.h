@@ -27,7 +27,7 @@ public:
 	tuple<int, string, double, int, bool, char> SelectUserDataForLogin(const string& id);
 	vector<string> SelectHash(const string& id); // Index 0: hash / Index 1: salt
 
-	bool InsertNewUser(const string& id);
+	bool InsertNewUser(const string& id, const char department);
 	bool InsertNewAccount(const string& id, const string& password);
 
 	bool UpdateUserConnectionState(const int uid, const int state);
@@ -38,7 +38,7 @@ public:
 
 	bool DeleteAccount(const string& id);
 
-	bool SignUpNewPlayer(const string& id, const string& password);
+	bool SignUpNewPlayer(const string& id, const string& password, const char department);
 	bool CheckVerifyUser(const string& id, const string& password);
 
 	void DisconnectDB();

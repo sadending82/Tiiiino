@@ -313,7 +313,7 @@ void Socket::ProcessPacket_Logout(unsigned char* buf)
 void Socket::ProcessPacket_SignUp(int key, unsigned char* buf)
 {
     LD_SIGNUP_PACKET* p = reinterpret_cast<LD_SIGNUP_PACKET*>(buf);
-    bool bResult = Getm_pDB()->SignUpNewPlayer(p->id, p->password);
+    bool bResult = Getm_pDB()->SignUpNewPlayer(p->id, p->password, p->department);
     if (bResult != true) {
         cout << "Sign Up new user failed\n";
         SendSignUpFail(key, p->userKey);
@@ -334,6 +334,12 @@ void Socket::ProcessPacket_UpdateNickname(int key, unsigned char* buf)
 void Socket::ProcessPacket_UpdateGrade(int key, unsigned char* buf)
 {
     LD_UPDATE_GRADE_PACKET* p = reinterpret_cast<LD_UPDATE_GRADE_PACKET*>(buf);
+
+    if (ADMIN_START_UID <= p->uid 
+        && p->uid <= ADMIN_LAST_UID) {
+        return;
+    }
+
     bool bResult = Getm_pDB()->UpdateUserGrade(p->uid, p->grade);
     if (bResult != true) {
         cout << "Update User Grade failed\n";

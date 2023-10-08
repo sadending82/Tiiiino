@@ -256,9 +256,9 @@ vector<string> DB::SelectHash(const string& id)
 	return result;
 }
 
-bool DB::InsertNewUser(const string& id)
+bool DB::InsertNewUser(const string& id, const char department)
 {
-	string query = "INSERT INTO userinfo (ID) VALUES (?)";
+	string query = "INSERT INTO userinfo (ID, department) VALUES (?, ?)";
 
 	if (mysql_stmt_prepare(GetmStmt(), query.c_str(), query.length()) != 0) {
 #ifdef Test
@@ -268,14 +268,17 @@ bool DB::InsertNewUser(const string& id)
 	}
 
 
-	MYSQL_BIND bind;
+	MYSQL_BIND bind[2];
 	memset(&bind, 0, sizeof(bind));
 
-	bind.buffer_type = MYSQL_TYPE_STRING;
-	bind.buffer = (void*)id.c_str();
-	bind.buffer_length = id.length();
+	bind[0].buffer_type = MYSQL_TYPE_STRING;
+	bind[0].buffer = (void*)id.c_str();
+	bind[0].buffer_length = id.length();
 
-	if (mysql_stmt_bind_param(GetmStmt(), &bind) != 0) {
+	bind[1].buffer_type = MYSQL_TYPE_TINY;
+	bind[1].buffer = (void*)&department;
+
+	if (mysql_stmt_bind_param(GetmStmt(), bind) != 0) {
 
 #ifdef Test
 		std::cout << "InsertNewUser stmt bind error: " << mysql_stmt_error(GetmStmt()) << std::endl;
@@ -555,12 +558,12 @@ bool DB::DeleteAccount(const string& id)
 	return true;
 }
 
-bool DB::SignUpNewPlayer(const string& id, const string& password)
+bool DB::SignUpNewPlayer(const string& id, const string& password, const char department)
 {
 	bool res = InsertNewAccount(id, password);
 	if (res == false) return false;
 
-	res = InsertNewUser(id);
+	res = InsertNewUser(id, department);
 	if (res == false) {
 		DeleteAccount(id);
 		return false;
