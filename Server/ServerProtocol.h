@@ -8,6 +8,10 @@ constexpr int MAXGAMESERVER = 2;
 
 constexpr unsigned long long INCODE_SERVER_PACKET = 0xFFFF'5137'0808'6310;
 
+enum DB_ErrorCode {
+	NONE			 = 0,
+	SIGNUP_Duplicate = 101
+};
 
 enum SPacketType {
 	// LobbyServer To GameServer
@@ -135,6 +139,7 @@ struct DL_LOGIN_OK_PACKET :public SPACKET {
 };
 
 struct DL_LOGIN_FAIL_PACKET :public SPACKET {
+	int		errorCode;
 	int		userKey;
 };
 
@@ -147,6 +152,7 @@ struct DL_SIGNUP_OK_PACKET :public SPACKET {
 };
 
 struct DL_SIGNUP_FAIL_PACKET :public SPACKET {
+	int		errorCode;
 	int		userKey;
 };
 

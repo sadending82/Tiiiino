@@ -22,7 +22,7 @@ public:
 	void CheckDuplicateLogin(int uid);
 
 	void SendDiconnectPacketToGameServer(int key, int uid, int roomID);
-	void SendMatchResult(int key);
+	void SendMatchResult(int key, int rank, int point);
 public:
 	array <Session, MAX_USER> mClients;
 	array <Session, MAXGAMESERVER> mServers;
