@@ -31,6 +31,13 @@ public:
 	const int GetObjectID() const { return mObjectID; }
 	void SetObjectID(const int id) { mObjectID = id; }
 
+	// 10/08 김혁동
+	// 네트워크 동기화를 위한 변수를 제어하기 위한 함수를 추가하였습니다.
+	// 아래 함수들을 호출하여 사용하면 될 것으로 보입니다.
+	inline const bool IsMoveStart() const { return bIsStartMove; }
+	void EnableMoveStart(const bool value) { bIsStartMove = value; }
+
+
 protected:
 
 	UPROPERTY(EditAnywhere, Category = "Network")
