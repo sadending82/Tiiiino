@@ -42,6 +42,9 @@ public:
 	void InputLoginPassword(const FText& Text);
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void OnEnterPressed();
+
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void DisconnectNetwork();
 
 protected:

@@ -25,7 +25,7 @@ void ATinoController::BeginPlay()
 			SetInputUIMode();
 		}
 	}
-	//ChangeMenuWidget(StartingWidgetClass);
+	ChangeMenuWidget(StartingWidgetClass);
 }
 
 void ATinoController::ChangeMenuWidget(TSubclassOf<UUserWidget> NewWidgetClass)
@@ -79,7 +79,7 @@ void ATinoController::SetInputGameMode()
 
 void ATinoController::DisconnectNetwork()
 {
-	// ¼­¹ö ¿¬°á ²÷±è
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
 	DialogUI = Cast<UDialogUIWidget>(CreateWidget(GetWorld(), DialogUIClass));
 	DialogUI->AddToViewport();

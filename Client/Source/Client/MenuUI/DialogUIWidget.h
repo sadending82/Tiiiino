@@ -24,5 +24,5 @@ public:
 	void DisconnectNetwork();
 
 	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* DialogText;
+	class UTextBlock* DisconnectNetworkText;
 };
