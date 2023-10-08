@@ -31,7 +31,7 @@ public:
 	//Server to Server
 	void send_room_ready_packet(const int roomID);
 	void send_room_reset_packet(const int roomID);
-	void send_player_result_packet(const int uID, const int rank);
+	void send_player_result_packet(const int uID, const int rank, const int roomID, const bool retire);
 	void send_room_end_packet(const int roomID);
 
 	//Server to client

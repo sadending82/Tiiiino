@@ -228,13 +228,15 @@ void MainServer::send_room_reset_packet(const int roomID)
 	mLobbyServer->SendPacket(&packet, sizeof(packet));
 }
 
-void MainServer::send_player_result_packet(const int uID, const int rank)
+void MainServer::send_player_result_packet(const int uID, const int rank,const int roomID,const bool retire)
 {
 	GL_PLAYER_RESULT_PACKET packet{};
 	packet.size = sizeof(packet);
 	packet.type = GL_PLAYER_RESULT;
 	packet.uID = uID;
 	packet.rank = rank;
+	packet.roomID = roomID;
+	packet.retire = retire;
 
 	mLobbyServer->SendPacket(&packet, sizeof(packet));
 }
@@ -696,7 +698,7 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 			auto sPacket = make_player_arrive_packet(player->GetRoomSyncID());
 			SendRoomSomeoneExcept(player->GetRoomID(), player->GetSocketID(), (void*)&sPacket, sizeof(sPacket));
 		}
-		send_player_result_packet(player->GetUID(), player->GetRank());
+		send_player_result_packet(player->GetUID(), player->GetRank(), player->GetRoomID(), false);
 
 		break;
 	}

@@ -140,7 +140,8 @@ void WorkerThread::doThread()
 			DEBUGMSGNOPARAM("한번만 오는지 GAME END\n");
 			int roomID = TimerThread::DeserializeReceiver(wsa_ex->GetBuf());
 			mMainServer->GetRooms()[roomID]->SetRoomEnd();
-			mMainServer->send_room_end_packet(roomID);
+
+			//mMainServer->send_room_end_packet(roomID);
 			{
 				auto sPacket = mMainServer->make_game_end_packet();	//판정은 클라가 알아서.
 				mMainServer->SendRoomBroadCast(roomID, (void*)&sPacket, sizeof(sPacket));
