@@ -18,9 +18,6 @@ void ARotatingGround::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	// 임시적으로 true로 설정하였음
-	// 실제로는 동기화 패킷을 받았을 때에 변경해 주어야 함.
-	bIsStartMove = true;
 }
 
 void ARotatingGround::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)

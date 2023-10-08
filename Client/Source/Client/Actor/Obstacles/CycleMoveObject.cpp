@@ -27,10 +27,6 @@ void ACycleMoveObject::BeginPlay()
 	Super::BeginPlay();
 	
 	StartPos = GetActorLocation();
-
-	//네트워크용 함수가 들어오면 변경될 사항임.
-
-	bIsStartMove = true;
 }
 
 // Called every frame
