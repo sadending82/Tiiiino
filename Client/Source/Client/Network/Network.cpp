@@ -505,6 +505,10 @@ void Network::l_process_packet(unsigned char* p)
 		bLevelOpenTriggerEnabled = true;
 		break;
 	}
+	case LC_MATCH_RESULT: {
+		LC_MATCH_RESULT_PACKET* packet = reinterpret_cast<LC_MATCH_RESULT_PACKET*>(p);
+		break;
+	}
 	default:
 		break;
 	}

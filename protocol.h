@@ -76,6 +76,7 @@ enum PacketType {
 	LC_LOGIN_OK,
 	LC_LOGIN_FAIL,
 	LC_MATCH_RESPONSE,
+	LC_MATCH_RESULT
 };
 
 #pragma pack (push, 1)
@@ -242,6 +243,12 @@ struct LC_MATCH_RESPONSE_PACKET : public PACKET {
 	int gameServerPortNum;
 	unsigned char gameServerIP[16];	//IPv4에서 ip는 4바이트인데 글자로 표기하니까 최대 xxx.xxx.xxx.xxx  15 + 널문자 = 16
 	char	hashs[MAX_NAME_SIZE];	//암호화 값 이 값을 기반으로 client verification
+};
+
+struct LC_MATCH_RESULT_PACKET : public PACKET {
+	int		rank;
+	double	grade;
+	int		point;
 };
 
 //--------------------------

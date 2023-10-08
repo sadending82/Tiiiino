@@ -237,6 +237,10 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 					packet.size = sizeof(LD_UPDATE_GRADE_PACKET);
 					packet.type = LD_UPDATE_GRADE;
 					mServers[0].DoSend(&packet);
+
+
+					SendMatchResult(mRooms[p->roomID].mSockID[i], p->rank, 0);
+
 					mRooms[p->roomID].mUpdateCount++;
 					printf("[%d]플레이어의 점수 [%f] 로비안끊김\n", packet.uid, packet.grade);
 					break;
@@ -761,4 +765,15 @@ void Server::SendDiconnectPacketToGameServer(int key, int uid, int roomID)
 	p.roomID = roomID;
 	
 	mClients[key].DoSend(reinterpret_cast<char*>(&p));
+}
+
+void Server::SendMatchResult(int key, int rank, int point)
+{
+	LC_MATCH_RESULT_PACKET packet;
+	packet.grade = mClients[key].mGrade;
+	packet.rank = rank;
+	packet.point = point;
+	packet.size = sizeof(LC_MATCH_RESULT_PACKET);
+	packet.type = LC_MATCH_RESULT;
+	mServers[key].DoSend(&packet);
 }
