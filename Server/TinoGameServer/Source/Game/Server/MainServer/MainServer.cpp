@@ -64,6 +64,14 @@ void MainServer::init()
 	server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	bind(mSocket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr));
 	listen(mSocket, SOMAXCONN);
+
+	int option = TRUE;               //네이글 알고리즘 on/off
+	setsockopt(mSocket,             //해당 소켓
+		IPPROTO_TCP,          //소켓의 레벨
+		TCP_NODELAY,          //설정 옵션
+		(const char*)&option, // 옵션 포인터
+		sizeof(option));      //옵션 크기
+
 	//std::cout << ntohs(server_addr.sin_port) << std::endl;
 	mhiocp = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, NULL, 0);
 	CreateIoCompletionPort(reinterpret_cast<HANDLE>(mSocket), mhiocp, 0, 0);

@@ -1,5 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#include <string>
 #include "Network.h"
 #include "Actor/Character/TinoCharacter.h"
 #include "Actor/Obstacles/BaseObstacle.h"
@@ -500,7 +501,9 @@ void Network::l_process_packet(unsigned char* p)
 		LC_MATCH_RESPONSE_PACKET* packet = reinterpret_cast<LC_MATCH_RESPONSE_PACKET*>(p);
 		//게임서버 연결 코드 나중에 ip랑 포트넘버도 넘겨야함.
 		UE_LOG(LogTemp, Error, TEXT("Game Match Responed"));
-		UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("Level1_ver1"));
+		string maplv{ "Level" };
+		maplv += std::to_string(packet->mapLevel);
+		UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName(maplv.c_str()));
 		strcpy_s(hashs, packet->hashs);
 		bLevelOpenTriggerEnabled = true;
 		break;

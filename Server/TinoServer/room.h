@@ -43,4 +43,5 @@ public:
 	int mUserNum;
 	double mGradeAvg;
 	int mUpdateCount;
+	int	mRoomLevel;
 };

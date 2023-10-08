@@ -155,12 +155,21 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		memcpy(packet.gameServerIP, SERVERIP, sizeof(packet.gameServerIP));
 		packet.gameServerPortNum = GAMESERVERPORT;
 
+		random_device rd;
+		mt19937_64 rng(rd());
+		uniform_int_distribution<int> rLevel(MIN_LEVEL, MAX_LEVEL);
+		int randomlevel = rLevel(rng);
+		
+		packet.mapLevel = randomlevel;
+		
+
 		int uidCount = 0;
 		double userGradeSum = 0;
 		mRooms[p->roomID].mStateLock.lock();
 		mRooms[p->roomID].mState = eRoomState::RS_INGAME;
 		mRooms[p->roomID].mStateLock.unlock();
-
+		mRooms[p->roomID].mRoomLevel = randomlevel;
+		printf("레벨[%d] 준비완\n",randomlevel);
 		vector<int> delPlayerVector;
 		for (auto& player : mReadytoGame)
 		{

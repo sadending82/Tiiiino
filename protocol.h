@@ -17,6 +17,10 @@ constexpr int MAX_ROOM_USER = 8;
 constexpr int DELAY_TIME_EXEC_BREAKDOOR = 1000;
 constexpr int DELAY_TIME_EXEC_BREAKPLATFORM = 3000;
 
+// Level min, max
+constexpr int MIN_LEVEL = 1;
+constexpr int MAX_LEVEL = 4;
+
 enum class eDepartment : char
 {
 
@@ -244,6 +248,7 @@ struct LC_MATCH_RESPONSE_PACKET : public PACKET {
 	int gameServerPortNum;
 	unsigned char gameServerIP[16];	//IPv4에서 ip는 4바이트인데 글자로 표기하니까 최대 xxx.xxx.xxx.xxx  15 + 널문자 = 16
 	char	hashs[MAX_NAME_SIZE];	//암호화 값 이 값을 기반으로 client verification
+	int		mapLevel;	//몇번 째 맵 사용할것인지.
 };
 
 struct LC_GAME_RESULT_PACKET : public PACKET {
