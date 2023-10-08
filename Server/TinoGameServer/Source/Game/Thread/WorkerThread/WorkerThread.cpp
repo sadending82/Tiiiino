@@ -126,7 +126,7 @@ void WorkerThread::doThread()
 		case eCOMMAND_IOCP::CMD_GAME_START:
 		{
 			eEventType eventType = TimerThread::DeserializeEventType(wsa_ex->GetBuf());
-			DEBUGMSGNOPARAM("한번만 오는지 GAME END\n");
+			DEBUGMSGNOPARAM("한번만 오는지 GAME Start\n");
 			int roomID = TimerThread::DeserializeReceiver(wsa_ex->GetBuf());
 			{
 				auto sPacket = mMainServer->make_game_start_packet();
@@ -165,7 +165,7 @@ void WorkerThread::doThread()
 				auto sPacket = mMainServer->make_game_countdown_start_packet();
 				mMainServer->SendRoomBroadCast(roomID, (void*)&sPacket, sizeof(sPacket));
 			}
-			TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_END, eEventType::TYPE_BROADCAST_ROOM, 10000, NULL, roomID);
+			TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_END, eEventType::TYPE_BROADCAST_ROOM, 20000, NULL, roomID);
 
 			break;
 		}

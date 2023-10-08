@@ -276,6 +276,7 @@ void Network::process_packet(unsigned char* p)
 	{		
 		SC_GAME_PLAYERLOAD_OK_PACKET* packet = reinterpret_cast<SC_GAME_PLAYERLOAD_OK_PACKET*>(p);
 
+		UE_LOG(LogTemp, Error, TEXT("PLAYERLOAD PACKET COME IN"));
 		send_game_playerload_ack_packet(s_socket);
 		break;
 	}
@@ -297,9 +298,7 @@ void Network::process_packet(unsigned char* p)
 				mOtherCharacter[move_id]->SetActorRotation(FQuat(packet->rx, packet->ry, packet->rz, packet->rw));
 				mOtherCharacter[move_id]->ServerSyncSpeed = packet->speed;
 				mOtherCharacter[move_id]->ServerCharMovingSpeed = FVector(packet->sx, packet->sy, packet->sz);
-				auto anim = Cast<UCharacterAnimInstance>(mOtherCharacter[move_id]->GetMesh()->GetAnimInstance());
-				if(anim)
-					anim->bIsAirForNetwork = packet->inair;
+				mOtherCharacter[move_id]->SetIsAirForNetwork(packet->inair);
 				//mOtherCharacter[move_id]->ServerStoreGroundSpeed = packet->speed;
 				//mOtherCharacter[move_id]->CharMovingSpeed = FVector(packet->sx, packet->sy, packet->sz);
 				//mOtherCharacter[move_id]->GroundSpeedd = packet->speed;
@@ -331,7 +330,7 @@ void Network::process_packet(unsigned char* p)
 		else {
 			FName path = TEXT("Blueprint'/Game/Characters/Tino/BP_TinoCharacter.BP_TinoCharacter_C'"); //_C를 꼭 붙여야 된다고 함.
 			UClass* GeneratedInventoryBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
-			FTransform trans(FQuat(packet->rx, packet->ry, packet->rz, packet->rw), FVector(888, 1566, 400));
+			FTransform trans(FQuat(packet->rx, packet->ry, packet->rz, packet->rw), FVector(888, 1566, 400 + (id * 150)));
 			auto mc = mMyCharacter->GetWorld()->SpawnActorDeferred<ATinoCharacter>(GeneratedInventoryBP, trans);
 			if (nullptr != mc)
 			{
@@ -388,9 +387,19 @@ void Network::process_packet(unsigned char* p)
 				//다이브
 				break;
 			case 3:				
-				mOtherCharacter[id]->PlayAnimMontage(mOtherCharacter[id]->TumbleMontage);
+				mOtherCharacter[id]->PlayTumbleMontage();
+				//착지(텀블)
 				//mOtherCharacter[id]->Dive();
 				break;
+			case 4:
+				mOtherCharacter[id]->OnGrab();
+				break;
+				//잡기
+			case 5:
+				mOtherCharacter[id]->OffGrab();
+				//잡기취소
+				break;
+
 			default:
 				break;
 			}
@@ -488,6 +497,7 @@ void Network::l_process_packet(unsigned char* p)
 	{
 		LC_MATCH_RESPONSE_PACKET* packet = reinterpret_cast<LC_MATCH_RESPONSE_PACKET*>(p);
 		//게임서버 연결 코드 나중에 ip랑 포트넘버도 넘겨야함.
+		UE_LOG(LogTemp, Error, TEXT("Game Match Responed"));
 		UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("Level1_ver1"));
 		strcpy_s(hashs, packet->hashs);
 		bLevelOpenTriggerEnabled = true;

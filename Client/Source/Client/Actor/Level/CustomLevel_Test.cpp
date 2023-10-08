@@ -21,6 +21,8 @@ void ACustomLevel_Test::BeginPlay() {
 	FName path = TEXT("Blueprint'/Game/Characters/Tino/BP_TinoCharacter.BP_TinoCharacter_C'"); //_C를 꼭 붙여야 된다고 함.
 	UClass* GeneratedCharacterBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 	FTransform trans;
+	srand(time(NULL));
+	mMyCharacterSpawnPosition.Y += (rand() % 10) * 10;
 	trans.SetLocation(trans.GetLocation() + mMyCharacterSpawnPosition);
 	auto mc1 = GetWorld()->SpawnActorDeferred<ATinoCharacter>(GeneratedCharacterBP, trans);
 	mc1->SpawnDefaultController();

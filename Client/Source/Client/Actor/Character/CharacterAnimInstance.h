@@ -7,6 +7,8 @@
 /**
  * 
  */
+enum class EMovementState : uint8;
+
 UCLASS()
 class CLIENT_API UCharacterAnimInstance : public UAnimInstance
 {
@@ -32,7 +34,8 @@ protected:
 		float Speed;
 	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly, Category = "Animation")
 		float Direction;
-
+	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly, Category = "Animation")
+		EMovementState MovementState;
 
 private:
 	UPROPERTY()

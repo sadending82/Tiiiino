@@ -103,7 +103,7 @@ struct CS_ACTION_PACKET : public PACKET {
 };
 
 struct CS_GAME_PLAYERLOAD_ACK_PACKET : public PACKET {
-
+	int temp[30];
 };
 
 struct CS_GAME_BREAKDOOR_PACKET : public PACKET {
@@ -197,7 +197,7 @@ struct SC_GAME_DOORSYNC_PACKET : public PACKET {
 };
 
 struct SC_GAME_PLAYERLOAD_OK_PACKET : public PACKET {
-
+	int temp[30];
 };
 
 struct SC_GAME_BREAKDOOR_PACKET : public PACKET {

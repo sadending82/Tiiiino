@@ -33,7 +33,11 @@ void UCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			if (otherplayer)
 			{
 				Speed = otherplayer->ServerSyncSpeed;
+
 			}
 		}
+		auto Owner = Cast<ATinoCharacter>(OwnerCharacter);
+		if(Owner != nullptr)
+			MovementState = Owner->GetMovementState();
 	}
 }

@@ -4,6 +4,8 @@
 #include "Actor/GoalArea.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Actor/Character/TinoCharacter.h"
+#include "MenuUI/InGameUIWidget.h"
 #include "Global.h"
 #include "Network/Network.h"
 
@@ -48,7 +50,16 @@ void AGoalArea::BoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 				// 캐릭터를 안보이게 하고 콜리젼도 off
 				PlayerDisable(OverlapCharacter);
 				// UI 타이머 생성과 UI 결과 출력은 인게임 UI가 완성되는 대로 추가
-				
+				ATinoCharacter* myTinoChar = Cast<ATinoCharacter>(OverlapCharacter);
+
+				if (myTinoChar != nullptr)
+				{
+					if (myTinoChar->InGameWidgetInstance != nullptr)
+					{
+						myTinoChar->InGameWidgetInstance->bLevelClearCheck = true;
+					}
+					
+				}
 
 				// 관전 모드 변환...? -> 은 할줄 모름
 

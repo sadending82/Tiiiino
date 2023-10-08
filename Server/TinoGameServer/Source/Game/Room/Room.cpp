@@ -133,7 +133,14 @@ bool Room::IsRoomReadyComplete()
 
 bool Room::IsAllPlayerReady()
 {
-	if (mPlayerCnt != mPlayerMax) return false;
+	mRoomReadyLock.lock();
+	PlayerCntIncrease();
+	if (mPlayerCnt != mPlayerMax) {
+		mRoomReadyLock.unlock();
+		return false;
+	}
+	mRoomReadyLock.unlock();
+
 	mRoomStateLock.lock();
 	if (mRoomState == eRoomState::ST_READY_COMPLETE)
 	{

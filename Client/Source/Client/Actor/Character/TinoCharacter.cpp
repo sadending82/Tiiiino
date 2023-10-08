@@ -1,4 +1,4 @@
-#include "Actor/Character/TinoCharacter.h"
+ï»¿#include "Actor/Character/TinoCharacter.h"
 #include "Actor/Controller/TinoController.h"
 #include "Global.h"
 
@@ -14,6 +14,14 @@
 
 ATinoCharacter::ATinoCharacter()
 	:MaxTumbledTime(1.0f),
+	MaxGrabTime(3.0f),
+	GrabCoolTime(1.0f),
+	GrabbedSpeedRate(80.f),
+	DetectDist(100.f),
+	DetectRadius(50.f),
+	DetectAngle(60.f),
+	TargetInterval(50.f),
+	Target(nullptr),
 	MovementState(EMovementState::EMS_Normal)
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -22,7 +30,8 @@ ATinoCharacter::ATinoCharacter()
 
 	bUseControllerRotationYaw = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-
+	OriginalSpeed = GetCharacterMovement()->MaxWalkSpeed;
+	OriginalRotationSpeed = GetCharacterMovement()->RotationRate;
 	SpringArm->bDoCollisionTest = false;
 	SpringArm->bUsePawnControlRotation = true;
 }
@@ -40,6 +49,8 @@ void ATinoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction("CreateDummy", EInputEvent::IE_Pressed, this, &ATinoCharacter::CreateDummy);
 	PlayerInputComponent->BindAction("Align", EInputEvent::IE_Pressed, this, &ATinoCharacter::Align);
 	PlayerInputComponent->BindAction("Jump", EInputEvent::IE_Pressed, this, &ATinoCharacter::Jump);
+	PlayerInputComponent->BindAction("Grab", EInputEvent::IE_Pressed, this, &ATinoCharacter::OnGrab);
+	PlayerInputComponent->BindAction("Grab", EInputEvent::IE_Released, this, &ATinoCharacter::OffGrab);
 	//PlayerInputComponent->BindAction("Jump", EInputEvent::IE_Released, this, &ATinoCharacter::StopJumping);
 	PlayerInputComponent->BindAction("Dive", EInputEvent::IE_Pressed, this, &ATinoCharacter::Dive);
 }
@@ -78,7 +89,7 @@ void ATinoCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	PlayTumbleMontage(DeltaTime);
+
 	if (Controller != nullptr)
 	{
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -93,7 +104,7 @@ void ATinoCharacter::Tick(float DeltaTime)
 			{
 				if (!GetController()->IsPlayerController())
 				{
-					//¼­¹ö¶û ¿¬°á µÅ ÀÖÀ» ¶§¸¸ »ó´ë Ä³¸¯ÅÍ º¸°£ÇÏ·Á ½Ãµµ. 
+					//ì„œë²„ëž‘ ì—°ê²° ë¼ ìžˆì„ ë•Œë§Œ ìƒëŒ€ ìºë¦­í„° ë³´ê°„í•˜ë ¤
 					//Update GroundSpeedd (22-04-05)
 					//GroundSpeedd = ServerStoreGroundSpeed;
 					//Update Interpolation (23-09-27)
@@ -121,8 +132,15 @@ void ATinoCharacter::Tick(float DeltaTime)
 			
 		}
 
+		PlayTumbleMontage(DeltaTime);
+		
+		if (MovementState == EMovementState::EMS_Grabbing && Target != nullptr)
+		{
+			SetActorLocation(Target->GetActorLocation() - GetActorForwardVector() * TargetInterval);
+			//SetActorRotation(Target->GetActorRotation());
+		}
 
-		// 10/04 °¡¸¸È÷ ÀÖÀ» ¶§ Ãæµ¹ÇÏÁö ¾Ê´Â ºÎºÐÀ» ÇØ°áÇÏ±â À§ÇÑ ÄÚµå Ãß°¡
+		// 10/04 ê°€ë§Œížˆ ìžˆì„ ë•Œ ì¶©ëŒí•˜ì§€ ì•ˆí” ë¶€ë¶„ì„ í•´ê²°í•˜ê¸° ìœ„í•œ ì½”ë“œ ì¶”ê°€
 		FHitResult OutHit;
 		GetCharacterMovement()->SafeMoveUpdatedComponent(FVector(0.f, 0.f, 0.01f), GetActorRotation(), true, OutHit);
 		GetCharacterMovement()->SafeMoveUpdatedComponent(FVector(0.f, 0.f, -0.01f), GetActorRotation(), true, OutHit);
@@ -153,11 +171,7 @@ void ATinoCharacter::PlayTumbleMontage(float DeltaTime)
 		{
 			CurrentTumbledTime = 0.f;
 			bCanTumbled = false;
-			if (GetController())
-			{
-				if (GetController()->IsPlayerController())
-					send_action_packet(Network::GetNetwork()->s_socket, 3);
-			}
+			SendAnimPacket(3);
 			PlayAnimMontage(TumbleMontage);
 		}
 		else
@@ -187,6 +201,25 @@ void ATinoCharacter::MakeAndShowDialog()
 	DialogWidget->AddToViewport();
 }
 
+
+bool ATinoCharacter::SendAnimPacket(int32 AnimType)
+{
+	if (!!GetController())
+	{
+		if (GetController()->IsPlayerController())
+		{
+			send_action_packet(Network::GetNetwork()->s_socket, static_cast<int>(AnimType));
+			return true;
+		}
+	}
+	else
+	{
+		CLog::Log("Controller is nullptr");
+	}
+	return false;
+
+}
+
 void ATinoCharacter::DiveBegin()
 {
 }
@@ -198,7 +231,7 @@ void ATinoCharacter::DiveEnd()
 
 void ATinoCharacter::OnAccelEffect()
 {
-	//ºñ³×Æ® °ªÀ» Á¶ÀýÇØ °¡¼Ó ÀÌÆåÆ®¸¦ Å´
+	//ë¹„ë„¤íŠ¸ ê°’ì„ ì¡°ì ˆí•´ ê°€ì† ì´íŽ™íŠ¸ë¥¼ í‚´
 	Camera->PostProcessSettings.bOverride_VignetteIntensity = true;
 	Camera->PostProcessSettings.VignetteIntensity = CustomVignetteIntensity;
 }
@@ -208,6 +241,7 @@ void ATinoCharacter::OffAccelEffect()
 	Camera->PostProcessSettings.bOverride_VignetteIntensity = false;
 
 }
+
 void ATinoCharacter::TimerStart()
 {
 
@@ -219,10 +253,10 @@ void ATinoCharacter::TimerStart()
 void ATinoCharacter::TimerEnd()
 {
 
-	// À¯È¿¼º È®ÀÎ
+	// ìœ íš¨ì„± í™•ì¸
 	if (InGameWidgetInstance)
 	{
-		// UInGameUIWidgetÀÇ TimerRun ÇÔ¼ö È£Ãâ
+		// UInGameUIWidgetì˜ TimerRun í•¨ìˆ˜ í˜¸ì¶œ
 		InGameWidgetInstance->TimerRun();
 	}
 	if (InGameWidgetInstance->GetRestGameTime() < 0)
@@ -238,13 +272,33 @@ void ATinoCharacter::Dive()
 	if (DiveMontage && CanDive())
 	{
 		bIsDiving = true;
-		if (GetController())
-		{
-			if (GetController()->IsPlayerController())
-				send_action_packet(Network::GetNetwork()->s_socket, 2);
-		}
+		SendAnimPacket(2);
 		PlayAnimMontage(DiveMontage);
 	}
+}
+
+bool ATinoCharacter::GetIsAirForNetwork()
+{
+	auto AnimInstance = GetTinoAnimInstance();
+	if (!!AnimInstance)
+	{
+		return AnimInstance->bIsAirForNetwork;
+	}
+	return false;
+}
+
+void ATinoCharacter::SetIsAirForNetwork(bool val)
+{
+	auto AnimInstance = GetTinoAnimInstance();
+	if (!!AnimInstance)
+	{
+		AnimInstance->bIsAirForNetwork = val;
+	}
+}
+
+UCharacterAnimInstance* ATinoCharacter::GetTinoAnimInstance()
+{
+	return Cast<UCharacterAnimInstance>(GetMesh()->GetAnimInstance());
 }
 
 void ATinoCharacter::OnMoveForward(float Axis)
@@ -291,12 +345,7 @@ void ATinoCharacter::Jump()
 	if (CanMove() && GetCharacterMovement()->IsFalling() == false)
 	{
 		Super::Jump();
-		if (GetController())
-		{
-			if (GetController()->IsPlayerController())
-				send_action_packet(Network::GetNetwork()->s_socket, 1);
-		}
-
+		SendAnimPacket(1);
 	}
 
 	if (GetController())
@@ -319,6 +368,144 @@ void ATinoCharacter::PlayTumbleMontage()
 	PlayAnimMontage(TumbleMontage);
 }
 
+void ATinoCharacter::OnGrab()
+{
+	if (GrabMontage == nullptr || (CanGrab() == false)) return;
+
+	bIsGrabbing = true;
+
+	SendAnimPacket(4);
+	PlayAnimMontage(GrabMontage);
+	//if (GetController() && GetController()->IsPlayerController())
+		//CLog::Print("GrabOn");
+	
+
+}
+
+void ATinoCharacter::OffGrab()
+{
+	SendAnimPacket(5);
+
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+
+	StopAnimMontage(GrabMontage);
+	if (GetController() && GetController()->IsPlayerController())
+		SetMovementState(EMovementState::EMS_Normal);
+
+	SetGrabbedToNormal();
+
+
+	bIsGrabbing = false;
+	bIsGrabCoolTime = true;
+
+	if (GetWorldTimerManager().IsTimerActive(GrabCoolTimer) == false)
+	{	//ê·¸ëž© ì¿¨íƒ€ìž„ ì‹œìž‘
+		GetWorldTimerManager().SetTimer(GrabCoolTimer, [this]()
+			{
+				bIsGrabCoolTime = false;
+			}
+		, GrabCoolTime, false);
+	}
+
+	//if (GetController() && GetController()->IsPlayerController())
+		//CLog::Print("GrabOff");
+
+
+}
+
+void ATinoCharacter::SetNormalToGrabbed()
+{
+	if (!!Target)
+	{
+		auto Other = Cast<ATinoCharacter>(Target);
+		Other->SetMovementState(EMovementState::EMS_IsGrabbed);
+		Other->GetCharacterMovement()->MaxWalkSpeed *= (GrabbedSpeedRate * 0.01);
+		Other->GetCharacterMovement()->RotationRate *= (GrabbedRotationSpeedRate * 0.01);
+	}
+	else
+		CLog::Log("Target is Nullptr");
+}
+
+void ATinoCharacter::SetGrabbedToNormal()
+{
+	if (!!Target)
+	{
+		//if(GetController() && GetController()->IsPlayerController())
+			//CLog::Print("Target Remove");
+		auto Other = Cast<ATinoCharacter>(Target);
+		Other->SetMovementState(EMovementState::EMS_Normal);
+		Other->GetCharacterMovement()->MaxWalkSpeed = OriginalSpeed;
+		Other->GetCharacterMovement()->RotationRate = OriginalRotationSpeed;
+		Target = nullptr;
+	}
+	else
+		CLog::Log("No targets to delete");
+}
+
+void ATinoCharacter::GrabBegin()
+{
+	//ê·¸ëž© ì¿¨íƒ€ìž„ ì‹œìž‘
+	//if (GetController() && GetController()->IsPlayerController())
+		//CLog::Print("Grab Timer ON");
+	GetWorldTimerManager().SetTimer(GrabTimer, this, &ATinoCharacter::OffGrab, MaxGrabTime, false);
+}
+
+
+void ATinoCharacter::DetectTarget()
+{
+	FVector start = GetActorLocation();
+	FVector end = start + GetActorForwardVector() * DetectDist;
+
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	EObjectTypeQuery Pawn = UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn);
+	ObjectTypes.Add(Pawn);
+
+	TArray<AActor*> IgnoreActors;
+	//ìžê¸°ìžì‹ ì€ ì¶©ëŒê²€ì‚¬ X
+	IgnoreActors.Add(this);
+
+	FHitResult HitResult;
+	bool result = UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(),
+		start, end, DetectRadius,
+		ObjectTypes,
+		false,
+		IgnoreActors,
+		bShowDebugTrace ? EDrawDebugTrace::ForDuration : EDrawDebugTrace::None,
+		HitResult,
+		true);
+
+	if (result && bIsGrabCoolTime == false)
+	{
+		Target = HitResult.GetActor();
+		//float ScalarValue = GetActorForwardVector().Dot(Target->GetActorForwardVector());
+		
+		FVector DirVec = Target->GetActorLocation() - GetActorLocation();
+		double angle = FMath::Acos(static_cast<double>(GetActorForwardVector().Dot(DirVec.GetUnsafeNormal())));
+		angle = FMath::RadiansToDegrees(angle);
+		if (angle < DetectAngle / 2.f)
+		{
+			SetMovementState(EMovementState::EMS_Grabbing);
+			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			SetNormalToGrabbed();
+		}
+		else
+		{
+			CLog::Log("Target is bigger than DetectAngle, Go to Location In DectectAngle");
+			Target = nullptr;
+		}
+		//ì•žë’¤ íŒì •
+		/*if (ScalarValue > 0)
+		{
+			
+		}
+		else
+		{
+			CLog::Log("Target is front, Go to the Target's Back");
+			Target = nullptr;
+		}*/
+	}
+}
+
 void ATinoCharacter::DisableInputMode()
 {
 	DisableInput(GetController<APlayerController>());
@@ -337,6 +524,7 @@ bool ATinoCharacter::CanMove()
 	{
 	case EMovementState::EMS_Normal:
 	case EMovementState::EMS_Fall:
+	case EMovementState::EMS_IsGrabbed:
 		ret = true;
 		break;
 	default:
@@ -362,4 +550,26 @@ bool ATinoCharacter::CanDive()
 	ret &= (bIsDiving == false);
 	return ret;
 }
+
+bool ATinoCharacter::CanGrab()
+{
+	bool ret = false;
+
+	switch (MovementState)
+	{
+	case EMovementState::EMS_Normal:
+	case EMovementState::EMS_Fall:
+	case EMovementState::EMS_Grabbing:
+		ret = true;
+		break;
+	default:
+		ret = false;
+		break;
+	}
+	if(bIsGrabCoolTime == true)
+		ret = false;
+
+	return ret;
+}
+
 

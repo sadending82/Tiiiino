@@ -13,6 +13,11 @@ void CLog::Print(float InValue, int32 InKey, float Duration, FColor InColor)
 	GEngine->AddOnScreenDebugMessage(InKey, Duration, InColor, FString::SanitizeFloat(InValue));
 }
 
+void CLog::Print(double InValue, int32 InKey, float Duration, FColor InColor)
+{
+	GEngine->AddOnScreenDebugMessage(InKey, Duration, InColor,FString::SanitizeFloat(InValue));
+}
+
 void CLog::Print(const FString& InValue, int32 InKey, float Duration, FColor InColor)
 {
 	GEngine->AddOnScreenDebugMessage(InKey, Duration, InColor, InValue);
