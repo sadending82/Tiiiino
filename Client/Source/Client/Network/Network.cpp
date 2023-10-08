@@ -507,6 +507,9 @@ void Network::l_process_packet(unsigned char* p)
 	}
 	case LC_GAME_RESULT: {
 		LC_GAME_RESULT_PACKET* packet = reinterpret_cast<LC_GAME_RESULT_PACKET*>(p);
+		GameResult.rank = packet->rank;
+		GameResult.grade = packet->grade;
+		GameResult.point = packet->point;
 		break;
 	}
 	default:

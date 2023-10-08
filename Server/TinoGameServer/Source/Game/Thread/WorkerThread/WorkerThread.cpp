@@ -151,6 +151,7 @@ void WorkerThread::doThread()
 					//위의 setroomEnd로 인해서 더이상 플레이어의 rank는 바뀌지않음.
 					//volatile을 붙여 최적화 금지.
 					if (OtherPlayer->GetRank() > -1) continue;
+					OtherPlayer->SetRank(0);	//접속끊김이 아닌 Retire
 					DEBUGMSGNOPARAM("결과값 보냄\n");
 					mMainServer->send_player_result_packet(OtherPlayer->GetUID(), 0, roomID, true);
 					continue;
@@ -163,7 +164,7 @@ void WorkerThread::doThread()
 				auto sPacket = mMainServer->make_game_end_packet();	//판정은 클라가 알아서.
 				mMainServer->SendRoomBroadCast(roomID, (void*)&sPacket, sizeof(sPacket));
 			}
-			TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_RESET, eEventType::TYPE_TARGET, 10000, 0, roomID);
+			TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_RESET, eEventType::TYPE_TARGET, 100000, 0, roomID);
 			break;
 		}
 		case eCOMMAND_IOCP::CMD_GAME_RESET:
