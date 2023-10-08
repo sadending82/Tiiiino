@@ -774,11 +774,11 @@ void Server::SendDiconnectPacketToGameServer(int key, int uid, int roomID)
 
 void Server::SendMatchResult(int key, int rank, int point)
 {
-	LC_MATCH_RESULT_PACKET packet;
+	LC_GAME_RESULT_PACKET packet;
 	packet.grade = mClients[key].mGrade;
 	packet.rank = rank;
 	packet.point = point;
-	packet.size = sizeof(LC_MATCH_RESULT_PACKET);
-	packet.type = LC_MATCH_RESULT;
+	packet.size = sizeof(LC_GAME_RESULT_PACKET);
+	packet.type = LC_GAME_RESULT;
 	mServers[key].DoSend(&packet);
 }

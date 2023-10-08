@@ -76,7 +76,7 @@ enum PacketType {
 	LC_LOGIN_OK,
 	LC_LOGIN_FAIL,
 	LC_MATCH_RESPONSE,
-	LC_MATCH_RESULT
+	LC_GAME_RESULT
 };
 
 #pragma pack (push, 1)
@@ -245,7 +245,7 @@ struct LC_MATCH_RESPONSE_PACKET : public PACKET {
 	char	hashs[MAX_NAME_SIZE];	//암호화 값 이 값을 기반으로 client verification
 };
 
-struct LC_MATCH_RESULT_PACKET : public PACKET {
+struct LC_GAME_RESULT_PACKET : public PACKET {
 	int		rank;
 	double	grade;
 	int		point;
