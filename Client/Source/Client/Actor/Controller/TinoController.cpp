@@ -3,6 +3,7 @@
 #include "GameFramework/PlayerController.h"
 #include "Network/Network.h"
 #include "MenuUI/DialogUIWidget.h"
+#include "MenuUI/FinishGameUIWidget.h"
 
 #include "Global.h"
 
@@ -26,6 +27,7 @@ void ATinoController::BeginPlay()
 		}
 	}
 	ChangeMenuWidget(StartingWidgetClass);
+	DialogUI = Cast<UDialogUIWidget>(CreateWidget(GetWorld(), DialogUIClass));
 }
 
 void ATinoController::ChangeMenuWidget(TSubclassOf<UUserWidget> NewWidgetClass)
@@ -77,11 +79,38 @@ void ATinoController::SetInputGameMode()
 	SetShowMouseCursor(false);
 }
 
+void ATinoController::OpenInGameUI()
+{
+
+	DialogUI->OpenInGameMenuUI();
+	DialogUI->AddToViewport();
+}
+
+void ATinoController::CloseInGameUI()
+{
+	
+	DialogUI->CloseInGameMenuUI();
+	DialogUI->RemoveFromParent();
+}
+
 void ATinoController::DisconnectNetwork()
 {
-	// ���� ���� ����
+	// if Network is disconnected 
 
-	DialogUI = Cast<UDialogUIWidget>(CreateWidget(GetWorld(), DialogUIClass));
+
+	DialogUI->RenderDisconnectNetworkWindow();
 	DialogUI->AddToViewport();
 	
+}
+
+
+
+void ATinoController::ShowGameResult(int rank, double grade, int point)
+{
+	FinishGameUI = Cast<UFinishGameUIWidget>(CreateWidget(GetWorld(), FinishGameUIClass));
+	if (!!FinishGameUI)
+	{
+		FinishGameUI->ShowResult(rank, grade, point);
+		FinishGameUI->AddToViewport();
+	}
 }

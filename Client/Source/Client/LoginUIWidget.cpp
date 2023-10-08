@@ -36,8 +36,13 @@ void ULoginUIWidget::TryLogin()
 	Network::GetNetwork()->MyCharacterPassWord = pass;
 	send_login_packet(Network::GetNetwork()->l_socket, id, pass);
 
-	//auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	//TinoController->ChangeMenuWidget(TinoController->GetLobbyWidgetClass());
+
+
+}
+
+void ULoginUIWidget::LoginFailed()
+{
+	// if login failed
 
 }
 
@@ -60,11 +65,6 @@ void ULoginUIWidget::InputLoginPassword(const FText& Text)
 {
 	// Input Password Textbox
 	// UE_LOG(LogTemp, Error, TEXT("UnExpected Tree PasswordInput"));
-}
-
-void ULoginUIWidget::OnEnterPressed()
-{
-
 }
 
 void ULoginUIWidget::DisconnectNetwork()
