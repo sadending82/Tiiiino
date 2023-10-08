@@ -31,6 +31,7 @@ public:
 	USceneComponent* SceneRootComponent;
 	UPROPERTY(EditAnywhere) UStaticMeshComponent* Mesh;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) USkeletalMeshComponent* JumpingMesh;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) UStaticMeshComponent* CollisionMesh;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation") UAnimationAsset* HitAnimation;
 
 private:
