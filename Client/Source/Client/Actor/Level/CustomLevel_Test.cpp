@@ -132,12 +132,15 @@ bool ACustomLevel_Test::ConnLobbyServer()
 void ACustomLevel_Test::ShowGameResult()
 {
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	
-	int rank = Network::GetNetwork()->GameResult.rank;
-	double grade = Network::GetNetwork()->GameResult.grade;
-	int point = Network::GetNetwork()->GameResult.point;
 
-	TinoController->ShowGameResult(rank, grade, point);
+	if (!!TinoController)
+	{
+		int rank = Network::GetNetwork()->GameResult.rank;
+		double grade = Network::GetNetwork()->GameResult.grade;
+		int point = Network::GetNetwork()->GameResult.point;
+
+		TinoController->ShowGameResult(rank, grade, point);
+	}
 }
 
 
