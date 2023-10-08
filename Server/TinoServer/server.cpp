@@ -187,23 +187,36 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 
 		break;
 	}
+	case GL_ROOM_END:
+	{
+
+	}
 	case GL_ROOM_RESET:
 	{
+		GL_ROOM_RESET_PACKET* p = reinterpret_cast<GL_ROOM_RESET_PACKET*>(spacket);
+
+		mRooms[p->roomID].mStateLock.lock();
+		mRooms[p->roomID].mState = eRoomState::RS_FREE;
+		ZeroMemory(mRooms[p->roomID].mUID, sizeof(mRooms[p->roomID].mUID));
+		ZeroMemory(mRooms[p->roomID].mSockID, sizeof(mRooms[p->roomID].mSockID));
+		ZeroMemory(mRooms[p->roomID].mGrade, sizeof(mRooms[p->roomID].mGrade));
+		mRooms[p->roomID].mUserNum = 0;
+		mRooms[p->roomID].mGradeAvg = 0;
+		mRooms[p->roomID].mUpdateCount = 0;
+		mRooms[p->roomID].mStateLock.unlock();
 		break;
 	}
 	case GL_PLAYER_RESULT:
 	{
 		GL_PLAYER_RESULT_PACKET* p = reinterpret_cast<GL_PLAYER_RESULT_PACKET*>(spacket);
-		int cnt = 0;
 		for (int i = 0; i < mRooms[p->RoomID].mUserNum; i++)
 		{
-			cnt++;
 			if (mRooms[p->RoomID].mUID[i] == p->uID)
 			{
 				if (mClients[mRooms[p->RoomID].mSockID[i]].mUID == mRooms[p->RoomID].mUID[i]) // player connected lobby server
 				{
 					double GradePerRank = GRADE_FOR_SCORE[mRooms[p->RoomID].mUserNum - MIN_USER][p->rank - 1]; // 등수 가중치
-					if (p->retire = true)
+					if (p->retire == true)
 					{
 						GradePerRank = -5;
 					}
@@ -260,19 +273,6 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 					break;
 				}
 			}
-		}
-
-		if (mRooms[p->RoomID].mUpdateCount == mRooms[p->RoomID].mUserNum)	// need room reset
-		{
-			mRooms[p->RoomID].mStateLock.lock();
-			mRooms[p->RoomID].mState = eRoomState::RS_FREE;
-			ZeroMemory(mRooms[p->RoomID].mUID, sizeof(mRooms[p->RoomID].mUID));
-			ZeroMemory(mRooms[p->RoomID].mSockID, sizeof(mRooms[p->RoomID].mSockID));
-			ZeroMemory(mRooms[p->RoomID].mGrade, sizeof(mRooms[p->RoomID].mGrade));
-			mRooms[p->RoomID].mUserNum = 0;
-			mRooms[p->RoomID].mGradeAvg = 0;
-			mRooms[p->RoomID].mUpdateCount = 0;
-			mRooms[p->RoomID].mStateLock.unlock();
 		}
 		break;
 	}
