@@ -23,10 +23,6 @@ ADoor::ADoor()
 void ADoor::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	// 네트워크 동기화시 true로 변경해 줄것.
-	// 현재는 임시 변수임.
-	bIsStartMove = true;
 }
 
 // Called every frame
