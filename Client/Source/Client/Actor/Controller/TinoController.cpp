@@ -26,7 +26,7 @@ void ATinoController::BeginPlay()
 			SetInputUIMode();
 		}
 	}
-	ChangeMenuWidget(StartingWidgetClass);
+	//ChangeMenuWidget(StartingWidgetClass);
 	DialogUI = Cast<UDialogUIWidget>(CreateWidget(GetWorld(), DialogUIClass));
 }
 
