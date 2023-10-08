@@ -20,7 +20,6 @@ public:
 		ZeroMemory(mNickName, sizeof(mNickName));
 		mGrade = 0;
 		mPoint = 0;
-		mTier = 0;
 		mMatchStartTime = system_clock::now();
 	}
 	~Session() {}
@@ -48,7 +47,6 @@ public:
 	char	mNickName[MAX_NAME_SIZE];
 	double	mGrade;
 	int		mPoint;
-	double	mTier;
 	system_clock::time_point mMatchStartTime;
 	SOCKET	mSocket;
 	int		mPrevRemain;

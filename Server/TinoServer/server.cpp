@@ -93,7 +93,7 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 	}
 	case CL_MATCH:
 	{
-		if (mClients[cID].mTier > 3.5)
+		if (mClients[cID].mGrade > 3.5)
 		{
 			mMatchListHighTier.push_back(cID);
 			if (mMatchListHighTier.size() == MAX_ROOM_USER / 2)
@@ -242,7 +242,6 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 				}
 				else // player disconnected lobby server
 				{
-
 					double GradePerRank = GRADE_FOR_SCORE[mRooms[p->roomID].mUserNum - MIN_USER][p->rank - 1]; // 등수 가중치
 					if (p->retire = true)
 					{
