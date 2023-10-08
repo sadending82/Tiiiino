@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SkeletalMeshcomponent.h"
+#include "Components/Capsulecomponent.h"
 
 // Sets default values
 ATrampoline::ATrampoline()
@@ -17,10 +18,12 @@ ATrampoline::ATrampoline()
 	SceneRootComponent = CreateDefaultSubobject <USceneComponent>("RootSceneComponent");
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TrampolineMesh"));
 	JumpingMesh = CreateDefaultSubobject<USkeletalMeshComponent>("jumper");
+	CollisionMesh = CreateDefaultSubobject<UStaticMeshComponent>("CollisionMesh");
 
 	SceneRootComponent->SetupAttachment(RootComponent);
 	Mesh->SetupAttachment(SceneRootComponent);
 	JumpingMesh->SetupAttachment(SceneRootComponent);
+	CollisionMesh->SetupAttachment(SceneRootComponent);
 
 }
 
@@ -28,7 +31,7 @@ ATrampoline::ATrampoline()
 void ATrampoline::BeginPlay()
 {
 	Super::BeginPlay();
-	JumpingMesh->OnComponentHit.AddDynamic(this, &ATrampoline::OnHit);
+	CollisionMesh->OnComponentHit.AddDynamic(this, &ATrampoline::OnHit);
 }
 
 void ATrampoline::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)

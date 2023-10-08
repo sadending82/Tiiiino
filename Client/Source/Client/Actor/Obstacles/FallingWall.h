@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -22,9 +22,14 @@ protected:
 
 public:
 
+	UFUNCTION()
 	void MeshComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
+public:
+
+	UFUNCTION()
+	virtual	void ActionObject() override;
 private:
 
 	UPROPERTY(VisibleDefaultsOnly, Category = "Component")
@@ -38,6 +43,21 @@ private:
 	UPROPERTY(VisibleDefaultsOnly, Category = "Component")
 		class UGeometryCollectionComponent* RightBreakableMesh;
 
-	UPROPERTY(EditAnywhere, Category = "Stat")
-		bool bIsFallable;
+	UPROPERTY(VisibleDefaultsOnly, Category = "Field")
+		class UFieldSystemComponent* FieldSystemComponent;
+	UPROPERTY(VisibleDefaultsOnly, Category = "Field")
+		class URadialFalloff* RadialFalloff;
+	UPROPERTY(VisibleDefaultsOnly, Category = "Field")
+		class URadialVector* RadialVector;
+	UPROPERTY(VisibleDefaultsOnly, Category = "Field")
+		class UFieldSystemMetaDataFilter* MetaData;
+
+	UPROPERTY(EditAnywhere, meta=(ToolTip="퍼지는 힘?"), Category = "Stat")
+		float RadialFalloffMagnitude;
+	UPROPERTY(EditAnywhere, meta = (ToolTip = "미는 힘?"), Category = "Stat")
+		float RadialVectorMagnitude;
+	UPROPERTY(EditAnywhere, meta = (ToolTip = "True 설정시 파괴됨"), Category = "Stat")
+		bool bIsBreakable;
+
+	FVector FieldLocation;
 };

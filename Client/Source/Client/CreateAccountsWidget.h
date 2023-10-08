@@ -41,5 +41,8 @@ public:
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void InputCreatePassword(const FText& Text);
 
+	UPROPERTY(EditAnywhere, BlueprintReadwrite ,Category = "UMG_Game")
+	int DepartmentNum;
+
 
 };
