@@ -149,6 +149,14 @@ void ATinoCharacter::Tick(float DeltaTime)
 		GetCharacterMovement()->SafeMoveUpdatedComponent(FVector(0.f, 0.f, 0.01f), GetActorRotation(), true, OutHit);
 		GetCharacterMovement()->SafeMoveUpdatedComponent(FVector(0.f, 0.f, -0.01f), GetActorRotation(), true, OutHit);
 
+		if (bIsSpactateModeEnabled)
+		{
+			if (GetCharacterMovement()->MovementMode != EMovementMode::MOVE_Flying)
+			{
+				GetCharacterMovement()->MovementMode = EMovementMode::MOVE_Flying;
+			}
+		}
+
 	}
 }
 bool ATinoCharacter::CanTumble(float DeltaTime)
