@@ -198,6 +198,7 @@ struct SC_GAME_START_PACKET : public PACKET {
 };
 
 struct SC_GAME_END_PACKET : public PACKET {
+	int temp[30];
 	//char	record;		//성공 실패
 };
 

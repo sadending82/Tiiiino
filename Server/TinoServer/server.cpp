@@ -780,5 +780,5 @@ void Server::SendMatchResult(int key, int rank, int point)
 	packet.point = point;
 	packet.size = sizeof(LC_GAME_RESULT_PACKET);
 	packet.type = LC_GAME_RESULT;
-	mServers[key].DoSend(&packet);
+	mClients[key].DoSend(&packet);
 }
