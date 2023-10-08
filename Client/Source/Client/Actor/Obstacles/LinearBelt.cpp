@@ -45,7 +45,7 @@ void ALinearBelt::Tick(float DeltaTime)
 	{
 		for (auto actor : OverlappingActors)
 		{
-			actor->AddActorWorldOffset(DirectionArrow->GetForwardVector() * BeltSpeed * DeltaTime);
+			actor->AddActorWorldOffset(DirectionArrow->GetForwardVector() * BeltSpeed * DeltaTime, true);
 		}
 	}
 }
