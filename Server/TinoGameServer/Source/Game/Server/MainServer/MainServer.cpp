@@ -64,6 +64,14 @@ void MainServer::init()
 	server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	bind(mSocket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr));
 	listen(mSocket, SOMAXCONN);
+
+	int option = TRUE;               //네이글 알고리즘 on/off
+	setsockopt(mSocket,             //해당 소켓
+		IPPROTO_TCP,          //소켓의 레벨
+		TCP_NODELAY,          //설정 옵션
+		(const char*)&option, // 옵션 포인터
+		sizeof(option));      //옵션 크기
+
 	//std::cout << ntohs(server_addr.sin_port) << std::endl;
 	mhiocp = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, NULL, 0);
 	CreateIoCompletionPort(reinterpret_cast<HANDLE>(mSocket), mhiocp, 0, 0);
@@ -524,6 +532,8 @@ bool MainServer::setPlayerInRoom(Player* player, const char verification[MAX_NAM
 					player->SetDepartment(pInfo.Department);
 					player->SetID(pInfo.ID);
 					player->SetNickName(pInfo.NickName);
+					//한명이라도 들어오면 일단 타이머 세팅
+					room->setGameStartTimerStartOnce();
 					return true;
 				}
 				else {
@@ -733,14 +743,16 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 		Room* pRoom = mRooms[player->GetRoomID()];
 		DEBUGMSGNOPARAM("TheGameIsWaitting\n");
 		cout << player->GetID() << endl;
-		if (pRoom->IsAllPlayerReady())
-		{
-			DEBUGMSGNOPARAM("TheGameIsWaitting Packet Come In \n");
-			SC_GAME_WAITTING_PACKET spacket = make_game_watting_packet();
-			SendRoomBroadCast(player->GetRoomID(), (void*)&spacket, sizeof(spacket));
-			TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_START, eEventType::TYPE_BROADCAST_ROOM, 4000, NULL, player->GetRoomID());
-		}
-
+		pRoom->PlayerCntIncrease();
+		//--
+		//if (pRoom->IsAllPlayerReady())
+		//{
+		//	DEBUGMSGNOPARAM("TheGameIsWaitting Packet Come In \n");
+		//	SC_GAME_WAITTING_PACKET spacket = make_game_watting_packet();
+		//	SendRoomBroadCast(player->GetRoomID(), (void*)&spacket, sizeof(spacket));
+		//	TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_START, eEventType::TYPE_BROADCAST_ROOM, 4000, NULL, player->GetRoomID());
+		//}
+		//--
 		break;
 	}
 	case CS_GAME_BREAKDOOR:

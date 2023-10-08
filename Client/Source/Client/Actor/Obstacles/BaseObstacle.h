@@ -25,9 +25,6 @@ public:
 
 public:
 
-	const int GetObjectType() const { return ObjectType; }
-	void SetObjectType(const int Type) { ObjectType = Type; }
-
 	const int GetObjectID() const { return mObjectID; }
 	void SetObjectID(const int id) { mObjectID = id; }
 
@@ -37,11 +34,10 @@ public:
 	inline const bool IsMoveStart() const { return bIsStartMove; }
 	void EnableMoveStart(const bool value) { bIsStartMove = value; }
 
+	//장애물별 기능을 적용할 함수, 상속해서 세부기능 구현
+	virtual void ActionObject() {};
 
 protected:
-
-	UPROPERTY(EditAnywhere, Category = "Network")
-		int ObjectType;
 
 	//1006 이수민 이 mObjectID에 부서지는 발판및 부서지는 문은 기획이 넘버링을 해주어야함. "무조건"
 	UPROPERTY(EditAnywhere, Category = "Network")

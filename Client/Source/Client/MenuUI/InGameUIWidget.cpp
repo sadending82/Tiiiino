@@ -20,22 +20,22 @@ void UInGameUIWidget::NativeDestruct()
 
 void UInGameUIWidget::LevelSuccess()
 {
-	// ¿ÏÁÖ ¼º°ø
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	
 
 }
 
 void UInGameUIWidget::LevelFailed()
 {
-	// ¿ÏÁÖ ½ÇÆÐ
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
 }
 
 void UInGameUIWidget::LevelClearCheck()
 {
-	// ¿ÏÁÖ ¼º°ø ½ÇÆÐ Ã¼Å©
-	// ¼º°ø½Ã bLevelClearCheck = true
-	// ½ÇÆÐ½Ã bLevelClearCheck = false
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ã¼Å©
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ bLevelClearCheck = true
+	// ï¿½ï¿½ï¿½Ð½ï¿½ bLevelClearCheck = false
 	
 }
 
@@ -46,21 +46,22 @@ void UInGameUIWidget::TimerStart()
 	auto TinoCharacter = TinoController->GetPawn<ATinoCharacter>();
 	if (TinoCharacter)
 	{
-		// ATinoCharacter ÀÎ½ºÅÏ½º¸¦ »ç¿ëÇÏ¿© TimerStart ÇÔ¼ö¸¦ È£Ãâ
+		// ATinoCharacter ï¿½Î½ï¿½ï¿½Ï½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ TimerStart ï¿½Ô¼ï¿½ï¿½ï¿½ È£ï¿½ï¿½
 		TinoCharacter->TimerStart();
 	}
 }
 
 void UInGameUIWidget::TimerEnd()
 {
-	// °ÔÀÓ¿À¹ö Å¸ÀÌ¸Ó Á¾·á
+	// Timer end
+	// Reset RestGameTime
 	RestGameTime = 20;
 	
 }
 
 void UInGameUIWidget::TimerRun()
 {
-	// °ÔÀÓ¿À¹ö Å¸ÀÌ¸Ó ÁøÇà
+	// ï¿½ï¿½ï¿½Ó¿ï¿½ï¿½ï¿½ Å¸ï¿½Ì¸ï¿½ ï¿½ï¿½ï¿½ï¿½
 
 	FText RestGameTimeText = FText::AsNumber(RestGameTime);
 	GameTimeText->SetText(RestGameTimeText);
@@ -69,9 +70,17 @@ void UInGameUIWidget::TimerRun()
 
 }
 
-void UInGameUIWidget::DisconnectNetwork()
+void UInGameUIWidget::OpenInGameUI()
 {
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	TinoController->DisconnectNetwork();
+	if (!!TinoController)
+		TinoController->OpenInGameUI();
+}
+
+void UInGameUIWidget::CloseInGameUI()
+{
+	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (!!TinoController)
+		TinoController->RemoveDialogUI();
 }
 

@@ -1,5 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#include <string>
 #include "Network.h"
 #include "Actor/Character/TinoCharacter.h"
 #include "Actor/Obstacles/BaseObstacle.h"
@@ -121,11 +122,12 @@ void Network::error_display(int err_no)
 	LocalFree(lpMsgBuf);
 }
 
-void send_newaccount_packet(SOCKET& sock, const char* id, const char* passWord)
+void send_newaccount_packet(SOCKET& sock, const char* id, const char* passWord, const int department)
 {
 	CL_SIGNUP_PACKET packet;
 	packet.size = sizeof(packet);
 	packet.type = CL_SIGNUP;
+	packet.department = department;
 	strcpy_s(packet.id, id);
 	strcpy_s(packet.password, passWord);
 	//strcpy_s(packet.name, TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterName));
@@ -274,7 +276,7 @@ void Network::process_packet(unsigned char* p)
 		break;
 	}
 	case SC_GAME_PLAYERLOAD_OK:
-	{		
+	{
 		SC_GAME_PLAYERLOAD_OK_PACKET* packet = reinterpret_cast<SC_GAME_PLAYERLOAD_OK_PACKET*>(p);
 
 		UE_LOG(LogTemp, Error, TEXT("PLAYERLOAD PACKET COME IN"));
@@ -387,7 +389,7 @@ void Network::process_packet(unsigned char* p)
 				mOtherCharacter[id]->Dive();
 				//다이브
 				break;
-			case 3:				
+			case 3:
 				mOtherCharacter[id]->PlayTumbleMontage();
 				//착지(텀블)
 				//mOtherCharacter[id]->Dive();
@@ -454,10 +456,11 @@ void Network::process_packet(unsigned char* p)
 
 		break;
 	}
-	case SC_GAME_BREAKDOOR: 
+	case SC_GAME_BREAKDOOR:
 	{
 		SC_GAME_BREAKDOOR_PACKET* packet = reinterpret_cast<SC_GAME_BREAKDOOR_PACKET*>(p);
 
+		mObjects[packet->objectID]->ActionObject();
 		break;
 	}
 	case SC_GAME_BREAKPLATFORM:
@@ -499,8 +502,10 @@ void Network::l_process_packet(unsigned char* p)
 	{
 		LC_MATCH_RESPONSE_PACKET* packet = reinterpret_cast<LC_MATCH_RESPONSE_PACKET*>(p);
 		//게임서버 연결 코드 나중에 ip랑 포트넘버도 넘겨야함.
-		UE_LOG(LogTemp, Error, TEXT("Game Match Responed"));
-		UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("Level1_ver1"));
+		UE_LOG(LogTemp, Error, TEXT("Game Match Responed")); 
+		string maplv{ "Level" };
+		maplv += std::to_string(packet->mapLevel);
+		UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName(maplv.c_str()));
 		strcpy_s(hashs, packet->hashs);
 		bLevelOpenTriggerEnabled = true;
 		break;

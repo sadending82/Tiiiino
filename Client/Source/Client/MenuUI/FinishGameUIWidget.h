@@ -25,7 +25,7 @@ public:
 	void EnterLobby();
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	void ShowResult();
+	void ShowResult(int rank, double grade, int point);
 
 
 	UPROPERTY(meta = (BindWidget))

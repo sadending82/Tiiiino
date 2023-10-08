@@ -85,6 +85,7 @@ public:
 
 	void MakeAndShowDialog();
 
+	void SetDepartmentClothes(const int department);
 	//Getter & Setter
 	FORCEINLINE void SetMovementState(EMovementState State) { MovementState = State; }
 	FORCEINLINE void SetMaxTumbleTime(float MaxTime) { MaxTumbledTime = MaxTime; }
@@ -126,6 +127,8 @@ private:
 	void CreateDummy();
 
 private:
+
+	UTexture* GetTinoDepartTexture(int department);
 
 	bool CanMove();
 	bool CanDive();
