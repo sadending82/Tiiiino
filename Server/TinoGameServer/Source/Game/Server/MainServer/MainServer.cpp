@@ -771,6 +771,8 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 
 		break;
 	}
+	default:
+		break;
 	}
 }
 
@@ -798,5 +800,7 @@ void MainServer::ProcessPacketLobby(const int serverID, unsigned char* p)
 
 		break;
 	}
+	default:
+		break;
 	}
 }

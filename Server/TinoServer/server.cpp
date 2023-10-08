@@ -238,6 +238,7 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 					packet.type = LD_UPDATE_GRADE;
 					mServers[0].DoSend(&packet);
 					mRooms[p->roomID].mUpdateCount++;
+					printf("[%d]플레이어의 점수 [%f] 로비안끊김\n", packet.uid, packet.grade);
 					break;
 				}
 				else // player disconnected lobby server
@@ -266,6 +267,7 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 					packet.type = LD_UPDATE_GRADE;
 					mServers[0].DoSend(&packet);
 					mRooms[p->roomID].mUpdateCount++;
+					printf("[%d]플레이어의 점수 [%f] 로비끊김.\n", packet.uid, packet.grade);
 					break;
 				}
 			}
@@ -367,6 +369,7 @@ void Server::DoWorker()
 					mServers[server_id].mRecvOver.mCompType = eCompType::OP_SERVER_RECV;
 					mServers[server_id].mPrevRemain = 0;
 					mServers[server_id].mSocket = cSocket;
+					mServers[server_id].mRecvOver.mTargetID = server_id;
 
 					CreateIoCompletionPort(reinterpret_cast<HANDLE>(cSocket), mHCP, server_id, 0);
 					mServers[server_id].DoRecv();
@@ -609,7 +612,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 				packet.roomMax = MAX_ROOM_USER;
 				mClients[player_id].mRoomID = packet.roomID;
 
-				mServers[1].DoSend(&packet);
+				mServers[1].ServerDoSend(&packet);
 
 				mMatchListHighTier.pop_front();
 				mReadytoGame.push_back(player_id);
@@ -634,7 +637,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 				packet.roomMax = MAX_ROOM_USER;
 				mClients[player_id].mRoomID = packet.roomID;
 
-				mServers[1].DoSend(&packet);
+				mServers[1].ServerDoSend(&packet);
 				
 				mMatchListLowTier.pop_front();
 				mReadytoGame.push_back(player_id);
@@ -665,7 +668,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 						packet.roomMax = tSize;
 						mClients[player_id].mRoomID = packet.roomID;
 
-						mServers[1].DoSend(&packet);
+						mServers[1].ServerDoSend(&packet);
 
 						mMatchListHighTier.pop_front();
 						mReadytoGame.push_back(player_id);
@@ -698,7 +701,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 					packet.roomMax = tSize;
 					mClients[player_id].mRoomID = packet.roomID;
 
-					mServers[1].DoSend(&packet);
+					mServers[1].ServerDoSend(&packet);
 
 					mMatchListLowTier.pop_front();
 					mReadytoGame.push_back(player_id);

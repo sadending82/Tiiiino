@@ -25,7 +25,7 @@ public:
     int GetRoomSyncID() const { return mRoomSyncID; }
     void SetRoomSyncID(int roomSyncID) { mRoomSyncID = roomSyncID; }
 
-    int GetRank() const { return mRank; }
+    volatile int GetRank() const { return mRank; }
     void SetRank(int rank) { mRank = rank; }
 
     bool IsPlayerArrived();
@@ -63,7 +63,7 @@ protected:
     //client using this for own identify key
     // in room number, client use "Othercharacter[mRoomSyncID]"
     int mRoomSyncID;
-    int mRank;    //몇등?
+    volatile int mRank;    //몇등?
     int mUID;       //DB에서 부여해주는 ID use for game result 
     long long mPing;    //milliseconds
 };

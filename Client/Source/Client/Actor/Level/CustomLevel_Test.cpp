@@ -57,6 +57,12 @@ bool ACustomLevel_Test::ConnGameServer()
 	{
 		if (true == Network::GetNetwork()->ConnectServerGame())
 		{
+			int option = TRUE;               //네이글 알고리즘 on/off
+			setsockopt(Network::GetNetwork()->s_socket,             //해당 소켓
+				IPPROTO_TCP,          //소켓의 레벨
+				TCP_NODELAY,          //설정 옵션
+				(const char*)&option, // 옵션 포인터
+				sizeof(option));      //옵션 크기
 			CLog::Log("Connect Successfully");
 			send_movetogame_packet(Network::GetNetwork()->s_socket,Network::GetNetwork()->mDBUID,
 				TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterName), 0);

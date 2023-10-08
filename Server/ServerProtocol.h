@@ -9,7 +9,6 @@ constexpr int MAXGAMESERVER = 2;
 constexpr unsigned long long INCODE_SERVER_PACKET = 0xFFFF'5137'0808'6310;
 
 
-
 enum SPacketType {
 	// LobbyServer To GameServer
 	LG_LOGIN_OK,

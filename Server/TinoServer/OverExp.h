@@ -16,7 +16,7 @@ public:
 		mCompType = eCompType::OP_RECV;
 		ZeroMemory(&mOver, sizeof(mOver));
 	}
-	OverEXP(char* packet)
+	OverEXP(unsigned char* packet)
 	{
 		mWsaBuf.len = packet[0];
 		mWsaBuf.buf = reinterpret_cast<char*>(mMessageBuf);
@@ -42,10 +42,10 @@ public:
 	{
 		mWsaBuf.len = BUF_SIZE;
 		mWsaBuf.buf = reinterpret_cast<char*>(mMessageBuf);
-		mCompType = eCompType::OP_RECV;
+		mCompType = eCompType::OP_SERVER_RECV;
 		ZeroMemory(&mOver, sizeof(mOver));
 	}
-	ServerOverEXP(char* packet)
+	ServerOverEXP(unsigned char* packet)
 	{
 		mWsaBuf.len = packet[0];
 		mWsaBuf.buf = reinterpret_cast<char*>(mMessageBuf);

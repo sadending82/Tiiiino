@@ -140,7 +140,25 @@ void WorkerThread::doThread()
 			DEBUGMSGNOPARAM("한번만 오는지 GAME END\n");
 			int roomID = TimerThread::DeserializeReceiver(wsa_ex->GetBuf());
 			mMainServer->GetRooms()[roomID]->SetRoomEnd();
-
+			for (auto other : mMainServer->GetRooms()[roomID]->GetObjectsRef())
+			{
+				Player* OtherPlayer = dynamic_cast<Player*>(other);
+				if (OtherPlayer == nullptr) break;
+				if (OtherPlayer->GetSocketID() == INVALID_SOCKET_ID) continue;
+				OtherPlayer->GetStateLockRef().lock();
+				if (eSocketState::ST_INGAME == OtherPlayer->GetSocketState()) {
+					OtherPlayer->GetStateLockRef().unlock();
+					//위의 setroomEnd로 인해서 더이상 플레이어의 rank는 바뀌지않음.
+					//volatile을 붙여 최적화 금지.
+					if (OtherPlayer->GetRank() > -1) continue;
+					DEBUGMSGNOPARAM("결과값 보냄\n");
+					mMainServer->send_player_result_packet(OtherPlayer->GetUID(), 0, roomID, true);
+					continue;
+				}
+				else {
+					OtherPlayer->GetStateLockRef().unlock();
+				}
+			}
 			{
 				auto sPacket = mMainServer->make_game_end_packet();	//판정은 클라가 알아서.
 				mMainServer->SendRoomBroadCast(roomID, (void*)&sPacket, sizeof(sPacket));

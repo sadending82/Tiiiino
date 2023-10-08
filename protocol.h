@@ -17,6 +17,25 @@ constexpr int MAX_ROOM_USER = 8;
 constexpr int DELAY_TIME_EXEC_BREAKDOOR = 1000;
 constexpr int DELAY_TIME_EXEC_BREAKPLATFORM = 3000;
 
+enum class eDepartment : char
+{
+
+	None,
+	Game,
+	Ai,
+	Computer,
+	MechanicalEngine,
+	MechanicalDesign,
+	Mechatronics,
+	Electrionics,
+	AdvMaterial,
+	Chemical,
+	Nano,
+	EnergyElec,
+	Bussiness,
+	Design,
+};
+
 enum PacketType {
 	// Client To GameServer
 	CS_LOGIN,

@@ -61,6 +61,7 @@ bool Network::init()
 {
 	if (!isInit)
 	{
+
 		isInit = true;
 		WSAStartup(MAKEWORD(2, 2), &WSAData);
 		return true;
@@ -426,6 +427,7 @@ void Network::process_packet(unsigned char* p)
 		SC_GAME_END_PACKET* packet = reinterpret_cast<SC_GAME_END_PACKET*>(p);
 		closesocket(s_socket);
 		UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("Lobby"));
+		bIsConnected = false;
 		bLevelOpenTriggerEnabled = true;
 
 		break;

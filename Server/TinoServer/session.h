@@ -34,10 +34,15 @@ public:
 	}
 	void DoSend(void* packet)
 	{
-		OverEXP* sdata = new OverEXP{ reinterpret_cast<char*>(packet) };
+		OverEXP* sdata = new OverEXP{ reinterpret_cast<unsigned char*>(packet) };
 		WSASend(mSocket, &sdata->mWsaBuf, 1, 0, 0, &sdata->mOver, 0);
 	}
+	void ServerDoSend(void* packet)
+	{
+		ServerOverEXP* sdata = new ServerOverEXP{ reinterpret_cast<unsigned char*>(packet) };
+		WSASend(mSocket, &sdata->mWsaBuf, 1, 0, 0, &sdata->mOver, 0);
 
+	}
 public:
 	OverEXP mRecvOver;
 	mutex	mStateLock;
