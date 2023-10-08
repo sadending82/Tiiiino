@@ -457,7 +457,8 @@ void Network::process_packet(unsigned char* p)
 	case SC_GAME_BREAKDOOR: 
 	{
 		SC_GAME_BREAKDOOR_PACKET* packet = reinterpret_cast<SC_GAME_BREAKDOOR_PACKET*>(p);
-
+		
+		mObjects[packet->objectID]->ActionObject();
 		break;
 	}
 	case SC_GAME_BREAKPLATFORM:
