@@ -27,7 +27,7 @@ void UCreateAccountsWidget::TryCreateAccounts()
 	const char* pass = TCHAR_TO_ANSI(*CreatePasswordTextBox->GetText().ToString());
 	Network::GetNetwork()->MyCharacterName = id;
 	Network::GetNetwork()->MyCharacterPassWord = pass;
-	send_newaccount_packet(Network::GetNetwork()->l_socket, id, pass);
+	send_newaccount_packet(Network::GetNetwork()->l_socket, id, pass,DepartmentNum);
 }
 
 void UCreateAccountsWidget::InputCreateID(const FText& Text)

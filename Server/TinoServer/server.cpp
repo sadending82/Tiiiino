@@ -85,6 +85,7 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 		LD_SIGNUP_PACKET sp;
 		sp.size = sizeof(sp);
 		sp.type = LD_SIGNUP;
+		sp.department = rp->department;
 		memcpy(sp.id, rp->id, sizeof(rp->id));
 		memcpy(sp.password, rp->password, sizeof(rp->password));
 		// send to db server

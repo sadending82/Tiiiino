@@ -122,11 +122,12 @@ void Network::error_display(int err_no)
 	LocalFree(lpMsgBuf);
 }
 
-void send_newaccount_packet(SOCKET& sock, const char* id, const char* passWord)
+void send_newaccount_packet(SOCKET& sock, const char* id, const char* passWord,const int department)
 {
 	CL_SIGNUP_PACKET packet;
 	packet.size = sizeof(packet);
 	packet.type = CL_SIGNUP;
+	packet.department = department;
 	strcpy_s(packet.id, id);
 	strcpy_s(packet.password, passWord);
 	//strcpy_s(packet.name, TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterName));
