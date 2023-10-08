@@ -73,8 +73,8 @@ struct GL_PLAYER_RESULT_PACKET : public SPACKET {
 };
 
 struct GL_ROOM_END_PACKET : public SPACKET {
-	int roomID;
-	int retireUID[8];
+	int		roomID;
+	int		retireUID[8];
 };
 //---
 struct LG_LOGIN_OK_PACKET : public SPACKET {
