@@ -30,10 +30,15 @@ ATinoCharacter::ATinoCharacter()
 
 	bUseControllerRotationYaw = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-	OriginalSpeed = GetCharacterMovement()->MaxWalkSpeed;
-	OriginalRotationSpeed = GetCharacterMovement()->RotationRate;
 	SpringArm->bDoCollisionTest = false;
 	SpringArm->bUsePawnControlRotation = true;
+	
+
+	OriginalSpeed = GetCharacterMovement()->MaxWalkSpeed;
+	OriginalRotationSpeed = GetCharacterMovement()->RotationRate;
+	
+	//카메라 각도 제한(마우스 Y축 아래로 제한)
+	UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->ViewPitchMax = 0.f;
 }
 
 void ATinoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
