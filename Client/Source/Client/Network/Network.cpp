@@ -1,5 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#include <string>
 #include "Network.h"
 #include "Actor/Character/TinoCharacter.h"
 #include "Actor/Obstacles/BaseObstacle.h"
@@ -86,12 +87,12 @@ void Network::release()
 		WSACleanup();
 		if (!bLevelOpenTriggerEnabled)
 		{
-			//openlevelï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ releaseï¿½ï¿½ ï¿½Æ´Ï¶ï¿½,
-			//editorï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ releaseï¿½ï¿½ï¿½ falseï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.
+			//openlevel·Î ÀÎÇÑ release°¡ ¾Æ´Ï¶ó,
+			//editorÁßÁö¶§¹®¿¡ »ý±â´Â release¶ó¸é false½ÃÄÑÁÜ.
 			bLoginFlag = false;
-			//editorï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì´Ï±ï¿½ ï¿½ï¿½ï¿½âµµ ï¿½×³ï¿½ falseï¿½ï¿½ ï¿½Ù½ï¿½ ï¿½Ê±ï¿½È­.
+			//editorÁßÁö¶§¹®ÀÌ´Ï±î ¿©±âµµ ±×³É false·Î ´Ù½Ã ÃÊ±âÈ­.
 			bLevelOpenTriggerEnabled = false;
-			//editor ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Æ´Ï¶ï¿½ level ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ò¸ï¿½ï¿½ï¿½ releaseï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Æ¾ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ifï¿½ï¿½ ï¿½È¿ï¿½ ï¿½Ö±ï¿½.
+			//editor ÁßÁö°¡ ¾Æ´Ï¶ó level º¯°æ½Ã ºÒ¸®´Â release¿¡¼­ º¯°æµÇÁö ¸»¾Æ¾ß ÇÒ °ªÀº ÀÌ if¹® ¾È¿¡ ³Ö±â.
 			bIsConnectedLobby = 0;
 			bIsConnected = 0;
 			closesocket(l_socket);
@@ -121,11 +122,12 @@ void Network::error_display(int err_no)
 	LocalFree(lpMsgBuf);
 }
 
-void send_newaccount_packet(SOCKET& sock, const char* id, const char* passWord)
+void send_newaccount_packet(SOCKET& sock, const char* id, const char* passWord, const int department)
 {
 	CL_SIGNUP_PACKET packet;
 	packet.size = sizeof(packet);
 	packet.type = CL_SIGNUP;
+	packet.department = department;
 	strcpy_s(packet.id, id);
 	strcpy_s(packet.password, passWord);
 	//strcpy_s(packet.name, TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterName));
@@ -269,12 +271,12 @@ void Network::process_packet(unsigned char* p)
 	{
 		SC_LOGIN_OK_PACKET* packet = reinterpret_cast<SC_LOGIN_OK_PACKET*>(p);
 		mMyCharacter->SetClientID(packet->id);
-		//ï¿½ï¿½ï¿½á¼ºï¿½ï¿½
+		//¿¬°á¼º°ø
 		bIsConnected = true;
 		break;
 	}
 	case SC_GAME_PLAYERLOAD_OK:
-	{		
+	{
 		SC_GAME_PLAYERLOAD_OK_PACKET* packet = reinterpret_cast<SC_GAME_PLAYERLOAD_OK_PACKET*>(p);
 
 		UE_LOG(LogTemp, Error, TEXT("PLAYERLOAD PACKET COME IN"));
@@ -289,7 +291,7 @@ void Network::process_packet(unsigned char* p)
 		{
 			if (move_id == mMyCharacter->GetClientID())
 			{
-				//ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Î°ï¿½ Ã³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê´Â´ï¿½.
+				//³»°¡ ¿òÁ÷ÀÎ°Ç Ã³¸®ÇÏÁö ¾Ê´Â´Ù.
 			}
 			else if (mOtherCharacter[move_id] != nullptr)
 			{
@@ -314,7 +316,7 @@ void Network::process_packet(unsigned char* p)
 	{
 		SC_ADD_PLAYER_PACKET* packet = reinterpret_cast<SC_ADD_PLAYER_PACKET*>(p);
 		int id = packet->id;
-		//ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ìµï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½. Å»ï¿½ï¿½.
+		//³ª¿Í °°Àº ¾ÆÀÌµð¶ó¸é ¶Ç ¸¸µé¾îÁÙ ÀÌÀ¯ ¾øÀ½. Å»Ãâ.
 		if (id == mMyCharacter->GetClientID())
 			break;
 		if (nullptr != mOtherCharacter[id])
@@ -329,7 +331,7 @@ void Network::process_packet(unsigned char* p)
 
 		}
 		else {
-			FName path = TEXT("Blueprint'/Game/Characters/Tino/BP_TinoCharacter.BP_TinoCharacter_C'"); //_Cï¿½ï¿½ ï¿½ï¿½ ï¿½Ù¿ï¿½ï¿½ï¿½ ï¿½È´Ù°ï¿½ ï¿½ï¿½.
+			FName path = TEXT("Blueprint'/Game/Characters/Tino/BP_TinoCharacter.BP_TinoCharacter_C'"); //_C¸¦ ²À ºÙ¿©¾ß µÈ´Ù°í ÇÔ.
 			UClass* GeneratedInventoryBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 			FTransform trans(FQuat(packet->rx, packet->ry, packet->rz, packet->rw), FVector(888, 1566, 400 + (id * 150)));
 			auto mc = mMyCharacter->GetWorld()->SpawnActorDeferred<ATinoCharacter>(GeneratedInventoryBP, trans);
@@ -381,24 +383,24 @@ void Network::process_packet(unsigned char* p)
 			{
 			case 1:
 				mOtherCharacter[id]->Jump();
-				//ï¿½ï¿½ï¿½ï¿½
+				//Á¡ÇÁ
 				break;
 			case 2:
 				mOtherCharacter[id]->Dive();
-				//ï¿½ï¿½ï¿½Ìºï¿½
+				//´ÙÀÌºê
 				break;
-			case 3:				
+			case 3:
 				mOtherCharacter[id]->PlayTumbleMontage();
-				//ï¿½ï¿½ï¿½ï¿½(ï¿½Òºï¿½)
+				//ÂøÁö(ÅÒºí)
 				//mOtherCharacter[id]->Dive();
 				break;
 			case 4:
 				mOtherCharacter[id]->OnGrab();
 				break;
-				//ï¿½ï¿½ï¿½
+				//Àâ±â
 			case 5:
 				mOtherCharacter[id]->OffGrab();
-				//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+				//Àâ±âÃë¼Ò
 				break;
 
 			default:
@@ -412,14 +414,14 @@ void Network::process_packet(unsigned char* p)
 		bGameIsStart = true;
 		mMyCharacter->MakeAndShowHUD();
 		//
-		// Ä«ï¿½ï¿½Æ®ï¿½Ù¿ï¿½ UI ï¿½ï¿½ï¿½ï¿½ï¿½ objectï¿½ï¿½ Ã³ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½È­.
+		// Ä«¿îÆ®´Ù¿î UI ¶ç¿ì±â¹× objectµé Ã³À½ µ¿±âÈ­.
 		//
 		break;
 	}
 	case SC_GAME_START: {
 		SC_GAME_START_PACKET* packet = reinterpret_cast<SC_GAME_START_PACKET*>(p);
 		//
-		// ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ö°ï¿½ ï¿½Ï±ï¿½.
+		// ÇÃ·¹ÀÌ¾îµé ¿òÁ÷ÀÏ ¼ö ÀÖ°Ô ÇÏ±â.
 		//
 		break;
 	}
@@ -440,7 +442,7 @@ void Network::process_packet(unsigned char* p)
 			mOtherCharacter[packet->id]->SetActorEnableCollision(false);
 			mOtherCharacter[packet->id]->SetActorHiddenInGame(true);
 			//
-			//UIï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Î¿ï¿½ +1 Update
+			//UI¿¡ µµÂøÇÑ ÀÎ¿ø +1 Update
 			//
 		}
 		break;
@@ -450,14 +452,14 @@ void Network::process_packet(unsigned char* p)
 		SC_GAME_COUNTDOWN_START_PACKET* packet = reinterpret_cast<SC_GAME_COUNTDOWN_START_PACKET*>(p);
 
 		mMyCharacter->InGameWidgetInstance->TimerStart();
-		//Ä«ï¿½ï¿½Æ®ï¿½Ù¿ï¿½ UI ï¿½ï¿½ï¿½ï¿½ (Appear CountDown UI)
+		//Ä«¿îÆ®´Ù¿î UI ¶ç¿ì±â (Appear CountDown UI)
 
 		break;
 	}
-	case SC_GAME_BREAKDOOR: 
+	case SC_GAME_BREAKDOOR:
 	{
 		SC_GAME_BREAKDOOR_PACKET* packet = reinterpret_cast<SC_GAME_BREAKDOOR_PACKET*>(p);
-		
+
 		mObjects[packet->objectID]->ActionObject();
 		break;
 	}
@@ -483,7 +485,7 @@ void Network::l_process_packet(unsigned char* p)
 		LC_LOGIN_OK_PACKET* packet = reinterpret_cast<LC_LOGIN_OK_PACKET*>(p);
 		mMyCharacter->SetClientID(packet->id);
 		mDBUID = packet->UID;
-		//ï¿½ï¿½ï¿½á¼ºï¿½ï¿½
+		//¿¬°á¼º°ø
 		bIsConnectedLobby = true;
 		CLog::Print("LC_LOGIN_OK IS CALLING");
 
@@ -499,9 +501,11 @@ void Network::l_process_packet(unsigned char* p)
 	case LC_MATCH_RESPONSE:
 	{
 		LC_MATCH_RESPONSE_PACKET* packet = reinterpret_cast<LC_MATCH_RESPONSE_PACKET*>(p);
-		//ï¿½ï¿½ï¿½Ó¼ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Úµï¿½ ï¿½ï¿½ï¿½ß¿ï¿½ ipï¿½ï¿½ ï¿½ï¿½Æ®ï¿½Ñ¹ï¿½ï¿½ï¿½ ï¿½Ñ°Ü¾ï¿½ï¿½ï¿½.
-		UE_LOG(LogTemp, Error, TEXT("Game Match Responed"));
-		UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("Level1_ver1"));
+		//°ÔÀÓ¼­¹ö ¿¬°á ÄÚµå ³ªÁß¿¡ ip¶û Æ÷Æ®³Ñ¹öµµ ³Ñ°Ü¾ßÇÔ.
+		UE_LOG(LogTemp, Error, TEXT("Game Match Responed")); 
+		string maplv{ "Level" };
+		maplv += std::to_string(packet->mapLevel);
+		UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName(maplv.c_str()));
 		strcpy_s(hashs, packet->hashs);
 		bLevelOpenTriggerEnabled = true;
 		break;
