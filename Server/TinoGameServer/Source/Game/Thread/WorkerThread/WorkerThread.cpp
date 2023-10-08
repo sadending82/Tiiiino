@@ -123,6 +123,23 @@ void WorkerThread::doThread()
 			AcceptEx(mMainServer->GetSocket(), c_socket, wsa_ex->GetBuf() + 8, 0, sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN) + 16, NULL, &wsa_ex->GetWsaOver());
 			break;
 		}
+		case eCOMMAND_IOCP::CMD_GAME_WAIT:
+		{
+			eEventType eventType = TimerThread::DeserializeEventType(wsa_ex->GetBuf());
+			int roomID = TimerThread::DeserializeReceiver(wsa_ex->GetBuf());
+			Room* pRoom = mMainServer->GetRooms()[roomID];
+			if (pRoom->IsAllPlayerReady())
+			{
+				DEBUGMSGNOPARAM("TheGameIsWaitting Packet Come In \n");
+				SC_GAME_WAITTING_PACKET spacket = mMainServer->make_game_watting_packet();
+				mMainServer->SendRoomBroadCast(roomID, (void*)&spacket, sizeof(spacket));
+				TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_START, eEventType::TYPE_BROADCAST_ROOM, 4000, NULL, roomID);
+			}
+			else {
+				TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_WAIT, eEventType::TYPE_BROADCAST_ROOM, 2000, NULL, roomID);
+			}
+			break;
+		}
 		case eCOMMAND_IOCP::CMD_GAME_START:
 		{
 			eEventType eventType = TimerThread::DeserializeEventType(wsa_ex->GetBuf());

@@ -27,6 +27,14 @@ public:
 	void SetInputUIMode();
 	void SetInputGameMode();
 	
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void OpenInGameUI();
+
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void RemoveDialogUI();
+
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void LoginFailed();
 
 	//APlayerController* GetController();
 	TSubclassOf<UUserWidget> GetLobbyWidgetClass() const { return LobbyWidgetClass; }
@@ -34,14 +42,25 @@ public:
 	TSubclassOf<UUserWidget> GetCreateAccountsWidgetClass() const { return CreateAccountsWidgetClass; }
 
 public:
-	// Network ¿¬°á ²÷±è
+	// Network Disconnect
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void DisconnectNetwork();
 
 	UPROPERTY(BlueprintReadOnly, Category = "UMG_Game")
 	class UDialogUIWidget* DialogUI;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
 	class TSubclassOf<UDialogUIWidget> DialogUIClass;
+
+public:
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void ShowGameResult(int rank, double grade, int point);
+
+	UPROPERTY(BlueprintReadOnly, Category = "UMG_Game")
+	class UFinishGameUIWidget* FinishGameUI;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
+	class TSubclassOf<UFinishGameUIWidget> FinishGameUIClass;
 
 protected:
 	virtual void BeginPlay() override;
@@ -55,7 +74,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
 	TSubclassOf<UUserWidget> CreateAccountsWidgetClass;
 
-
+	
 
 	UPROPERTY()
 	UUserWidget* CurrentWidget;

@@ -5,20 +5,21 @@
 #include "Network/Network.h"
 #include "Actor/Character/TinoCharacter.h"
 #include "Actor/Controller/TinoController.h"
+
 #include "Global.h"
 
 
 void ACustomLevel_Test::BeginPlay() {
 
 	Super::BeginPlay();
-	Network::GetNetwork()->bLevelOpenTriggerEnabled = false;	//·¹º§ ½ÃÀÛµÆÀ¸´Ï Æ®¸®°Å ²¨ÁÜ.
+	Network::GetNetwork()->bLevelOpenTriggerEnabled = false;	//ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ûµï¿½ï¿½ï¿½ï¿½ï¿½ Æ®ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.
 	/*
-	1. Ä³¸¯ÅÍ¸¦ ½ºÆùÇÏ°í Network mMyCharacter¿¡ ¿¬°á
-	2. ¼­¹ö¿¡ ¿¬°áÇÔ
-	3. ·Î±×ÀÎ ui
-	4. ·Î±×ÀÎ ¼º°ø½Ã ui´ÝÈ÷°í ·Îºñ ½ÃÀÛ.
+	1. Ä³ï¿½ï¿½ï¿½Í¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½ Network mMyCharacterï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+	2. ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	3. ï¿½Î±ï¿½ï¿½ï¿½ ui
+	4. ï¿½Î±ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ uiï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Îºï¿½ ï¿½ï¿½ï¿½ï¿½.
 	*/
-	FName path = TEXT("Blueprint'/Game/Characters/Tino/BP_TinoCharacter.BP_TinoCharacter_C'"); //_C¸¦ ²À ºÙ¿©¾ß µÈ´Ù°í ÇÔ.
+	FName path = TEXT("Blueprint'/Game/Characters/Tino/BP_TinoCharacter.BP_TinoCharacter_C'"); //_Cï¿½ï¿½ ï¿½ï¿½ ï¿½Ù¿ï¿½ï¿½ï¿½ ï¿½È´Ù°ï¿½ ï¿½ï¿½.
 	UClass* GeneratedCharacterBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 	FTransform trans;
 	srand(time(NULL));
@@ -57,12 +58,12 @@ bool ACustomLevel_Test::ConnGameServer()
 	{
 		if (true == Network::GetNetwork()->ConnectServerGame())
 		{
-			int option = TRUE;               //³×ÀÌ±Û ¾Ë°í¸®Áò on/off
-			setsockopt(Network::GetNetwork()->s_socket,             //ÇØ´ç ¼ÒÄÏ
-				IPPROTO_TCP,          //¼ÒÄÏÀÇ ·¹º§
-				TCP_NODELAY,          //¼³Á¤ ¿É¼Ç
-				(const char*)&option, // ¿É¼Ç Æ÷ÀÎÅÍ
-				sizeof(option));      //¿É¼Ç Å©±â
+			int option = TRUE;               //ï¿½ï¿½ï¿½Ì±ï¿½ ï¿½Ë°ï¿½ï¿½ï¿½ï¿½ on/off
+			setsockopt(Network::GetNetwork()->s_socket,             //ï¿½Ø´ï¿½ ï¿½ï¿½ï¿½ï¿½
+				IPPROTO_TCP,          //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+				TCP_NODELAY,          //ï¿½ï¿½ï¿½ï¿½ ï¿½É¼ï¿½
+				(const char*)&option, // ï¿½É¼ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+				sizeof(option));      //ï¿½É¼ï¿½ Å©ï¿½ï¿½
 			CLog::Log("Connect Successfully");
 			send_movetogame_packet(Network::GetNetwork()->s_socket,Network::GetNetwork()->mDBUID,
 				TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterName), 0);
@@ -83,7 +84,7 @@ bool ACustomLevel_Test::ConnLobbyServer()
 {
 	auto player = Network::GetNetwork()->mMyCharacter;
 	if (nullptr == player) return false;
-	//ÀÌ¹Ì ¿¬°á µÇ¾îÀÖ´Ù¸é,
+	// ì´ë¯¸ ì—°ê²° ë˜ì–´ìžˆë‹¤ë©´,
 	if (true == Network::GetNetwork()->bIsConnectedLobby)
 	{
 		auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
@@ -93,16 +94,19 @@ bool ACustomLevel_Test::ConnLobbyServer()
 		}
 		else {
 			TinoController->ChangeMenuWidget(TinoController->GetLobbyWidgetClass());
-			//¿©±â¼­ °á°ú UI¸¦ ¶ç¿öÁÜ
+			// ì—¬ê¸°ì„œ ê²°ê³¼ UIë¥¼ ë„ì›Œì¤Œ
 			if (-1 != Network::GetNetwork()->GameResult.point)
 			{
 				UE_LOG(LogTemp, Error, TEXT("Result is Comming"));
-				// UI¿¡ 3°³°ªÀ» ³Ö°í ¶ç¿öÁÖ¸é µÊ. rank´Â -1ÀÌ³ª 0ÀÌ¸é retireÀÓÀ¸·Î, º¯È¯ÇØÁÖ½Ã±æ -¼ö¹Î-
+				// UIì— 3ê°œê°’ì„ ë„£ê³  ë„ì›Œì£¼ë©´ ë¨. rankëŠ” -1ì´ë‚˜ 0ì´ë©´ retireìž„ìœ¼ë¡œ, ë³€í™˜í•´ì£¼ì‹œê¸¸ -ìˆ˜ë¯¼-
 				Network::GetNetwork()->GameResult.point;
 				Network::GetNetwork()->GameResult.grade;
 				Network::GetNetwork()->GameResult.rank;
 
-				Network::GetNetwork()->GameResult = sGameResult{}; //°á°ú Ã³¸® ÇßÀ¸´Ï ºñ¿öÁÖ±â.
+				// ê²°ê³¼ì°½ ì¶œë ¥
+				ShowGameResult();
+
+				Network::GetNetwork()->GameResult = sGameResult{}; // ê²°ê³¼ ì²˜ë¦¬ í–ˆìœ¼ë‹ˆ ë¹„ì›Œì£¼ê¸°.
 			}
 			CLog::Log("Connect Lobby Against Successfully");
 		}
@@ -123,6 +127,20 @@ bool ACustomLevel_Test::ConnLobbyServer()
 
 	//UE_LOG(LogTemp, Log, TEXT("Player Try Conn"));
 	return false;
+}
+
+void ACustomLevel_Test::ShowGameResult()
+{
+	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+
+	if (!!TinoController)
+	{
+		int rank = Network::GetNetwork()->GameResult.rank;
+		double grade = Network::GetNetwork()->GameResult.grade;
+		int point = Network::GetNetwork()->GameResult.point;
+
+		TinoController->ShowGameResult(rank, grade, point);
+	}
 }
 
 

@@ -25,16 +25,19 @@ public:
 
 public:
 
-	const int GetObjectType() const { return ObjectType; }
-	void SetObjectType(const int Type) { ObjectType = Type; }
-
 	const int GetObjectID() const { return mObjectID; }
 	void SetObjectID(const int id) { mObjectID = id; }
 
-protected:
+	// 10/08 김혁동
+	// 네트워크 동기화를 위한 변수를 제어하기 위한 함수를 추가하였습니다.
+	// 아래 함수들을 호출하여 사용하면 될 것으로 보입니다.
+	inline const bool IsMoveStart() const { return bIsStartMove; }
+	void EnableMoveStart(const bool value) { bIsStartMove = value; }
 
-	UPROPERTY(EditAnywhere, Category = "Network")
-		int ObjectType;
+	//장애물별 기능을 적용할 함수, 상속해서 세부기능 구현
+	virtual void ActionObject() {};
+
+protected:
 
 	//1006 이수민 이 mObjectID에 부서지는 발판및 부서지는 문은 기획이 넘버링을 해주어야함. "무조건"
 	UPROPERTY(EditAnywhere, Category = "Network")

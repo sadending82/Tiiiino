@@ -33,6 +33,7 @@ public:
 	//이 함수는 락을 걸고 사용해야함.
 	eRoomState GetRoomState() const { return mRoomState; }
 	void PlayerCntIncrease();
+	void PlayerMaxDecrease();
 
 	bool SettingRoomPlayer(const sPlayerInfo& playerInfo, const int& playerMaxNum);
 	int GetPlayerRoomSyncID(const int uID);
@@ -43,6 +44,7 @@ public:
 	//0~7 - player 
 	//8~ (MAX_OBJECT-1) - mapobject
 	std::array<Object*, MAX_OBJECT>& GetObjectsRef() { return mObjects;}
+	void setGameStartTimerStartOnce();
 protected:
 	void addPlayer(Player* player);
 	void addMapObject(MapObject* mapObject);
@@ -69,8 +71,9 @@ protected:
 	int mPlayerSettingCnt;	//현재 방에 player가 몇명 세팅 됐는지.
 	std::atomic_int mPlayerCnt;	//현재 방에 player가 몇 명 들어왔는지.
 	std::mutex mRoomReadyLock;
-	int mPlayerMax;	//방 최대 인원
+	std::atomic_int mPlayerMax;	//방 최대 인원
 	bool mGameEndTimer;	//The Room Game is Over (Using CAS)
+	bool mGameStartTimer;	//The Room Game is Start (Using CAS)
 	eRoomStage mRoomStageKindof;	//나중에 생길지 모르는 종류별 스테이지 대비용.
 
 };

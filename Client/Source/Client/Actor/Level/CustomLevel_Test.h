@@ -27,6 +27,7 @@ protected:
 private:
 	bool ConnGameServer();
 	bool ConnLobbyServer();
+	void ShowGameResult();
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Network")
