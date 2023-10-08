@@ -99,6 +99,9 @@ public:
 
 	class UCharacterAnimInstance* GetTinoAnimInstance();
 
+	UPROPERTY()
+	bool bIsSpactateModeEnabled = false;
+
 public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
