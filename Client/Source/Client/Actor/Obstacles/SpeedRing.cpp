@@ -46,11 +46,8 @@ void ASpeedRing::BoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 		{
 			if (Controller->IsPlayerController())
 			{
-				//본인 속도만 바꾼다. 다른 플레이어는 서버에서 수정된 속도로 move packet을 보내줄 듯?
-				//초기속도저장은 덮어쓰지않도록
-				if(GetWorldTimerManager().IsTimerActive(SpeedRingTImer) == false) 
-					OriginalSpeed = OverlapCharacter->GetCharacterMovement()->MaxWalkSpeed;
-				else
+				//본인 속도만 바꾼다. 
+				if(GetWorldTimerManager().IsTimerActive(SpeedRingTImer) == true) 
 				{	//타이머 중복 방지, 이미있으면 삭제하고 다시 생성
 					GetWorldTimerManager().ClearTimer(SpeedRingTImer);
 				}
@@ -58,7 +55,7 @@ void ASpeedRing::BoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 				OverlapCharacter->OnAccelEffect();
 				GetWorldTimerManager().SetTimer(SpeedRingTImer, [this, OverlapCharacter]()
 					{
-						OverlapCharacter->GetCharacterMovement()->MaxWalkSpeed = OriginalSpeed;
+						OverlapCharacter->SetOriginalSpeed();
 						OverlapCharacter->OffAccelEffect();
 					}
 				, DurationTime, false);

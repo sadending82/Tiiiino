@@ -16,13 +16,15 @@ ATinoCharacter::ATinoCharacter()
 	:MaxTumbledTime(1.0f),
 	MaxGrabTime(3.0f),
 	GrabCoolTime(1.0f),
-	GrabbedSpeedRate(80.f),
+	GrabbedSpeed(100.f),
+	GrabbedRotationSpeed(FRotator(0.f,0.f,108.f)),
 	DetectDist(100.f),
 	DetectRadius(50.f),
 	DetectAngle(60.f),
 	TargetInterval(50.f),
-	Target(nullptr),
-	MovementState(EMovementState::EMS_Normal)
+	OriginalSpeed(400.f),
+	MovementState(EMovementState::EMS_Normal),
+	Target(nullptr)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	UHelpers::CreateComponent<USpringArmComponent>(this, &SpringArm, "SpringArm", GetCapsuleComponent());
@@ -33,12 +35,8 @@ ATinoCharacter::ATinoCharacter()
 	SpringArm->bDoCollisionTest = false;
 	SpringArm->bUsePawnControlRotation = true;
 	
-
-	OriginalSpeed = GetCharacterMovement()->MaxWalkSpeed;
 	OriginalRotationSpeed = GetCharacterMovement()->RotationRate;
 	
-	//카메라 각도 제한(마우스 Y축 아래로 제한)
-	UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->ViewPitchMax = 0.f;
 }
 
 void ATinoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -68,7 +66,8 @@ void ATinoCharacter::BeginPlay()
 	{
 		if (GetController()->IsPlayerController())
 		{
-			
+			//카메라 각도 제한(마우스 Y축 아래로 제한)
+			UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->ViewPitchMax = 0.f;
 		}
 		else
 		{
@@ -247,12 +246,14 @@ void ATinoCharacter::OffAccelEffect()
 
 }
 
+void ATinoCharacter::SetOriginalSpeed()
+{
+	GetCharacterMovement()->MaxWalkSpeed = OriginalSpeed;
+}
+
 void ATinoCharacter::TimerStart()
 {
-
 	GetWorldTimerManager().SetTimer(InGameUITimerHandle, this, &ATinoCharacter::TimerEnd, 1.f, true);
-	
-	
 }
 
 void ATinoCharacter::TimerEnd()
@@ -424,8 +425,8 @@ void ATinoCharacter::SetNormalToGrabbed()
 	{
 		auto Other = Cast<ATinoCharacter>(Target);
 		Other->SetMovementState(EMovementState::EMS_IsGrabbed);
-		Other->GetCharacterMovement()->MaxWalkSpeed *= (GrabbedSpeedRate * 0.01);
-		Other->GetCharacterMovement()->RotationRate *= (GrabbedRotationSpeedRate * 0.01);
+		Other->GetCharacterMovement()->MaxWalkSpeed = GrabbedSpeed;
+		Other->GetCharacterMovement()->RotationRate = GrabbedRotationSpeed;
 	}
 	else
 		CLog::Log("Target is Nullptr");
@@ -484,6 +485,18 @@ void ATinoCharacter::DetectTarget()
 		Target = HitResult.GetActor();
 		//float ScalarValue = GetActorForwardVector().Dot(Target->GetActorForwardVector());
 		
+		// 이미 잡힌 캐릭터나 잡고있는 캐릭터는 잡기 대상이 될 수 없다(기차 방지)
+		EMovementState TargetState = Cast<ATinoCharacter>(Target)->GetMovementState();
+		switch (TargetState)
+		{
+		case EMovementState::EMS_Grabbing :
+		case EMovementState::EMS_IsGrabbed :
+			Target = nullptr;
+			return;
+		default:
+			break;
+		}
+
 		FVector DirVec = Target->GetActorLocation() - GetActorLocation();
 		double angle = FMath::Acos(static_cast<double>(GetActorForwardVector().Dot(DirVec.GetUnsafeNormal())));
 		angle = FMath::RadiansToDegrees(angle);
@@ -560,6 +573,9 @@ bool ATinoCharacter::CanGrab()
 {
 	bool ret = false;
 
+	if (bIsGrabCoolTime == true)
+		ret = false;
+
 	switch (MovementState)
 	{
 	case EMovementState::EMS_Normal:
@@ -571,8 +587,7 @@ bool ATinoCharacter::CanGrab()
 		ret = false;
 		break;
 	}
-	if(bIsGrabCoolTime == true)
-		ret = false;
+
 
 	return ret;
 }
