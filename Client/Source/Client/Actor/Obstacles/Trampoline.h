@@ -28,8 +28,10 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	USceneComponent* SceneRootComponent;
 	UPROPERTY(EditAnywhere) UStaticMeshComponent* Mesh;
-	UPROPERTY(EditAnywhere) UStaticMeshComponent* JumpingMesh;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) USkeletalMeshComponent* JumpingMesh;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation") UAnimationAsset* HitAnimation;
 
 private:
 
