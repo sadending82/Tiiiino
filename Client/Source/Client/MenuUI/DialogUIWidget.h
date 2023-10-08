@@ -39,6 +39,7 @@ public:
 	void RenderDisconnectNetworkWindow();
 
 public:
+	// InGameMenu UI
 	UPROPERTY(meta = (BindWidget))
 	class UButton* InGameMenuButton;
 
@@ -55,6 +56,7 @@ public:
 	void DisconnectGame();
 
 public:
+	// Login Failed UI Window
 	UPROPERTY(meta = (BindWidget))
 	class UButton* LoginFailedButton;
 
@@ -70,4 +72,5 @@ public:
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void RenderLoginFailedUI();
 
+public:
 };
