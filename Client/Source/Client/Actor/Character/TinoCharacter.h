@@ -39,64 +39,80 @@ protected:
 
 public:
 
+	//상속 함수
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	virtual void Tick(float DeltaTime) override;
 
-public:
-
 	virtual void Jump() override;
 
+public:
+
+	//다이브 관련 함수
 	UFUNCTION(BlueprintCallable)
 	void Dive();
-
-	//단순 재생용,서버 패킷을받아서 실행
-	void PlayTumbleMontage();
-
-	void OnGrab();
-	void OffGrab();
-	void SetNormalToGrabbed();
-	void SetGrabbedToNormal();
-
-
-	void GrabBegin();
-	void DetectTarget();
-
-	void DisableInputMode();
-	void EnableInputMode();
 
 	void DiveBegin();
 	void DiveEnd();
 
+	//단순 재생용,서버 패킷을받아서 실행
+	void PlayTumbleMontage();
+
+	//잡기 관련 함수
+	void OnGrab();
+	void OffGrab();
+
+	void SetNormalToGrabbed();
+	void SetGrabbedToNormal();
+
+	void DetectTarget();
+	void GrabBegin();
+
+	void DisableInputMode();
+	void EnableInputMode();
+
+	//외부 호출 함수(장애물)
 	void OnAccelEffect();
 	void OffAccelEffect();
+
+	void SetOriginalSpeed();
 	
+	//UI 관련 함수
 	void TimerStart();
 	void TimerEnd();
 
 	void MakeAndShowHUD();	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
-	TSubclassOf<UInGameUIWidget> InGameWidgetClass;
-	UPROPERTY()
-	UInGameUIWidget* InGameWidgetInstance = nullptr;
-
 
 	void MakeAndShowDialog();
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
-	TSubclassOf<class UDialogUIWidget> DialogWidgetClass;
-	UPROPERTY()
-	class UDialogUIWidget* DialogWidget = nullptr;
 
+	//Getter & Setter
 	FORCEINLINE void SetMovementState(EMovementState State) { MovementState = State; }
 	FORCEINLINE void SetMaxTumbleTime(float MaxTime) { MaxTumbledTime = MaxTime; }
 	FORCEINLINE EMovementState GetMovementState() { return MovementState; }
 	FORCEINLINE float GetMaxTumbleTime() { return MaxTumbledTime; }
 	FORCEINLINE bool IsDivining() { return bIsDiving; }
+	FORCEINLINE float GetOriginalWalkSpeed() { return OriginalSpeed; }
+	FORCEINLINE FRotator GetOriginalRotationSpeed() { return OriginalRotationSpeed; }
 
 	bool GetIsAirForNetwork();
 	void SetIsAirForNetwork(bool val);
 
 	class UCharacterAnimInstance* GetTinoAnimInstance();
+
+	UPROPERTY()
+	bool bIsSpactateModeEnabled = false;
+
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
+		TSubclassOf<class UDialogUIWidget> DialogWidgetClass;
+	UPROPERTY()
+		class UDialogUIWidget* DialogWidget = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
+		TSubclassOf<UInGameUIWidget> InGameWidgetClass;
+	UPROPERTY()
+		UInGameUIWidget* InGameWidgetInstance = nullptr;
 
 private:
 	//키입력 관련 함수
@@ -120,7 +136,6 @@ private:
 
 	void Align();
 
-
 	bool SendAnimPacket(int32 AnimType);
 
 private:
@@ -141,14 +156,14 @@ private:
 		float CurrentTumbledTime;
 	UPROPERTY(EditDefaultsOnly, Category = "Animation | Tumble")
 		float MaxTumbledTime;
-	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "그랩 최대 유지시간"), Category = "Animation | Grab")
+	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "잡기 최대 유지시간"), Category = "Animation | Grab")
 		float MaxGrabTime;
-	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "그랩 재사용시간"), Category = "Animation | Grab")
+	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "잡기 재사용시간"), Category = "Animation | Grab")
 		float GrabCoolTime;
-	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "그랩시 감속량"), Category = "Animation | Grab")
-		float GrabbedSpeedRate;
-	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "그랩시 회전 감속량"), Category = "Animation | Grab")
-		float GrabbedRotationSpeedRate;
+	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "잡기당할 때 이동속도  "), Category = "Animation | Grab")
+		float GrabbedSpeed;
+	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "잡기당할 때 회전 속도"), Category = "Animation | Grab")
+		FRotator GrabbedRotationSpeed;
 
 	UPROPERTY(EditDefaultsOnly,meta = (ToolTip="탐지 거리"), Category = "Animation | Grab")
 		float DetectDist;
@@ -162,8 +177,10 @@ private:
 	UPROPERTY(BlueprintReadWrite,EditAnywhere,meta = (AllowPrivateAccess = true, ToolTip="비네트 강도"), Category = "Effect")
 		float CustomVignetteIntensity;
 
-	float OriginalSpeed;
-	FRotator OriginalRotationSpeed;
+	UPROPERTY(EditDefaultsOnly, Category = "CharacterSpeed")
+		float OriginalSpeed;
+	UPROPERTY(EditDefaultsOnly, Category = "CharacterSpeed")
+		FRotator OriginalRotationSpeed;
 
 	UPROPERTY(VisibleAnywhere, Category = "Enums")
 		EMovementState MovementState;

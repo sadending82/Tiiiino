@@ -54,6 +54,7 @@ void AGoalArea::BoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 
 				if (myTinoChar != nullptr)
 				{
+					myTinoChar->bIsSpactateModeEnabled = true;
 					if (myTinoChar->InGameWidgetInstance != nullptr)
 					{
 						myTinoChar->InGameWidgetInstance->bLevelClearCheck = true;
@@ -76,5 +77,6 @@ void AGoalArea::PlayerDisable(ACharacter* Character)
 	Character->SetActorHiddenInGame(true);
 	Character->GetCharacterMovement()->StopMovementImmediately();
 	Character->GetCharacterMovement()->GravityScale = 0.f;
+	
 }
 
