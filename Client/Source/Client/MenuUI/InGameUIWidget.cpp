@@ -53,7 +53,8 @@ void UInGameUIWidget::TimerStart()
 
 void UInGameUIWidget::TimerEnd()
 {
-	// ���ӿ��� Ÿ�̸� ����
+	// Timer end
+	// Reset RestGameTime
 	RestGameTime = 20;
 	
 }
@@ -72,18 +73,21 @@ void UInGameUIWidget::TimerRun()
 void UInGameUIWidget::DisconnectNetwork()
 {
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	TinoController->DisconnectNetwork();
+	if(!!TinoController)
+		TinoController->DisconnectNetwork();
 }
 
 void UInGameUIWidget::OpenInGameUI()
 {
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	TinoController->OpenInGameUI();
+	if (!!TinoController)
+		TinoController->OpenInGameUI();
 }
 
 void UInGameUIWidget::CloseInGameUI()
 {
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	TinoController->CloseInGameUI();
+	if (!!TinoController)
+		TinoController->RemoveDialogUI();
 }
 

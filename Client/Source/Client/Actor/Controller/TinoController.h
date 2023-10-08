@@ -31,7 +31,10 @@ public:
 	void OpenInGameUI();
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	void CloseInGameUI();
+	void RemoveDialogUI();
+
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void LoginFailed();
 
 	//APlayerController* GetController();
 	TSubclassOf<UUserWidget> GetLobbyWidgetClass() const { return LobbyWidgetClass; }

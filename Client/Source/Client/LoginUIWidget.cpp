@@ -43,7 +43,9 @@ void ULoginUIWidget::TryLogin()
 void ULoginUIWidget::LoginFailed()
 {
 	// if login failed
-
+	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (!!TinoController)
+		TinoController->LoginFailed();
 }
 
 void ULoginUIWidget::TryNewAccounts()
@@ -52,7 +54,8 @@ void ULoginUIWidget::TryNewAccounts()
 	// UE_LOG(LogTemp, Error, TEXT("UnExpected Tree NewAccounts"));
 
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	TinoController->ChangeMenuWidget(TinoController->GetCreateAccountsWidgetClass());
+	if (!!TinoController)
+		TinoController->ChangeMenuWidget(TinoController->GetCreateAccountsWidgetClass());
 }
 
 void ULoginUIWidget::InputLoginID(const FText& Text)
@@ -70,5 +73,6 @@ void ULoginUIWidget::InputLoginPassword(const FText& Text)
 void ULoginUIWidget::DisconnectNetwork()
 {
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	TinoController->DisconnectNetwork();
+	if (!!TinoController)
+		TinoController->DisconnectNetwork();
 }

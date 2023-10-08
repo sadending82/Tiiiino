@@ -81,29 +81,41 @@ void ATinoController::SetInputGameMode()
 
 void ATinoController::OpenInGameUI()
 {
-
-	DialogUI->OpenInGameMenuUI();
-	DialogUI->AddToViewport();
+	if (!!DialogUI)
+	{
+		DialogUI->RenderInGameMenuUI();
+		DialogUI->AddToViewport();
+	}
 }
 
-void ATinoController::CloseInGameUI()
+void ATinoController::RemoveDialogUI()
 {
-	
-	DialogUI->CloseInGameMenuUI();
-	DialogUI->RemoveFromParent();
+	if (!!DialogUI)
+	{
+		DialogUI->ResetWindow();
+		DialogUI->RemoveFromParent();
+	}
+}
+
+void ATinoController::LoginFailed()
+{
+	if (!!DialogUI)
+	{
+		DialogUI->RenderLoginFailedUI();
+		DialogUI->AddToViewport();
+	}
 }
 
 void ATinoController::DisconnectNetwork()
 {
 	// if Network is disconnected 
 
-
-	DialogUI->RenderDisconnectNetworkWindow();
-	DialogUI->AddToViewport();
-	
+	if (!!DialogUI)
+	{
+		DialogUI->RenderDisconnectNetworkWindow();
+		DialogUI->AddToViewport();
+	}
 }
-
-
 
 void ATinoController::ShowGameResult(int rank, double grade, int point)
 {

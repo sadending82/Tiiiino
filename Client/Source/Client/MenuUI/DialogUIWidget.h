@@ -17,6 +17,8 @@ public:
 	virtual void NativePreConstruct() override;
 	virtual void NativeDestruct() override;
 
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void ResetWindow();
 public:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* DisconnectNetworkButton;
@@ -47,12 +49,25 @@ public:
 	class UImage* InGameMenuImage;
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	void OpenInGameMenuUI();
-
-	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	void CloseInGameMenuUI();
+	void RenderInGameMenuUI();
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void DisconnectGame();
+
+public:
+	UPROPERTY(meta = (BindWidget))
+	class UButton* LoginFailedButton;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* LoginFailedText;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* LoginFailedButtonText;
+
+	UPROPERTY(meta = (BindWidget))
+	class UImage* LoginFailedImage;
+
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void RenderLoginFailedUI();
 
 };
