@@ -93,6 +93,17 @@ bool ACustomLevel_Test::ConnLobbyServer()
 		}
 		else {
 			TinoController->ChangeMenuWidget(TinoController->GetLobbyWidgetClass());
+			//여기서 결과 UI를 띄워줌
+			if (-1 != Network::GetNetwork()->GameResult.point)
+			{
+				UE_LOG(LogTemp, Error, TEXT("Result is Comming"));
+				// UI에 3개값을 넣고 띄워주면 됨. rank는 -1이나 0이면 retire임으로, 변환해주시길 -수민-
+				Network::GetNetwork()->GameResult.point;
+				Network::GetNetwork()->GameResult.grade;
+				Network::GetNetwork()->GameResult.rank;
+
+				Network::GetNetwork()->GameResult = sGameResult{}; //결과 처리 했으니 비워주기.
+			}
 			CLog::Log("Connect Lobby Against Successfully");
 		}
 		return true;

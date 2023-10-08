@@ -11,7 +11,11 @@
 
 
 
-
+struct sGameResult {
+	int rank;
+	double grade = -1.f;
+	int point = -1;
+};
 
 
 enum class AnimType
@@ -100,7 +104,7 @@ public:
 	bool bLoginFlag = false;	//로그인시 true, Game한판이 끝나고 다시 로비로 돌아올 때 
 	//Flag가 true라면 로그인 창을 띄우지 않기 위해서 있는 트릭.
 	short GameServerPort = -1;		//게임서버 접속용 port
-
+	sGameResult GameResult;
 private:
 	bool isInit;
 
