@@ -187,10 +187,6 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 
 		break;
 	}
-	case GL_ROOM_END:
-	{
-
-	}
 	case GL_ROOM_RESET:
 	{
 		GL_ROOM_RESET_PACKET* p = reinterpret_cast<GL_ROOM_RESET_PACKET*>(spacket);

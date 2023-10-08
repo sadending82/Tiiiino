@@ -241,17 +241,6 @@ void MainServer::send_player_result_packet(const int uID, const int rank,const i
 	mLobbyServer->SendPacket(&packet, sizeof(packet));
 }
 
-void MainServer::send_room_end_packet(const int roomID)
-{
-	GL_ROOM_END_PACKET packet{};
-	packet.size = sizeof(packet);
-	packet.type = GL_ROOM_END;
-	packet.roomID = roomID;
-
-	mLobbyServer->SendPacket(&packet, sizeof(packet));
-}
-
-
 void MainServer::send_move_packet(const int player_id, const int mover_id, const bool inair, const float value, const float sx, const float sy, const float sz)
 {
 	auto player = reinterpret_cast<Player*>(mObjects[player_id]);
