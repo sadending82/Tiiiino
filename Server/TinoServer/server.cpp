@@ -209,67 +209,67 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 	case GL_PLAYER_RESULT:
 	{
 		GL_PLAYER_RESULT_PACKET* p = reinterpret_cast<GL_PLAYER_RESULT_PACKET*>(spacket);
-		for (int i = 0; i < mRooms[p->RoomID].mUserNum; i++)
+		for (int i = 0; i < mRooms[p->roomID].mUserNum; i++)
 		{
-			if (mRooms[p->RoomID].mUID[i] == p->uID)
+			if (mRooms[p->roomID].mUID[i] == p->uID)
 			{
-				if (mClients[mRooms[p->RoomID].mSockID[i]].mUID == mRooms[p->RoomID].mUID[i]) // player connected lobby server
+				if (mClients[mRooms[p->roomID].mSockID[i]].mUID == mRooms[p->roomID].mUID[i]) // player connected lobby server
 				{
-					double GradePerRank = GRADE_FOR_SCORE[mRooms[p->RoomID].mUserNum - MIN_USER][p->rank - 1]; // 등수 가중치
+					double GradePerRank = GRADE_FOR_SCORE[mRooms[p->roomID].mUserNum - MIN_USER][p->rank - 1]; // 등수 가중치
 					if (p->retire == true)
 					{
 						GradePerRank = -5;
 					}
-					double GAP = mRooms[p->RoomID].mGradeAvg - mClients[mRooms[p->RoomID].mSockID[i]].mGrade;
+					double GAP = mRooms[p->roomID].mGradeAvg - mClients[mRooms[p->roomID].mSockID[i]].mGrade;
 					if (GAP < -4)
 					{
 						GAP = -4;
 					}
-					double temp = mRooms[p->RoomID].mUserNum * GRADE_CON_NUM * (GradePerRank + GAP);
+					double temp = mRooms[p->roomID].mUserNum * GRADE_CON_NUM * (GradePerRank + GAP);
 					if (temp < 0)
 					{
-						temp *= mClients[mRooms[p->RoomID].mSockID[i]].mGrade / 5;
+						temp *= mClients[mRooms[p->roomID].mSockID[i]].mGrade / 5;
 					}
-					mClients[mRooms[p->RoomID].mSockID[i]].mStateLock.lock();
-					mClients[mRooms[p->RoomID].mSockID[i]].mGrade += temp;
-					mClients[mRooms[p->RoomID].mSockID[i]].mState = eSessionState::ST_LOBBY;
-					mClients[mRooms[p->RoomID].mSockID[i]].mStateLock.unlock();
+					mClients[mRooms[p->roomID].mSockID[i]].mStateLock.lock();
+					mClients[mRooms[p->roomID].mSockID[i]].mGrade += temp;
+					mClients[mRooms[p->roomID].mSockID[i]].mState = eSessionState::ST_LOBBY;
+					mClients[mRooms[p->roomID].mSockID[i]].mStateLock.unlock();
 					// to db server update
 					LD_UPDATE_GRADE_PACKET packet;
-					packet.grade = mClients[mRooms[p->RoomID].mSockID[i]].mGrade;
-					packet.uid = mClients[mRooms[p->RoomID].mSockID[i]].mUID;
+					packet.grade = mClients[mRooms[p->roomID].mSockID[i]].mGrade;
+					packet.uid = mClients[mRooms[p->roomID].mSockID[i]].mUID;
 					packet.size = sizeof(LD_UPDATE_GRADE_PACKET);
 					packet.type = LD_UPDATE_GRADE;
 					mServers[0].DoSend(&packet);
-					mRooms[p->RoomID].mUpdateCount++;
+					mRooms[p->roomID].mUpdateCount++;
 					break;
 				}
 				else // player disconnected lobby server
 				{
 
-					double GradePerRank = GRADE_FOR_SCORE[mRooms[p->RoomID].mUserNum - MIN_USER][p->rank - 1]; // 등수 가중치
+					double GradePerRank = GRADE_FOR_SCORE[mRooms[p->roomID].mUserNum - MIN_USER][p->rank - 1]; // 등수 가중치
 					if (p->retire = true)
 					{
 						GradePerRank = -5;
 					}
-					double GAP = mRooms[p->RoomID].mGradeAvg - mRooms[p->RoomID].mGrade[i];
+					double GAP = mRooms[p->roomID].mGradeAvg - mRooms[p->roomID].mGrade[i];
 					if (GAP < -4)
 					{
 						GAP = -4;
 					}
-					double temp = mRooms[p->RoomID].mUserNum * GRADE_CON_NUM * (GradePerRank + GAP);
+					double temp = mRooms[p->roomID].mUserNum * GRADE_CON_NUM * (GradePerRank + GAP);
 					if (temp < 0)
 					{
-						temp *= mRooms[p->RoomID].mGrade[i] / 5;
+						temp *= mRooms[p->roomID].mGrade[i] / 5;
 					}
 					// to db server update
 					LD_UPDATE_GRADE_PACKET packet;
-					packet.grade = mRooms[p->RoomID].mGrade[i];
-					packet.uid = mRooms[p->RoomID].mUID[i];
+					packet.grade = mRooms[p->roomID].mGrade[i];
+					packet.uid = mRooms[p->roomID].mUID[i];
 					packet.size = sizeof(LD_UPDATE_GRADE_PACKET);
 					packet.type = LD_UPDATE_GRADE;
 					mServers[0].DoSend(&packet);
-					mRooms[p->RoomID].mUpdateCount++;
+					mRooms[p->roomID].mUpdateCount++;
 					break;
 				}
 			}
