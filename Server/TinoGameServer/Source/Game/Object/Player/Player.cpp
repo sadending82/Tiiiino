@@ -33,7 +33,9 @@ void Player::DisConnectAndReset()
 		mStateLock.unlock();
 	}
 	DisConnect();
-	gMainServer->GetRooms()[mRoomID]->DisablePlayer(this);
+	if(mRank < 0)
+		gMainServer->send_player_result_packet(mUID, mRank, mRoomID, true);
+	//gMainServer->GetRooms()[mRoomID]->DisablePlayer(this);
 	auto sPacket = gMainServer->make_player_remove_packet(mRoomSyncID);
 	gMainServer->SendRoomBroadCast(mRoomID, (void*)&sPacket, sizeof(sPacket));
 	Reset();

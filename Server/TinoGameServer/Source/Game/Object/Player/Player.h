@@ -63,7 +63,7 @@ protected:
     //client using this for own identify key
     // in room number, client use "Othercharacter[mRoomSyncID]"
     int mRoomSyncID;
-    int mRank;    //몇등?
+    std::atomic_int mRank;    //몇등?
     int mUID;       //DB에서 부여해주는 ID use for game result 
     long long mPing;    //milliseconds
 };

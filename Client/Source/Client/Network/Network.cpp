@@ -61,6 +61,7 @@ bool Network::init()
 {
 	if (!isInit)
 	{
+
 		isInit = true;
 		WSAStartup(MAKEWORD(2, 2), &WSAData);
 		return true;
@@ -426,6 +427,7 @@ void Network::process_packet(unsigned char* p)
 		SC_GAME_END_PACKET* packet = reinterpret_cast<SC_GAME_END_PACKET*>(p);
 		closesocket(s_socket);
 		UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("Lobby"));
+		bIsConnected = false;
 		bLevelOpenTriggerEnabled = true;
 
 		break;
@@ -455,6 +457,12 @@ void Network::process_packet(unsigned char* p)
 	case SC_GAME_BREAKDOOR: 
 	{
 		SC_GAME_BREAKDOOR_PACKET* packet = reinterpret_cast<SC_GAME_BREAKDOOR_PACKET*>(p);
+
+		break;
+	}
+	case SC_GAME_BREAKPLATFORM:
+	{
+		SC_GAME_BREAKPLATFORM_PACKET* packet = reinterpret_cast<SC_GAME_BREAKPLATFORM_PACKET*>(p);
 
 		break;
 	}
@@ -495,6 +503,13 @@ void Network::l_process_packet(unsigned char* p)
 		UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("Level1_ver1"));
 		strcpy_s(hashs, packet->hashs);
 		bLevelOpenTriggerEnabled = true;
+		break;
+	}
+	case LC_GAME_RESULT: {
+		LC_GAME_RESULT_PACKET* packet = reinterpret_cast<LC_GAME_RESULT_PACKET*>(p);
+		GameResult.rank = packet->rank;
+		GameResult.grade = packet->grade;
+		GameResult.point = packet->point;
 		break;
 	}
 	default:

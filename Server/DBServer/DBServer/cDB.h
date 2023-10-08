@@ -24,7 +24,7 @@ public:
 	bool ExecuteQuery();
 
 	tuple<string, string, double, int> SelectUserData(const int uid);
-	tuple<int, string, double, int, bool> SelectUserDataForLogin(const string& id);
+	tuple<int, string, double, int, bool, char> SelectUserDataForLogin(const string& id);
 	vector<string> SelectHash(const string& id); // Index 0: hash / Index 1: salt
 
 	bool InsertNewUser(const string& id);
@@ -32,7 +32,7 @@ public:
 
 	bool UpdateUserConnectionState(const int uid, const int state);
 	bool UpdateUserNickname(const int uid, const string& nicknameToChange);
-	bool UpdateUsergrade(const int uid, double grade);
+	bool UpdateUserGrade(const int uid, double grade);
 	bool UpdateUserPoint(const int uid, unsigned int point);
 	bool UpdateUserDepartment(const int uid, const char department);
 

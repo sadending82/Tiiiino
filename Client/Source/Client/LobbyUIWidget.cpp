@@ -31,6 +31,7 @@ void ULobbyUIWidget::TryGameReady()
 void ULobbyUIWidget::TryGameReadyCancel()
 {
 	// If ready
+	send_matchout_packet(Network::GetNetwork()->l_socket);
 	// GameStart Button Onclicked
 
 }

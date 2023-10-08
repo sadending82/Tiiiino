@@ -9,13 +9,32 @@ constexpr int BUF_SIZE = 200;
 
 constexpr int MAX_USER = 300;
 constexpr int MAX_OBJECT = 3000;
-constexpr int MAX_NAME_SIZE = 20;	//닉네임, 중복검사 X
+constexpr int MAX_NAME_SIZE = 36 + 1;	//닉네임, 중복검사 X
 constexpr int MAX_ROOM = 10;
 constexpr int MAX_ROOM_USER = 8;
 
 // Object Event Time
 constexpr int DELAY_TIME_EXEC_BREAKDOOR = 1000;
 constexpr int DELAY_TIME_EXEC_BREAKPLATFORM = 3000;
+
+enum class eDepartment : char
+{
+
+	None,
+	Game,
+	Ai,
+	Computer,
+	MechanicalEngine,
+	MechanicalDesign,
+	Mechatronics,
+	Electrionics,
+	AdvMaterial,
+	Chemical,
+	Nano,
+	EnergyElec,
+	Bussiness,
+	Design,
+};
 
 enum PacketType {
 	// Client To GameServer
@@ -57,6 +76,7 @@ enum PacketType {
 	LC_LOGIN_OK,
 	LC_LOGIN_FAIL,
 	LC_MATCH_RESPONSE,
+	LC_GAME_RESULT
 };
 
 #pragma pack (push, 1)
@@ -178,6 +198,7 @@ struct SC_GAME_START_PACKET : public PACKET {
 };
 
 struct SC_GAME_END_PACKET : public PACKET {
+	int temp[30];
 	//char	record;		//성공 실패
 };
 
@@ -223,6 +244,12 @@ struct LC_MATCH_RESPONSE_PACKET : public PACKET {
 	int gameServerPortNum;
 	unsigned char gameServerIP[16];	//IPv4에서 ip는 4바이트인데 글자로 표기하니까 최대 xxx.xxx.xxx.xxx  15 + 널문자 = 16
 	char	hashs[MAX_NAME_SIZE];	//암호화 값 이 값을 기반으로 client verification
+};
+
+struct LC_GAME_RESULT_PACKET : public PACKET {
+	int		rank;
+	double	grade;
+	int		point;
 };
 
 //--------------------------

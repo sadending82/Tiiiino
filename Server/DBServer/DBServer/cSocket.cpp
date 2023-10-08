@@ -162,17 +162,35 @@ void Socket::processPacket(int key, unsigned char* buf)
 {
     switch (buf[1])
     {
-        // 로그인 요청
     case LD_LOGIN: {
         ProcessPacket_Login(key, buf);
         break;
     }
+    case LD_LOGOUT: {
+        ProcessPacket_Logout(buf);
+        break;
+    }
     case LD_SIGNUP: {
-        ProcessPacket_SignUp(buf);
+        ProcessPacket_SignUp(key, buf);
+        break;
+    }
+    case LD_UPDATE_NICKNAME: {
+        ProcessPacket_UpdateNickname(key, buf);
+        break;
+    }
+    case LD_UPDATE_GRADE: {
+        ProcessPacket_UpdateGrade(key, buf);
+        break;
+    }
+    case LD_CHANGE_DEPARTMENT: {
+        ProcessPacket_ChangeDepartment(key, buf);
         break;
     }
     default:
     {
+#ifdef Test
+        cout << "Wrong Packet Received - sender: " << key << endl;
+#endif
         break;
     }
     }
@@ -198,8 +216,9 @@ bool Socket::CheckLogin(int key, const char* id, const char* password, int userK
     double grade = get<2>(userData);
     int point = get<3>(userData);
     int state = get<4>(userData);
+    char department = get<5>(userData);
 
-    SendUserDataAfterLogin(key, uid, nickname, id, grade, point, state, userKey);
+    SendLoginOK(key, uid, nickname, id, grade, point, state, department, userKey);
 
     if (state == FALSE)
         Getm_pDB()->UpdateUserConnectionState(uid, true);
@@ -210,7 +229,8 @@ bool Socket::CheckLogin(int key, const char* id, const char* password, int userK
 }
 
 // SendPacket
-void Socket::SendUserDataAfterLogin(int key, int uid, string& nickname, const char* id, double grade, int point, int state, int userKey)
+void Socket::SendLoginOK(int key, int uid, string& nickname, const char* id
+    , double grade, int point, int state, char department, int userKey)
 {
     DL_LOGIN_OK_PACKET p;
     p.size = sizeof(DL_LOGIN_OK_PACKET);
@@ -223,18 +243,49 @@ void Socket::SendUserDataAfterLogin(int key, int uid, string& nickname, const ch
     p.grade = grade;
     p.point = point;
     p.connState = state;
+    p.department = department;
     p.userKey = userKey;
 
-    mSessions[key].DoSend(reinterpret_cast<DL_LOGIN_OK_PACKET*>(&p));
+    mSessions[key].DoSend((void*)(&p));
 }
 
-void Socket::SendLoginFail(int key, const char* id, int userKey) {
+void Socket::SendLoginFail(int key, int userKey) {
     DL_LOGIN_FAIL_PACKET p;
     p.size = sizeof(DL_LOGIN_FAIL_PACKET);
     p.type = SPacketType::DL_LOGIN_FAIL;
     p.userKey = userKey;
 
-    mSessions[key].DoSend(reinterpret_cast<DL_LOGIN_FAIL_PACKET*>(&p));
+    mSessions[key].DoSend((void*)(&p));
+}
+
+void Socket::SendSignUpOK(int key, int userKey)
+{
+    DL_SIGNUP_OK_PACKET p;
+    p.size = sizeof(DL_SIGNUP_OK_PACKET);
+    p.type = SPacketType::DL_SIGNUP_OK;
+    p.userKey = userKey;
+
+    mSessions[key].DoSend((void*)(&p));
+}
+
+void Socket::SendSignUpFail(int key, int userKey)
+{
+    DL_SIGNUP_FAIL_PACKET p;
+    p.size = sizeof(DL_SIGNUP_FAIL_PACKET);
+    p.type = SPacketType::DL_SIGNUP_FAIL;
+    p.userKey = userKey;
+
+    mSessions[key].DoSend((void*)(&p));
+}
+
+void Socket::SendUpdateNicknameOK(int key, int userKey)
+{
+    DL_UPDATE_NICKNAME_OK_PACKET p;
+    p.size = sizeof(DL_UPDATE_NICKNAME_OK_PACKET);
+    p.type = SPacketType::DL_UPDATE_NICKNAME_OK;
+    p.userKey = userKey;
+
+    mSessions[key].DoSend((void*)(&p));
 }
 
 // ProcessPacket
@@ -242,17 +293,91 @@ void Socket::ProcessPacket_Login(int key, unsigned char* buf)
 {
     LD_LOGIN_PACKET* p = reinterpret_cast<LD_LOGIN_PACKET*>(buf);
 
-    bool bCheckLogin = CheckLogin(key, p->id, p->password, p->userKey);
-    if (bCheckLogin == false) {
-        SendLoginFail(key, p->id, p->userKey);
+    if (strcmp(p->id, ADMIN_ID) == 0) {
+        Admin_Login(key, buf);
+        return;
+    }
+
+    bool bResult = CheckLogin(key, p->id, p->password, p->userKey);
+    if (bResult == false) {
+        SendLoginFail(key, p->userKey);
     }
 }
 
-void Socket::ProcessPacket_SignUp(unsigned char* buf)
+void Socket::ProcessPacket_Logout(unsigned char* buf)
+{
+    LD_LOGOUT_PACKET* p = reinterpret_cast<LD_LOGOUT_PACKET*>(buf);
+    Getm_pDB()->UpdateUserConnectionState(p->uid, 0);
+}
+
+void Socket::ProcessPacket_SignUp(int key, unsigned char* buf)
 {
     LD_SIGNUP_PACKET* p = reinterpret_cast<LD_SIGNUP_PACKET*>(buf);
-    bool bJoin = Getm_pDB()->SignUpNewPlayer(p->id, p->password);
-    if (bJoin == false) {
+    bool bResult = Getm_pDB()->SignUpNewPlayer(p->id, p->password);
+    if (bResult != true) {
         cout << "Sign Up new user failed\n";
+        SendSignUpFail(key, p->userKey);
+        return;
     }
+    SendSignUpOK(key, p->userKey);
+}
+
+void Socket::ProcessPacket_UpdateNickname(int key, unsigned char* buf)
+{
+    LD_UPDATE_NICKNAME_PACKET* p = reinterpret_cast<LD_UPDATE_NICKNAME_PACKET*>(buf);
+    bool bResult = Getm_pDB()->UpdateUserNickname(p->uid, p->nickname);
+    if (bResult == true) {
+        SendUpdateNicknameOK(key, p->userKey);
+    }
+}
+
+void Socket::ProcessPacket_UpdateGrade(int key, unsigned char* buf)
+{
+    LD_UPDATE_GRADE_PACKET* p = reinterpret_cast<LD_UPDATE_GRADE_PACKET*>(buf);
+    bool bResult = Getm_pDB()->UpdateUserGrade(p->uid, p->grade);
+    if (bResult != true) {
+        cout << "Update User Grade failed\n";
+    }
+}
+
+void Socket::ProcessPacket_ChangeDepartment(int key, unsigned char* buf)
+{
+    LD_CHANGE_DEPARTMENT_PACKET* p = reinterpret_cast<LD_CHANGE_DEPARTMENT_PACKET*>(buf);
+    bool bResult = Getm_pDB()->UpdateUserDepartment(p->uid, p->department);
+    if (bResult != true) {
+
+    }
+}
+
+
+// ADMIN
+int Socket::SetAdminUID()
+{
+    int cnt = ADMIN_START_UID;
+    while (true) {
+        if (cnt == ADMIN_LAST_UID)
+            return INVALIDKEY;
+        if (bAdminLogin[cnt] == false) {
+            return cnt;
+        }
+        else
+            ++cnt;
+    }
+}
+
+void Socket::Admin_Login(int key, unsigned char* buf)
+{
+    LD_LOGIN_PACKET* p = reinterpret_cast<LD_LOGIN_PACKET*>(buf);
+
+    int uid = atoi(p->password);
+
+    if (uid < 1 && 10 < uid) {
+        SendLoginFail(key, p->userKey);
+        return;
+    }
+
+    string id = string(ADMIN_ID) + string(p->password);
+
+    SendLoginOK(key, uid, id, id.c_str()
+        , 3.0, 100000, 1, 0, p->userKey);
 }

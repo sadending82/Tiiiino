@@ -57,6 +57,12 @@ bool ACustomLevel_Test::ConnGameServer()
 	{
 		if (true == Network::GetNetwork()->ConnectServerGame())
 		{
+			int option = TRUE;               //네이글 알고리즘 on/off
+			setsockopt(Network::GetNetwork()->s_socket,             //해당 소켓
+				IPPROTO_TCP,          //소켓의 레벨
+				TCP_NODELAY,          //설정 옵션
+				(const char*)&option, // 옵션 포인터
+				sizeof(option));      //옵션 크기
 			CLog::Log("Connect Successfully");
 			send_movetogame_packet(Network::GetNetwork()->s_socket,Network::GetNetwork()->mDBUID,
 				TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterName), 0);
@@ -87,6 +93,17 @@ bool ACustomLevel_Test::ConnLobbyServer()
 		}
 		else {
 			TinoController->ChangeMenuWidget(TinoController->GetLobbyWidgetClass());
+			//여기서 결과 UI를 띄워줌
+			if (-1 != Network::GetNetwork()->GameResult.point)
+			{
+				UE_LOG(LogTemp, Error, TEXT("Result is Comming"));
+				// UI에 3개값을 넣고 띄워주면 됨. rank는 -1이나 0이면 retire임으로, 변환해주시길 -수민-
+				Network::GetNetwork()->GameResult.point;
+				Network::GetNetwork()->GameResult.grade;
+				Network::GetNetwork()->GameResult.rank;
+
+				Network::GetNetwork()->GameResult = sGameResult{}; //결과 처리 했으니 비워주기.
+			}
 			CLog::Log("Connect Lobby Against Successfully");
 		}
 		return true;

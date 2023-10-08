@@ -54,24 +54,7 @@ enum class eRoomState
 	ST_INGAME			//게임중인 방
 };
 
-enum class eDepartment : char 
-{
 
-	None,
-	Game,
-	Ai,
-	Computer,
-	MechanicalEngine,
-	MechanicalDesign,
-	Mechatronics,
-	Electrionics,
-	AdvMaterial,
-	Chemical,
-	Nano,
-	EnergyElec,
-	Bussiness,
-	Design,
-};
 //Player Have Item BitFlag with int64
 enum class eEquipmentFlags : __int64
 {
