@@ -47,11 +47,14 @@ public:
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	int GetRestGameTime() const { return RestGameTime; }
 
-	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	void DisconnectNetwork();
-
 	UPROPERTY(EditAnywhere, Category = "UMG_Game")
 	bool bLevelClearCheck = false;
+
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void OpenInGameUI();
+
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void CloseInGameUI();
 
 private:
 	UPROPERTY(EditAnywhere, Category = "UMG_Game")
