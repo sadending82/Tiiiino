@@ -165,7 +165,7 @@ void WorkerThread::doThread()
 				auto sPacket = mMainServer->make_game_countdown_start_packet();
 				mMainServer->SendRoomBroadCast(roomID, (void*)&sPacket, sizeof(sPacket));
 			}
-			TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_END, eEventType::TYPE_BROADCAST_ROOM, 10000, NULL, roomID);
+			TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_END, eEventType::TYPE_BROADCAST_ROOM, 20000, NULL, roomID);
 
 			break;
 		}

@@ -157,7 +157,7 @@ void MainServer::send_login_ok_packet(const int player_id, void* buf)
 	player->SendPacket(&packet, sizeof(packet));
 }
 
-SC_LOGIN_OK_PACKET MainServer::make_login_ok_packet(const int playerID,const char* playername)
+SC_LOGIN_OK_PACKET MainServer::make_login_ok_packet(const int playerID, const char* playername)
 {
 	auto player = dynamic_cast<Player*>(mObjects[playerID]);
 	SC_LOGIN_OK_PACKET packet;
@@ -229,7 +229,7 @@ void MainServer::send_room_reset_packet(const int roomID)
 }
 
 
-void MainServer::send_move_packet(const int player_id,const int mover_id, const bool inair,const float value, const float sx, const float sy, const float sz)
+void MainServer::send_move_packet(const int player_id, const int mover_id, const bool inair, const float value, const float sx, const float sy, const float sz)
 {
 	auto player = reinterpret_cast<Player*>(mObjects[player_id]);
 	SC_MOVE_PLAYER_PACKET packet{};
@@ -288,7 +288,7 @@ SC_PLAYER_ARRIVE_PACKET MainServer::make_player_arrive_packet(const int arriveID
 	packet.id = arriveID;
 	packet.size = sizeof(packet);
 	packet.type = SC_PLAYER_ARRIVE;
-	
+
 	return packet;
 }
 
@@ -484,7 +484,7 @@ void MainServer::connectLobbyServer()
 	dynamic_cast<LobbyServer*>(mLobbyServer)->init();
 }
 
-bool MainServer::setPlayerInRoom(Player* player,const char verification[MAX_NAME_SIZE])
+bool MainServer::setPlayerInRoom(Player* player, const char verification[MAX_NAME_SIZE])
 {
 	for (auto& tRoom : mRooms)
 	{
@@ -536,7 +536,7 @@ bool MainServer::initRoom(const std::string& mapName)
 	{
 		DEBUGMSGONEPARAM("[%s]읽기 실패\n", mapName.c_str());
 	}
-	
+
 	return false;
 }
 
@@ -578,7 +578,7 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 		// 이유: 해킹범이 uid를 변조했을 때, 이 암호화 된 무언가의 랜덤값 또한 맞춰야함. 그런데 진짜 로비서버에서 랜덤으로 생성해서 주면 어떻게 맞출건데? 
 
 		//
-		if (false == setPlayerInRoom(player,packet->hashs))
+		if (false == setPlayerInRoom(player, packet->hashs))
 		{
 			/*
 				나중에 여기에 제대로 된 방 id가 안나오면 접속을 끊어버려야함. 부정접속
@@ -618,10 +618,11 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 		//방안의 모든 플레이어 정보를 나에게로
 		SendRoomOthersToMe(player->GetRoomID(), player->GetSocketID(), player->GetSocketID(), &MainServer::make_player_add_packet);
 
-		{
-			auto spacket = make_game_playerload_ok_packet();
-			SendMySelf(player->GetSocketID(), (void*)&spacket, sizeof(spacket));
-		}
+
+		DEBUGMSGNOPARAM("player load ok Send.\n");
+		auto loadpacket = make_game_playerload_ok_packet();
+		SendMySelf(player->GetSocketID(), (void*)&loadpacket, sizeof(loadpacket));
+
 		break;
 	}
 	case CS_MOVE: {
@@ -633,7 +634,7 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 			break;
 		}
 		Room* pRoom = mRooms[player->GetRoomID()];
-		
+
 
 		player->SetMoveTime(packet->move_time);
 		player->SetPosition(Vector3f(packet->x, packet->y, packet->z));
@@ -709,9 +710,11 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 			break;
 		}
 		Room* pRoom = mRooms[player->GetRoomID()];
-		pRoom->PlayerCntIncrease();
+		DEBUGMSGNOPARAM("TheGameIsWaitting\n");
+		cout << player->GetID() << endl;
 		if (pRoom->IsAllPlayerReady())
 		{
+			DEBUGMSGNOPARAM("TheGameIsWaitting Packet Come In \n");
 			SC_GAME_WAITTING_PACKET spacket = make_game_watting_packet();
 			SendRoomBroadCast(player->GetRoomID(), (void*)&spacket, sizeof(spacket));
 			TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_START, eEventType::TYPE_BROADCAST_ROOM, 4000, NULL, player->GetRoomID());
@@ -728,7 +731,7 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 			DEBUGMSGNOPARAM("player is nullptr.\n");
 			break;
 		}
-		
+
 		auto sPacket = make_game_breakdoor_packet(packet->objectID);
 		SendRoomBroadCast(player->GetRoomID(), (void*)(&sPacket), sizeof(sPacket));
 
@@ -760,15 +763,16 @@ void MainServer::ProcessPacketLobby(const int serverID, unsigned char* p)
 		LG_USER_INTO_GAME_PACKET* packet = reinterpret_cast<LG_USER_INTO_GAME_PACKET*>(p);
 		Room* activeRoom = mRooms[packet->roomID];
 		mRooms[packet->roomID]->ActiveRoom();
-		sPlayerInfo playerinfo{ packet->id,packet->name,static_cast<eDepartment>(packet->department),static_cast<eEquipmentFlags>(packet->equipmentflag),packet->roomID};
+		sPlayerInfo playerinfo{ packet->id,packet->name,static_cast<eDepartment>(packet->department),static_cast<eEquipmentFlags>(packet->equipmentflag),packet->roomID };
 		playerinfo.UID = packet->uID;
 		strcpy_s(playerinfo.hashs, packet->hashs);
 		if (true == activeRoom->SettingRoomPlayer(playerinfo, packet->roomMax))
 		{
-			DEBUGMSGONEPARAM("%d번째 방 활성화 완료.\n", packet->roomID);
+			DEBUGMSGONEPARAM("%d번째 방 활성화 완료.", packet->roomID);
+			DEBUGMSGONEPARAM("인원수 [%d]\n", packet->roomMax);
 			send_room_ready_packet(packet->roomID);
 			TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_PING, eEventType::TYPE_BROADCAST_ROOM, 3000, NULL, packet->roomID);
-			
+
 		}
 
 		break;

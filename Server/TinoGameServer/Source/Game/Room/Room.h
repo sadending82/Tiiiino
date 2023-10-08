@@ -65,9 +65,9 @@ protected:
 	int	mRoomID;	//방 ID
 	int mPlayerSettingCnt;	//현재 방에 player가 몇명 세팅 됐는지.
 	std::atomic_int mPlayerCnt;	//현재 방에 player가 몇 명 들어왔는지.
+	std::mutex mRoomReadyLock;
 	int mPlayerMax;	//방 최대 인원
 	bool mGameEndTimer;	//The Room Game is Over (Using CAS)
-
 	eRoomStage mRoomStageKindof;	//나중에 생길지 모르는 종류별 스테이지 대비용.
 
 };
