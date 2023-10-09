@@ -217,7 +217,8 @@ void ATinoCharacter::SetDepartmentClothes(const int department)
 {
 	auto DynamicMaterialMesh = GetMesh()->CreateDynamicMaterialInstance(0);
 	DynamicMaterialMesh->SetTextureParameterValue(TEXT("Department"), GetTinoDepartTexture(department));
-	GetMesh()->SetMaterial(0, DynamicMaterialMesh);
+	if(DynamicMaterialMesh)
+		GetMesh()->SetMaterial(0, DynamicMaterialMesh);
 }
 
 
@@ -555,6 +556,7 @@ UTexture* ATinoCharacter::GetTinoDepartTexture(int department)
 	switch (department)
 	{
 	case 1:
+		//겜공
 		break;
 	case 2:
 		UHelpers::GetAssetDynamic(&pTexture, "Engine.Texture2D'/Game/Characters/Tino/Cloth/Texture/DepartmentTestTexture/Tino_A.Tino_A'");
@@ -592,7 +594,8 @@ UTexture* ATinoCharacter::GetTinoDepartTexture(int department)
 	case 13:
 		UHelpers::GetAssetDynamic(&pTexture, "Engine.Texture2D'/Game/Characters/Tino/Cloth/Texture/DepartmentTestTexture/Tino_L.Tino_L'");
 		break;
-
+	default:
+		break;
 	}
 
 	return pTexture;

@@ -341,6 +341,7 @@ void Network::process_packet(unsigned char* p)
 				mc->AutoPossessPlayer = EAutoReceiveInput::Disabled;
 				mc->bIsControlledPlayer = false;
 				mc->FinishSpawning(trans);
+				mc->SetDepartmentClothes(packet->department);
 				mOtherCharacter[id] = mc;
 				mOtherCharacter[id]->GetMesh()->SetVisibility(true);
 				mOtherCharacter[id]->SetClientID(packet->id);
@@ -428,6 +429,7 @@ void Network::process_packet(unsigned char* p)
 	case SC_GAME_END: {
 		SC_GAME_END_PACKET* packet = reinterpret_cast<SC_GAME_END_PACKET*>(p);
 		closesocket(s_socket);
+		//mMyCharacter->InGameWidgetInstance->ShowResultUI();
 		UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("Lobby"));
 		bIsConnected = false;
 		bLevelOpenTriggerEnabled = true;

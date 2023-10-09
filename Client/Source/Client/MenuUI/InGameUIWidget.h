@@ -31,6 +31,9 @@ public:
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void LevelClearCheck();
 
+	UFUNCTION(BluePrintImplementableEvent, Category = "UMG_Game")
+	void ShowResultUI();
+
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	bool GetbLevelClearCheck() { return bLevelClearCheck; }
 
