@@ -12,14 +12,14 @@
 void ACustomLevel_Test::BeginPlay() {
 
 	Super::BeginPlay();
-	Network::GetNetwork()->bLevelOpenTriggerEnabled = false;	//���� ���۵����� Ʈ���� ����.
+	Network::GetNetwork()->bLevelOpenTriggerEnabled = false;	//레벨 시작됐으니 트리거 꺼줌.
 	/*
-	1. ĳ���͸� �����ϰ� Network mMyCharacter�� ����
-	2. ������ ������
-	3. �α��� ui
-	4. �α��� ������ ui������ �κ� ����.
+	1. 캐릭터를 스폰하고 Network mMyCharacter에 연결
+	2. 서버에 연결함
+	3. 로그인 ui
+	4. 로그인 성공시 ui닫히고 로비 시작.
 	*/
-	FName path = TEXT("Blueprint'/Game/Characters/Tino/BP_TinoCharacter.BP_TinoCharacter_C'"); //_C�� �� �ٿ��� �ȴٰ� ��.
+	FName path = TEXT("Blueprint'/Game/Characters/Tino/BP_TinoCharacter.BP_TinoCharacter_C'"); //_C를 꼭 붙여야 된다고 함.
 	UClass* GeneratedCharacterBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 	FTransform trans;
 	srand(time(NULL));
@@ -58,12 +58,12 @@ bool ACustomLevel_Test::ConnGameServer()
 	{
 		if (true == Network::GetNetwork()->ConnectServerGame())
 		{
-			int option = TRUE;               //���̱� �˰���� on/off
-			setsockopt(Network::GetNetwork()->s_socket,             //�ش� ����
-				IPPROTO_TCP,          //������ ����
-				TCP_NODELAY,          //���� �ɼ�
-				(const char*)&option, // �ɼ� ������
-				sizeof(option));      //�ɼ� ũ��
+			int option = TRUE;               //네이글 알고리즘 on/off
+			setsockopt(Network::GetNetwork()->s_socket,             //해당 소켓
+				IPPROTO_TCP,          //소켓의 레벨
+				TCP_NODELAY,          //설정 옵션
+				(const char*)&option, // 옵션 포인터
+				sizeof(option));      //옵션 크기
 			CLog::Log("Connect Successfully");
 			send_movetogame_packet(Network::GetNetwork()->s_socket,Network::GetNetwork()->mDBUID,
 				TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterName), 0);
