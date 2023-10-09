@@ -288,6 +288,7 @@ void Network::process_packet(unsigned char* p)
 	{
 		SC_LOGIN_OK_PACKET* packet = reinterpret_cast<SC_LOGIN_OK_PACKET*>(p);
 		mMyCharacter->SetClientID(packet->id);
+		mMyCharacter->SetDepartmentClothes(packet->department);
 		//연결성공
 		bIsConnected = true;
 		break;
@@ -429,7 +430,6 @@ void Network::process_packet(unsigned char* p)
 	}
 	case SC_GAME_WAITTING: {
 		SC_GAME_WAITTING_PACKET* packet = reinterpret_cast<SC_GAME_WAITTING_PACKET*>(p);
-		mMyCharacter->GetWorld()->GetFirstPlayerController<ATinoController>()->SetInputGameMode();
 		bGameIsStart = true;
 		mMyCharacter->MakeAndShowHUD();
 		for (auto obj : mObjects)

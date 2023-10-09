@@ -33,6 +33,11 @@ void Player::DisConnectAndReset()
 		mStateLock.unlock();
 	}
 	DisConnect();
+	if (mRoomSyncID < 0)
+	{
+		DEBUGMSGNOPARAM("이상한 사람 접속\n");
+		return;
+	}
 	if(mRank < 0)
 		gMainServer->send_player_result_packet(mUID, mRank, mRoomID, true);
 	gMainServer->GetRooms()[mRoomID]->PlayerMaxDecrease();
