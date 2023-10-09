@@ -23,6 +23,26 @@ enum class EMovementState : uint8
 	EMS_MAX UMETA(DisplayName = "DefaultMAX")
 };
 
+UENUM(BlueprintType)
+enum class EDepartment : uint8
+{
+	EDepartment_None UMETA(DisplayName = "None"),
+	EDepartment_Game UMETA(DisplayName = "Game"),
+	EDepartment_Ai UMETA(DisplayName = "Ai"),
+	EDepartment_Computer UMETA(DisplayName = "Computer"),
+	EDepartment_MechanicalEngine UMETA(DisplayName = "MechanicalEngine"),
+	EDepartment_MechanicalDesign UMETA(DisplayName = "MechanicalDesign"),
+	EDepartment_Mechatornics UMETA(DisplayName = "Mechatornics"),
+	EDepartment_Electrionics UMETA(DisplayName = "Electrionics"),
+	EDepartment_AdvMaterial UMETA(DisplayName = "AdvMaterial"),
+	EDepartment_Chemical UMETA(DisplayName = "Chemical"),
+	EDepartment_Nano UMETA(DisplayName = "Nano"),
+	EDepartment_EnergyElec UMETA(DisplayName = "EnergyElec"),
+	EDepartment_Bussiness UMETA(DisplayName = "Bussiness"),
+	EDepartment_Design UMETA(DisplayName = "Design"),
+	EDepartment_MAX UMETA(DisplayName = "DefaultMAX")
+};
+
 UCLASS()
 class CLIENT_API ATinoCharacter : public ABaseCharacter
 {
@@ -85,7 +105,6 @@ public:
 
 	void MakeAndShowDialog();
 
-	void SetDepartmentClothes(const int department);
 	//Getter & Setter
 	FORCEINLINE void SetMovementState(EMovementState State) { MovementState = State; }
 	FORCEINLINE void SetMaxTumbleTime(float MaxTime) { MaxTumbledTime = MaxTime; }
@@ -94,6 +113,9 @@ public:
 	FORCEINLINE bool IsDivining() { return bIsDiving; }
 	FORCEINLINE float GetOriginalWalkSpeed() { return OriginalSpeed; }
 	FORCEINLINE FRotator GetOriginalRotationSpeed() { return OriginalRotationSpeed; }
+	
+	UFUNCTION(BlueprintCallable)
+	void SetDepartmentClothes(const int department);
 
 	bool GetIsAirForNetwork();
 	void SetIsAirForNetwork(bool val);
@@ -128,7 +150,6 @@ private:
 
 private:
 
-	UTexture* GetTinoDepartTexture(int department);
 
 	bool CanMove();
 	bool CanDive();
@@ -140,6 +161,8 @@ private:
 	void Align();
 
 	bool SendAnimPacket(int32 AnimType);
+
+	UTexture* GetTinoDepartTexture(EDepartment DepartmentNumber);
 
 private:
 
@@ -187,6 +210,11 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = "Enums")
 		EMovementState MovementState;
+	UPROPERTY(VisibleAnywhere, Category = "Enums")
+		EDepartment Department;
+
+	UPROPERTY(BlueprintReadOnly,EditDefaultsOnly,meta=(AllowPrivateAccess = true), Category = "Texture")
+		TMap<EDepartment, UTexture*> DepartmentTextureMap;
 
 	UPROPERTY(VisibleAnywhere, Category = "Animation | Grab")
 		AActor* Target;
