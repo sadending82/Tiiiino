@@ -7,6 +7,7 @@
 #include "Actor/Controller/TinoController.h"
 #include "Actor/Character/TinoCharacter.h"
 #include "MenuUI/InGameTimerWidget.h"
+#include "Network/Network.h"
 
 #include "Global.h"
 
@@ -87,8 +88,13 @@ void UInGameUIWidget::CloseInGameUI()
 void UInGameUIWidget::ChangeLobbyUI()
 {
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	if (!!TinoController)
-		TinoController->ChangeMenuWidget(TinoController->GetLobbyWidgetClass());
+	{
+		Network::GetNetwork()->bIsConnected = false;
+		Network::GetNetwork()->bLevelOpenTriggerEnabled = true;
+		UGameplayStatics::OpenLevel(GetWorld(), FName("Lobby"));
+	}
+	//if (!!TinoController)
+	//	TinoController->ChangeMenuWidget(TinoController->GetLobbyWidgetClass());
 }
 
 void UInGameUIWidget::LevelStartCountdown()
