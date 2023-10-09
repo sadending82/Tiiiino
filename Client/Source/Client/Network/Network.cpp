@@ -429,6 +429,7 @@ void Network::process_packet(unsigned char* p)
 	}
 	case SC_GAME_WAITTING: {
 		SC_GAME_WAITTING_PACKET* packet = reinterpret_cast<SC_GAME_WAITTING_PACKET*>(p);
+		mMyCharacter->GetWorld()->GetFirstPlayerController<ATinoController>()->SetInputGameMode();
 		bGameIsStart = true;
 		mMyCharacter->MakeAndShowHUD();
 		for (auto obj : mObjects)
