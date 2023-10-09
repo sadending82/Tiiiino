@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Actor/Character/BaseCharacter.h"
 #include "MenuUI/InGameUIWidget.h"
+#include "MenuUI/InGameTimerWidget.h"
 #include "TinoCharacter.generated.h"
 
 /**
@@ -98,8 +99,8 @@ public:
 	void SetOriginalSpeed();
 	
 	//UI 관련 함수
-	void TimerStart();
-	void TimerEnd();
+	void TimerStart(ETimerType type);
+	void TimerRun();
 
 	void MakeAndShowHUD();	
 
@@ -131,6 +132,13 @@ public:
 		TSubclassOf<class UDialogUIWidget> DialogWidgetClass;
 	UPROPERTY()
 		class UDialogUIWidget* DialogWidget = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
+		TSubclassOf<UInGameTimerWidget> InGameUITimerClass;
+	UPROPERTY()
+		UInGameTimerWidget* InGameUITimerInstance = nullptr;
+	UPROPERTY()
+		ETimerType Type;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
 		TSubclassOf<UInGameUIWidget> InGameWidgetClass;
@@ -234,5 +242,5 @@ private:
 
 	FTimerHandle GrabTimer;
 	FTimerHandle GrabCoolTimer;
-	FTimerHandle InGameUITimerHandle;
+	FTimerHandle UITimerHandle;
 };

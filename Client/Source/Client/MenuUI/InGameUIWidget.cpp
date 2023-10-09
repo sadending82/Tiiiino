@@ -6,12 +6,13 @@
 #include "Components/TextBlock.h"
 #include "Actor/Controller/TinoController.h"
 #include "Actor/Character/TinoCharacter.h"
+#include "MenuUI/InGameTimerWidget.h"
 
 #include "Global.h"
 
 void UInGameUIWidget::NativePreConstruct()
 {
-	RestGameTime = 20;
+
 }
 
 void UInGameUIWidget::NativeDestruct()
@@ -41,34 +42,33 @@ void UInGameUIWidget::LevelClearCheck()
 
 void UInGameUIWidget::TimerStart()
 {
-
-	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	auto TinoCharacter = TinoController->GetPawn<ATinoCharacter>();
-	if (TinoCharacter)
+	InGameTimer = Cast<UInGameTimerWidget>(CreateWidget(GetWorld(), InGameTimerClass));
+	StartCountDownText->SetRenderOpacity(1.0);
+	if (!!InGameTimer)
 	{
-		// ATinoCharacter 인스턴스를 사용하여 TimerStart 함수를 호출
-		TinoCharacter->TimerStart();
+		InGameTimer->TimerStart(ETimerType::ETT_LevelClear);
 	}
-}
-
-void UInGameUIWidget::TimerEnd()
-{
-	// Timer end
-	// Reset RestGameTime
-	RestGameTime = 20;
 	
 }
-
-void UInGameUIWidget::TimerRun()
-{
-	// 게임오버 타이머 진행
-
-	FText RestGameTimeText = FText::AsNumber(RestGameTime);
-	GameTimeText->SetText(RestGameTimeText);
-	RestGameTime--;
-	
-
-}
+//
+//void UInGameUIWidget::TimerEnd()
+//{
+//	// Timer end
+//	// Reset RestGameTime
+//	RestGameTime = 20;
+//	
+//}
+//
+//void UInGameUIWidget::TimerRun()
+//{
+//	// 게임오버 타이머 진행
+//
+//	FText RestGameTimeText = FText::AsNumber(RestGameTime);
+//	GameTimeText->SetText(RestGameTimeText);
+//	RestGameTime--;
+//	
+//
+//}
 
 void UInGameUIWidget::OpenInGameUI()
 {
@@ -82,5 +82,53 @@ void UInGameUIWidget::CloseInGameUI()
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	if (!!TinoController)
 		TinoController->RemoveDialogUI();
+}
+
+void UInGameUIWidget::ChangeLobbyUI()
+{
+	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (!!TinoController)
+		TinoController->ChangeMenuWidget(TinoController->GetLobbyWidgetClass());
+}
+
+void UInGameUIWidget::LevelStartCountdown()
+{
+	// 레벨 시작시 카운트다운을 위해 이 함수 호출
+	InGameTimer = Cast<UInGameTimerWidget>(CreateWidget(GetWorld(), InGameTimerClass));
+	if (!!InGameTimer)
+	{
+		InGameTimer->TimerStart(ETimerType::ETT_LevelStart);
+	}
+}
+
+void UInGameUIWidget::LevelStart()
+{
+	// 카운트다운이 끝나고 화면에 go를 띄우는 동시에 레벨 시작
+	// 타이머 안보이도록 숨김
+	StartCountDownText->SetRenderOpacity(0.0);
+
+}
+
+void UInGameUIWidget::LevelClearCountdown()
+{
+	// 누군가 결승선을 통과했을 때 레벨을 끝내기까지 남은시간 카운트다운
+	if (!!InGameTimer)
+	{
+		InGameTimer->TimerStart(ETimerType::ETT_LevelClear);
+	}
+}
+
+void UInGameUIWidget::TimerTextChange(int RestGameTime, ETimerType Type)
+{
+	if (Type == ETimerType::ETT_LevelClear)
+	{
+		FText RestGameTimeText = FText::AsNumber(RestGameTime);
+		GameTimeText->SetText(RestGameTimeText);
+	}
+	else if (Type == ETimerType::ETT_LevelStart)
+	{
+		FText StartCountDown = FText::AsNumber(RestGameTime);
+		StartCountDownText->SetText(StartCountDown);
+	}
 }
 

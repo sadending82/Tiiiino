@@ -44,5 +44,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadwrite ,Category = "UMG_Game")
 	int DepartmentNum;
 
-
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void CheckCreateAccount();
 };

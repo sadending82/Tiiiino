@@ -27,7 +27,7 @@ public:
 	void TryLogin();
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	void LoginFailed();
+	void UIAlertMessage();
 
 
 	UFUNCTION()

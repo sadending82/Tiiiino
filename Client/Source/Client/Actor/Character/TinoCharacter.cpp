@@ -11,6 +11,8 @@
 #include "Animation/AnimMontage.h"
 #include "MenuUI/InGameUIWidget.h"
 #include "MenuUI/DialogUIWidget.h"
+#include "MenuUI/InGameTimerWidget.h"
+
 
 ATinoCharacter::ATinoCharacter()
 	:MaxTumbledTime(1.0f),
@@ -206,6 +208,9 @@ void ATinoCharacter::MakeAndShowHUD()
 	InGameWidgetInstance = CreateWidget<UInGameUIWidget>(GetWorld(), InGameWidgetClass);
 	InGameWidgetInstance->AddToViewport();
 
+	InGameUITimerInstance = CreateWidget<UInGameTimerWidget>(GetWorld(), InGameUITimerClass);
+	InGameUITimerInstance->AddToViewport();
+
 }
 
 void ATinoCharacter::MakeAndShowDialog()
@@ -274,26 +279,27 @@ void ATinoCharacter::SetOriginalSpeed()
 	GetCharacterMovement()->MaxWalkSpeed = OriginalSpeed;
 }
 
-void ATinoCharacter::TimerStart()
+void ATinoCharacter::TimerStart(ETimerType type)
 {
-	GetWorldTimerManager().SetTimer(InGameUITimerHandle, this, &ATinoCharacter::TimerEnd, 1.f, true);
+	Type = type;
+	GetWorldTimerManager().SetTimer(UITimerHandle, this, &ATinoCharacter::TimerRun, true);
 }
 
-void ATinoCharacter::TimerEnd()
+void ATinoCharacter::TimerRun()
 {
 
 	// 유효성 확인
-	if (InGameWidgetInstance)
+	if (!!InGameUITimerInstance)
 	{
 		// UInGameUIWidget의 TimerRun 함수 호출
-		InGameWidgetInstance->TimerRun();
-	}
-	if (InGameWidgetInstance->GetRestGameTime() < 0)
-	{
-		InGameWidgetInstance->TimerEnd();
-		GetWorldTimerManager().ClearTimer(InGameUITimerHandle);
-	}
+		InGameUITimerInstance->TimerRun(Type);
 
+		if (InGameUITimerInstance->GetRestGameTime() < 0)
+		{
+			InGameUITimerInstance->TimerEnd(Type);
+			GetWorldTimerManager().ClearTimer(UITimerHandle);
+		}
+	}
 }
 
 void ATinoCharacter::Dive()

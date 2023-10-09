@@ -10,6 +10,15 @@
 /**
  * 
  */
+
+UENUM(BlueprintType)
+enum class EDialogUICheck : uint8
+{
+	EDC_LoginFailed,
+	EDC_CASuccess,
+	EDC_CAFailed,
+};
+
 UCLASS()
 class CLIENT_API ATinoController : public APlayerController
 {
@@ -34,7 +43,7 @@ public:
 	void RemoveDialogUI();
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	void LoginFailed();
+	void UIAlertMessage(EDialogUICheck check);
 
 	//APlayerController* GetController();
 	TSubclassOf<UUserWidget> GetLobbyWidgetClass() const { return LobbyWidgetClass; }
