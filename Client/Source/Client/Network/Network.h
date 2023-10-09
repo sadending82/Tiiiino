@@ -131,8 +131,8 @@ public:
 	bool RecvPacketGame() ;
 	bool RecvPacketLobby();
 	// 112.152.55.49  127.0.0.1  , 112.153.53.142
-	const char* GAMESERVER_ADDR = "58.125.39.92";
-	const char* LOBBYSERVER_ADDR = "58.125.39.92";
+	const char* GAMESERVER_ADDR = "127.0.0.1";
+	const char* LOBBYSERVER_ADDR = "127.0.0.1";
 };
 
 
