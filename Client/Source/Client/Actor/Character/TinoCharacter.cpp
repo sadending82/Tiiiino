@@ -219,18 +219,26 @@ void ATinoCharacter::MakeAndShowDialog()
 	DialogWidget->AddToViewport();
 }
 
-void ATinoCharacter::SetDepartmentClothes(const int department)
+void ATinoCharacter::SetDepartmentClothes(int department)
 {
-	auto DynamicMaterialMesh = GetMesh()->CreateDynamicMaterialInstance(0);
-	auto DepartmentTexture = GetTinoDepartTexture(static_cast<EDepartment>(department));
-	if (DepartmentTexture == nullptr)
+	if (static_cast<int>(EDepartment::EDepartment_None) < department &&
+		static_cast<int>(EDepartment::EDepartment_MAX) > department)
 	{
-		CLog::Log("Fail to Get Department Texture!");
-		return;
+		auto DynamicMaterialMesh = GetMesh()->CreateDynamicMaterialInstance(0);
+		auto DepartmentTexture = GetTinoDepartTexture(static_cast<EDepartment>(department));
+		if (DepartmentTexture == nullptr)
+		{
+			CLog::Log("Fail to Get Department Texture!");
+			return;
+		}
+		DynamicMaterialMesh->SetTextureParameterValue(TEXT("Department"), DepartmentTexture);
+		if (DynamicMaterialMesh)
+			GetMesh()->SetMaterial(0, DynamicMaterialMesh);
 	}
-	DynamicMaterialMesh->SetTextureParameterValue(TEXT("Department"), DepartmentTexture);
-	if(DynamicMaterialMesh)
-		GetMesh()->SetMaterial(0, DynamicMaterialMesh);
+	else
+	{
+		CLog::Print("Department value is Invalid. Check Server",1, 10.f,FColor::Red);
+	}
 }
 
 

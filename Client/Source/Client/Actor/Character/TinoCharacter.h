@@ -116,7 +116,7 @@ public:
 	FORCEINLINE FRotator GetOriginalRotationSpeed() { return OriginalRotationSpeed; }
 	
 	UFUNCTION(BlueprintCallable)
-	void SetDepartmentClothes(const int department);
+	void SetDepartmentClothes(int department);
 
 	bool GetIsAirForNetwork();
 	void SetIsAirForNetwork(bool val);
