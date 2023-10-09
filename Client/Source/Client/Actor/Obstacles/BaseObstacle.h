@@ -42,7 +42,11 @@ protected:
 	//1006 이수민 이 mObjectID에 부서지는 발판및 부서지는 문은 기획이 넘버링을 해주어야함. "무조건"
 	UPROPERTY(EditAnywhere, Category = "Network")
 	int mObjectID;
-
+	// 10.09 이수민 동기화가 필요한 obstacle과 아닌 obstacle ex)LinearBelt를 구분짓기 위함.
+	//동기화가 필요없다면 false. 기본은 false 기획은 건물설치하고 동기화가 필요하다면
+	// (움직이는 타이밍 등) 체크를해주도록한다.
+	UPROPERTY(EditAnywhere, Category = "Network")
+	bool bIsSyncObject = false ;
 		// 10/06 김혁동
 		// 이 부분은 네트워크 동기화를 위한 변수입니다.
 		// 타이밍을 맞춰야 하는 장애물들은 이 변수가 true가 되는 순간 움직이도록 설정해야 합니다. 

@@ -1,8 +1,6 @@
 #pragma once
 #include "cSocket.h"
 
-#define Test
-
 int Socket::SetKey()
 {
     int cnt = STARTKEY;
@@ -113,10 +111,8 @@ void Socket::WorkerFunc()
     }
 }
 
-void Socket::ServerReady(DB* pDB)
+void Socket::ServerReady()
 {
-    Setm_pDB(pDB);
-
     WSADATA wsa;
     WSAStartup(MAKEWORD(2, 2), &wsa);
 
@@ -154,6 +150,8 @@ void Socket::ServerReady(DB* pDB)
 #ifdef Test
     std::cout << "Connect To Lobby Server Ready" << std::endl;
 #endif
+
+    m_pDB->UpdateUserGrade(100, 2.2);
 
     WorkerFunc();
 }
@@ -199,6 +197,7 @@ void Socket::processPacket(int key, unsigned char* buf)
 // DB
 bool Socket::CheckLogin(int key, const char* id, const char* password, int userKey)
 {
+#ifdef RUN_DB
     int res = Getm_pDB()->CheckVerifyUser(id, password);
     if (res == false) {
         cout << "Login Information Invalid\n";
@@ -225,6 +224,7 @@ bool Socket::CheckLogin(int key, const char* id, const char* password, int userK
 
     cout << "Login Success / ID: " << id << endl;
 
+#endif
     return true;
 }
 
@@ -297,56 +297,72 @@ void Socket::ProcessPacket_Login(int key, unsigned char* buf)
         Admin_Login(key, buf);
         return;
     }
-
+#ifdef RUN_DB
     bool bResult = CheckLogin(key, p->id, p->password, p->userKey);
     if (bResult == false) {
         SendLoginFail(key, p->userKey);
     }
+#endif
 }
 
 void Socket::ProcessPacket_Logout(unsigned char* buf)
 {
+#ifdef RUN_DB
     LD_LOGOUT_PACKET* p = reinterpret_cast<LD_LOGOUT_PACKET*>(buf);
     Getm_pDB()->UpdateUserConnectionState(p->uid, 0);
+#endif
 }
 
 void Socket::ProcessPacket_SignUp(int key, unsigned char* buf)
 {
     LD_SIGNUP_PACKET* p = reinterpret_cast<LD_SIGNUP_PACKET*>(buf);
-    bool bResult = Getm_pDB()->SignUpNewPlayer(p->id, p->password);
+#ifdef RUN_DB
+    bool bResult = Getm_pDB()->SignUpNewPlayer(p->id, p->password, p->department);
     if (bResult != true) {
         cout << "Sign Up new user failed\n";
         SendSignUpFail(key, p->userKey);
         return;
     }
+#endif
     SendSignUpOK(key, p->userKey);
 }
 
 void Socket::ProcessPacket_UpdateNickname(int key, unsigned char* buf)
 {
     LD_UPDATE_NICKNAME_PACKET* p = reinterpret_cast<LD_UPDATE_NICKNAME_PACKET*>(buf);
+#ifdef RUN_DB
     bool bResult = Getm_pDB()->UpdateUserNickname(p->uid, p->nickname);
     if (bResult == true) {
         SendUpdateNicknameOK(key, p->userKey);
     }
+#endif
 }
 
 void Socket::ProcessPacket_UpdateGrade(int key, unsigned char* buf)
 {
     LD_UPDATE_GRADE_PACKET* p = reinterpret_cast<LD_UPDATE_GRADE_PACKET*>(buf);
+
+    if (ADMIN_START_UID <= p->uid 
+        && p->uid <= ADMIN_LAST_UID) {
+        return;
+    }
+#ifdef RUN_DB
     bool bResult = Getm_pDB()->UpdateUserGrade(p->uid, p->grade);
     if (bResult != true) {
         cout << "Update User Grade failed\n";
     }
+#endif
 }
 
 void Socket::ProcessPacket_ChangeDepartment(int key, unsigned char* buf)
 {
     LD_CHANGE_DEPARTMENT_PACKET* p = reinterpret_cast<LD_CHANGE_DEPARTMENT_PACKET*>(buf);
+#ifdef RUN_DB
     bool bResult = Getm_pDB()->UpdateUserDepartment(p->uid, p->department);
     if (bResult != true) {
 
     }
+#endif
 }
 
 
