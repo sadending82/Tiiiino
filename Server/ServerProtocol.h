@@ -108,6 +108,7 @@ struct LD_LOGOUT_PACKET :public SPACKET {
 struct LD_SIGNUP_PACKET :public SPACKET {
 	char	id[MAX_NAME_SIZE];
 	char	password[MAX_NAME_SIZE];
+	char    department;
 	int		userKey;
 };
 

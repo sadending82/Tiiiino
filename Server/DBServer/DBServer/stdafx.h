@@ -16,17 +16,6 @@
 #include <locale.h>
 
 #define UNICODE  
-#include <sqlext.h>  
-#include <string>
-
-#include "../../../protocol.h"
-
-#pragma comment(lib, "WS2_32.lib")
-#pragma comment(lib, "MSWSock.lib")
-using namespace std;
-
-#include "mysql.h"
-#pragma comment(lib, "libmysql.lib")
 
 constexpr int MAXLOBBY = 10;
 constexpr int INVALIDKEY = -1;
@@ -40,3 +29,26 @@ constexpr int ADMIN_START_UID = 1;
 constexpr int ADMIN_LAST_UID = 10;
 
 constexpr const char* ADMIN_ID = "admin";
+
+#define Test
+
+//###############################
+//###############################
+#define RUN_DB
+//###############################
+//###############################
+
+#include <string>
+
+#include "../../../protocol.h"
+
+#pragma comment(lib, "WS2_32.lib")
+#pragma comment(lib, "MSWSock.lib")
+
+using namespace std;
+
+#ifdef RUN_DB
+#include <sqlext.h>  
+#include "mysql.h"
+#pragma comment(lib, "libmysql.lib")
+#endif 
