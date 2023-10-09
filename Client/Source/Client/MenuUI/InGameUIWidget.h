@@ -59,6 +59,9 @@ public:
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void CloseInGameUI();
 
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void ChangeLobbyUI();
+
 private:
 	UPROPERTY(EditAnywhere, Category = "UMG_Game")
 	int RestGameTime = 20;

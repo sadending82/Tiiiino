@@ -269,24 +269,24 @@ void ATinoCharacter::SetOriginalSpeed()
 
 void ATinoCharacter::TimerStart()
 {
-	GetWorldTimerManager().SetTimer(InGameUITimerHandle, this, &ATinoCharacter::TimerEnd, 1.f, true);
+	GetWorldTimerManager().SetTimer(InGameUITimerHandle, this, &ATinoCharacter::TimerEnd, true);
 }
 
 void ATinoCharacter::TimerEnd()
 {
 
 	// 유효성 확인
-	if (InGameWidgetInstance)
+	if (!!InGameWidgetInstance)
 	{
 		// UInGameUIWidget의 TimerRun 함수 호출
 		InGameWidgetInstance->TimerRun();
-	}
-	if (InGameWidgetInstance->GetRestGameTime() < 0)
-	{
-		InGameWidgetInstance->TimerEnd();
-		GetWorldTimerManager().ClearTimer(InGameUITimerHandle);
-	}
 
+		if (InGameWidgetInstance->GetRestGameTime() < 0)
+		{
+			InGameWidgetInstance->TimerEnd();
+			GetWorldTimerManager().ClearTimer(InGameUITimerHandle);
+		}
+	}
 }
 
 void ATinoCharacter::Dive()

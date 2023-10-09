@@ -44,7 +44,7 @@ void UInGameUIWidget::TimerStart()
 
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	auto TinoCharacter = TinoController->GetPawn<ATinoCharacter>();
-	if (TinoCharacter)
+	if (!!TinoCharacter)
 	{
 		// ATinoCharacter 인스턴스를 사용하여 TimerStart 함수를 호출
 		TinoCharacter->TimerStart();
@@ -82,5 +82,12 @@ void UInGameUIWidget::CloseInGameUI()
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	if (!!TinoController)
 		TinoController->RemoveDialogUI();
+}
+
+void UInGameUIWidget::ChangeLobbyUI()
+{
+	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (!!TinoController)
+		TinoController->ChangeMenuWidget(TinoController->GetLobbyWidgetClass());
 }
 
