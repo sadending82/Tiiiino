@@ -414,6 +414,11 @@ void Network::process_packet(unsigned char* p)
 		SC_GAME_WAITTING_PACKET* packet = reinterpret_cast<SC_GAME_WAITTING_PACKET*>(p);
 		bGameIsStart = true;
 		mMyCharacter->MakeAndShowHUD();
+		for (auto obj : mObjects)
+		{
+			if(obj)
+				obj->EnableMoveStart(true);
+		}
 		//
 		// 카운트다운 UI 띄우기및 object들 처음 동기화.
 		//

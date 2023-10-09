@@ -8,16 +8,17 @@ class Socket {
 public:
 
 	int SetKey();
-	void SetIsConnectDB(bool b) { bIsConnectDB = b; }
-	bool GetIsConnectDB() { return bIsConnectDB; }
 	void Disconnect(int key);
 	void WorkerFunc();
-	void ServerReady(DB* pDB);
+	void ServerReady();
 	void processPacket(int key, unsigned char* buf);
 
+#ifdef RUN_DB
 	void Setm_pDB(DB* pDB) { m_pDB = pDB; }
-
 	DB* Getm_pDB() { return m_pDB; }
+	void SetIsConnectDB(bool b) { bIsConnectDB = b; }
+	bool GetIsConnectDB() { return bIsConnectDB; }
+#endif
 
 	bool CheckLogin(int key, const char* id, const char* password, int userid);
 
@@ -44,8 +45,10 @@ private:
 	HANDLE mHcp;
 	SOCKET mListenSocket;
 
+#ifdef RUN_DB
 	DB* m_pDB = NULL;
 	bool bIsConnectDB = false;
+#endif
 
 	array<Session, MAXLOBBY + 1> mSessions;
 
