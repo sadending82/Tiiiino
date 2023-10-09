@@ -234,7 +234,7 @@ void Socket::SendLoginOK(int key, int uid, string& nickname, const char* id
     p.size = sizeof(DL_LOGIN_OK_PACKET);
     p.type = SPacketType::DL_LOGIN_OK;
     p.uid = uid;
-    memcpy(p.id, id, sizeof(id));
+    memcpy(p.id, id, sizeof(p.id));
     size_t lengthToCopy = min(nickname.size(), sizeof(p.nickname) - 1);
     memcpy(p.nickname, nickname.c_str(), lengthToCopy);
     p.nickname[lengthToCopy] = '\0';

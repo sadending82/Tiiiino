@@ -616,7 +616,6 @@ bool DB::SignUpNewPlayer(const string& id, const string& password, const char de
 {
 	bool res = InsertNewAccount(id, password);
 	if (res == false) return false;
-
 	res = InsertNewUser(id, department);
 	if (res == false) {
 		DeleteAccount(id);

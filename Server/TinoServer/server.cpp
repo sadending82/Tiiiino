@@ -304,8 +304,9 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 
 		mClients[p->userKey].mStateLock.lock();
 		mClients[p->userKey].mGrade = p->grade;
-		strcpy_s(mClients[p->userKey].mNickName, sizeof(p->nickname), p->nickname);
-		strcpy_s(mClients[p->userKey].mID, sizeof(p->id), p->id);
+		mClients[p->userKey].mDepartment = p->department;
+		strcpy_s(mClients[p->userKey].mNickName, p->nickname);
+		strcpy_s(mClients[p->userKey].mID, p->id);
 		mClients[p->userKey].mPoint = p->point;
 		mClients[p->userKey].mUID = p->uid;
 		mClients[p->userKey].mState = eSessionState::ST_LOBBY;
@@ -621,11 +622,12 @@ void Server::ProcessEvent(unsigned char* cmessage)
 				LG_USER_INTO_GAME_PACKET packet;
 				packet.size = sizeof(packet);
 				packet.type = LG_USER_INTO_GAME;
+				packet.department = mClients[player_id].mDepartment;
 				packet.roomID = roomID;// need update		
 				_itoa_s(rand() % 2'000'000'000, mClients[player_id].mHashs, 10);
 				strcpy_s(packet.hashs, mClients[player_id].mHashs);
-				strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
-				strcpy_s(packet.id, sizeof(mClients[player_id].mID), mClients[player_id].mID);
+				strcpy_s(packet.name,  mClients[player_id].mNickName);
+				strcpy_s(packet.id,  mClients[player_id].mID);
 				packet.uID = mClients[player_id].mUID;
 				packet.roomMax = MAX_ROOM_USER;
 				mClients[player_id].mRoomID = packet.roomID;
@@ -647,10 +649,11 @@ void Server::ProcessEvent(unsigned char* cmessage)
 				packet.size = sizeof(packet);
 				packet.type = LG_USER_INTO_GAME;
 				packet.roomID = roomID;// need update
+				packet.department = mClients[player_id].mDepartment;
 				_itoa_s(rand() % 2'000'000'000, mClients[player_id].mHashs, 10);
 				strcpy_s(packet.hashs, mClients[player_id].mHashs);
-				strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
-				strcpy_s(packet.id, sizeof(mClients[player_id].mID), mClients[player_id].mID);
+				strcpy_s(packet.name,  mClients[player_id].mNickName);
+				strcpy_s(packet.id,  mClients[player_id].mID);
 				packet.uID = mClients[player_id].mUID;
 				packet.roomMax = MAX_ROOM_USER;
 				mClients[player_id].mRoomID = packet.roomID;
@@ -678,10 +681,11 @@ void Server::ProcessEvent(unsigned char* cmessage)
 						packet.size = sizeof(packet);
 						packet.type = LG_USER_INTO_GAME;
 						packet.roomID = roomID;//need update
+						packet.department = mClients[player_id].mDepartment;
 						_itoa_s(rand() % 2'000'000'000, mClients[player_id].mHashs, 10);
 						strcpy_s(packet.hashs, mClients[player_id].mHashs);
-						strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
-						strcpy_s(packet.id, sizeof(mClients[player_id].mID), mClients[player_id].mID);
+						strcpy_s(packet.name,  mClients[player_id].mNickName);
+						strcpy_s(packet.id,  mClients[player_id].mID);
 						packet.uID = mClients[player_id].mUID;
 						packet.roomMax = tSize;
 						mClients[player_id].mRoomID = packet.roomID;
@@ -711,8 +715,9 @@ void Server::ProcessEvent(unsigned char* cmessage)
 					packet.size = sizeof(packet);
 					packet.type = LG_USER_INTO_GAME;
 					packet.roomID = roomID;//need update
-					strcpy_s(packet.name, sizeof(mClients[player_id].mNickName), mClients[player_id].mNickName);
-					strcpy_s(packet.id, sizeof(mClients[player_id].mID), mClients[player_id].mID);
+					packet.department = mClients[player_id].mDepartment;
+					strcpy_s(packet.name,  mClients[player_id].mNickName);
+					strcpy_s(packet.id,  mClients[player_id].mID);
 					packet.uID = mClients[player_id].mUID;
 					_itoa_s(rand() % 2'000'000'000, mClients[player_id].mHashs, 10);
 					strcpy_s(packet.hashs, mClients[player_id].mHashs);

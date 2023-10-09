@@ -198,6 +198,23 @@ void send_move_packet(SOCKET& sock, const bool& inair, const float& x, const flo
 	packet.sz = speedVec.Z;
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(CS_MOVE_PACKET), &packet);
 	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+	if (SOCKET_ERROR == ret)
+	{
+		int err = WSAGetLastError();
+		if (err != WSA_IO_PENDING)
+		{
+			//error ! 
+			auto Game = Network::GetNetwork();
+			if (Game->bIsConnected)
+			{
+				Game->bIsConnected = false;
+				if (Game->mMyCharacter)
+					Game->mMyCharacter->MakeAndShowDialog();
+			}
+		}
+		else {
+		}
+	}
 }
 
 void send_action_packet(SOCKET& sock, const char action)
@@ -217,7 +234,7 @@ void send_ping_packet(SOCKET& sock, const long long ping)
 	packet.type = CS_PING;
 	packet.ping = ping;
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
-	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback); 
 }
 
 void send_goal_packet(SOCKET& sock)
@@ -271,6 +288,7 @@ void Network::process_packet(unsigned char* p)
 	{
 		SC_LOGIN_OK_PACKET* packet = reinterpret_cast<SC_LOGIN_OK_PACKET*>(p);
 		mMyCharacter->SetClientID(packet->id);
+		mMyCharacter->SetDepartmentClothes(packet->department);
 		//연결성공
 		bIsConnected = true;
 		break;
@@ -333,7 +351,7 @@ void Network::process_packet(unsigned char* p)
 		else {
 			FName path = TEXT("Blueprint'/Game/Characters/Tino/BP_TinoCharacter.BP_TinoCharacter_C'"); //_C를 꼭 붙여야 된다고 함.
 			UClass* GeneratedInventoryBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
-			FTransform trans(FQuat(packet->rx, packet->ry, packet->rz, packet->rw), FVector(888, 1566, 400 + (id * 150)));
+			FTransform trans(FQuat(packet->rx, packet->ry, packet->rz, packet->rw), FVector(888, 1566, -10000 + (id * 150)));
 			auto mc = mMyCharacter->GetWorld()->SpawnActorDeferred<ATinoCharacter>(GeneratedInventoryBP, trans);
 			if (nullptr != mc)
 			{
@@ -434,10 +452,7 @@ void Network::process_packet(unsigned char* p)
 	case SC_GAME_END: {
 		SC_GAME_END_PACKET* packet = reinterpret_cast<SC_GAME_END_PACKET*>(p);
 		closesocket(s_socket);
-		//mMyCharacter->InGameWidgetInstance->ShowResultUI();
-		UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("Lobby"));
-		bIsConnected = false;
-		bLevelOpenTriggerEnabled = true;
+		mMyCharacter->InGameWidgetInstance->ShowResultUI();
 
 		break;
 	}
@@ -473,6 +488,7 @@ void Network::process_packet(unsigned char* p)
 	case SC_GAME_BREAKPLATFORM:
 	{
 		SC_GAME_BREAKPLATFORM_PACKET* packet = reinterpret_cast<SC_GAME_BREAKPLATFORM_PACKET*>(p);
+		mObjects[packet->objectID]->ActionObject();
 
 		break;
 	}

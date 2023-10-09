@@ -26,13 +26,13 @@ void UDialogUIWidget::ResetWindow()
 	InGameMenuButton->SetRenderOpacity(0.0);
 	InGameMenuButtonText->SetRenderOpacity(0.0);
 	InGameMenuImage->SetRenderOpacity(0.0);
-	LoginFailedButton->SetRenderOpacity(0.0);
-	LoginFailedButtonText->SetRenderOpacity(0.0);
-	LoginFailedImage->SetRenderOpacity(0.0);
-	LoginFailedText->SetRenderOpacity(0.0);
+	FailedButton->SetRenderOpacity(0.0);
+	FailedButtonText->SetRenderOpacity(0.0);
+	FailedImage->SetRenderOpacity(0.0);
+	FailedText->SetRenderOpacity(0.0);
 
 	InGameMenuButton->SetVisibility(ESlateVisibility::HitTestInvisible);
-	LoginFailedButton->SetVisibility(ESlateVisibility::HitTestInvisible);
+	FailedButton->SetVisibility(ESlateVisibility::HitTestInvisible);
 	DisconnectNetworkButton->SetVisibility(ESlateVisibility::HitTestInvisible);
 }
 
@@ -68,11 +68,39 @@ void UDialogUIWidget::DisconnectGame()
 
 }
 
-void UDialogUIWidget::RenderLoginFailedUI()
+void UDialogUIWidget::RenderUIAlertMessage()
 {
-	LoginFailedButton->SetRenderOpacity(1.0);
-	LoginFailedButtonText->SetRenderOpacity(1.0);
-	LoginFailedImage->SetRenderOpacity(1.0);
-	LoginFailedText->SetRenderOpacity(1.0);
-	LoginFailedButton->SetVisibility(ESlateVisibility::Visible);
+	FailedButton->SetRenderOpacity(1.0);
+	FailedButtonText->SetRenderOpacity(1.0);
+	FailedImage->SetRenderOpacity(1.0);
+	FailedText->SetRenderOpacity(1.0);
+	FailedButton->SetVisibility(ESlateVisibility::Visible);
+}
+
+void UDialogUIWidget::SetLoginFailedUI()
+{
+	FString text = L"아이디 혹은 비밀번호가 존재하지 않는 계정입니다.";
+	FText CurrentText = FText::FromString(text);
+	FailedText->SetText(CurrentText);
+}
+
+void UDialogUIWidget::SetCreateAccountSuccessUI()
+{
+	FString text = L"회원가입에 성공했습니다.";
+	FText CurrentText = FText::FromString(text);
+	FailedText->SetText(CurrentText);
+}
+
+void UDialogUIWidget::SetCreateAccountFailedUI()
+{
+	FString text = L"회원가입에 실패했습니다.";
+	FText CurrentText = FText::FromString(text);
+	FailedText->SetText(CurrentText);
+}
+
+void UDialogUIWidget::FixedAlertMessage()
+{
+	FString text = L"";
+	FText CurrentText = FText::FromString(text);
+	FailedText->SetText(CurrentText);
 }

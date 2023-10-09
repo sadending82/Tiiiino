@@ -19,7 +19,7 @@ constexpr int DELAY_TIME_EXEC_BREAKPLATFORM = 3000;
 
 // Level min, max
 constexpr int MIN_LEVEL = 1;
-constexpr int MAX_LEVEL = 4;
+constexpr int MAX_LEVEL = 5;
 
 enum class eDepartment : char
 {
@@ -161,6 +161,7 @@ struct CL_MATCH_OUT_PACKET : public PACKET {
 
 struct SC_LOGIN_OK_PACKET : public PACKET {
 	int		id;
+	char	department;
 };
 struct SC_MOVE_PLAYER_PACKET : public PACKET {
 	int		id;
