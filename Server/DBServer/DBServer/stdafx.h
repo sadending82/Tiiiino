@@ -38,6 +38,14 @@ constexpr const char* ADMIN_ID = "admin";
 //###############################
 //###############################
 
+#ifdef _DEBUG
+#define DEBUGMSGNOPARAM(args) (printf("file: %s, line:%d ",__FILE__,__LINE__), printf(args))
+#define DEBUGMSGONEPARAM(args,k) (printf("file: %s, line:%d ",__FILE__,__LINE__), printf(args,k))
+#else
+#define DEBUGMSGNOPARAM(...)
+#define DEBUGMSGONEPARAM(...)
+#endif
+
 #include <string>
 
 #include "../../../protocol.h"
