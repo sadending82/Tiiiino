@@ -88,7 +88,7 @@ public:
 
 	static std::shared_ptr<class Network> GetNetwork();
 
-	void RegisterObjectNetwork(ABaseObstacle* object);
+	void RegisterObjectNetwork(ABaseObstacle* object,int& ObjectID);
 
 public:
 	void SetObjectNetID(ABaseObstacle* object, const int netID);

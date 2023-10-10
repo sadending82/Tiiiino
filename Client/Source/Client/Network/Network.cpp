@@ -52,18 +52,21 @@ std::shared_ptr<Network> Network::GetNetwork()
 	return m_Network;
 }
 
-void Network::RegisterObjectNetwork(ABaseObstacle* object)
+void Network::RegisterObjectNetwork(ABaseObstacle* object, int& ObjectID)
 {
 	if (mObjects[mObjectCnt])
 	{
 		if (!IsValid(mObjects[mObjectCnt]))
 		{
+			mObjects[mObjectCnt]->SetIsObjectSync(false);
 			mObjects[mObjectCnt] = object;
+			ObjectID = mObjectCnt;
 			mObjectCnt++;
 		}
 	}
 	else {
 		mObjects[mObjectCnt] = object;
+		ObjectID = mObjectCnt;
 		mObjectCnt++;
 	}
 }

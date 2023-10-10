@@ -16,7 +16,7 @@ void ABaseObstacle::BeginPlay()
 	Super::BeginPlay();
 	if (bIsSyncObject)
 	{
-		Network::GetNetwork()->RegisterObjectNetwork(this);
+		Network::GetNetwork()->RegisterObjectNetwork(this, mObjectID);
 	}
 
 	// 10/08 ±Ë«ıµø
