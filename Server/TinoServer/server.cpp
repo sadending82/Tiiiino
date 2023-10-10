@@ -627,7 +627,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 			for (int i = 0; i < MAX_ROOM_USER; ++i)
 			{
 				int player_id = mMatchListHighTier.front();
-
+				DEBUGMSGONEPARAM("[%s]플레이어 게임서버로\n",mClients[player_id].mID);
 				LG_USER_INTO_GAME_PACKET packet;
 				packet.size = sizeof(packet);
 				packet.type = LG_USER_INTO_GAME;
@@ -654,6 +654,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 			{
 				int player_id = mMatchListLowTier.front();
 
+				DEBUGMSGONEPARAM("[%s]플레이어 게임서버로\n", mClients[player_id].mID);
 				LG_USER_INTO_GAME_PACKET packet;
 				packet.size = sizeof(packet);
 				packet.type = LG_USER_INTO_GAME;
@@ -686,6 +687,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 					{
 						int player_id = mMatchListHighTier.front();
 
+						DEBUGMSGONEPARAM("[%s]플레이어 게임서버로\n", mClients[player_id].mID);
 						LG_USER_INTO_GAME_PACKET packet;
 						packet.size = sizeof(packet);
 						packet.type = LG_USER_INTO_GAME;
@@ -720,6 +722,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 				{
 					int player_id = mMatchListLowTier.front();
 
+					DEBUGMSGONEPARAM("[%s]플레이어 게임서버로\n", mClients[player_id].mID);
 					LG_USER_INTO_GAME_PACKET packet;
 					packet.size = sizeof(packet);
 					packet.type = LG_USER_INTO_GAME;
