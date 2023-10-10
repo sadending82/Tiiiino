@@ -38,7 +38,13 @@ void UInGameUIWidget::LevelClearCheck()
 	// 완주 성공 실패 체크
 	// 성공시 bLevelClearCheck = true
 	// 실패시 bLevelClearCheck = false
-	
+
+	// 레벨 종료시 마우스커서 띄우기
+	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (!!TinoController)
+	{
+		TinoController->SetShowMouseCursor(true);
+	}
 }
 
 void UInGameUIWidget::TimerStart()
