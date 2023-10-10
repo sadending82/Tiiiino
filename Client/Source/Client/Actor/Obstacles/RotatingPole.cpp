@@ -27,15 +27,12 @@ void ARotatingPole::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimi
 	ACharacter* hitCharacter = Cast<ACharacter>(Other);
 
 	if (hitCharacter != nullptr)
-	{
-		//혹시 밑으로 발사해서 문제인건가?
-		
-		//hitCharacter->LaunchCharacter(-HitNormal * ElasticForce, false, false);
-		
+	{		
 		CLog::Log("Hit");
-
-		hitCharacter->LaunchCharacter(FVector(-HitNormal.X, -HitNormal.Y, fabs(HitNormal.Z))*ElasticForce, false, false);
-		
+		if (DoElasticCollision)
+		{
+			hitCharacter->LaunchCharacter(FVector(-HitNormal.X, -HitNormal.Y, fabs(HitNormal.Z)) * ElasticForce, false, false);
+		}
 	}
 }
 
