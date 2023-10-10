@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include <string>
 #include "Network.h"
+#include <string>
 #include "Actor/Character/TinoCharacter.h"
 #include "Actor/Obstacles/BaseObstacle.h"
 #include "Actor/Controller/TinoController.h"
