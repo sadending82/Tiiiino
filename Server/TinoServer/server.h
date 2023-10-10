@@ -30,7 +30,8 @@ public:
 	list <int> mMatchListHighTier;
 	list <int> mMatchListLowTier;
 	list <int> mReadytoGame;
-	mutex mListLock;
+	mutex mHighListLock;
+	mutex mLowListlock;
 private:
 	SOCKET mListenSocket;
 	HANDLE mHCP;

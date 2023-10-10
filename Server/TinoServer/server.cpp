@@ -621,10 +621,10 @@ void Server::ProcessEvent(unsigned char* cmessage)
 	case eEVENT_TYPE::EV_MATCH_UP:
 	{
 		// match room max
+		mHighListLock.lock();
 		if (mMatchListHighTier.size() >= MAX_ROOM_USER)
 		{
 			int roomID = GetNewRoomID();
-			mListLock.lock();
 			for (int i = 0; i < MAX_ROOM_USER; ++i)
 			{
 				int player_id = mMatchListHighTier.front();
@@ -647,12 +647,12 @@ void Server::ProcessEvent(unsigned char* cmessage)
 				mMatchListHighTier.pop_front();
 				mReadytoGame.push_back(player_id);
 			}
-			mListLock.unlock();
 		}
+		mHighListLock.unlock();
+		mLowListlock.lock();
 		if (mMatchListLowTier.size() >= MAX_ROOM_USER)
 		{
 			int roomID = GetNewRoomID();
-			mListLock.lock();
 			for (int i = 0; i < MAX_ROOM_USER; ++i)
 			{
 				int player_id = mMatchListLowTier.front();
@@ -676,14 +676,14 @@ void Server::ProcessEvent(unsigned char* cmessage)
 				mMatchListLowTier.pop_front();
 				mReadytoGame.push_back(player_id);
 			}
-			mListLock.unlock();
 		}
+		mLowListlock.unlock();
 
 		// half room max
 		system_clock::time_point tTime = system_clock::now();
+		mHighListLock.lock();
 		if (mMatchListHighTier.size() >= MAX_ROOM_USER / 2) // high list
 		{
-			mListLock.lock();
 			if (tTime - mClients[mMatchListHighTier.front()].mMatchStartTime >= milliseconds(20000))
 				{
 					int tSize = mMatchListHighTier.size();
@@ -716,11 +716,11 @@ void Server::ProcessEvent(unsigned char* cmessage)
 				{
 					// count down packet?
 				}
-			mListLock.unlock();
 		}
+		mHighListLock.unlock();
+		mLowListlock.lock();
 		if (mMatchListLowTier.size() >= MAX_ROOM_USER / 2)
 		{
-			mListLock.lock();
 			if (tTime - mClients[mMatchListLowTier.front()].mMatchStartTime >= milliseconds(20000))
 			{
 				int tSize = mMatchListLowTier.size();
@@ -753,8 +753,9 @@ void Server::ProcessEvent(unsigned char* cmessage)
 			{
 				// count down packet?
 			}
-			mListLock.unlock();
 		}
+		mLowListlock.unlock();
+
 
 		EV_UpdateMatchPacket p;
 		p.size = sizeof(EV_UpdateMatchPacket);
