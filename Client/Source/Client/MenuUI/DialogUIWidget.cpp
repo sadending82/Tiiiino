@@ -56,13 +56,13 @@ void UDialogUIWidget::RenderInGameMenuUI()
 	InGameMenuButtonText->SetRenderOpacity(1.0);
 	InGameMenuImage->SetRenderOpacity(1.0);
 	InGameMenuButton->SetVisibility(ESlateVisibility::Visible);
-
+	
 }
 
 void UDialogUIWidget::DisconnectGame()
 {
 	// 로비로 돌아가는 기능
-
+	RemoveFromParent();
 	// 임시로 게임종료하도록 설정
 	UKismetSystemLibrary::QuitGame(GetWorld(), nullptr, EQuitPreference::Quit, false);
 

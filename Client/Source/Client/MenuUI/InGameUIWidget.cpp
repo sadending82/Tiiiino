@@ -75,14 +75,20 @@ void UInGameUIWidget::OpenInGameUI()
 {
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	if (!!TinoController)
+	{
 		TinoController->OpenInGameUI();
+		TinoController->SetShowMouseCursor(true);
+	}
 }
 
 void UInGameUIWidget::CloseInGameUI()
 {
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	if (!!TinoController)
+	{
 		TinoController->RemoveDialogUI();
+		TinoController->SetShowMouseCursor(false);
+	}
 }
 
 void UInGameUIWidget::ChangeLobbyUI()
