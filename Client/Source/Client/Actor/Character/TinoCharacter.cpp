@@ -209,6 +209,7 @@ void ATinoCharacter::MakeAndShowHUD()
 	InGameWidgetInstance->AddToViewport();
 
 	InGameUITimerInstance = CreateWidget<UInGameTimerWidget>(GetWorld(), InGameUITimerClass);
+	InGameUITimerInstance->SetInGameUI(InGameWidgetInstance);
 	InGameUITimerInstance->AddToViewport();
 
 }

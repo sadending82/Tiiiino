@@ -112,7 +112,6 @@ void UInGameUIWidget::ChangeLobbyUI()
 void UInGameUIWidget::LevelStartCountdown()
 {
 	// 레벨 시작시 카운트다운을 위해 이 함수 호출
-	InGameTimer = Cast<UInGameTimerWidget>(CreateWidget(GetWorld(), InGameTimerClass));
 	if (!!InGameTimer)
 	{
 		StartCountDownText->SetRenderOpacity(1.0);
