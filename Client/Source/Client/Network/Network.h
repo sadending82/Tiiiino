@@ -88,6 +88,7 @@ public:
 
 	static std::shared_ptr<class Network> GetNetwork();
 
+	void RegisterObjectNetwork(ABaseObstacle* object);
 
 public:
 	void SetObjectNetID(ABaseObstacle* object, const int netID);
@@ -107,6 +108,7 @@ public:
 	sGameResult GameResult;
 private:
 	bool isInit;
+	int mObjectCnt = 0;
 
 public:
 	WSADATA WSAData;

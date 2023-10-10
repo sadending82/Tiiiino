@@ -52,6 +52,22 @@ std::shared_ptr<Network> Network::GetNetwork()
 	return m_Network;
 }
 
+void Network::RegisterObjectNetwork(ABaseObstacle* object)
+{
+	if (mObjects[mObjectCnt])
+	{
+		if (!IsValid(mObjects[mObjectCnt]))
+		{
+			mObjects[mObjectCnt] = object;
+			mObjectCnt++;
+		}
+	}
+	else {
+		mObjects[mObjectCnt] = object;
+		mObjectCnt++;
+	}
+}
+
 void Network::SetObjectNetID(ABaseObstacle* object, const int netID)
 {
 	mObjects[netID] = object;
@@ -82,6 +98,7 @@ void Network::release()
 			p = nullptr;
 		for (auto& p : mObjects)
 			p = nullptr;
+		mObjectCnt = 0;
 		//shutdown(s_socket, SD_BOTH);
 		closesocket(s_socket);
 		WSACleanup();
