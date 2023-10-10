@@ -49,7 +49,6 @@ void UInGameUIWidget::LevelClearCheck()
 
 void UInGameUIWidget::TimerStart()
 {
-	InGameTimer = Cast<UInGameTimerWidget>(CreateWidget(GetWorld(), InGameTimerClass));
 	StartCountDownText->SetRenderOpacity(1.0);
 	if (!!InGameTimer)
 	{

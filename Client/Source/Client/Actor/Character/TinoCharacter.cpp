@@ -212,6 +212,8 @@ void ATinoCharacter::MakeAndShowHUD()
 	InGameUITimerInstance->SetInGameUI(InGameWidgetInstance);
 	InGameUITimerInstance->AddToViewport();
 
+	InGameWidgetInstance->InGameTimer = InGameUITimerInstance;
+
 }
 
 void ATinoCharacter::MakeAndShowDialog()
