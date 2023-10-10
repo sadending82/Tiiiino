@@ -101,6 +101,7 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 	}
 	case CL_MATCH:
 	{
+		DEBUGMSGONEPARAM("[%s] 플레이어 매치 시작\n", mClients[cID].mID);
 		if (mClients[cID].mGrade > 3.5)
 		{
 			mMatchListHighTier.push_back(cID);
@@ -122,6 +123,7 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 	}
 	case CL_MATCH_OUT:
 	{
+		DEBUGMSGONEPARAM("[%s] 플레이어 매치 아웃\n", mClients[cID].mID);
 		mMatchListHighTier.remove(cID);
 		mMatchListLowTier.remove(cID);
 		if (mMatchListHighTier.size() > MAX_ROOM_USER / 2)
@@ -620,6 +622,8 @@ void Server::ProcessEvent(unsigned char* cmessage)
 	switch (cmessage[1]) {
 	case eEVENT_TYPE::EV_MATCH_UP:
 	{
+		DEBUGMSGONEPARAM("상위 티어 매칭 인원 [%d]\n", mMatchListHighTier.size());
+		DEBUGMSGONEPARAM("하위 티어 매칭 인원 [%d]\n", mMatchListLowTier.size());
 		// match room max
 		if (mMatchListHighTier.size() >= MAX_ROOM_USER)
 		{
