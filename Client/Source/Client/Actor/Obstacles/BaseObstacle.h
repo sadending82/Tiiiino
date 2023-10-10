@@ -42,6 +42,7 @@ protected:
 
 	//1006 이수민 이 mObjectID에 부서지는 발판및 부서지는 문은 기획이 넘버링을 해주어야함. "무조건"
 	//1010 이수민 기획이 이거 넘버링 하다가 실수 할수도있으니 코드적으로 자동화 시킴.
+	//-> 다시생각해보니 로딩타이밍이 런타임이라 보장되지가 않음,,, 자동화 불가.
 	UPROPERTY(EditAnywhere, Category = "Network")
 	int mObjectID;
 	// 10.09 이수민 동기화가 필요한 obstacle과 아닌 obstacle ex)LinearBelt를 구분짓기 위함.
