@@ -42,18 +42,18 @@ void TimerThread::doThread()
 			if (execEvent.execTime <= chrono::system_clock::now())
 			{
 				WSA_OVER_EX* wsa_ex = new WSA_OVER_EX;
-				wsa_ex->SetCmd(isAlready.type);
-				memcpy(wsa_ex->GetBuf(), &isAlready.eventType, sizeof(char));
-				memcpy(wsa_ex->GetBuf() + sizeof(char), &isAlready.receiverID, sizeof(int));
-				memcpy(wsa_ex->GetBuf() + sizeof(char) + sizeof(int), &isAlready.pos, sizeof(Vector3i));
-				PostQueuedCompletionStatus(gMainServer->GetIOCPHandle(), 1, isAlready.senderID, &wsa_ex->GetWsaOver());
+				wsa_ex->SetCmd(execEvent.type);
+				memcpy(wsa_ex->GetBuf(), &execEvent.eventType, sizeof(char));
+				memcpy(wsa_ex->GetBuf() + sizeof(char), &execEvent.receiverID, sizeof(int));
+				memcpy(wsa_ex->GetBuf() + sizeof(char) + sizeof(int), &execEvent.pos, sizeof(Vector3i));
+				PostQueuedCompletionStatus(gMainServer->GetIOCPHandle(), 1, execEvent.senderID, &wsa_ex->GetWsaOver());
 			}
 			else {
 
-				if (execEvent.execTime > chrono::system_clock::now() + 100ms)
+				if (execEvent.execTime > chrono::system_clock::now() + 10ms)
 				{// 기다려야 하는 시간이 0.1초이상이라면 다른 더 중요한게 이 사이에 들어올 수 있으므로. 0.1초정도만 기다려줌. 그리고 다시 넣음.
 					gTimerQueue.push(execEvent);
-					this_thread::sleep_for(100ms);
+					this_thread::sleep_for(10ms);
 				}
 				else {
 					isAlready = execEvent;
@@ -63,7 +63,8 @@ void TimerThread::doThread()
 
 			}
 		}
-		this_thread::sleep_for(chrono::duration_cast<chrono::milliseconds>(isAlready.execTime - chrono::system_clock::now()));
+		if((isAlready.execTime - chrono::system_clock::now()).count() > 0)
+			this_thread::sleep_for(chrono::duration_cast<chrono::milliseconds>(isAlready.execTime - chrono::system_clock::now()));
 	}
 }
 

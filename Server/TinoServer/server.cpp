@@ -57,7 +57,7 @@ int Server::GetNewServerID()
 
 int Server::GetNewRoomID()
 {
-	for (int i = 0; i < MAXGAMESERVER*10; ++i) {
+	for (int i = 0; i < MAX_ROOM; ++i) {
 		mRooms[i].mStateLock.lock();
 		if (mRooms[i].mState == eRoomState::RS_FREE) {
 			mRooms[i].mState = eRoomState::RS_READY;
@@ -168,7 +168,7 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		uniform_int_distribution<int> rLevel(MIN_LEVEL, MAX_LEVEL);
 		int randomlevel = rLevel(rng);
 		
-		packet.mapLevel = randomlevel;
+		packet.mapLevel = 2;
 		
 
 		int uidCount = 0;
@@ -207,7 +207,7 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 	case GL_ROOM_RESET:
 	{
 		GL_ROOM_RESET_PACKET* p = reinterpret_cast<GL_ROOM_RESET_PACKET*>(spacket);
-
+		DEBUGMSGONEPARAM("¹æ[%d] ¸®¼Â", p->roomID);
 		mRooms[p->roomID].mStateLock.lock();
 		mRooms[p->roomID].mState = eRoomState::RS_FREE;
 		ZeroMemory(mRooms[p->roomID].mUID, sizeof(mRooms[p->roomID].mUID));

@@ -88,7 +88,7 @@ void Room::ResetGameRoom()
 {
 	
 	mRoomStateLock.lock();
-	if (mRoomState != eRoomState::ST_FREE)
+	if (mRoomState == eRoomState::ST_CLOSED)
 	{
 		mRoomState = eRoomState::ST_FREE;
 		mRoomStateLock.unlock();
@@ -117,6 +117,7 @@ void Room::ResetGameRoom()
 	mPlayerArrivedCnt = 0;
 	mPlayerCnt = 0;
 	mGameEndTimer = false;
+	mGameStartTimer = false;
 
 	gMainServer->send_room_reset_packet(mRoomID);
 }
@@ -176,7 +177,7 @@ bool Room::IsAllPlayerReady()
 void Room::SetRoomEnd()
 {
 	mRoomStateLock.lock();
-	mRoomState = eRoomState::ST_FREE;
+	mRoomState = eRoomState::ST_CLOSED;	//곧 리셋 될 방.
 	mRoomStateLock.unlock();
 }
 
@@ -191,7 +192,7 @@ void Room::PlayerMaxDecrease()
 	mPlayerMax--;
 	if (mPlayerMax <= 0)
 	{
-		ResetGameRoom();
+		TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_RESET, eEventType::TYPE_TARGET, 5000, 0, mRoomID);
 	}
 }
 
@@ -375,7 +376,7 @@ void Room::setGameEndTimerStartOnce()
 	{
 		DEBUGMSGNOPARAM("게임 엔드 한 번 실행되야함\n");
 
-		TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_COUNTDOWN_START, eEventType::TYPE_BROADCAST_ROOM, 1000, NULL, mRoomID);
+		TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_COUNTDOWN_START, eEventType::TYPE_BROADCAST_ROOM, 0, NULL, mRoomID);
 	}
 }
 

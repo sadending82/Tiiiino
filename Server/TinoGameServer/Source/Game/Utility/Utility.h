@@ -51,7 +51,8 @@ enum class eRoomState
 	ST_FREE,			//빈 방 empty room
 	ST_READY,			//사람을 받고 있는 방 people come into room 
 	ST_READY_COMPLETE,	//사람을 다 받은 방		people come into room complete
-	ST_INGAME			//게임중인 방
+	ST_INGAME,			//게임중인 방
+	ST_CLOSED,			//곧 리셋이 될 방.
 };
 
 

@@ -55,7 +55,7 @@ void UInGameTimerWidget::TimerRun(ETimerType Type)
 	}
 	RestGameTime--;
 	// if Timer End
-	TimerEnd(Type);
+	//TimerEnd(Type);
 }
 
 void UInGameTimerWidget::TimerEnd(ETimerType Type)
