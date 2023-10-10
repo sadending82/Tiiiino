@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include <string>
 #include "Network.h"
+#include <string>
 #include "Actor/Character/TinoCharacter.h"
 #include "Actor/Obstacles/BaseObstacle.h"
 #include "Actor/Controller/TinoController.h"
@@ -105,6 +105,7 @@ void Network::release()
 		mObjectCnt = 0;
 		//shutdown(s_socket, SD_BOTH);
 		closesocket(s_socket);
+		_prev_size = 0;
 		WSACleanup();
 		if (!bLevelOpenTriggerEnabled)
 		{
@@ -118,6 +119,7 @@ void Network::release()
 			bIsConnected = 0;
 			closesocket(l_socket);
 			l_socket = INVALID_SOCKET;
+			l_prev_size = 0;
 		}
 		isInit = false;
 	}
@@ -188,26 +190,26 @@ void send_matchout_packet(SOCKET& sock)
 
 void send_control_packet(SOCKET& sock)
 {
-	//CL_CONTROL_PACKET packet;
-	//packet.size = sizeof(packet);
-	////packet.type = CL_CONTROL;
-	//WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
-	//int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
-	//if (SOCKET_ERROR == ret)
-	//{
-	//	int err = WSAGetLastError();
-	//	if (err != WSA_IO_PENDING)
-	//	{
-	//		//error ! 
-	//		auto Game = Network::GetNetwork();
-	//		if (Game->bIsConnectedLobby)
-	//		{
-	//			Game->bIsConnectedLobby = false;
-	//			if (Game->mMyCharacter)
-	//				Game->mMyCharacter->MakeAndShowDialog();
-	//		}
-	//	}
-	//}
+	CL_CONTROL_PACKET packet;
+	packet.size = sizeof(packet);
+	//packet.type = CL_CONTROL;
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+	if (SOCKET_ERROR == ret)
+	{
+		int err = WSAGetLastError();
+		if (err != WSA_IO_PENDING)
+		{
+			//error ! 
+			auto Game = Network::GetNetwork();
+			if (Game->bIsConnectedLobby)
+			{
+				Game->bIsConnectedLobby = false;
+				if (Game->mMyCharacter)
+					Game->mMyCharacter->MakeAndShowDialog();
+			}
+		}
+	}
 }
 
 void send_movetogame_packet(SOCKET& sock, const int uID, const char* id, const int& roomID)
@@ -588,10 +590,10 @@ void Network::l_process_packet(unsigned char* p)
 		GameResult.point = packet->point;
 		break;
 	}
-	//case LC_CONTROL: {
-	//	//send_control_packet(l_socket);
-	//	break;
-	//}
+	case LC_CONTROL: {
+		//send_control_packet(l_socket);
+		break;
+	}
 	default:
 		break;
 	}
