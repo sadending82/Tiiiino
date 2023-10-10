@@ -28,7 +28,7 @@ AFallingWall::AFallingWall()
 	RadialVector = CreateDefaultSubobject<URadialVector>(TEXT("RadialVector"));
 	MetaData = CreateDefaultSubobject<UFieldSystemMetaDataFilter>(TEXT("MetaData"));
 
-
+	FieldLocation = GetActorLocation();
 }
 
 void AFallingWall::BeginPlay()

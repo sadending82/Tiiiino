@@ -2,7 +2,7 @@
 
 enum eEVENT_TYPE
 {
-	EV_MATCH_UP, EV_COUNT_DOWN
+	EV_MATCH_UP, EV_CONTROL
 };
 
 #pragma pack (push, 1)
@@ -22,8 +22,8 @@ struct EV_ReadyToGamePacket : public TimerPacket
 
 };
 
-struct EV_CountDownPacket : public TimerPacket
+struct EV_ControlPacket : public TimerPacket
 {
-	int listnum;
+
 };
 #pragma pack (pop)

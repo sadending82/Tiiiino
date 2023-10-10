@@ -6,6 +6,7 @@
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
+#include "Network/Network.h"
 
 #include "Global.h"
 
@@ -62,9 +63,12 @@ void UDialogUIWidget::RenderInGameMenuUI()
 void UDialogUIWidget::DisconnectGame()
 {
 	// 로비로 돌아가는 기능
-	RemoveFromParent();
+	Network::GetNetwork()->bIsConnected = false;
+	Network::GetNetwork()->bLevelOpenTriggerEnabled = true;
+	UGameplayStatics::OpenLevel(GetWorld(), FName("Lobby"));
+
 	// 임시로 게임종료하도록 설정
-	UKismetSystemLibrary::QuitGame(GetWorld(), nullptr, EQuitPreference::Quit, false);
+	//UKismetSystemLibrary::QuitGame(GetWorld(), nullptr, EQuitPreference::Quit, false);
 
 }
 

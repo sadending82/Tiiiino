@@ -186,6 +186,30 @@ void send_matchout_packet(SOCKET& sock)
 	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
 }
 
+void send_control_packet(SOCKET& sock)
+{
+	//CL_CONTROL_PACKET packet;
+	//packet.size = sizeof(packet);
+	////packet.type = CL_CONTROL;
+	//WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	//int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+	//if (SOCKET_ERROR == ret)
+	//{
+	//	int err = WSAGetLastError();
+	//	if (err != WSA_IO_PENDING)
+	//	{
+	//		//error ! 
+	//		auto Game = Network::GetNetwork();
+	//		if (Game->bIsConnectedLobby)
+	//		{
+	//			Game->bIsConnectedLobby = false;
+	//			if (Game->mMyCharacter)
+	//				Game->mMyCharacter->MakeAndShowDialog();
+	//		}
+	//	}
+	//}
+}
+
 void send_movetogame_packet(SOCKET& sock, const int uID, const char* id, const int& roomID)
 {
 	CS_LOGIN_PACKET packet;
@@ -458,6 +482,7 @@ void Network::process_packet(unsigned char* p)
 			if(obj)
 				obj->EnableMoveStart(true);
 		}
+		mMyCharacter->InGameWidgetInstance->LevelStartCountdown();
 		//
 		// 카운트다운 UI 띄우기및 object들 처음 동기화.
 		//
@@ -465,6 +490,8 @@ void Network::process_packet(unsigned char* p)
 	}
 	case SC_GAME_START: {
 		SC_GAME_START_PACKET* packet = reinterpret_cast<SC_GAME_START_PACKET*>(p);
+		mMyCharacter->InGameWidgetInstance->LevelStart();
+		mMyCharacter->EnableInputMode();
 		//
 		// 플레이어들 움직일 수 있게 하기.
 		//
@@ -561,6 +588,10 @@ void Network::l_process_packet(unsigned char* p)
 		GameResult.point = packet->point;
 		break;
 	}
+	//case LC_CONTROL: {
+	//	//send_control_packet(l_socket);
+	//	break;
+	//}
 	default:
 		break;
 	}

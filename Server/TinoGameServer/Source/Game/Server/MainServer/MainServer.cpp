@@ -522,6 +522,7 @@ bool MainServer::setPlayerInRoom(Player* player, const char verification[MAX_NAM
 					if (0 != strcmp(pInfo.hashs, verification))
 					{
 						DEBUGMSGONEPARAM("검증값이 다름.(부정접속) [%d]번째플레이어\n", player->GetSocketID());
+						DEBUGMSGONEPARAM("검증값이 다름.(부정접속) [%s]플레이어\n", player->GetID());
 						return false;
 					}
 					if (pInfo.RoomID != tRoom.first)
