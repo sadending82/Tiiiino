@@ -198,7 +198,7 @@ bool Socket::CheckLogin(int key, const char* id, const char* password, int userK
 #ifdef RUN_DB
     int res = Getm_pDB()->CheckVerifyUser(id, password);
     if (res == false) {
-        cout << "Login Information Invalid\n";
+        cout << "Login Information Invalid: " << id << endl;;
         return false;
     }
 
@@ -223,6 +223,16 @@ bool Socket::CheckLogin(int key, const char* id, const char* password, int userK
     cout << "Login Success / ID: " << id << endl;
 
 #endif
+    return true;
+}
+
+bool Socket::CheckValidString(const char* input)
+{
+    string str = input;
+
+    if (str.find_first_of("!@#$%^&*()_+{}[];:'\"<>,.?") != std::string::npos) {
+        return false;
+    }
     return true;
 }
 
