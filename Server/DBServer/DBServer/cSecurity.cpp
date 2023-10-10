@@ -4,7 +4,7 @@ string Security::GenerateSalt()
 {
 	unsigned char salt[SALT_LENGTH];
 	if (RAND_bytes(salt, SALT_LENGTH) == false) {
-		cout << "Salt Generate Failed\n";
+		DEBUGMSGNOPARAM("Salt Generate Failed\n");
 	}
 
 	string hexSalt;

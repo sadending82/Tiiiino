@@ -30,8 +30,6 @@ constexpr int ADMIN_LAST_UID = 10;
 
 constexpr const char* ADMIN_ID = "admin";
 
-#define Test
-
 //###############################
 //###############################
 #define RUN_DB
