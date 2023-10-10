@@ -31,4 +31,5 @@ public:
 private:
 	UPROPERTY(EditAnywhere, Category = Stat, Meta = (AllowPrivateAccess = true)) float RotateSpeed = 30.0f;
 	UPROPERTY(EditAnywhere, Category = Stat, Meta = (AllowPrivateAccess = true)) float ElasticForce = 500.0f;
+	UPROPERTY(EditAnywhere, Category = Stat, Meta = (AllowPrivateAccess = true)) bool DoElasticCollision = true;
 };
