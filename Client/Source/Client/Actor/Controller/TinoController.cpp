@@ -97,11 +97,25 @@ void ATinoController::RemoveDialogUI()
 	}
 }
 
-void ATinoController::LoginFailed()
+void ATinoController::UIAlertMessage(EDialogUICheck check)
 {
 	if (!!DialogUI)
 	{
-		DialogUI->RenderLoginFailedUI();
+		DialogUI->FixedAlertMessage();
+		if (check == EDialogUICheck::EDC_LoginFailed)
+		{
+			DialogUI->SetLoginFailedUI();
+		}
+		else if (check == EDialogUICheck::EDC_CASuccess)
+		{
+			DialogUI->SetCreateAccountSuccessUI();
+		}
+		else if (check == EDialogUICheck::EDC_CAFailed)
+		{
+			DialogUI->SetCreateAccountFailedUI();
+		}
+
+		DialogUI->RenderUIAlertMessage();
 		DialogUI->AddToViewport();
 	}
 }

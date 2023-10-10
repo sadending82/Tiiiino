@@ -20,6 +20,7 @@ public:
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void ResetWindow();
 public:
+	// Server Disconnect UI
 	UPROPERTY(meta = (BindWidget))
 	class UButton* DisconnectNetworkButton;
 
@@ -58,19 +59,33 @@ public:
 public:
 	// Login Failed UI Window
 	UPROPERTY(meta = (BindWidget))
-	class UButton* LoginFailedButton;
+	class UButton* FailedButton;
 
 	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* LoginFailedText;
+	class UTextBlock* FailedText;
 
 	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* LoginFailedButtonText;
+	class UTextBlock* FailedButtonText;
 
 	UPROPERTY(meta = (BindWidget))
-	class UImage* LoginFailedImage;
+	class UImage* FailedImage;
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	void RenderLoginFailedUI();
+	void RenderUIAlertMessage();
 
-public:
+	// Set Login Failed UI
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void SetLoginFailedUI();
+
+	// Set CreateAccount Success UI
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void SetCreateAccountSuccessUI();
+
+	// Set CreateAccount Failed UI
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void SetCreateAccountFailedUI();
+
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void FixedAlertMessage();
+
 };

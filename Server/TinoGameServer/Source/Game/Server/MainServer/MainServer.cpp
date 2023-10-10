@@ -165,9 +165,9 @@ void MainServer::send_login_ok_packet(const int player_id, void* buf)
 	player->SendPacket(&packet, sizeof(packet));
 }
 
-SC_LOGIN_OK_PACKET MainServer::make_login_ok_packet(const int playerID, const char* playername)
+SC_LOGIN_OK_PACKET MainServer::make_login_ok_packet(const int playerSocketID, const int playerID, const char* playername)
 {
-	auto player = dynamic_cast<Player*>(mObjects[playerID]);
+	auto player = dynamic_cast<Player*>(mObjects[playerSocketID]);
 	SC_LOGIN_OK_PACKET packet;
 	memset(&packet, 0, sizeof(SC_LOGIN_OK_PACKET));
 
@@ -175,6 +175,8 @@ SC_LOGIN_OK_PACKET MainServer::make_login_ok_packet(const int playerID, const ch
 	packet.type = SC_LOGIN_OK;
 
 	packet.id = playerID;
+	if(player)
+		packet.department = static_cast<char>(player->GetDepartment());
 	//wcscpy(packet.name, playername);
 	return packet;
 }
@@ -616,9 +618,8 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 		pRoom->AddObject(player);
 		{
 			DEBUGMSGONEPARAM("[%d]\n", player->GetRoomSyncID());
-			SC_LOGIN_OK_PACKET sPacket = make_login_ok_packet(player->GetRoomSyncID(), "none");
+			SC_LOGIN_OK_PACKET sPacket = make_login_ok_packet(player->GetSocketID(),player->GetRoomSyncID(), "none");
 			SendMySelf(client_id, (void*)&sPacket, sizeof(sPacket));
-			//send_login_ok_packet(client_id, "none");
 		}
 		{
 			SC_PING_PACKET sPacket = make_ping_packet();

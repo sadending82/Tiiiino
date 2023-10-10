@@ -11,6 +11,8 @@
 #include "Animation/AnimMontage.h"
 #include "MenuUI/InGameUIWidget.h"
 #include "MenuUI/DialogUIWidget.h"
+#include "MenuUI/InGameTimerWidget.h"
+
 
 ATinoCharacter::ATinoCharacter()
 	:MaxTumbledTime(1.0f),
@@ -24,6 +26,7 @@ ATinoCharacter::ATinoCharacter()
 	TargetInterval(50.f),
 	OriginalSpeed(400.f),
 	MovementState(EMovementState::EMS_Normal),
+	Department(EDepartment::EDepartment_Game),
 	Target(nullptr)
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -205,6 +208,9 @@ void ATinoCharacter::MakeAndShowHUD()
 	InGameWidgetInstance = CreateWidget<UInGameUIWidget>(GetWorld(), InGameWidgetClass);
 	InGameWidgetInstance->AddToViewport();
 
+	InGameUITimerInstance = CreateWidget<UInGameTimerWidget>(GetWorld(), InGameUITimerClass);
+	InGameUITimerInstance->AddToViewport();
+
 }
 
 void ATinoCharacter::MakeAndShowDialog()
@@ -213,12 +219,26 @@ void ATinoCharacter::MakeAndShowDialog()
 	DialogWidget->AddToViewport();
 }
 
-void ATinoCharacter::SetDepartmentClothes(const int department)
+void ATinoCharacter::SetDepartmentClothes(int department)
 {
-	auto DynamicMaterialMesh = GetMesh()->CreateDynamicMaterialInstance(0);
-	DynamicMaterialMesh->SetTextureParameterValue(TEXT("Department"), GetTinoDepartTexture(department));
-	if(DynamicMaterialMesh)
-		GetMesh()->SetMaterial(0, DynamicMaterialMesh);
+	if (static_cast<int>(EDepartment::EDepartment_None) < department &&
+		static_cast<int>(EDepartment::EDepartment_MAX) > department)
+	{
+		auto DynamicMaterialMesh = GetMesh()->CreateDynamicMaterialInstance(0);
+		auto DepartmentTexture = GetTinoDepartTexture(static_cast<EDepartment>(department));
+		if (DepartmentTexture == nullptr)
+		{
+			CLog::Log("Fail to Get Department Texture!");
+			return;
+		}
+		DynamicMaterialMesh->SetTextureParameterValue(TEXT("Department"), DepartmentTexture);
+		if (DynamicMaterialMesh)
+			GetMesh()->SetMaterial(0, DynamicMaterialMesh);
+	}
+	else
+	{
+		CLog::Print("Department value is Invalid. Check Server",1, 10.f,FColor::Red);
+	}
 }
 
 
@@ -267,26 +287,27 @@ void ATinoCharacter::SetOriginalSpeed()
 	GetCharacterMovement()->MaxWalkSpeed = OriginalSpeed;
 }
 
-void ATinoCharacter::TimerStart()
+void ATinoCharacter::TimerStart(ETimerType type)
 {
-	GetWorldTimerManager().SetTimer(InGameUITimerHandle, this, &ATinoCharacter::TimerEnd, 1.f, true);
+	Type = type;
+	GetWorldTimerManager().SetTimer(UITimerHandle, this, &ATinoCharacter::TimerRun, true);
 }
 
-void ATinoCharacter::TimerEnd()
+void ATinoCharacter::TimerRun()
 {
 
 	// 유효성 확인
-	if (InGameWidgetInstance)
+	if (!!InGameUITimerInstance)
 	{
 		// UInGameUIWidget의 TimerRun 함수 호출
-		InGameWidgetInstance->TimerRun();
-	}
-	if (InGameWidgetInstance->GetRestGameTime() < 0)
-	{
-		InGameWidgetInstance->TimerEnd();
-		GetWorldTimerManager().ClearTimer(InGameUITimerHandle);
-	}
+		InGameUITimerInstance->TimerRun(Type);
 
+		if (InGameUITimerInstance->GetRestGameTime() < 0)
+		{
+			InGameUITimerInstance->TimerEnd(Type);
+			GetWorldTimerManager().ClearTimer(UITimerHandle);
+		}
+	}
 }
 
 void ATinoCharacter::Dive()
@@ -550,55 +571,16 @@ void ATinoCharacter::EnableInputMode()
 	EnableInput(GetController<APlayerController>());
 }
 
-UTexture* ATinoCharacter::GetTinoDepartTexture(int department)
+UTexture* ATinoCharacter::GetTinoDepartTexture(EDepartment DepartmentNumber)
 {
-	UTexture* pTexture = nullptr;
-	switch (department)
+	if (DepartmentTextureMap.Num() <= 0)
 	{
-	case 1:
-		//겜공
-		break;
-	case 2:
-		UHelpers::GetAssetDynamic(&pTexture, "Engine.Texture2D'/Game/Characters/Tino/Cloth/Texture/DepartmentTestTexture/Tino_A.Tino_A'");
-		break;
-	case 3:
-		UHelpers::GetAssetDynamic(&pTexture, "Engine.Texture2D'/Game/Characters/Tino/Cloth/Texture/DepartmentTestTexture/Tino_B.Tino_B'");
-		break;
-	case 4:
-		UHelpers::GetAssetDynamic(&pTexture, "Engine.Texture2D'/Game/Characters/Tino/Cloth/Texture/DepartmentTestTexture/Tino_C.Tino_C'");
-		break;
-	case 5:
-		UHelpers::GetAssetDynamic(&pTexture, "Engine.Texture2D'/Game/Characters/Tino/Cloth/Texture/DepartmentTestTexture/Tino_D.Tino_D'");
-		break;
-	case 6:
-		UHelpers::GetAssetDynamic(&pTexture, "Engine.Texture2D'/Game/Characters/Tino/Cloth/Texture/DepartmentTestTexture/Tino_E.Tino_E'");
-		break;
-	case 7:
-		UHelpers::GetAssetDynamic(&pTexture, "Engine.Texture2D'/Game/Characters/Tino/Cloth/Texture/DepartmentTestTexture/Tino_F.Tino_F'");
-		break;
-	case 8:
-		UHelpers::GetAssetDynamic(&pTexture, "Engine.Texture2D'/Game/Characters/Tino/Cloth/Texture/DepartmentTestTexture/Tino_G.Tino_G'");
-		break;
-	case 9:
-		UHelpers::GetAssetDynamic(&pTexture, "Engine.Texture2D'/Game/Characters/Tino/Cloth/Texture/DepartmentTestTexture/Tino_H.Tino_H'");
-		break;
-	case 10:
-		UHelpers::GetAssetDynamic(&pTexture, "Engine.Texture2D'/Game/Characters/Tino/Cloth/Texture/DepartmentTestTexture/Tino_I.Tino_I'");
-		break;
-	case 11:
-		UHelpers::GetAssetDynamic(&pTexture, "Engine.Texture2D'/Game/Characters/Tino/Cloth/Texture/DepartmentTestTexture/Tino_J.Tino_J'");
-		break;
-	case 12:
-		UHelpers::GetAssetDynamic(&pTexture, "Engine.Texture2D'/Game/Characters/Tino/Cloth/Texture/DepartmentTestTexture/Tino_K.Tino_K'");
-		break;
-	case 13:
-		UHelpers::GetAssetDynamic(&pTexture, "Engine.Texture2D'/Game/Characters/Tino/Cloth/Texture/DepartmentTestTexture/Tino_L.Tino_L'");
-		break;
-	default:
-		break;
+		CLog::Log("DepartmentTextureMap is Empty");
+		return nullptr;
 	}
+	UTexture* Texture = DepartmentTextureMap[DepartmentNumber];
 
-	return pTexture;
+	return Texture;
 }
 
 bool ATinoCharacter::CanMove()

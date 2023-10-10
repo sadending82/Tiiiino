@@ -40,12 +40,12 @@ void ULoginUIWidget::TryLogin()
 
 }
 
-void ULoginUIWidget::LoginFailed()
+void ULoginUIWidget::UIAlertMessage()
 {
 	// if login failed
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	if (!!TinoController)
-		TinoController->LoginFailed();
+		TinoController->UIAlertMessage(EDialogUICheck::EDC_LoginFailed);
 }
 
 void ULoginUIWidget::TryNewAccounts()

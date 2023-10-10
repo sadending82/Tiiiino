@@ -288,6 +288,7 @@ void Network::process_packet(unsigned char* p)
 	{
 		SC_LOGIN_OK_PACKET* packet = reinterpret_cast<SC_LOGIN_OK_PACKET*>(p);
 		mMyCharacter->SetClientID(packet->id);
+		mMyCharacter->SetDepartmentClothes(packet->department);
 		//연결성공
 		bIsConnected = true;
 		break;
@@ -350,7 +351,7 @@ void Network::process_packet(unsigned char* p)
 		else {
 			FName path = TEXT("Blueprint'/Game/Characters/Tino/BP_TinoCharacter.BP_TinoCharacter_C'"); //_C를 꼭 붙여야 된다고 함.
 			UClass* GeneratedInventoryBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
-			FTransform trans(FQuat(packet->rx, packet->ry, packet->rz, packet->rw), FVector(888, 1566, 400 + (id * 150)));
+			FTransform trans(FQuat(packet->rx, packet->ry, packet->rz, packet->rw), FVector(888, 1566, -10000 + (id * 150)));
 			auto mc = mMyCharacter->GetWorld()->SpawnActorDeferred<ATinoCharacter>(GeneratedInventoryBP, trans);
 			if (nullptr != mc)
 			{
@@ -451,10 +452,7 @@ void Network::process_packet(unsigned char* p)
 	case SC_GAME_END: {
 		SC_GAME_END_PACKET* packet = reinterpret_cast<SC_GAME_END_PACKET*>(p);
 		closesocket(s_socket);
-		//mMyCharacter->InGameWidgetInstance->ShowResultUI();
-		UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName("Lobby"));
-		bIsConnected = false;
-		bLevelOpenTriggerEnabled = true;
+		mMyCharacter->InGameWidgetInstance->ShowResultUI();
 
 		break;
 	}

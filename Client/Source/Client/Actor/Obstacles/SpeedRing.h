@@ -36,9 +36,9 @@ private:
 	UPROPERTY(VisibleDefaultsOnly, Category = "Component")
 		class UBoxComponent* OverlapBox;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Stat")
+	UPROPERTY(EditAnywhere, Category = "Stat")
 		float ChangeSpeed;
-	UPROPERTY(EditDefaultsOnly, Category = "Stat")
+	UPROPERTY(EditAnywhere, Category = "Stat")
 		float DurationTime;
 
 	UPROPERTY(VisibleAnywhere, Category = "Stat")

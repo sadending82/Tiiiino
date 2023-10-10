@@ -22,6 +22,9 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* GameTimeText;
 
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* StartCountDownText;
+
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void LevelSuccess();
 
@@ -35,38 +38,54 @@ public:
 	void ShowResultUI();
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	bool GetbLevelClearCheck() { return bLevelClearCheck; }
-
-	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void TimerStart();
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	void TimerEnd();
-
-	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	void TimerRun();
-
-
-	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	int GetRestGameTime() const { return RestGameTime; }
+	bool GetbLevelClearCheck() { return bLevelClearCheck; }
 
 	UPROPERTY(EditAnywhere, Category = "UMG_Game")
 	bool bLevelClearCheck = false;
 
+	// 인게임메뉴창 열기
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void OpenInGameUI();
 
+	// 인게임메뉴창 닫기
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void CloseInGameUI();
 
-private:
+	// 나가기 버튼을 눌렀을 때 로비로 나가는 함수
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void ChangeLobbyUI();
+
+	// 게임시작시 카운트다운 3..2..1
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void LevelStartCountdown();
+
+	// 게임시작시 카운트다운 3..2..1
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void LevelStart();
+
+	// 게임종료시 카운트다운
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void LevelClearCountdown();
+
+	// 타이머 문구 체인지 20->19->18
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void TimerTextChange(int RestGameTime, ETimerType Type);
+
 	UPROPERTY(EditAnywhere, Category = "UMG_Game")
-	int RestGameTime = 20;
+	class UInGameTimerWidget* InGameTimer;
+
+	UPROPERTY(EditAnywhere, Category = "UMG_Game")
+	class TSubclassOf<UInGameTimerWidget> InGameTimerClass;
+
+private:
 
 	UPROPERTY(EditAnywhere, Category = "UMG_Game")
 	UImage* MyImage;
 
-
+	
 	
 	
 };
