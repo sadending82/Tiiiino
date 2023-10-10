@@ -624,7 +624,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 				packet.type = LG_USER_INTO_GAME;
 				packet.department = mClients[player_id].mDepartment;
 				packet.roomID = roomID;// need update		
-				_itoa_s(rand() % 2'000'000'000, mClients[player_id].mHashs, 10);
+				_itoa_s(rand() % 2'000'000'000, mClients[player_id].mHashs, 10); 
 				strcpy_s(packet.hashs, mClients[player_id].mHashs);
 				strcpy_s(packet.name,  mClients[player_id].mNickName);
 				strcpy_s(packet.id,  mClients[player_id].mID);
