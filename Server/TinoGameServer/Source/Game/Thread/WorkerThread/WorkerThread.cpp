@@ -189,7 +189,6 @@ void WorkerThread::doThread()
 			eEventType eventType = TimerThread::DeserializeEventType(wsa_ex->GetBuf());
 			int roomID = TimerThread::DeserializeReceiver(wsa_ex->GetBuf());
 			mMainServer->GetRooms()[roomID]->ResetGameRoom();
-			mMainServer->send_room_reset_packet(roomID);
 
 			break;
 		}
