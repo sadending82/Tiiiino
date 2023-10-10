@@ -28,6 +28,7 @@ public:
 	tuple<string, string, double, int> SelectUserData(const int uid);
 	tuple<int, string, double, int, bool, char> SelectUserDataForLogin(const string& id);
 	vector<string> SelectHash(const string& id); // Index 0: hash / Index 1: salt
+	tuple<double, char> SelectUserGradeAndDepartment(const int uid);
 
 	bool InsertNewUser(const string& id, const char department);
 	bool InsertNewAccount(const string& id, const string& password);
@@ -42,6 +43,8 @@ public:
 
 	bool SignUpNewPlayer(const string& id, const string& password, const char department);
 	bool CheckVerifyUser(const string& id, const string& password);
+
+	bool UpdateRanking(const char department, const int incrementScore);
 
 	void DisconnectDB();
 

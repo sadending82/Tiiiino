@@ -151,8 +151,6 @@ void Socket::ServerReady()
     std::cout << "Connect To Lobby Server Ready" << std::endl;
 #endif
 
-    m_pDB->UpdateUserGrade(100, 2.2);
-
     WorkerFunc();
 }
 
@@ -346,11 +344,26 @@ void Socket::ProcessPacket_UpdateGrade(int key, unsigned char* buf)
         && p->uid <= ADMIN_LAST_UID) {
         return;
     }
+
 #ifdef RUN_DB
+
+    auto userData = Getm_pDB()->SelectUserGradeAndDepartment(p->uid);
+    int gradeBeforeUpdate = get<0>(userData);
+    char department = get<1>(userData);
+
     bool bResult = Getm_pDB()->UpdateUserGrade(p->uid, p->grade);
     if (bResult != true) {
         cout << "Update User Grade failed\n";
     }
+
+    // 랭킹에 반영할 점수 나중에 수정
+    /*int score = 100;
+
+    bResult = Getm_pDB()->UpdateRanking(department, score);
+    if (bResult != true) {
+        cout << "Update Ranking failed\n";
+    }*/
+
 #endif
 }
 

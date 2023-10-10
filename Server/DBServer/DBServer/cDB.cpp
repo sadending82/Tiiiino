@@ -256,6 +256,60 @@ vector<string> DB::SelectHash(const string& id)
 	return result;
 }
 
+tuple<double, char> DB::SelectUserGradeAndDepartment(const int uid)
+{
+	string query = "SELECT grade, department FROM userinfo WHERE uid = ?";
+
+	if (mysql_stmt_prepare(GetmStmt(), query.c_str(), query.length()) != 0) {
+#ifdef Test
+		std::cout << "SelectUserData stmt prepare error: " << mysql_stmt_error(GetmStmt()) << std::endl;
+#endif
+		return tuple<double, char>();
+	}
+
+	MYSQL_BIND paramBind;
+	memset(&paramBind, 0, sizeof(paramBind));
+	paramBind.buffer_type = MYSQL_TYPE_LONG;
+	paramBind.buffer = (void*)&uid;
+
+	if (mysql_stmt_bind_param(GetmStmt(), &paramBind) != 0) {
+#ifdef Test
+		std::cout << "SelectUserData stmt param bind error: " << mysql_stmt_error(GetmStmt()) << std::endl;
+#endif
+		return tuple<double, char>();
+	}
+
+	const int resColNum = 2;
+	MYSQL_BIND resultBinds[resColNum];
+	memset(resultBinds, 0, sizeof(resultBinds));
+	int bindDepartment;
+	double bindGrade;
+	{
+		resultBinds[0].buffer_type = MYSQL_TYPE_DOUBLE;
+		resultBinds[0].buffer = (void*)&bindGrade;
+
+		resultBinds[1].buffer_type = MYSQL_TYPE_LONG;
+		resultBinds[1].buffer = (void*)&bindDepartment;
+	}
+
+	if (mysql_stmt_bind_result(GetmStmt(), resultBinds) != 0) {
+#ifdef Test
+		std::cout << "SelectUserData stmt result bind error: " << mysql_stmt_error(GetmStmt()) << std::endl;
+#endif
+		return tuple<double, char>();
+	}
+
+	if (ExecuteQuery() == false) {
+		return tuple<double, char>();
+	}
+
+	if (mysql_stmt_fetch(GetmStmt()) != 0) {
+		return tuple<double, char>();
+	}
+
+	return make_tuple(bindGrade, static_cast<char>(bindDepartment));
+}
+
 bool DB::InsertNewUser(const string& id, const char department)
 {
 	string query = "INSERT INTO userinfo (ID, department) VALUES (?, ?)";
@@ -583,6 +637,46 @@ bool DB::CheckVerifyUser(const string& id, const string& password)
 	string salt = selectRes[1];
 
 	return GetmSecurity()->VerifyPassword(password, hash, salt);
+}
+
+bool DB::UpdateRanking(const char department, const int incrementScore)
+{
+	string query = "INSERT INTO department_rank (department, score) VALUES (?, ?) ON DUPLICATE KEY UPDATE score = score + ?";
+
+	if (mysql_stmt_prepare(GetmStmt(), query.c_str(), query.length()) != 0) {
+#ifdef Test
+		std::cout << "UpdateRanking stmt prepare error: " << mysql_stmt_error(GetmStmt()) << std::endl;
+#endif
+		return false;
+	}
+
+	const int num = 3;
+
+	MYSQL_BIND binds[num];
+	memset(binds, 0, sizeof(binds));
+
+	binds[0].buffer_type = MYSQL_TYPE_TINY;
+	binds[0].buffer = (void*)&department;
+
+	binds[1].buffer_type = MYSQL_TYPE_LONG;
+	binds[1].buffer = (void*)&incrementScore;
+
+	binds[2].buffer_type = MYSQL_TYPE_LONG;
+	binds[2].buffer = (void*)&incrementScore;
+
+	if (mysql_stmt_bind_param(GetmStmt(), binds) != 0) {
+
+#ifdef Test
+		std::cout << "UpdateRanking stmt bind error: " << mysql_stmt_error(GetmStmt()) << std::endl;
+#endif
+		return false;
+	}
+
+	if (ExecuteQuery() == false) {
+		return false;
+	}
+
+	return true;
 }
 
 void DB::DisconnectDB()
