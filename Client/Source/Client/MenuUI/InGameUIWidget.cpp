@@ -115,6 +115,7 @@ void UInGameUIWidget::LevelStartCountdown()
 	InGameTimer = Cast<UInGameTimerWidget>(CreateWidget(GetWorld(), InGameTimerClass));
 	if (!!InGameTimer)
 	{
+		StartCountDownText->SetRenderOpacity(1.0);
 		InGameTimer->TimerStart(ETimerType::ETT_LevelStart);
 	}
 }
@@ -132,6 +133,7 @@ void UInGameUIWidget::LevelClearCountdown()
 	// 누군가 결승선을 통과했을 때 레벨을 끝내기까지 남은시간 카운트다운
 	if (!!InGameTimer)
 	{
+		GameTimeText->SetRenderOpacity(1.0);
 		InGameTimer->TimerStart(ETimerType::ETT_LevelClear);
 	}
 }
