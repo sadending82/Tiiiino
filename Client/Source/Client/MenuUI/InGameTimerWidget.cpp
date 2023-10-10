@@ -5,6 +5,7 @@
 #include "Actor/Controller/TinoController.h"
 #include "Actor/Character/TinoCharacter.h"
 #include "MenuUI/InGameUIWidget.h"
+#include "Network/Network.h"
 
 #include "Global.h"
 
@@ -24,7 +25,7 @@ void UInGameTimerWidget::TimerStart(ETimerType Type)
 		auto TinoCharacter = TinoController->GetPawn<ATinoCharacter>();
 		if (!!TinoCharacter)
 		{
-			InGameUI = Cast<UInGameUIWidget>(CreateWidget(GetWorld(), InGameUIClass));
+			InGameUI = Network::GetNetwork()->mMyCharacter->InGameWidgetInstance;
 			if (Type == ETimerType::ETT_LevelClear)
 			{
 				RestGameTime = 20;
