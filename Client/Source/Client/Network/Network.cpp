@@ -523,7 +523,7 @@ void Network::process_packet(unsigned char* p)
 	{
 		SC_GAME_COUNTDOWN_START_PACKET* packet = reinterpret_cast<SC_GAME_COUNTDOWN_START_PACKET*>(p);
 
-		mMyCharacter->InGameWidgetInstance->TimerStart();
+		mMyCharacter->InGameWidgetInstance->LevelClearCountdown();
 		//카운트다운 UI 띄우기 (Appear CountDown UI)
 
 		break;
