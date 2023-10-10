@@ -27,6 +27,7 @@ public:
 
 	const int GetObjectID() const { return mObjectID; }
 	void SetObjectID(const int id) { mObjectID = id; }
+	void SetIsObjectSync(const bool sync) { bIsSyncObject = sync; }
 
 	// 10/08 김혁동
 	// 네트워크 동기화를 위한 변수를 제어하기 위한 함수를 추가하였습니다.
@@ -40,6 +41,7 @@ public:
 protected:
 
 	//1006 이수민 이 mObjectID에 부서지는 발판및 부서지는 문은 기획이 넘버링을 해주어야함. "무조건"
+	//1010 이수민 기획이 이거 넘버링 하다가 실수 할수도있으니 코드적으로 자동화 시킴.
 	UPROPERTY(EditAnywhere, Category = "Network")
 	int mObjectID;
 	// 10.09 이수민 동기화가 필요한 obstacle과 아닌 obstacle ex)LinearBelt를 구분짓기 위함.
