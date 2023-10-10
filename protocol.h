@@ -80,7 +80,8 @@ enum PacketType {
 	LC_LOGIN_OK,
 	LC_LOGIN_FAIL,
 	LC_MATCH_RESPONSE,
-	LC_GAME_RESULT
+	LC_GAME_RESULT,
+	LC_CONTROL
 };
 
 #pragma pack (push, 1)
@@ -257,6 +258,10 @@ struct LC_GAME_RESULT_PACKET : public PACKET {
 	int		rank;
 	double	grade;
 	int		point;
+};
+
+struct LC_CONTROL_PACKET :public PACKET {
+
 };
 
 //--------------------------
