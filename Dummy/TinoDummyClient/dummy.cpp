@@ -1,7 +1,7 @@
 #pragma once
 #include "dummy.h"
 #include <string>
-
+#include <random>
 extern HWND		hWnd;
 
 HANDLE g_hiocp;
@@ -103,6 +103,9 @@ void Game_ProcessPacket(int ci, unsigned char packet[])
 	{
 		SC_LOGIN_OK_PACKET* p = reinterpret_cast<SC_LOGIN_OK_PACKET*>(packet);
 		g_clients[ci].roomSyncID = p->id;
+		g_clients[ci].x = 240.f - ((p->id % 4) * 160);
+		g_clients[ci].y = 0 - (p->id / 4 * 160);
+		g_clients[ci].z = 0;
 		break;
 	}
 	case SC_GAME_START: {
@@ -516,26 +519,30 @@ void SendMatchingPacket(int key)
 	SendPacketToLobby(key, &sPacket);
 }
 
-void SendMoveRand(int key)
+void SendMoveRand(int key)//
 {
 	CS_MOVE_PACKET my_packet;
 	my_packet.size = sizeof(my_packet);
 	my_packet.type = CS_MOVE;
 
-	g_clients[key].x += 0;//rand() % 10;
-	my_packet.x = g_clients[key].x;
-	g_clients[key].y += 0;// rand() % 10;
-	my_packet.y = g_clients[key].y;
-	g_clients[key].y += 0;//rand() % 10;
-	my_packet.z = g_clients[key].z;
+	//g_clients[key].x += 0;//rand() % 10;
+	my_packet.x = static_cast<float>(g_clients[key].x);
+	//g_clients[key].y += 0;// rand() % 10;
+	my_packet.y = static_cast<float>(g_clients[key].y);
+	//g_clients[key].y += 0;//rand() % 10;
+	my_packet.z = static_cast<float>(g_clients[key].z);
 
 	my_packet.inair = false;
-	my_packet.rw = rand() % 360;
-	my_packet.rx = rand() % 360;
-	my_packet.ry = rand() % 360;
-	my_packet.rz = rand() % 360;
+	my_packet.rw = static_cast<float>((rand() %100)) / 100.f;
+	my_packet.rx = static_cast<float>((rand() % 100)) / 100.f;
+	my_packet.ry = static_cast<float>((rand() % 100)) / 100.f;
+	my_packet.rz = static_cast<float>((rand() % 100)) / 100.f;
+	my_packet.sx = 0;
+	my_packet.sy = 0;
+	my_packet.sz = 0;
+	
 
-	my_packet.speed = 30;
+	my_packet.speed = 0;
 	my_packet.move_time = static_cast<unsigned>(duration_cast<milliseconds>(high_resolution_clock::now().time_since_epoch()).count());
 	SendPacketToGame(key, &my_packet);
 }
