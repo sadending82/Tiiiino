@@ -367,10 +367,11 @@ void Network::process_packet(unsigned char* p)
 				//if (mOtherCharacter[move_id]->SyncInAirDelegate.IsBound() == true)
 				//	mOtherCharacter[move_id]->SyncInAirDelegate.Broadcast(packet->inair);
 				mOtherCharacter[move_id]->ServerLocateLerp = FVector(packet->x, packet->y, packet->z);
+				mOtherCharacter[move_id]->ServerRotateLerp = FQuat(packet->rx, packet->ry, packet->rz, packet->rw);
 				//FMath::Lerp(mOtherCharacter[move_id]->GetActorLocation(), FVector(packet->x, packet->y, packet->z),0.5);
 				////mOtherCharacter[move_id]->SetActorLocation(FVector(packet->x, packet->y, packet->z));
 				//mOtherCharacter[move_id]->SetActorLocation(FVector(packet->x, packet->y, packet->z));
-				mOtherCharacter[move_id]->SetActorRotation(FQuat(packet->rx, packet->ry, packet->rz, packet->rw));
+				//mOtherCharacter[move_id]->SetActorRotation(FQuat(packet->rx, packet->ry, packet->rz, packet->rw));
 				mOtherCharacter[move_id]->ServerSyncSpeed = packet->speed;
 				mOtherCharacter[move_id]->ServerCharMovingSpeed = FVector(packet->sx, packet->sy, packet->sz);
 				mOtherCharacter[move_id]->SetIsAirForNetwork(packet->inair);
