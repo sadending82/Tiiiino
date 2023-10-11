@@ -130,9 +130,13 @@ void WorkerThread::doThread()
 			Room* pRoom = mMainServer->GetRooms()[roomID];
 			DEBUGMSGNOPARAM("The Game Wait Packet On \n");
 			int retryTime = client_id;
-			if (retryTime > 100)
+			if (retryTime > 4)
 			{
-				TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_RESET, eEventType::TYPE_TARGET, ROOM_RESET_TIME, 0, roomID);
+				DEBUGMSGNOPARAM("The Game Force Begin 4second after \n");
+				pRoom->RoomStartForce();
+				SC_GAME_WAITTING_PACKET spacket = mMainServer->make_game_watting_packet();
+				mMainServer->SendRoomBroadCast(roomID, (void*)&spacket, sizeof(spacket));
+				TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_START, eEventType::TYPE_BROADCAST_ROOM, 4000, NULL, roomID);
 				break;
 			}
 			int ret = pRoom->IsAllPlayerReady();

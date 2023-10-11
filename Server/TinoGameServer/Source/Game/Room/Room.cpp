@@ -181,6 +181,37 @@ bool Room::IsAllPlayerReady()
 
 }
 
+void Room::RoomStartForce()
+{
+	mRoomStateLock.lock();
+	if (mRoomState == eRoomState::ST_READY_COMPLETE)
+	{
+		mRoomState = eRoomState::ST_INGAME;
+		mRoomStateLock.unlock();
+	}
+	else {
+		mRoomStateLock.unlock();
+	}
+
+	mRoomReadyLock.lock();
+	mPlayerMax = mPlayerCnt.load();
+	mRoomReadyLock.unlock();
+}
+
+bool Room::IsRoomStartForce()
+{
+
+	mRoomReadyLock.lock();
+	if (mPlayerMax == mPlayerCnt)
+	{
+		mRoomReadyLock.unlock();
+		//이미 방이 시작한 상태.
+		return true;
+	}
+	mRoomReadyLock.unlock();
+	return false;
+}
+
 void Room::SetRoomEnd()
 {
 	mRoomStateLock.lock();
@@ -200,7 +231,17 @@ void Room::SetRoomEnd()
 
 void Room::PlayerCntIncrease()
 {
+	mRoomReadyLock.lock();
 	mPlayerCnt++;
+
+	// 이 코드는 Force Start때 늦게 들어온 플레이어가
+	// Increase 할 때, Cnt가 Max보다 높으면 생기는
+	// Goal이 Max만큼만 해주니까 Cnt에서 Max뺀 만큼 타이머끝나기전에 껨 끝나는,,, 불상사를 방지하기 위한 코드
+	if (mPlayerMax < mPlayerCnt)
+	{
+		mPlayerMax = mPlayerCnt.load();
+	}
+	mRoomReadyLock.unlock();
 }
 
 void Room::PlayerMaxDecrease()
