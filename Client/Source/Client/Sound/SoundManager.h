@@ -45,7 +45,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void PlaySFX(ESFXType Type);
-
+	//UFUNCTION(BlueprintCallable)
+		void PlaySFX(class USoundCue* Sound);
 public:
 
 

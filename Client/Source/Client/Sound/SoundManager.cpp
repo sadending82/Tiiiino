@@ -45,3 +45,12 @@ void ASoundManager::PlaySFX(ESFXType Type)
 		SFXAudio->Play();
 	}
 }
+
+void ASoundManager::PlaySFX(USoundCue* Sound)
+{
+	if (SoundManagerInstance && Sound)
+	{
+		SFXAudio->SetSound(Sound);
+		SFXAudio->Play();
+	}
+}
