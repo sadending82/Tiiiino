@@ -43,7 +43,8 @@ private:
 		float MaterialSpeedY;
 	UPROPERTY(EditAnywhere, Category = "Stat")
 		float BeltSpeed;
-
+	UPROPERTY(EditDefaultsOnly, Category = "Stat")
+		TSubclassOf<class ATinoCharacter> OverlapFilter;
 	UPROPERTY(VisibleAnywhere, Category = "Stat")
-		TSet<ACharacter*> OverlappingActors;
+		TSet<AActor*> OverlappingActors;
 };
