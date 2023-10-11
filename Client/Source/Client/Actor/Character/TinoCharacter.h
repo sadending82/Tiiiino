@@ -186,6 +186,8 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 		class UAnimMontage* GrabMontage;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Animation | Dive")
+		float MaxDiveTime;
 	UPROPERTY(VisibleAnywhere, Category = "Animation | Tumble")
 		float CurrentTumbledTime;
 	UPROPERTY(EditDefaultsOnly, Category = "Animation | Tumble")
@@ -240,6 +242,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Animation | Grab")
 		bool bShowDebugTrace;
 
+	FTimerHandle DiveTimer;
 	FTimerHandle GrabTimer;
 	FTimerHandle GrabCoolTimer;
 	FTimerHandle UITimerHandle;

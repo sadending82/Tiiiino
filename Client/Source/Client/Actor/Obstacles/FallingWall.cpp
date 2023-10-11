@@ -67,15 +67,14 @@ void AFallingWall::MeshComponentHit(UPrimitiveComponent* HitComponent, AActor* O
 
 		if (OverlapCharacter->bIsControlledPlayer)
 		{
-			//send hit packet
-			send_game_breakdoor_packet(Network::GetNetwork()->s_socket, mObjectID);
-			FieldLocation = OverlapCharacter->GetActorLocation();
-			ActionObject();
+			//send_game_breakdoor_packet(Network::GetNetwork()->s_socket, mObjectID);
 		}
 		else
 		{
 
 		}
+		FieldLocation = OverlapCharacter->GetActorLocation();
+		ActionObject();
 	}
 }
 

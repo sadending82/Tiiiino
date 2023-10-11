@@ -15,7 +15,8 @@
 
 
 ATinoCharacter::ATinoCharacter()
-	:MaxTumbledTime(1.0f),
+	:MaxDiveTime(3.f),
+	MaxTumbledTime(1.0f),
 	MaxGrabTime(3.0f),
 	GrabCoolTime(1.0f),
 	GrabbedSpeed(100.f),
@@ -320,6 +321,7 @@ void ATinoCharacter::Dive()
 		bIsDiving = true;
 		SendAnimPacket(2);
 		PlayAnimMontage(DiveMontage);
+		GetWorldTimerManager().SetTimer(DiveTimer,this,&ATinoCharacter::DiveEnd, MaxDiveTime, false);
 	}
 }
 
