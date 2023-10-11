@@ -129,16 +129,23 @@ void WorkerThread::doThread()
 			int roomID = TimerThread::DeserializeReceiver(wsa_ex->GetBuf());
 			Room* pRoom = mMainServer->GetRooms()[roomID];
 			DEBUGMSGNOPARAM("The Game Wait Packet On \n");
-			if (pRoom->IsAllPlayerReady())
+			int retryTime = client_id;
+			if (retryTime > 100)
+			{
+				TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_RESET, eEventType::TYPE_TARGET, ROOM_RESET_TIME, 0, roomID);
+				break;
+			}
+			int ret = pRoom->IsAllPlayerReady();
+			if (ret == true)
 			{
 				DEBUGMSGNOPARAM("The Game Will Begin 4second after \n");
 				SC_GAME_WAITTING_PACKET spacket = mMainServer->make_game_watting_packet();
 				mMainServer->SendRoomBroadCast(roomID, (void*)&spacket, sizeof(spacket));
 				TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_START, eEventType::TYPE_BROADCAST_ROOM, 4000, NULL, roomID);
 			}
-			else {
+			else if(ret == false){
 				DEBUGMSGNOPARAM("User Doesn't Ready Wait 2seconds\n");
-				TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_WAIT, eEventType::TYPE_BROADCAST_ROOM, 2000, NULL, roomID);
+				TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_WAIT, eEventType::TYPE_BROADCAST_ROOM, 2000, client_id + 1, roomID);
 			}
 			break;
 		}
@@ -156,8 +163,9 @@ void WorkerThread::doThread()
 		case eCOMMAND_IOCP::CMD_GAME_END:
 		{
 			eEventType eventType = TimerThread::DeserializeEventType(wsa_ex->GetBuf());
-			DEBUGMSGNOPARAM("한번만 오는지 GAME END\n");
 			int roomID = TimerThread::DeserializeReceiver(wsa_ex->GetBuf());
+			std::cout << "부른놈 " << client_id << std::endl;
+			DEBUGMSGONEPARAM("한번만 오는지 GAME END [%d]\n", roomID);
 			int ret = mMainServer->GetRooms()[roomID]->IsGameEndOnce();
 			if (false == ret) break;
 			mMainServer->GetRooms()[roomID]->SetRoomEnd();
@@ -206,7 +214,9 @@ void WorkerThread::doThread()
 				auto sPacket = mMainServer->make_game_countdown_start_packet();
 				mMainServer->SendRoomBroadCast(roomID, (void*)&sPacket, sizeof(sPacket));
 			}
-			TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_END, eEventType::TYPE_BROADCAST_ROOM, 20000, NULL, roomID);
+
+			DEBUGMSGONEPARAM("카운트다운 스타트에서 [%d]\n", roomID);
+			TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_END, eEventType::TYPE_BROADCAST_ROOM, 20000, 30, roomID);
 
 			break;
 		}

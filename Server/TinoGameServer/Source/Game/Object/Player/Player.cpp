@@ -41,9 +41,32 @@ void Player::DisConnectAndReset()
 	if(mRank < 0)
 		gMainServer->send_player_result_packet(mUID, mRank, mRoomID, true);
 	gMainServer->GetRooms()[mRoomID]->PlayerMaxDecrease();
-	//gMainServer->GetRooms()[mRoomID]->DisablePlayer(this);
+	gMainServer->GetRooms()[mRoomID]->RemovePlayer(this);
 	auto sPacket = gMainServer->make_player_remove_packet(mRoomSyncID);
 	gMainServer->SendRoomBroadCast(mRoomID, (void*)&sPacket, sizeof(sPacket));
+	Reset();
+}
+
+void Player::DisConnectAndResetUseInRoom()
+{
+	mStateLock.lock();
+	if (mSocketState == eSocketState::ST_FREE)
+	{
+		mStateLock.unlock();
+		return;
+	}
+	else {
+		mSocketState = eSocketState::ST_FREE;
+		mStateLock.unlock();
+	}
+	DisConnect();
+	if (mRoomSyncID < 0)
+	{
+		DEBUGMSGNOPARAM("이상한 사람 접속\n");
+		return;
+	}
+	if (mRank < 0)
+		gMainServer->send_player_result_packet(mUID, mRank, mRoomID, true);
 	Reset();
 }
 

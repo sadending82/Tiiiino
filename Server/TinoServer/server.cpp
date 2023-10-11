@@ -93,6 +93,7 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 		sp.size = sizeof(sp);
 		sp.type = LD_SIGNUP;
 		sp.department = rp->department;
+		sp.userKey = cID;
 		memcpy(sp.id, rp->id, sizeof(rp->id));
 		memcpy(sp.password, rp->password, sizeof(rp->password));
 		// send to db server
@@ -170,7 +171,7 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		uniform_int_distribution<int> rLevel(MIN_LEVEL, MAX_LEVEL);
 		int randomlevel = rLevel(rng);
 		
-		packet.mapLevel = 2;
+		packet.mapLevel = 3;
 		
 
 		int uidCount = 0;

@@ -4,7 +4,7 @@
 #include "../../../../../protocol.h"
 constexpr int INVALID_SOCKET_ID = -1;
 constexpr int INVALID_ROOM_ID = -1;
-constexpr int ROOM_RESET_TIME = 30000;
+constexpr int ROOM_RESET_TIME = 100000;
 
 #ifdef _DEBUG
 #define DEBUGMSGNOPARAM(args) (printf("file: %s, line:%d ",__FILE__,__LINE__), printf(args))
