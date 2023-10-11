@@ -38,12 +38,17 @@ void UInGameUIWidget::LevelClearCheck()
 	// 완주 성공 실패 체크
 	// 성공시 bLevelClearCheck = true
 	// 실패시 bLevelClearCheck = false
-	
+
+	// 레벨 종료시 마우스커서 띄우기
+	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (!!TinoController)
+	{
+		TinoController->SetShowMouseCursor(true);
+	}
 }
 
 void UInGameUIWidget::TimerStart()
 {
-	InGameTimer = Cast<UInGameTimerWidget>(CreateWidget(GetWorld(), InGameTimerClass));
 	StartCountDownText->SetRenderOpacity(1.0);
 	if (!!InGameTimer)
 	{
@@ -75,14 +80,20 @@ void UInGameUIWidget::OpenInGameUI()
 {
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	if (!!TinoController)
+	{
 		TinoController->OpenInGameUI();
+		TinoController->SetShowMouseCursor(true);
+	}
 }
 
 void UInGameUIWidget::CloseInGameUI()
 {
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	if (!!TinoController)
+	{
 		TinoController->RemoveDialogUI();
+		TinoController->SetShowMouseCursor(false);
+	}
 }
 
 void UInGameUIWidget::ChangeLobbyUI()
@@ -100,9 +111,9 @@ void UInGameUIWidget::ChangeLobbyUI()
 void UInGameUIWidget::LevelStartCountdown()
 {
 	// 레벨 시작시 카운트다운을 위해 이 함수 호출
-	InGameTimer = Cast<UInGameTimerWidget>(CreateWidget(GetWorld(), InGameTimerClass));
 	if (!!InGameTimer)
 	{
+		StartCountDownText->SetRenderOpacity(1.0);
 		InGameTimer->TimerStart(ETimerType::ETT_LevelStart);
 	}
 }
@@ -120,6 +131,7 @@ void UInGameUIWidget::LevelClearCountdown()
 	// 누군가 결승선을 통과했을 때 레벨을 끝내기까지 남은시간 카운트다운
 	if (!!InGameTimer)
 	{
+		GameTimeText->SetRenderOpacity(1.0);
 		InGameTimer->TimerStart(ETimerType::ETT_LevelClear);
 	}
 }

@@ -70,3 +70,15 @@ void ULoginUIWidget::InputLoginPassword(const FText& Text)
 	// UE_LOG(LogTemp, Error, TEXT("UnExpected Tree PasswordInput"));
 }
 
+void ULoginUIWidget::ShowCreditUI()
+{
+	CreditUI = Cast<UCreditUIWidget>(CreateWidget(GetWorld(), CreditUIClass));
+	// Credit 버튼 클릭시 크레딧UI 창을 띄움
+	if (!!CreditUI)
+	{
+		CreditUI->OpenCreditUI();
+		CreditUI->AddToViewport();
+	}
+
+}
+

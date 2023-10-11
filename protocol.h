@@ -19,7 +19,7 @@ constexpr int DELAY_TIME_EXEC_BREAKPLATFORM = 3000;
 
 // Level min, max
 constexpr int MIN_LEVEL = 1;
-constexpr int MAX_LEVEL = 5;
+constexpr int MAX_LEVEL = 6;
 
 enum class eDepartment : char
 {
@@ -57,6 +57,7 @@ enum PacketType {
 	CL_SIGNUP,
 	CL_MATCH,
 	CL_MATCH_OUT,
+	CL_CONTROL,
 
 	// GameServer To Client
 	SC_LOGIN_OK,
@@ -81,7 +82,7 @@ enum PacketType {
 	LC_LOGIN_FAIL,
 	LC_MATCH_RESPONSE,
 	LC_GAME_RESULT,
-	LC_CONTROL
+	LC_CONTROL,
 };
 
 #pragma pack (push, 1)
@@ -156,6 +157,10 @@ struct CL_MATCH_PACKET : public PACKET {
 };
 
 struct CL_MATCH_OUT_PACKET : public PACKET {
+
+};
+
+struct CL_CONTROL_PACKET : public PACKET {
 
 };
 //-----------------------------------

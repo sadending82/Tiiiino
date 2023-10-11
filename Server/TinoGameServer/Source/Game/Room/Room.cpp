@@ -4,6 +4,7 @@
 #include "../Object/Player/Player.h"
 #include "../Object/MapObject/MapObject.h"
 #include "../Thread/TimerThread/TimerThread.h"
+#include "../Server/MainServer/MainServer.h"
 
 Room::Room(int id)
 	: mRoomStageKindof(eRoomStage::ST_AVOID)
@@ -85,14 +86,27 @@ void Room::DisablePlayer(Player* player)
 
 void Room::ResetGameRoom()
 {
+	
+	mRoomStateLock.lock();
+	if (mRoomState == eRoomState::ST_CLOSED)
+	{
+		mRoomState = eRoomState::ST_FREE;
+		mRoomStateLock.unlock();
+	}
+	else {
+		mRoomStateLock.unlock();
+		return;
+	}
 	for (auto object : mObjects)
 	{
 		if (!object) continue;
-		object->Reset();
 		Player* player = dynamic_cast<Player*>(object);
 		if (player)
 		{
 			player->DisConnectAndReset();
+		}
+		else {
+			object->Reset();
 		}
 		object = nullptr;
 	}
@@ -103,10 +117,9 @@ void Room::ResetGameRoom()
 	mPlayerArrivedCnt = 0;
 	mPlayerCnt = 0;
 	mGameEndTimer = false;
+	mGameStartTimer = false;
 
-	mRoomStateLock.lock();
-	mRoomState = eRoomState::ST_FREE;
-	mRoomStateLock.unlock();
+	gMainServer->send_room_reset_packet(mRoomID);
 }
 
 std::mutex& Room::GetRoomStateLockRef()
@@ -164,7 +177,7 @@ bool Room::IsAllPlayerReady()
 void Room::SetRoomEnd()
 {
 	mRoomStateLock.lock();
-	mRoomState = eRoomState::ST_FREE;
+	mRoomState = eRoomState::ST_CLOSED;	//곧 리셋 될 방.
 	mRoomStateLock.unlock();
 }
 
@@ -177,6 +190,10 @@ void Room::PlayerCntIncrease()
 void Room::PlayerMaxDecrease()
 {
 	mPlayerMax--;
+	if (mPlayerMax <= 0)
+	{
+		TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_RESET, eEventType::TYPE_TARGET, 5000, 0, mRoomID);
+	}
 }
 
 bool Room::IsRoomReady()
@@ -359,7 +376,7 @@ void Room::setGameEndTimerStartOnce()
 	{
 		DEBUGMSGNOPARAM("게임 엔드 한 번 실행되야함\n");
 
-		TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_COUNTDOWN_START, eEventType::TYPE_BROADCAST_ROOM, 1000, NULL, mRoomID);
+		TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_COUNTDOWN_START, eEventType::TYPE_BROADCAST_ROOM, 0, NULL, mRoomID);
 	}
 }
 
