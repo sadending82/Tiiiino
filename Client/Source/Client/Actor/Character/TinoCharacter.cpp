@@ -209,7 +209,10 @@ void ATinoCharacter::MakeAndShowHUD()
 	InGameWidgetInstance->AddToViewport();
 
 	InGameUITimerInstance = CreateWidget<UInGameTimerWidget>(GetWorld(), InGameUITimerClass);
+	InGameUITimerInstance->SetInGameUI(InGameWidgetInstance);
 	InGameUITimerInstance->AddToViewport();
+
+	InGameWidgetInstance->InGameTimer = InGameUITimerInstance;
 
 }
 
@@ -290,7 +293,7 @@ void ATinoCharacter::SetOriginalSpeed()
 void ATinoCharacter::TimerStart(ETimerType type)
 {
 	Type = type;
-	GetWorldTimerManager().SetTimer(UITimerHandle, this, &ATinoCharacter::TimerRun, true);
+	GetWorldTimerManager().SetTimer(UITimerHandle, this, &ATinoCharacter::TimerRun, true,true);
 }
 
 void ATinoCharacter::TimerRun()

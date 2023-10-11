@@ -57,7 +57,7 @@ int Server::GetNewServerID()
 
 int Server::GetNewRoomID()
 {
-	for (int i = 0; i < MAXGAMESERVER*10; ++i) {
+	for (int i = 0; i < MAX_ROOM; ++i) {
 		mRooms[i].mStateLock.lock();
 		if (mRooms[i].mState == eRoomState::RS_FREE) {
 			mRooms[i].mState = eRoomState::RS_READY;
@@ -170,7 +170,7 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		uniform_int_distribution<int> rLevel(MIN_LEVEL, MAX_LEVEL);
 		int randomlevel = rLevel(rng);
 		
-		packet.mapLevel = randomlevel;
+		packet.mapLevel = 2;
 		
 
 		int uidCount = 0;
@@ -209,7 +209,7 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 	case GL_ROOM_RESET:
 	{
 		GL_ROOM_RESET_PACKET* p = reinterpret_cast<GL_ROOM_RESET_PACKET*>(spacket);
-
+		DEBUGMSGONEPARAM("방[%d] 리셋", p->roomID);
 		mRooms[p->roomID].mStateLock.lock();
 		mRooms[p->roomID].mState = eRoomState::RS_FREE;
 		ZeroMemory(mRooms[p->roomID].mUID, sizeof(mRooms[p->roomID].mUID));
@@ -637,13 +637,14 @@ void Server::ProcessEvent(unsigned char* cmessage)
 		DEBUGMSGONEPARAM("상위 티어 매칭 인원 [%d]\n", mMatchListHighTier.size());
 		DEBUGMSGONEPARAM("하위 티어 매칭 인원 [%d]\n", mMatchListLowTier.size());
 		// match room max
+		mHighListLock.lock();
 		if (mMatchListHighTier.size() >= MAX_ROOM_USER)
 		{
 			int roomID = GetNewRoomID();
 			for (int i = 0; i < MAX_ROOM_USER; ++i)
 			{
 				int player_id = mMatchListHighTier.front();
-
+				DEBUGMSGONEPARAM("[%s]플레이어 게임서버로\n",mClients[player_id].mID);
 				LG_USER_INTO_GAME_PACKET packet;
 				packet.size = sizeof(packet);
 				packet.type = LG_USER_INTO_GAME;
@@ -663,6 +664,8 @@ void Server::ProcessEvent(unsigned char* cmessage)
 				mReadytoGame.push_back(player_id);
 			}
 		}
+		mHighListLock.unlock();
+		mLowListlock.lock();
 		if (mMatchListLowTier.size() >= MAX_ROOM_USER)
 		{
 			int roomID = GetNewRoomID();
@@ -670,6 +673,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 			{
 				int player_id = mMatchListLowTier.front();
 
+				DEBUGMSGONEPARAM("[%s]플레이어 게임서버로\n", mClients[player_id].mID);
 				LG_USER_INTO_GAME_PACKET packet;
 				packet.size = sizeof(packet);
 				packet.type = LG_USER_INTO_GAME;
@@ -689,9 +693,11 @@ void Server::ProcessEvent(unsigned char* cmessage)
 				mReadytoGame.push_back(player_id);
 			}
 		}
+		mLowListlock.unlock();
 
 		// half room max
 		system_clock::time_point tTime = system_clock::now();
+		mHighListLock.lock();
 		if (mMatchListHighTier.size() >= MAX_ROOM_USER / 2) // high list
 		{
 			if (tTime - mClients[mMatchListHighTier.front()].mMatchStartTime >= milliseconds(20000))
@@ -702,6 +708,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 					{
 						int player_id = mMatchListHighTier.front();
 
+						DEBUGMSGONEPARAM("[%s]플레이어 게임서버로\n", mClients[player_id].mID);
 						LG_USER_INTO_GAME_PACKET packet;
 						packet.size = sizeof(packet);
 						packet.type = LG_USER_INTO_GAME;
@@ -726,6 +733,8 @@ void Server::ProcessEvent(unsigned char* cmessage)
 					// count down packet?
 				}
 		}
+		mHighListLock.unlock();
+		mLowListlock.lock();
 		if (mMatchListLowTier.size() >= MAX_ROOM_USER / 2)
 		{
 			if (tTime - mClients[mMatchListLowTier.front()].mMatchStartTime >= milliseconds(20000))
@@ -736,6 +745,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 				{
 					int player_id = mMatchListLowTier.front();
 
+					DEBUGMSGONEPARAM("[%s]플레이어 게임서버로\n", mClients[player_id].mID);
 					LG_USER_INTO_GAME_PACKET packet;
 					packet.size = sizeof(packet);
 					packet.type = LG_USER_INTO_GAME;
@@ -760,6 +770,8 @@ void Server::ProcessEvent(unsigned char* cmessage)
 				// count down packet?
 			}
 		}
+		mLowListlock.unlock();
+
 
 		EV_UpdateMatchPacket p;
 		p.size = sizeof(EV_UpdateMatchPacket);
