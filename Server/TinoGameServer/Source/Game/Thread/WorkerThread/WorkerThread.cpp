@@ -128,14 +128,16 @@ void WorkerThread::doThread()
 			eEventType eventType = TimerThread::DeserializeEventType(wsa_ex->GetBuf());
 			int roomID = TimerThread::DeserializeReceiver(wsa_ex->GetBuf());
 			Room* pRoom = mMainServer->GetRooms()[roomID];
+			DEBUGMSGNOPARAM("The Game Wait Packet On \n");
 			if (pRoom->IsAllPlayerReady())
 			{
-				DEBUGMSGNOPARAM("TheGameIsWaitting Packet Come In \n");
+				DEBUGMSGNOPARAM("The Game Will Begin 4second after \n");
 				SC_GAME_WAITTING_PACKET spacket = mMainServer->make_game_watting_packet();
 				mMainServer->SendRoomBroadCast(roomID, (void*)&spacket, sizeof(spacket));
 				TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_START, eEventType::TYPE_BROADCAST_ROOM, 4000, NULL, roomID);
 			}
 			else {
+				DEBUGMSGNOPARAM("User Doesn't Ready Wait 2seconds\n");
 				TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_WAIT, eEventType::TYPE_BROADCAST_ROOM, 2000, NULL, roomID);
 			}
 			break;
@@ -156,6 +158,8 @@ void WorkerThread::doThread()
 			eEventType eventType = TimerThread::DeserializeEventType(wsa_ex->GetBuf());
 			DEBUGMSGNOPARAM("한번만 오는지 GAME END\n");
 			int roomID = TimerThread::DeserializeReceiver(wsa_ex->GetBuf());
+			int ret = mMainServer->GetRooms()[roomID]->IsGameEndOnce();
+			if (false == ret) break;
 			mMainServer->GetRooms()[roomID]->SetRoomEnd();
 			for (auto other : mMainServer->GetRooms()[roomID]->GetObjectsRef())
 			{
@@ -181,7 +185,7 @@ void WorkerThread::doThread()
 				auto sPacket = mMainServer->make_game_end_packet();	//판정은 클라가 알아서.
 				mMainServer->SendRoomBroadCast(roomID, (void*)&sPacket, sizeof(sPacket));
 			}
-			TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_RESET, eEventType::TYPE_TARGET, 100000, 0, roomID);
+			TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_RESET, eEventType::TYPE_TARGET, ROOM_RESET_TIME, 0, roomID);
 			break;
 		}
 		case eCOMMAND_IOCP::CMD_GAME_RESET:
@@ -189,7 +193,6 @@ void WorkerThread::doThread()
 			eEventType eventType = TimerThread::DeserializeEventType(wsa_ex->GetBuf());
 			int roomID = TimerThread::DeserializeReceiver(wsa_ex->GetBuf());
 			mMainServer->GetRooms()[roomID]->ResetGameRoom();
-			mMainServer->send_room_reset_packet(roomID);
 
 			break;
 		}

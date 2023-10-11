@@ -4,6 +4,7 @@
 #include "../../../../../protocol.h"
 constexpr int INVALID_SOCKET_ID = -1;
 constexpr int INVALID_ROOM_ID = -1;
+constexpr int ROOM_RESET_TIME = 30000;
 
 #ifdef _DEBUG
 #define DEBUGMSGNOPARAM(args) (printf("file: %s, line:%d ",__FILE__,__LINE__), printf(args))
@@ -51,7 +52,8 @@ enum class eRoomState
 	ST_FREE,			//빈 방 empty room
 	ST_READY,			//사람을 받고 있는 방 people come into room 
 	ST_READY_COMPLETE,	//사람을 다 받은 방		people come into room complete
-	ST_INGAME			//게임중인 방
+	ST_INGAME,			//게임중인 방
+	ST_CLOSED,			//곧 리셋이 될 방.
 };
 
 

@@ -21,6 +21,7 @@ public:
 #endif
 
 	bool CheckLogin(int key, const char* id, const char* password, int userid);
+	bool CheckValidString(const char* str);
 
 	void SendLoginOK(int key, int uid, string& nickname, const char* id, double grade
 		, int point, int state, char department, int userid);

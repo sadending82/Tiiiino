@@ -6,6 +6,8 @@
 #include "Actor/Character/BaseCharacter.h"
 #include "MenuUI/InGameUIWidget.h"
 #include "MenuUI/InGameTimerWidget.h"
+#include "CreateAccountsWidget.h"
+#include "LoginUIWidget.h"
 #include "TinoCharacter.generated.h"
 
 /**
@@ -145,6 +147,20 @@ public:
 	UPROPERTY()
 		UInGameUIWidget* InGameWidgetInstance = nullptr;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
+		TSubclassOf<UCreateAccountsWidget> CreateAccountsWidgetClass;
+	UPROPERTY()
+		UCreateAccountsWidget* CreateAccountsInstance = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
+		TSubclassOf<ULoginUIWidget> LoginWidgetClass;
+	UPROPERTY()
+		ULoginUIWidget* LoginUIInstance = nullptr;
+
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+		void SetLoginUIInstance();
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+		void SetCreateAccountsInstance();
 private:
 	//키입력 관련 함수
 	void OnMoveForward(float Axis);
@@ -179,6 +195,9 @@ private:
 	UPROPERTY(VisibleDefaultsOnly)
 		class UCameraComponent* Camera;
 
+	UPROPERTY(VisibleDefaultsOnly)
+		class ATinoController* PlayerController;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 		class UAnimMontage* DiveMontage;
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
@@ -186,6 +205,8 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 		class UAnimMontage* GrabMontage;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Animation | Dive")
+		float MaxDiveTime;
 	UPROPERTY(VisibleAnywhere, Category = "Animation | Tumble")
 		float CurrentTumbledTime;
 	UPROPERTY(EditDefaultsOnly, Category = "Animation | Tumble")
@@ -239,7 +260,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation | Grab")
 		bool bShowDebugTrace;
-
+	UPROPERTY(EditAnywhere, Category = "MouseCusor")
+		bool bShowMouse;
+	FTimerHandle DiveTimer;
 	FTimerHandle GrabTimer;
 	FTimerHandle GrabCoolTimer;
 	FTimerHandle UITimerHandle;

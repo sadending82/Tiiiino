@@ -27,3 +27,11 @@
 #pragma comment(lib, "MSWSock.lib")
 using namespace std;
 using namespace std::chrono;
+
+#ifdef _DEBUG
+#define DEBUGMSGNOPARAM(args) (printf("file: %s, line:%d ",__FILE__,__LINE__), printf(args))
+#define DEBUGMSGONEPARAM(args,k) (printf("file: %s, line:%d ",__FILE__,__LINE__), printf(args,k))
+#else
+#define DEBUGMSGNOPARAM(...)
+#define DEBUGMSGONEPARAM(...)
+#endif

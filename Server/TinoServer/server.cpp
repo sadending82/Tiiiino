@@ -10,7 +10,7 @@ void Server::Disconnect(int cID)
 		return;
 	}
 
-	cout << "DISCONNECT" << mClients[cID].mUID << endl;
+	DEBUGMSGONEPARAM("DISCONNECT [%s]\n", mClients[cID].mID);
 
 	mMatchListHighTier.remove(cID);
 	mMatchListLowTier.remove(cID);
@@ -18,6 +18,13 @@ void Server::Disconnect(int cID)
 	closesocket(mClients[cID].mSocket);
 	mClients[cID].mState = eSessionState::ST_FREE;
 	mClients[cID].mStateLock.unlock();
+
+	LD_LOGOUT_PACKET p;
+	p.size = sizeof(LD_LOGOUT_PACKET);
+	p.type = LD_LOGOUT;
+	p.uid = mClients[cID].mUID;
+
+	mServers[0].ServerDoSend(&p);
 }
 
 int Server::GetNewClientID()
@@ -50,7 +57,7 @@ int Server::GetNewServerID()
 
 int Server::GetNewRoomID()
 {
-	for (int i = 0; i < MAXGAMESERVER*10; ++i) {
+	for (int i = 0; i < MAX_ROOM; ++i) {
 		mRooms[i].mStateLock.lock();
 		if (mRooms[i].mState == eRoomState::RS_FREE) {
 			mRooms[i].mState = eRoomState::RS_READY;
@@ -94,6 +101,7 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 	}
 	case CL_MATCH:
 	{
+		DEBUGMSGONEPARAM("[%s] 플레이어 매치 시작\n", mClients[cID].mID);
 		if (mClients[cID].mGrade > 3.5)
 		{
 			mMatchListHighTier.push_back(cID);
@@ -115,6 +123,7 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 	}
 	case CL_MATCH_OUT:
 	{
+		DEBUGMSGONEPARAM("[%s] 플레이어 매치 아웃\n", mClients[cID].mID);
 		mMatchListHighTier.remove(cID);
 		mMatchListLowTier.remove(cID);
 		if (mMatchListHighTier.size() > MAX_ROOM_USER / 2)
@@ -143,7 +152,7 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 	{
 		GL_LOGIN_PACKET* p = reinterpret_cast<GL_LOGIN_PACKET*>(spacket);
 
-		cout << "game server login" << endl;
+		DEBUGMSGNOPARAM("game server login\n");
 
 		break;
 	}
@@ -161,7 +170,7 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		uniform_int_distribution<int> rLevel(MIN_LEVEL, MAX_LEVEL);
 		int randomlevel = rLevel(rng);
 		
-		packet.mapLevel = randomlevel;
+		packet.mapLevel = 2;
 		
 
 		int uidCount = 0;
@@ -170,7 +179,7 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		mRooms[p->roomID].mState = eRoomState::RS_INGAME;
 		mRooms[p->roomID].mStateLock.unlock();
 		mRooms[p->roomID].mRoomLevel = randomlevel;
-		printf("레벨[%d] 준비완\n",randomlevel);
+		DEBUGMSGONEPARAM("레벨[%d] 준비완\n", randomlevel);
 		vector<int> delPlayerVector;
 		for (auto& player : mReadytoGame)
 		{
@@ -200,7 +209,7 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 	case GL_ROOM_RESET:
 	{
 		GL_ROOM_RESET_PACKET* p = reinterpret_cast<GL_ROOM_RESET_PACKET*>(spacket);
-
+		DEBUGMSGONEPARAM("방[%d] 리셋", p->roomID);
 		mRooms[p->roomID].mStateLock.lock();
 		mRooms[p->roomID].mState = eRoomState::RS_FREE;
 		ZeroMemory(mRooms[p->roomID].mUID, sizeof(mRooms[p->roomID].mUID));
@@ -257,7 +266,8 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 					SendMatchResult(mRooms[p->roomID].mSockID[i], p->rank, 0);
 
 					mRooms[p->roomID].mUpdateCount++;
-					printf("[%d]플레이어의 점수 [%f] 로비안끊김\n", packet.uid, packet.grade);
+					DEBUGMSGONEPARAM("[%d]플레이어의 점수 ", packet.uid);
+					DEBUGMSGONEPARAM("[%f] 로비안끊김\n", packet.grade);
 					break;
 				}
 				else // player disconnected lobby server
@@ -285,7 +295,8 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 					packet.type = LD_UPDATE_GRADE;
 					mServers[0].DoSend(&packet);
 					mRooms[p->roomID].mUpdateCount++;
-					printf("[%d]플레이어의 점수 [%f] 로비끊김.\n", packet.uid, packet.grade);
+					DEBUGMSGONEPARAM("[%d]플레이어의 점수 ", packet.uid);
+					DEBUGMSGONEPARAM("[%f] 로비 끊김\n", packet.grade);
 					break;
 				}
 			}
@@ -294,9 +305,9 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 	}
 	case DL_LOGIN_OK:
 	{
-		cout << "player login ok" << endl;
-
 		DL_LOGIN_OK_PACKET* p = reinterpret_cast<DL_LOGIN_OK_PACKET*>(spacket);
+
+		DEBUGMSGONEPARAM("[%s] player login ok\n", p->id);
 
 		if (p->connState == TRUE) {
 			CheckDuplicateLogin(p->uid);
@@ -325,9 +336,9 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 	}
 	case DL_LOGIN_FAIL:
 	{
-		cout << "player login fail" << endl;
-
 		DL_LOGIN_FAIL_PACKET* p = reinterpret_cast<DL_LOGIN_FAIL_PACKET*>(spacket);
+
+		DEBUGMSGONEPARAM("player login fail : [%d]\n", p->errorCode);
 
 		LC_LOGIN_FAIL_PACKET pac;
 		pac.size = sizeof(LC_LOGIN_FAIL_PACKET);
@@ -335,6 +346,18 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 
 		mClients[p->userKey].DoSend(&pac);
 
+		break;
+	}
+	case DL_SIGNUP_OK:
+	{
+		DL_SIGNUP_OK_PACKET* p = reinterpret_cast<DL_SIGNUP_OK_PACKET*>(spacket);
+		SendSignUpOK(p->userKey);
+		break;
+	}
+	case DL_SIGNUP_FAIL:
+	{
+		DL_SIGNUP_FAIL_PACKET* p = reinterpret_cast<DL_SIGNUP_FAIL_PACKET*>(spacket);
+		SendSignUpFail(p->userKey);
 		break;
 	}
 	default:
@@ -358,11 +381,11 @@ void Server::DoWorker()
 		{
 			if (exOver->mCompType == eCompType::OP_ACCEPT)
 			{
-				cout << "Accept Error";
+				DEBUGMSGNOPARAM("Accept Error\n");
 			}
 			else
 			{
-				cout << "GQCS Error on client[" << key << "]\n";
+				DEBUGMSGONEPARAM("GQCS Error on client [%s]\n", mClients[client_id].mID);
 				Disconnect(static_cast<int>(key));
 				if (exOver->mCompType == eCompType::OP_SEND)
 				{
@@ -393,11 +416,11 @@ void Server::DoWorker()
 					CreateIoCompletionPort(reinterpret_cast<HANDLE>(cSocket), mHCP, server_id, 0);
 					mServers[server_id].DoRecv();
 					cSocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
-					cout << "server connect\n";
+					DEBUGMSGNOPARAM("server connect\n");
 				}
 				else
 				{
-					cout << "Max server exceeded.\n";
+					DEBUGMSGNOPARAM("Max server exceeded.\n");
 				}
 
 				ZeroMemory(&exOver->mOver, sizeof(exOver->mOver));
@@ -421,11 +444,11 @@ void Server::DoWorker()
 					CreateIoCompletionPort(reinterpret_cast<HANDLE>(cSocket), mHCP, client_id, 0);
 					mClients[client_id].DoRecv();
 					cSocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
-					cout << "player connect\n";
+					DEBUGMSGNOPARAM("player connect\n");
 				}
 				else
 				{
-					cout << "Max user exceeded.\n";
+					DEBUGMSGNOPARAM("Max user exceeded.\n");
 				}
 
 				ZeroMemory(&exOver->mOver, sizeof(exOver->mOver));
@@ -558,13 +581,13 @@ void Server::Init()
 	::memset(&serverAddr, 0, sizeof(serverAddr));
 	serverAddr.sin_family = AF_INET;
 	serverAddr.sin_port = htons(DBSERVERPORT);
-	inet_pton(AF_INET, SERVERIP, &serverAddr.sin_addr);
+	inet_pton(AF_INET, DBSERVERIP, &serverAddr.sin_addr);
 
 	if (connect(LDsocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR) {
-		cout << "DBconnection failed" << endl;
+		DEBUGMSGNOPARAM("DBconnection failed\n");
 	}
 	else {
-		cout << "DBconnection success" << endl;
+		DEBUGMSGNOPARAM("DBconnection success\n");
 		OverEXP ss_over;
 		ss_over.mCompType = eCompType::OP_ACCEPT;
 		ss_over.mWsaBuf.buf = reinterpret_cast<CHAR*>(LDsocket);
@@ -582,11 +605,11 @@ void Server::Init()
 			CreateIoCompletionPort(reinterpret_cast<HANDLE>(LDsocket), mHCP, server_id, 0);
 			mServers[server_id].DoRecv();
 			LDsocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
-			cout << "server connect\n";
+			DEBUGMSGNOPARAM("server connect\n");
 		}
 		else
 		{
-			cout << "Max server exceeded.\n";
+			DEBUGMSGNOPARAM("Max server exceeded.\n");
 		}
 	}
 
@@ -608,23 +631,28 @@ void Server::Init()
 
 void Server::ProcessEvent(unsigned char* cmessage)
 {
-	switch (cmessage[1]) {
+	TimerEvent* te = reinterpret_cast<TimerEvent*>(cmessage);
+
+	switch (te->mEventType) {
 	case eEVENT_TYPE::EV_MATCH_UP:
 	{
+		DEBUGMSGONEPARAM("상위 티어 매칭 인원 [%d]\n", mMatchListHighTier.size());
+		DEBUGMSGONEPARAM("하위 티어 매칭 인원 [%d]\n", mMatchListLowTier.size());
 		// match room max
+		mHighListLock.lock();
 		if (mMatchListHighTier.size() >= MAX_ROOM_USER)
 		{
 			int roomID = GetNewRoomID();
 			for (int i = 0; i < MAX_ROOM_USER; ++i)
 			{
 				int player_id = mMatchListHighTier.front();
-
+				DEBUGMSGONEPARAM("[%s]플레이어 게임서버로\n",mClients[player_id].mID);
 				LG_USER_INTO_GAME_PACKET packet;
 				packet.size = sizeof(packet);
 				packet.type = LG_USER_INTO_GAME;
 				packet.department = mClients[player_id].mDepartment;
 				packet.roomID = roomID;// need update		
-				_itoa_s(rand() % 2'000'000'000, mClients[player_id].mHashs, 10);
+				_itoa_s(rand() % 2'000'000'000, mClients[player_id].mHashs, 10); 
 				strcpy_s(packet.hashs, mClients[player_id].mHashs);
 				strcpy_s(packet.name,  mClients[player_id].mNickName);
 				strcpy_s(packet.id,  mClients[player_id].mID);
@@ -638,6 +666,8 @@ void Server::ProcessEvent(unsigned char* cmessage)
 				mReadytoGame.push_back(player_id);
 			}
 		}
+		mHighListLock.unlock();
+		mLowListlock.lock();
 		if (mMatchListLowTier.size() >= MAX_ROOM_USER)
 		{
 			int roomID = GetNewRoomID();
@@ -645,6 +675,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 			{
 				int player_id = mMatchListLowTier.front();
 
+				DEBUGMSGONEPARAM("[%s]플레이어 게임서버로\n", mClients[player_id].mID);
 				LG_USER_INTO_GAME_PACKET packet;
 				packet.size = sizeof(packet);
 				packet.type = LG_USER_INTO_GAME;
@@ -664,9 +695,11 @@ void Server::ProcessEvent(unsigned char* cmessage)
 				mReadytoGame.push_back(player_id);
 			}
 		}
+		mLowListlock.unlock();
 
 		// half room max
 		system_clock::time_point tTime = system_clock::now();
+		mHighListLock.lock();
 		if (mMatchListHighTier.size() >= MAX_ROOM_USER / 2) // high list
 		{
 			if (tTime - mClients[mMatchListHighTier.front()].mMatchStartTime >= milliseconds(20000))
@@ -677,6 +710,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 					{
 						int player_id = mMatchListHighTier.front();
 
+						DEBUGMSGONEPARAM("[%s]플레이어 게임서버로\n", mClients[player_id].mID);
 						LG_USER_INTO_GAME_PACKET packet;
 						packet.size = sizeof(packet);
 						packet.type = LG_USER_INTO_GAME;
@@ -701,6 +735,8 @@ void Server::ProcessEvent(unsigned char* cmessage)
 					// count down packet?
 				}
 		}
+		mHighListLock.unlock();
+		mLowListlock.lock();
 		if (mMatchListLowTier.size() >= MAX_ROOM_USER / 2)
 		{
 			if (tTime - mClients[mMatchListLowTier.front()].mMatchStartTime >= milliseconds(20000))
@@ -711,6 +747,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 				{
 					int player_id = mMatchListLowTier.front();
 
+					DEBUGMSGONEPARAM("[%s]플레이어 게임서버로\n", mClients[player_id].mID);
 					LG_USER_INTO_GAME_PACKET packet;
 					packet.size = sizeof(packet);
 					packet.type = LG_USER_INTO_GAME;
@@ -735,6 +772,8 @@ void Server::ProcessEvent(unsigned char* cmessage)
 				// count down packet?
 			}
 		}
+		mLowListlock.unlock();
+
 
 		EV_UpdateMatchPacket p;
 		p.size = sizeof(EV_UpdateMatchPacket);
@@ -743,8 +782,26 @@ void Server::ProcessEvent(unsigned char* cmessage)
 
 		break;
 	}
-	case eEVENT_TYPE::EV_COUNT_DOWN:
+	case eEVENT_TYPE::EV_CONTROL:
 	{
+		cout << " control\n";
+		for (int i = 0; i < MAX_USER; i++) {
+			if (mClients[i].mState == eSessionState::ST_FREE)
+			{
+				continue;
+			}
+
+			LC_CONTROL_PACKET p;
+			p.size = sizeof(LC_CONTROL_PACKET);
+			p.type = LC_CONTROL;
+			mClients[i].DoSend(&p);
+		}
+
+
+		EV_ControlPacket p;
+		p.size = sizeof(EV_ControlPacket);
+		p.type = eCompType::OP_EVENT;
+		pTimer->PushEvent(1, eEVENT_TYPE::EV_CONTROL, 5000, reinterpret_cast<unsigned char*>(&p));
 		break;
 	}
 	default:
@@ -793,7 +850,23 @@ void Server::SendMatchResult(int key, int rank, int point)
 	packet.grade = mClients[key].mGrade;
 	packet.rank = rank;
 	packet.point = point;
-	packet.size = sizeof(LC_GAME_RESULT_PACKET);
+	packet.size = sizeof(packet);
 	packet.type = LC_GAME_RESULT;
+	mClients[key].DoSend(&packet);
+}
+
+void Server::SendSignUpOK(int key)
+{
+	LC_SIGNUP_OK_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = LC_SIGNUP_OK;
+	mClients[key].DoSend(&packet);
+}
+
+void Server::SendSignUpFail(int key)
+{
+	LC_SIGNUP_FAIL_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = LC_SIGNUP_FAIL;
 	mClients[key].DoSend(&packet);
 }

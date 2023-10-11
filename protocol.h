@@ -19,7 +19,7 @@ constexpr int DELAY_TIME_EXEC_BREAKPLATFORM = 3000;
 
 // Level min, max
 constexpr int MIN_LEVEL = 1;
-constexpr int MAX_LEVEL = 5;
+constexpr int MAX_LEVEL = 6;
 
 enum class eDepartment : char
 {
@@ -57,6 +57,7 @@ enum PacketType {
 	CL_SIGNUP,
 	CL_MATCH,
 	CL_MATCH_OUT,
+	CL_CONTROL,
 
 	// GameServer To Client
 	SC_LOGIN_OK,
@@ -79,8 +80,11 @@ enum PacketType {
 	// Lobbyserver To Client
 	LC_LOGIN_OK,
 	LC_LOGIN_FAIL,
+	LC_SIGNUP_OK,
+	LC_SIGNUP_FAIL,
 	LC_MATCH_RESPONSE,
-	LC_GAME_RESULT
+	LC_GAME_RESULT,
+	LC_CONTROL,
 };
 
 #pragma pack (push, 1)
@@ -155,6 +159,10 @@ struct CL_MATCH_PACKET : public PACKET {
 };
 
 struct CL_MATCH_OUT_PACKET : public PACKET {
+
+};
+
+struct CL_CONTROL_PACKET : public PACKET {
 
 };
 //-----------------------------------
@@ -246,6 +254,14 @@ struct 	LC_LOGIN_FAIL_PACKET :public PACKET {
 
 };
 
+struct LC_SIGNUP_OK_PACKET :public PACKET {
+
+};
+
+struct LC_SIGNUP_FAIL_PACKET :public PACKET {
+
+};
+
 struct LC_MATCH_RESPONSE_PACKET : public PACKET {
 	int gameServerPortNum;
 	unsigned char gameServerIP[16];	//IPv4에서 ip는 4바이트인데 글자로 표기하니까 최대 xxx.xxx.xxx.xxx  15 + 널문자 = 16
@@ -257,6 +273,10 @@ struct LC_GAME_RESULT_PACKET : public PACKET {
 	int		rank;
 	double	grade;
 	int		point;
+};
+
+struct LC_CONTROL_PACKET :public PACKET {
+
 };
 
 //--------------------------
