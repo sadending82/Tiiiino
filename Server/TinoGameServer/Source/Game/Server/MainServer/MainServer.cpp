@@ -692,6 +692,7 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 		}
 		pRoom->PlayerArrive(player);
 		pRoom->GetRoomStateLockRef().unlock();
+		
 
 		DEBUGMSGONEPARAM("player Num[%d] Arrive Complete\n", player->GetSocketID());
 

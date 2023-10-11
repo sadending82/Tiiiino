@@ -336,6 +336,8 @@ void Network::process_packet(unsigned char* p)
 		SC_LOGIN_OK_PACKET* packet = reinterpret_cast<SC_LOGIN_OK_PACKET*>(p);
 		mMyCharacter->SetClientID(packet->id);
 		mMyCharacter->SetDepartmentClothes(packet->department);
+		FVector location(240.f - ((packet->id % 4) * 160), 0 - (packet->id / 4 * 160), 0);
+		mMyCharacter->SetActorLocation(location);
 		//연결성공
 		bIsConnected = true;
 		break;
@@ -638,6 +640,7 @@ void CALLBACK recv_Lobbycallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED rec
 {
 	WSA_OVER_EX* over = reinterpret_cast<WSA_OVER_EX*>(recv_over);
 	auto Game = Network::GetNetwork();
+	UE_LOG(LogTemp, Error, TEXT("[%d]"), err);
 	if (nullptr == Game->mMyCharacter) return;
 	if (num_bytes == 0)return;
 
