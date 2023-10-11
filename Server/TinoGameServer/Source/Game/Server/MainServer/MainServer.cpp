@@ -430,10 +430,15 @@ void MainServer::SendAllBroadCast(void* buf, const int bufSize)
 
 void MainServer::SendRoomBroadCast(const int roomID, void* buf, const int bufSize)
 {
+	int tmp = 0;
+	if (roomID < 0)
+		return;
 	Room* pRoom = mRooms[roomID];
-	for (auto& other : pRoom->GetObjectsRef()) {
-		Player* OtherPlayer = dynamic_cast<Player*>(other);
-		if (OtherPlayer == nullptr) break;
+	auto& objects = pRoom->GetObjectsRef();
+	for (int i = 0; i < MAX_ROOM_USER; ++i)
+	{
+		Player* OtherPlayer = dynamic_cast<Player*>(objects[i]);
+		if (OtherPlayer == nullptr) continue;
 		if (OtherPlayer->GetSocketID() == INVALID_SOCKET_ID) continue;
 		OtherPlayer->GetStateLockRef().lock();
 		if (eSocketState::ST_INGAME == OtherPlayer->GetSocketState()) {
@@ -444,17 +449,22 @@ void MainServer::SendRoomBroadCast(const int roomID, void* buf, const int bufSiz
 		else {
 			OtherPlayer->GetStateLockRef().unlock();
 		}
-
 	}
+	//for (auto& other : pRoom->GetObjectsRef()) {
+	//	
+	//
+	//}
 }
 
 
 void MainServer::SendRoomSomeoneExcept(const int roomID, const int exceptSocketID, void* buf, const int bufSize)
 {
 	Room* pRoom = mRooms[roomID];
-	for (auto& other : pRoom->GetObjectsRef()) {
-		Player* OtherPlayer = dynamic_cast<Player*>(other);
-		if (OtherPlayer == nullptr) break;
+	auto objects = pRoom->GetObjectsRef();
+	for (int i = 0; i < MAX_ROOM_USER; ++i)
+	{
+		Player* OtherPlayer = dynamic_cast<Player*>(objects[i]);
+		if (OtherPlayer == nullptr) continue;
 		if (OtherPlayer->GetSocketID() == exceptSocketID)continue; // 제외해줄 ID
 		if (OtherPlayer->GetSocketID() == INVALID_SOCKET_ID) continue;
 		OtherPlayer->GetStateLockRef().lock();
@@ -806,7 +816,7 @@ void MainServer::ProcessPacketLobby(const int serverID, unsigned char* p)
 		strcpy_s(playerinfo.hashs, packet->hashs);
 		if (true == activeRoom->SettingRoomPlayer(playerinfo, packet->roomMax))
 		{
-			DEBUGMSGONEPARAM("%d번째 방 활성화 완료.", packet->roomID);
+			DEBUGMSGONEPARAM("%d번째 방 활성화 완료.\n", packet->roomID);
 			DEBUGMSGONEPARAM("인원수 [%d]\n", packet->roomMax);
 			send_room_ready_packet(packet->roomID);
 			TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_PING, eEventType::TYPE_BROADCAST_ROOM, 3000, NULL, packet->roomID);

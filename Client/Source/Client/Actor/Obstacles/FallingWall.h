@@ -59,5 +59,6 @@ private:
 	UPROPERTY(EditAnywhere, meta = (ToolTip = "True 설정시 파괴됨"), Category = "Stat")
 		bool bIsBreakable;
 
-	FVector FieldLocation;
+	UPROPERTY(EditAnywhere, meta=(MakeEditWidget ,ToolTip="티노와의 접촉지점"), Category = "Stat")
+		FVector FieldLocation;
 };

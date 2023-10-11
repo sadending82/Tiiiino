@@ -1,5 +1,6 @@
 ﻿#include "Actor/Character/TinoCharacter.h"
 #include "Actor/Controller/TinoController.h"
+#include "Sound/SoundManager.h"
 #include "Global.h"
 
 #include "Network/Network.h"
@@ -12,7 +13,8 @@
 #include "MenuUI/InGameUIWidget.h"
 #include "MenuUI/DialogUIWidget.h"
 #include "MenuUI/InGameTimerWidget.h"
-
+#include "CreateAccountsWidget.h"
+#include "LoginUIWidget.h"
 
 ATinoCharacter::ATinoCharacter()
 	:MaxDiveTime(3.f),
@@ -70,6 +72,11 @@ void ATinoCharacter::BeginPlay()
 	{
 		if (GetController()->IsPlayerController())
 		{
+			PlayerController = GetController<ATinoController>();
+			// UI 위젯 생성
+			//SetLoginUIInstance();
+			//SetCreateAccountsInstance();
+
 			//카메라 각도 제한(마우스 Y축 아래로 제한)
 			UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->ViewPitchMax = 0.f;
 		}
@@ -112,6 +119,7 @@ void ATinoCharacter::Tick(float DeltaTime)
 			{
 				if (!GetController()->IsPlayerController())
 				{
+					
 					//서버랑 연결 돼 있을 때만 상대 캐릭터 보간하려
 					//Update GroundSpeedd (22-04-05)
 					//GroundSpeedd = ServerStoreGroundSpeed;
@@ -278,6 +286,7 @@ void ATinoCharacter::OnAccelEffect()
 	//비네트 값을 조절해 가속 이펙트를 킴
 	Camera->PostProcessSettings.bOverride_VignetteIntensity = true;
 	Camera->PostProcessSettings.VignetteIntensity = CustomVignetteIntensity;
+	ASoundManager::GetSoundManager()->PlaySFX(ESFXType::ESFXType_ObstacleAccel);
 }
 
 void ATinoCharacter::OffAccelEffect()
@@ -349,6 +358,32 @@ UCharacterAnimInstance* ATinoCharacter::GetTinoAnimInstance()
 	return Cast<UCharacterAnimInstance>(GetMesh()->GetAnimInstance());
 }
 
+void ATinoCharacter::SetLoginUIInstance()
+{
+	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (!!TinoController)
+	{
+		LoginUIInstance = Cast<ULoginUIWidget>(TinoController->GetCurrentWidget());
+		if (LoginUIInstance == nullptr)
+		{
+
+		}
+	}
+}
+
+void ATinoCharacter::SetCreateAccountsInstance()
+{
+	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (!!TinoController)
+	{
+		CreateAccountsInstance = Cast<UCreateAccountsWidget>(TinoController->GetCurrentWidget());
+		if (CreateAccountsInstance == nullptr)
+		{
+
+		}
+	}
+}
+
 void ATinoCharacter::OnMoveForward(float Axis)
 {
 	if (CanMove())
@@ -375,12 +410,14 @@ void ATinoCharacter::OnMoveRight(float Axis)
 
 void ATinoCharacter::OnHorizonLock(float Axis)
 {
-	AddControllerYawInput(Axis);
+	if (bIsControlledPlayer && PlayerController->bShowMouseCursor == true) return;
+		AddControllerYawInput(Axis);
 }
 
 void ATinoCharacter::OnVerticalLock(float Axis)
 {
-	AddControllerPitchInput(Axis);
+	if (bIsControlledPlayer && PlayerController->bShowMouseCursor == true) return;
+		AddControllerPitchInput(Axis);
 }
 
 void ATinoCharacter::CreateDummy()
@@ -578,7 +615,7 @@ void ATinoCharacter::EnableInputMode()
 
 UTexture* ATinoCharacter::GetTinoDepartTexture(EDepartment DepartmentNumber)
 {
-	if (DepartmentTextureMap.Num() <= 0)
+	if (DepartmentTextureMap.IsEmpty())
 	{
 		CLog::Log("DepartmentTextureMap is Empty");
 		return nullptr;

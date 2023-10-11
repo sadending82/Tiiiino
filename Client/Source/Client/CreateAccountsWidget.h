@@ -45,5 +45,5 @@ public:
 	int DepartmentNum;
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	void CheckCreateAccount();
+	void CheckCreateAccount(bool check);
 };

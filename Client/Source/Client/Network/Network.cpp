@@ -5,7 +5,9 @@
 #include "Actor/Character/TinoCharacter.h"
 #include "Actor/Obstacles/BaseObstacle.h"
 #include "Actor/Controller/TinoController.h"
+#include "CreateAccountsWidget.h"
 #include "MenuUI/InGameUIWidget.h"
+#include "LoginUIWidget.h"
 #include "GameFramework/PlayerController.h"
 #include "Components/CapsuleComponent.h"
 #include "Actor/Character/CharacterAnimInstance.h"
@@ -109,12 +111,12 @@ void Network::release()
 		WSACleanup();
 		if (!bLevelOpenTriggerEnabled)
 		{
-			//openlevel·Î ÀÎÇÑ release°¡ ¾Æ´Ï¶ó,
-			//editorÁßÁö¶§¹®¿¡ »ı±â´Â release¶ó¸é false½ÃÄÑÁÜ.
+			//openlevelë¡œ ì¸í•œ releaseê°€ ì•„ë‹ˆë¼,
+						//editorì¤‘ì§€ë•Œë¬¸ì— ìƒê¸°ëŠ” releaseë¼ë©´ falseì‹œì¼œì¤Œ.
 			bLoginFlag = false;
-			//editorÁßÁö¶§¹®ÀÌ´Ï±î ¿©±âµµ ±×³É false·Î ´Ù½Ã ÃÊ±âÈ­.
+			//editorì¤‘ì§€ë•Œë¬¸ì´ë‹ˆê¹Œ ì—¬ê¸°ë„ ê·¸ëƒ¥ falseë¡œ ë‹¤ì‹œ ì´ˆê¸°í™”.
 			bLevelOpenTriggerEnabled = false;
-			//editor ÁßÁö°¡ ¾Æ´Ï¶ó level º¯°æ½Ã ºÒ¸®´Â release¿¡¼­ º¯°æµÇÁö ¸»¾Æ¾ß ÇÒ °ªÀº ÀÌ if¹® ¾È¿¡ ³Ö±â.
+			//editor ì¤‘ì§€ê°€ ì•„ë‹ˆë¼ level ë³€ê²½ì‹œ ë¶ˆë¦¬ëŠ” releaseì—ì„œ ë³€ê²½ë˜ì§€ ë§ì•„ì•¼ í•  ê°’ì€ ì´ ifë¬¸ ì•ˆì— ë„£ê¸°.
 			bIsConnectedLobby = 0;
 			bIsConnected = 0;
 			closesocket(l_socket);
@@ -281,7 +283,7 @@ void send_ping_packet(SOCKET& sock, const long long ping)
 	packet.type = CS_PING;
 	packet.ping = ping;
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
-	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback); 
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
 }
 
 void send_goal_packet(SOCKET& sock)
@@ -338,7 +340,7 @@ void Network::process_packet(unsigned char* p)
 		mMyCharacter->SetDepartmentClothes(packet->department);
 		FVector location(240.f - ((packet->id % 4) * 160), 0 - (packet->id / 4 * 160), 0);
 		mMyCharacter->SetActorLocation(location);
-		//¿¬°á¼º°ø
+		//ì—°ê²°ì„±ê³µ
 		bIsConnected = true;
 		break;
 	}
@@ -358,7 +360,7 @@ void Network::process_packet(unsigned char* p)
 		{
 			if (move_id == mMyCharacter->GetClientID())
 			{
-				//³»°¡ ¿òÁ÷ÀÎ°Ç Ã³¸®ÇÏÁö ¾Ê´Â´Ù.
+				//ë‚´ê°€ ì›€ì§ì¸ê±´ ì²˜ë¦¬í•˜ì§€ ì•ŠëŠ”ë‹¤.
 			}
 			else if (mOtherCharacter[move_id] != nullptr)
 			{
@@ -383,7 +385,7 @@ void Network::process_packet(unsigned char* p)
 	{
 		SC_ADD_PLAYER_PACKET* packet = reinterpret_cast<SC_ADD_PLAYER_PACKET*>(p);
 		int id = packet->id;
-		//³ª¿Í °°Àº ¾ÆÀÌµğ¶ó¸é ¶Ç ¸¸µé¾îÁÙ ÀÌÀ¯ ¾øÀ½. Å»Ãâ.
+		//ë‚˜ì™€ ê°™ì€ ì•„ì´ë””ë¼ë©´ ë˜ ë§Œë“¤ì–´ì¤„ ì´ìœ  ì—†ìŒ. íƒˆì¶œ.
 		if (id == mMyCharacter->GetClientID())
 			break;
 		if (nullptr != mOtherCharacter[id])
@@ -398,7 +400,7 @@ void Network::process_packet(unsigned char* p)
 
 		}
 		else {
-			FName path = TEXT("Blueprint'/Game/Characters/Tino/BP_TinoCharacter.BP_TinoCharacter_C'"); //_C¸¦ ²À ºÙ¿©¾ß µÈ´Ù°í ÇÔ.
+			FName path = TEXT("Blueprint'/Game/Characters/Tino/BP_TinoCharacter.BP_TinoCharacter_C'"); //_Cë¥¼ ê¼­ ë¶™ì—¬ì•¼ ëœë‹¤ê³  í•¨.
 			UClass* GeneratedInventoryBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 			FTransform trans(FQuat(packet->rx, packet->ry, packet->rz, packet->rw), FVector(888, 1566, -10000 + (id * 150)));
 			auto mc = mMyCharacter->GetWorld()->SpawnActorDeferred<ATinoCharacter>(GeneratedInventoryBP, trans);
@@ -451,24 +453,24 @@ void Network::process_packet(unsigned char* p)
 			{
 			case 1:
 				mOtherCharacter[id]->Jump();
-				//Á¡ÇÁ
+				//ì í”„
 				break;
 			case 2:
 				mOtherCharacter[id]->Dive();
-				//´ÙÀÌºê
+				//ë‹¤ì´ë¸Œ
 				break;
 			case 3:
 				mOtherCharacter[id]->PlayTumbleMontage();
-				//ÂøÁö(ÅÒºí)
+				//ì°©ì§€(í…€ë¸”)
 				//mOtherCharacter[id]->Dive();
 				break;
 			case 4:
 				mOtherCharacter[id]->OnGrab();
 				break;
-				//Àâ±â
+				//ì¡ê¸°
 			case 5:
 				mOtherCharacter[id]->OffGrab();
-				//Àâ±âÃë¼Ò
+				//ì¡ê¸°ì·¨ì†Œ
 				break;
 
 			default:
@@ -483,12 +485,12 @@ void Network::process_packet(unsigned char* p)
 		mMyCharacter->MakeAndShowHUD();
 		for (auto obj : mObjects)
 		{
-			if(obj)
+			if (obj)
 				obj->EnableMoveStart(true);
 		}
 		mMyCharacter->InGameWidgetInstance->LevelStartCountdown();
 		//
-		// Ä«¿îÆ®´Ù¿î UI ¶ç¿ì±â¹× objectµé Ã³À½ µ¿±âÈ­.
+		// ì¹´ìš´íŠ¸ë‹¤ìš´ UI ë„ìš°ê¸°ë° objectë“¤ ì²˜ìŒ ë™ê¸°í™”.
 		//
 		break;
 	}
@@ -497,7 +499,7 @@ void Network::process_packet(unsigned char* p)
 		mMyCharacter->InGameWidgetInstance->LevelStart();
 		mMyCharacter->EnableInputMode();
 		//
-		// ÇÃ·¹ÀÌ¾îµé ¿òÁ÷ÀÏ ¼ö ÀÖ°Ô ÇÏ±â.
+		// í”Œë ˆì´ì–´ë“¤ ì›€ì§ì¼ ìˆ˜ ìˆê²Œ í•˜ê¸°.
 		//
 		break;
 	}
@@ -516,7 +518,7 @@ void Network::process_packet(unsigned char* p)
 			mOtherCharacter[packet->id]->SetActorEnableCollision(false);
 			mOtherCharacter[packet->id]->SetActorHiddenInGame(true);
 			//
-			//UI¿¡ µµÂøÇÑ ÀÎ¿ø +1 Update
+			//UIì— ë„ì°©í•œ ì¸ì› +1 Update
 			//
 		}
 		break;
@@ -526,7 +528,7 @@ void Network::process_packet(unsigned char* p)
 		SC_GAME_COUNTDOWN_START_PACKET* packet = reinterpret_cast<SC_GAME_COUNTDOWN_START_PACKET*>(p);
 
 		mMyCharacter->InGameWidgetInstance->LevelClearCountdown();
-		//Ä«¿îÆ®´Ù¿î UI ¶ç¿ì±â (Appear CountDown UI)
+		//ì¹´ìš´íŠ¸ë‹¤ìš´ UI ë„ìš°ê¸° (Appear CountDown UI)
 
 		break;
 	}
@@ -560,7 +562,7 @@ void Network::l_process_packet(unsigned char* p)
 		LC_LOGIN_OK_PACKET* packet = reinterpret_cast<LC_LOGIN_OK_PACKET*>(p);
 		mMyCharacter->SetClientID(packet->id);
 		mDBUID = packet->UID;
-		//¿¬°á¼º°ø
+		//ì—°ê²°ì„±ê³µ
 		bIsConnectedLobby = true;
 		CLog::Print("LC_LOGIN_OK IS CALLING");
 
@@ -576,24 +578,41 @@ void Network::l_process_packet(unsigned char* p)
 	case LC_LOGIN_FAIL:
 	{
 		LC_LOGIN_FAIL_PACKET* packet = reinterpret_cast<LC_LOGIN_FAIL_PACKET*>(p);
+
+		// ë¡œê·¸ì¸ ì‹¤íŒ¨ UI ë„ì›€
+		if (mMyCharacter->LoginUIInstance == nullptr)
+			mMyCharacter->SetLoginUIInstance();
+		mMyCharacter->LoginUIInstance->UIAlertMessage();
+
 		break;
 	}
-	case LC_SIGNUP_OK: 
+	case LC_SIGNUP_OK:
 	{
 		LC_SIGNUP_OK_PACKET* packet = reinterpret_cast<LC_SIGNUP_OK_PACKET*>(p);
+
+		// íšŒì›ê°€ì… ì„±ê³µ UI ë„ì›€
+		if (mMyCharacter->CreateAccountsInstance == nullptr)
+			mMyCharacter->SetCreateAccountsInstance();
+		mMyCharacter->CreateAccountsInstance->CheckCreateAccount(true);
 
 		break;
 	}
 	case LC_SIGNUP_FAIL:
 	{
 		LC_SIGNUP_FAIL_PACKET* packet = reinterpret_cast<LC_SIGNUP_FAIL_PACKET*>(p);
+
+		// íšŒì›ê°€ì… ì‹¤íŒ¨ UI ë„ì›€
+		if (mMyCharacter->CreateAccountsInstance == nullptr)
+			mMyCharacter->SetCreateAccountsInstance();
+		mMyCharacter->CreateAccountsInstance->CheckCreateAccount(false);
+
 		break;
 	}
 	case LC_MATCH_RESPONSE:
 	{
 		LC_MATCH_RESPONSE_PACKET* packet = reinterpret_cast<LC_MATCH_RESPONSE_PACKET*>(p);
-		//°ÔÀÓ¼­¹ö ¿¬°á ÄÚµå ³ªÁß¿¡ ip¶û Æ÷Æ®³Ñ¹öµµ ³Ñ°Ü¾ßÇÔ.
-		UE_LOG(LogTemp, Error, TEXT("Game Match Responed")); 
+		//ê²Œì„ì„œë²„ ì—°ê²° ì½”ë“œ ë‚˜ì¤‘ì— ipë‘ í¬íŠ¸ë„˜ë²„ë„ ë„˜ê²¨ì•¼í•¨.
+		UE_LOG(LogTemp, Error, TEXT("Game Match Responed"));
 		string maplv{ "Level" };
 		maplv += std::to_string(packet->mapLevel);
 		UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName(maplv.c_str()));
@@ -631,6 +650,14 @@ void CALLBACK recv_Gamecallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv
 {
 	WSA_OVER_EX* over = reinterpret_cast<WSA_OVER_EX*>(recv_over);
 	auto Game = Network::GetNetwork();
+	if (err != 0)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[%d]"), err);
+		if (Game->mMyCharacter)
+			Game->mMyCharacter->MakeAndShowDialog();
+		Game->release();
+		return;
+	}
 	if (nullptr == Game->mMyCharacter) return;
 	if (num_bytes == 0)return;
 
@@ -659,7 +686,7 @@ void CALLBACK recv_Lobbycallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED rec
 	if (err != 0)
 	{
 		UE_LOG(LogTemp, Error, TEXT("[%d]"), err);
-		if(Game->mMyCharacter)
+		if (Game->mMyCharacter)
 			Game->mMyCharacter->MakeAndShowDialog();
 		Game->release();
 		return;
