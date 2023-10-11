@@ -15,6 +15,7 @@ Room::Room(int id)
 	, mPlayerMax(0)
 	, mRoomState(eRoomState::ST_FREE)
 	, mPlayerArrivedCnt(0)
+	, mGameEndFlag(false)
 	, mGameEndTimer(false)
 	, mGameStartTimer(false)
 	, mRoomID(id)
@@ -86,7 +87,7 @@ void Room::DisablePlayer(Player* player)
 
 void Room::ResetGameRoom()
 {
-	
+
 	mRoomStateLock.lock();
 	if (mRoomState == eRoomState::ST_CLOSED)
 	{
@@ -116,6 +117,7 @@ void Room::ResetGameRoom()
 	mPlayerMax = 0;
 	mPlayerArrivedCnt = 0;
 	mPlayerCnt = 0;
+	mGameEndFlag = false;
 	mGameEndTimer = false;
 	mGameStartTimer = false;
 
@@ -192,7 +194,7 @@ void Room::PlayerMaxDecrease()
 	mPlayerMax--;
 	if (mPlayerMax <= 0)
 	{
-		TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_RESET, eEventType::TYPE_TARGET, 5000, 0, mRoomID);
+		TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_RESET, eEventType::TYPE_TARGET, ROOM_RESET_TIME, 0, mRoomID);
 	}
 }
 
@@ -286,8 +288,21 @@ void Room::PlayerArrive(Player* player)
 	mPlayerArriveLock.unlock();
 	player->SetRank(tRank);
 	setGameEndTimerStartOnce();		//이 함수는 room 하나당 딱 한 번 실행될 것임 .lockfree CAS(Compare And Set)으로 구현. (mutex 너무많이쓰는거같아서 락프리로 씀) 
-
+	if (tRank == mPlayerMax)
+	{
+		//누가 고의적으로 이 함수가 실행 될 때, 접속을 끊으면 이 곳에 안들어 올 수도 있음
+		// 근데 어차피 20초뒤에 방이 끝나니 크리티컬하지 않으므로 예외처리 하지 않음.
+		//If someone intentionally disconnects when this line is executed, they may not be able to enter here.
+		// But since the room ends after 20 seconds anyway, it is not critical, so no exception is handled.
+		AllPlayerArrived();
+	}
 }
+
+void Room::AllPlayerArrived()
+{
+	TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_END, eEventType::TYPE_BROADCAST_ROOM, 0, NULL, mRoomID);
+}
+
 
 void Room::addPlayer(Player* player)
 {
@@ -374,10 +389,21 @@ void Room::setGameEndTimerStartOnce()
 	bool expect = 0;
 	if (std::atomic_compare_exchange_strong(reinterpret_cast<std::atomic_bool*>(&mGameEndTimer), &expect, 1))
 	{
-		DEBUGMSGNOPARAM("게임 엔드 한 번 실행되야함\n");
+		DEBUGMSGNOPARAM("게임 엔드 타이머 한 번 실행되야함\n");
 
 		TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_COUNTDOWN_START, eEventType::TYPE_BROADCAST_ROOM, 0, NULL, mRoomID);
 	}
+}
+
+bool Room::IsGameEndOnce()
+{
+	bool expect = 0;
+	if (std::atomic_compare_exchange_strong(reinterpret_cast<std::atomic_bool*>(&mGameEndFlag), &expect, 1))
+	{
+		DEBUGMSGNOPARAM("게임 끝 한 번 실행되야함\n");
+		return true;
+	}
+	return false;
 }
 
 void Room::setGameStartTimerStartOnce()
@@ -385,7 +411,7 @@ void Room::setGameStartTimerStartOnce()
 	bool expect = 0;
 	if (std::atomic_compare_exchange_strong(reinterpret_cast<std::atomic_bool*>(&mGameStartTimer), &expect, 1))
 	{
-		DEBUGMSGNOPARAM("게임 스타트 한 번 실행되야함\n");
+		DEBUGMSGNOPARAM("게임 스타트 타이머 한 번 실행되야함\n");
 
 		TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_WAIT, eEventType::TYPE_BROADCAST_ROOM, 1000, NULL, mRoomID);
 	}

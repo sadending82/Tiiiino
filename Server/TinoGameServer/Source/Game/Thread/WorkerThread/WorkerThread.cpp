@@ -158,6 +158,8 @@ void WorkerThread::doThread()
 			eEventType eventType = TimerThread::DeserializeEventType(wsa_ex->GetBuf());
 			DEBUGMSGNOPARAM("한번만 오는지 GAME END\n");
 			int roomID = TimerThread::DeserializeReceiver(wsa_ex->GetBuf());
+			int ret = mMainServer->GetRooms()[roomID]->IsGameEndOnce();
+			if (false == ret) break;
 			mMainServer->GetRooms()[roomID]->SetRoomEnd();
 			for (auto other : mMainServer->GetRooms()[roomID]->GetObjectsRef())
 			{
@@ -183,7 +185,7 @@ void WorkerThread::doThread()
 				auto sPacket = mMainServer->make_game_end_packet();	//판정은 클라가 알아서.
 				mMainServer->SendRoomBroadCast(roomID, (void*)&sPacket, sizeof(sPacket));
 			}
-			TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_RESET, eEventType::TYPE_TARGET, 10000, 0, roomID);
+			TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_RESET, eEventType::TYPE_TARGET, ROOM_RESET_TIME, 0, roomID);
 			break;
 		}
 		case eCOMMAND_IOCP::CMD_GAME_RESET:
