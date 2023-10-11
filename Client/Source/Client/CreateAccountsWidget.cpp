@@ -38,16 +38,16 @@ void UCreateAccountsWidget::InputCreatePassword(const FText& Text)
 {
 }
 
-void UCreateAccountsWidget::CheckCreateAccount()
+void UCreateAccountsWidget::CheckCreateAccount(bool check)
 {
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	if (!!TinoController)
 	{
-		// if Create Account Success
-		TinoController->UIAlertMessage(EDialogUICheck::EDC_CASuccess);
+		if (check == true)
+			TinoController->UIAlertMessage(EDialogUICheck::EDC_CASuccess);
 
-		// if Create Account Failed
-		//TinoController->UIAlertMessage(EDialogUICheck::EDC_CAFailed);
+		if (check == false)
+			TinoController->UIAlertMessage(EDialogUICheck::EDC_CAFailed);
 	}
 }
 

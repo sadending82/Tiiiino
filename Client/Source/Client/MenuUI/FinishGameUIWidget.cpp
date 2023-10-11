@@ -23,7 +23,7 @@ void UFinishGameUIWidget::EnterLobby()
 void UFinishGameUIWidget::ShowResult(int rank, double grade, int point)
 {
 	// 맵 이름 입력
-	CurrentStage = "[맵 이름]";	// 맵 이름 입력
+	CurrentStage = L"[맵 이름]";	// 맵 이름 입력
 	FText CurrentStageText = FText::FromString(CurrentStage);
 	EditSTAGEText->SetText(CurrentStageText);
 

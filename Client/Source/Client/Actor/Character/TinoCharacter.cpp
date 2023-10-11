@@ -12,10 +12,12 @@
 #include "MenuUI/InGameUIWidget.h"
 #include "MenuUI/DialogUIWidget.h"
 #include "MenuUI/InGameTimerWidget.h"
-
+#include "CreateAccountsWidget.h"
+#include "LoginUIWidget.h"
 
 ATinoCharacter::ATinoCharacter()
-	:MaxTumbledTime(1.0f),
+	:MaxDiveTime(3.f),
+	MaxTumbledTime(1.0f),
 	MaxGrabTime(3.0f),
 	GrabCoolTime(1.0f),
 	GrabbedSpeed(100.f),
@@ -69,6 +71,11 @@ void ATinoCharacter::BeginPlay()
 	{
 		if (GetController()->IsPlayerController())
 		{
+			PlayerController = GetController<ATinoController>();
+			// UI 위젯 생성
+			//SetLoginUIInstance();
+			//SetCreateAccountsInstance();
+
 			//카메라 각도 제한(마우스 Y축 아래로 제한)
 			UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->ViewPitchMax = 0.f;
 		}
@@ -111,6 +118,7 @@ void ATinoCharacter::Tick(float DeltaTime)
 			{
 				if (!GetController()->IsPlayerController())
 				{
+					
 					//서버랑 연결 돼 있을 때만 상대 캐릭터 보간하려
 					//Update GroundSpeedd (22-04-05)
 					//GroundSpeedd = ServerStoreGroundSpeed;
@@ -209,7 +217,10 @@ void ATinoCharacter::MakeAndShowHUD()
 	InGameWidgetInstance->AddToViewport();
 
 	InGameUITimerInstance = CreateWidget<UInGameTimerWidget>(GetWorld(), InGameUITimerClass);
+	InGameUITimerInstance->SetInGameUI(InGameWidgetInstance);
 	InGameUITimerInstance->AddToViewport();
+
+	InGameWidgetInstance->InGameTimer = InGameUITimerInstance;
 
 }
 
@@ -290,7 +301,7 @@ void ATinoCharacter::SetOriginalSpeed()
 void ATinoCharacter::TimerStart(ETimerType type)
 {
 	Type = type;
-	GetWorldTimerManager().SetTimer(UITimerHandle, this, &ATinoCharacter::TimerRun, true);
+	GetWorldTimerManager().SetTimer(UITimerHandle, this, &ATinoCharacter::TimerRun, true,true);
 }
 
 void ATinoCharacter::TimerRun()
@@ -317,6 +328,7 @@ void ATinoCharacter::Dive()
 		bIsDiving = true;
 		SendAnimPacket(2);
 		PlayAnimMontage(DiveMontage);
+		GetWorldTimerManager().SetTimer(DiveTimer,this,&ATinoCharacter::DiveEnd, MaxDiveTime, false);
 	}
 }
 
@@ -342,6 +354,32 @@ void ATinoCharacter::SetIsAirForNetwork(bool val)
 UCharacterAnimInstance* ATinoCharacter::GetTinoAnimInstance()
 {
 	return Cast<UCharacterAnimInstance>(GetMesh()->GetAnimInstance());
+}
+
+void ATinoCharacter::SetLoginUIInstance()
+{
+	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (!!TinoController)
+	{
+		LoginUIInstance = Cast<ULoginUIWidget>(TinoController->GetCurrentWidget());
+		if (LoginUIInstance == nullptr)
+		{
+
+		}
+	}
+}
+
+void ATinoCharacter::SetCreateAccountsInstance()
+{
+	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (!!TinoController)
+	{
+		CreateAccountsInstance = Cast<UCreateAccountsWidget>(TinoController->GetCurrentWidget());
+		if (CreateAccountsInstance == nullptr)
+		{
+
+		}
+	}
 }
 
 void ATinoCharacter::OnMoveForward(float Axis)
@@ -370,12 +408,14 @@ void ATinoCharacter::OnMoveRight(float Axis)
 
 void ATinoCharacter::OnHorizonLock(float Axis)
 {
-	AddControllerYawInput(Axis);
+	if (bIsControlledPlayer && PlayerController->bShowMouseCursor == true) return;
+		AddControllerYawInput(Axis);
 }
 
 void ATinoCharacter::OnVerticalLock(float Axis)
 {
-	AddControllerPitchInput(Axis);
+	if (bIsControlledPlayer && PlayerController->bShowMouseCursor == true) return;
+		AddControllerPitchInput(Axis);
 }
 
 void ATinoCharacter::CreateDummy()

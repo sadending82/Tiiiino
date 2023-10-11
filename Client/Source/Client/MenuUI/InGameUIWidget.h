@@ -58,11 +58,11 @@ public:
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void ChangeLobbyUI();
 
-	// 게임시작시 카운트다운 3..2..1
+	// 레벨시작시 카운트다운 3..2..1
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void LevelStartCountdown();
 
-	// 게임시작시 카운트다운 3..2..1
+	// 카운트다운이 끝나고 게임시작시 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void LevelStart();
 

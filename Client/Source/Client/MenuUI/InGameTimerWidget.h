@@ -42,6 +42,7 @@ public:
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	int GetRestGameTime() const { return RestGameTime; }
 
+	void SetInGameUI(class UInGameUIWidget* ui) { InGameUI = ui; }
 private:
 	UPROPERTY(EditAnywhere, Category = "UMG_Game")
 	int RestGameTime = 20;

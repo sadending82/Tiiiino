@@ -13,6 +13,11 @@ void Timer::Init(HANDLE cHCP)
 	p.size = sizeof(EV_UpdateMatchPacket);
 	p.type = eCompType::OP_EVENT;
 	PushEvent(1, eEVENT_TYPE::EV_MATCH_UP, 10000, reinterpret_cast<unsigned char*>(&p));
+
+	EV_ControlPacket pac;
+	pac.size = sizeof(EV_ControlPacket);
+	pac.type = eCompType::OP_EVENT;
+	PushEvent(1, eEVENT_TYPE::EV_CONTROL, 10000, reinterpret_cast<unsigned char*>(&pac));
 	
 	thread timer_thread{ (thread(&Timer::TimerMain, this)) };
 	timer_thread.join();

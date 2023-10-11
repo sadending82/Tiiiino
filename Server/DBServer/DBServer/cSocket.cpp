@@ -23,10 +23,7 @@ void Socket::Disconnect(int key)
     closesocket(mSessions[key].GetSocket());
     mSessions[key].SetState(eSessionState::ST_FREE);
 
-#ifdef Test
-    cout << "Lobby Disconnect: " << key << endl;
-#endif
-
+    DEBUGMSGONEPARAM("Lobby Disconnect: %d\n", key);
 }
 
 void Socket::WorkerFunc()
@@ -56,9 +53,8 @@ void Socket::WorkerFunc()
                 mSessions[newKey].SetState(eSessionState::ST_ACCEPTED);
                 mSessions[newKey].SetID(newKey);
                 CreateIoCompletionPort((HANDLE)mSessions[newKey].GetSocket(), mHcp, newKey, 0);
-#ifdef Test
-                cout << "Lobby Accept: " << newKey << endl;
-#endif
+
+                DEBUGMSGONEPARAM("Lobby Accept: %d\n", newKey);
                 mSessions[newKey].DoRecv();
             }
             else {
@@ -76,9 +72,7 @@ void Socket::WorkerFunc()
                 int err_num = WSAGetLastError();
                 if (err_num != WSA_IO_PENDING)
                 {
-#ifdef Test
-                    std::cout << "Accept Error: " << err_num << std::endl;
-#endif
+                    DEBUGMSGONEPARAM("Accept Error: %d\n", err_num);
                 }
             }
             break;
@@ -141,15 +135,11 @@ void Socket::ServerReady()
         int err_num = WSAGetLastError();
         if (err_num != WSA_IO_PENDING)
         {
-#ifdef Test
-            std::cout << "Accept Error: " << err_num << std::endl;
-#endif
+            DEBUGMSGONEPARAM("Accept Error: %d\n", err_num);
             return;
         }
     }
-#ifdef Test
-    std::cout << "Connect To Lobby Server Ready" << std::endl;
-#endif
+    cout <<"Connect To Lobby Server Ready\n";
 
     WorkerFunc();
 }
@@ -184,9 +174,6 @@ void Socket::processPacket(int key, unsigned char* buf)
     }
     default:
     {
-#ifdef Test
-        cout << "Wrong Packet Received - sender: " << key << endl;
-#endif
         break;
     }
     }
@@ -198,7 +185,7 @@ bool Socket::CheckLogin(int key, const char* id, const char* password, int userK
 #ifdef RUN_DB
     int res = Getm_pDB()->CheckVerifyUser(id, password);
     if (res == false) {
-        cout << "Login Information Invalid\n";
+        DEBUGMSGONEPARAM("Login Information Invalid: %s\n", id);
         return false;
     }
 
@@ -220,9 +207,19 @@ bool Socket::CheckLogin(int key, const char* id, const char* password, int userK
     if (state == FALSE)
         Getm_pDB()->UpdateUserConnectionState(uid, true);
 
-    cout << "Login Success / ID: " << id << endl;
+    DEBUGMSGONEPARAM("Login Success / ID: %s\n", id);
 
 #endif
+    return true;
+}
+
+bool Socket::CheckValidString(const char* input)
+{
+    string str = input;
+
+    if (str.find_first_of("!@#$%^&*()_+{}[];:'\"<>,.?") != std::string::npos) {
+        return false;
+    }
     return true;
 }
 
@@ -314,14 +311,25 @@ void Socket::ProcessPacket_Logout(unsigned char* buf)
 void Socket::ProcessPacket_SignUp(int key, unsigned char* buf)
 {
     LD_SIGNUP_PACKET* p = reinterpret_cast<LD_SIGNUP_PACKET*>(buf);
+
+    if (CheckValidString(p->id) != true) {
+        DEBUGMSGONEPARAM("User Input Invaild Charactor In ID / ID: %s\n", p->id);
+        SendSignUpFail(key, p->userKey);
+    }
+    if (CheckValidString(p->password) != true) {
+        DEBUGMSGONEPARAM("User Input Invaild Charactor In Password / PW: %s\n", p->password);
+        SendSignUpFail(key, p->userKey);
+    }
+
 #ifdef RUN_DB
     bool bResult = Getm_pDB()->SignUpNewPlayer(p->id, p->password, p->department);
     if (bResult != true) {
-        cout << "Sign Up new user failed\n";
+        DEBUGMSGONEPARAM("Sign Up new user failed / ID: %s\n", p->id);
         SendSignUpFail(key, p->userKey);
         return;
     }
 #endif
+    DEBUGMSGONEPARAM("Sign Up new user success / ID: %s\n", p->id);
     SendSignUpOK(key, p->userKey);
 }
 
@@ -353,7 +361,7 @@ void Socket::ProcessPacket_UpdateGrade(int key, unsigned char* buf)
 
     bool bResult = Getm_pDB()->UpdateUserGrade(p->uid, p->grade);
     if (bResult != true) {
-        cout << "Update User Grade failed\n";
+        DEBUGMSGONEPARAM("Update User Grade failed / UID: %d\n", p->uid);
     }
 
     // 랭킹에 반영할 점수 나중에 수정

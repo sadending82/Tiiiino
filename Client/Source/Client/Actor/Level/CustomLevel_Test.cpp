@@ -5,6 +5,7 @@
 #include "Network/Network.h"
 #include "Actor/Character/TinoCharacter.h"
 #include "Actor/Controller/TinoController.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 #include "Global.h"
 
@@ -23,6 +24,7 @@ void ACustomLevel_Test::BeginPlay() {
 	UClass* GeneratedCharacterBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 	FTransform trans;
 	srand(time(NULL));
+	trans.SetRotation(trans.GetRotation() + FQuat(0, 0, 90, 0));
 	mMyCharacterSpawnPosition.Y += (rand() % 10) * 10;
 	trans.SetLocation(trans.GetLocation() + mMyCharacterSpawnPosition);
 	auto mc1 = GetWorld()->SpawnActorDeferred<ATinoCharacter>(GeneratedCharacterBP, trans);
@@ -68,7 +70,7 @@ bool ACustomLevel_Test::ConnGameServer()
 			send_movetogame_packet(Network::GetNetwork()->s_socket,Network::GetNetwork()->mDBUID,
 				TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterName), 0); 
 			GetWorld()->GetFirstPlayerController<ATinoController>()->SetInputGameMode();
-			
+			Network::GetNetwork()->mMyCharacter->DisableInputMode();
 			return true;
 		}
 		else {
@@ -83,6 +85,7 @@ bool ACustomLevel_Test::ConnLobbyServer()
 {
 	auto player = Network::GetNetwork()->mMyCharacter;
 	if (nullptr == player) return false;
+	player->GetCharacterMovement()->GravityScale = 0.0;
 	// 이미 연결 되어있다면,
 	if (true == Network::GetNetwork()->bIsConnectedLobby)
 	{

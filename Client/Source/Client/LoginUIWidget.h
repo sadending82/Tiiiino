@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "MenuUI/CreditUIWidget.h"
+
 #include "LoginUIWidget.generated.h"
 
 /**
@@ -44,6 +46,22 @@ public:
 
 	UFUNCTION()
 	void InputLoginPassword(const FText& Text);
+
+	
+
+public:
+	// CreditUI
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
+	class TSubclassOf<UCreditUIWidget> CreditUIClass;
+
+	UPROPERTY(BlueprintReadOnly, Category = "UMG_Game")
+	class UCreditUIWidget* CreditUI;
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* CreditButton;
+
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void ShowCreditUI();
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")

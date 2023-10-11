@@ -50,6 +50,9 @@ public:
 	TSubclassOf<UUserWidget> GetStartingWidgetClass() const { return StartingWidgetClass; }
 	TSubclassOf<UUserWidget> GetCreateAccountsWidgetClass() const { return CreateAccountsWidgetClass; }
 
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	UUserWidget* GetCurrentWidget() { return CurrentWidget; }
+
 public:
 	// Network Disconnect
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
@@ -82,7 +85,7 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
 	TSubclassOf<UUserWidget> CreateAccountsWidgetClass;
-
+	
 	
 
 	UPROPERTY()

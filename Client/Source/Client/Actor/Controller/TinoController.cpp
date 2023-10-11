@@ -4,7 +4,6 @@
 #include "Network/Network.h"
 #include "MenuUI/DialogUIWidget.h"
 #include "MenuUI/FinishGameUIWidget.h"
-
 #include "Global.h"
 
 ATinoController::ATinoController()
@@ -28,6 +27,7 @@ void ATinoController::BeginPlay()
 	}
 	//ChangeMenuWidget(StartingWidgetClass);
 	DialogUI = Cast<UDialogUIWidget>(CreateWidget(GetWorld(), DialogUIClass));
+	
 }
 
 void ATinoController::ChangeMenuWidget(TSubclassOf<UUserWidget> NewWidgetClass)
