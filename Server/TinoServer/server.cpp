@@ -631,7 +631,9 @@ void Server::Init()
 
 void Server::ProcessEvent(unsigned char* cmessage)
 {
-	switch (cmessage[1]) {
+	TimerEvent* te = reinterpret_cast<TimerEvent*>(cmessage);
+
+	switch (te->mEventType) {
 	case eEVENT_TYPE::EV_MATCH_UP:
 	{
 		DEBUGMSGONEPARAM("상위 티어 매칭 인원 [%d]\n", mMatchListHighTier.size());
