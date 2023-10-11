@@ -71,6 +71,7 @@ void ATinoCharacter::BeginPlay()
 	{
 		if (GetController()->IsPlayerController())
 		{
+			PlayerController = GetController<ATinoController>();
 			// UI 위젯 생성
 			//SetLoginUIInstance();
 			//SetCreateAccountsInstance();
@@ -117,6 +118,7 @@ void ATinoCharacter::Tick(float DeltaTime)
 			{
 				if (!GetController()->IsPlayerController())
 				{
+					
 					//서버랑 연결 돼 있을 때만 상대 캐릭터 보간하려
 					//Update GroundSpeedd (22-04-05)
 					//GroundSpeedd = ServerStoreGroundSpeed;
@@ -406,12 +408,14 @@ void ATinoCharacter::OnMoveRight(float Axis)
 
 void ATinoCharacter::OnHorizonLock(float Axis)
 {
-	AddControllerYawInput(Axis);
+	if (bIsControlledPlayer && PlayerController->bShowMouseCursor == true) return;
+		AddControllerYawInput(Axis);
 }
 
 void ATinoCharacter::OnVerticalLock(float Axis)
 {
-	AddControllerPitchInput(Axis);
+	if (bIsControlledPlayer && PlayerController->bShowMouseCursor == true) return;
+		AddControllerPitchInput(Axis);
 }
 
 void ATinoCharacter::CreateDummy()
