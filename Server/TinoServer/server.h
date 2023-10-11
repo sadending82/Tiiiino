@@ -23,6 +23,8 @@ public:
 
 	void SendDiconnectPacketToGameServer(int key, int uid, int roomID);
 	void SendMatchResult(int key, int rank, int point);
+	void SendSignUpOK(int key);
+	void SendSignUpFail(int key);
 public:
 	array <Session, MAX_USER> mClients;
 	array <Session, MAXGAMESERVER> mServers;

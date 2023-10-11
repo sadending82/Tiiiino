@@ -5,6 +5,7 @@
 #include "Network/Network.h"
 #include "Actor/Character/TinoCharacter.h"
 #include "Actor/Controller/TinoController.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 #include "Global.h"
 
@@ -84,6 +85,7 @@ bool ACustomLevel_Test::ConnLobbyServer()
 {
 	auto player = Network::GetNetwork()->mMyCharacter;
 	if (nullptr == player) return false;
+	player->GetCharacterMovement()->GravityScale = 0.0;
 	// 이미 연결 되어있다면,
 	if (true == Network::GetNetwork()->bIsConnectedLobby)
 	{

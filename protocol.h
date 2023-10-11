@@ -80,6 +80,8 @@ enum PacketType {
 	// Lobbyserver To Client
 	LC_LOGIN_OK,
 	LC_LOGIN_FAIL,
+	LC_SIGNUP_OK,
+	LC_SIGNUP_FAIL,
 	LC_MATCH_RESPONSE,
 	LC_GAME_RESULT,
 	LC_CONTROL,
@@ -249,6 +251,14 @@ struct LC_LOGIN_OK_PACKET : public PACKET {
 };
 
 struct 	LC_LOGIN_FAIL_PACKET :public PACKET {
+
+};
+
+struct LC_SIGNUP_OK_PACKET :public PACKET {
+
+};
+
+struct LC_SIGNUP_FAIL_PACKET :public PACKET {
 
 };
 

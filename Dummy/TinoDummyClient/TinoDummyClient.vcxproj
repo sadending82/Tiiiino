@@ -129,10 +129,13 @@
   <ItemGroup>
     <ClCompile Include="draw.cpp" />
     <ClCompile Include="dummy.cpp" />
+    <ClCompile Include="stdafx.h" />
+    <ClCompile Include="timer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\protocol.h" />
     <ClInclude Include="dummy.h" />
+    <ClInclude Include="timer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
