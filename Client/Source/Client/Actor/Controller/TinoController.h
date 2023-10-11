@@ -50,9 +50,6 @@ public:
 	TSubclassOf<UUserWidget> GetStartingWidgetClass() const { return StartingWidgetClass; }
 	TSubclassOf<UUserWidget> GetCreateAccountsWidgetClass() const { return CreateAccountsWidgetClass; }
 
-	UPROPERTY(BlueprintReadOnly, Category = "UMG_Game")
-	class UDialogUIWidget* DialogUI;
-
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	UUserWidget* GetCurrentWidget() { return CurrentWidget; }
 
