@@ -28,12 +28,12 @@ AFallingWall::AFallingWall()
 	RadialVector = CreateDefaultSubobject<URadialVector>(TEXT("RadialVector"));
 	MetaData = CreateDefaultSubobject<UFieldSystemMetaDataFilter>(TEXT("MetaData"));
 
-	FieldLocation = GetActorLocation();
 }
 
 void AFallingWall::BeginPlay()
 {
 	Super::BeginPlay();
+	FieldLocation = GetActorLocation();
 
 	//파괴되는 버전
 	if (bIsBreakable)
@@ -67,13 +67,13 @@ void AFallingWall::MeshComponentHit(UPrimitiveComponent* HitComponent, AActor* O
 
 		if (OverlapCharacter->bIsControlledPlayer)
 		{
-			//send_game_breakdoor_packet(Network::GetNetwork()->s_socket, mObjectID);
+			send_game_breakdoor_packet(Network::GetNetwork()->s_socket, mObjectID);
 		}
 		else
 		{
 
 		}
-		FieldLocation = OverlapCharacter->GetActorLocation();
+		//FieldLocation = OverlapCharacter->GetActorLocation();
 		ActionObject();
 	}
 }
@@ -86,4 +86,5 @@ void AFallingWall::ActionObject()
 
 	FieldSystemComponent->ApplyPhysicsField(true, EFieldPhysicsType::Field_ExternalClusterStrain, nullptr, RadialFalloff);
 	FieldSystemComponent->ApplyPhysicsField(true, EFieldPhysicsType::Field_LinearForce, MetaData, RadialVector);
+	//DrawDebugSphere(GetWorld(), FieldLocation, 25.f, 12, FColor::Red, true, 30.f, 0, 1.f);
 }

@@ -580,6 +580,8 @@ void Network::l_process_packet(unsigned char* p)
 		LC_LOGIN_FAIL_PACKET* packet = reinterpret_cast<LC_LOGIN_FAIL_PACKET*>(p);
 
 		// 로그인 실패 UI 띄움
+		if (mMyCharacter->LoginUIInstance == nullptr)
+			mMyCharacter->SetLoginUIInstance();
 		mMyCharacter->LoginUIInstance->UIAlertMessage();
 
 		break;
@@ -589,6 +591,8 @@ void Network::l_process_packet(unsigned char* p)
 		LC_SIGNUP_OK_PACKET* packet = reinterpret_cast<LC_SIGNUP_OK_PACKET*>(p);
 
 		// 회원가입 성공 UI 띄움
+		if (mMyCharacter->CreateAccountsInstance == nullptr)
+			mMyCharacter->SetCreateAccountsInstance();
 		mMyCharacter->CreateAccountsInstance->CheckCreateAccount(true);
 
 		break;
@@ -598,6 +602,8 @@ void Network::l_process_packet(unsigned char* p)
 		LC_SIGNUP_FAIL_PACKET* packet = reinterpret_cast<LC_SIGNUP_FAIL_PACKET*>(p);
 
 		// 회원가입 실패 UI 띄움
+		if (mMyCharacter->CreateAccountsInstance == nullptr)
+			mMyCharacter->SetCreateAccountsInstance();
 		mMyCharacter->CreateAccountsInstance->CheckCreateAccount(false);
 
 		break;

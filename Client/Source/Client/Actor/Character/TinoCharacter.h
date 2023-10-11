@@ -195,6 +195,9 @@ private:
 	UPROPERTY(VisibleDefaultsOnly)
 		class UCameraComponent* Camera;
 
+	UPROPERTY(VisibleDefaultsOnly)
+		class ATinoController* PlayerController;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 		class UAnimMontage* DiveMontage;
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
@@ -257,7 +260,8 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation | Grab")
 		bool bShowDebugTrace;
-
+	UPROPERTY(EditAnywhere, Category = "MouseCusor")
+		bool bShowMouse;
 	FTimerHandle DiveTimer;
 	FTimerHandle GrabTimer;
 	FTimerHandle GrabCoolTimer;
