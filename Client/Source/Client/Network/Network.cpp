@@ -608,6 +608,7 @@ void CALLBACK recv_Lobbycallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED rec
 {
 	WSA_OVER_EX* over = reinterpret_cast<WSA_OVER_EX*>(recv_over);
 	auto Game = Network::GetNetwork();
+	UE_LOG(LogTemp, Error, TEXT("[%d]"), err);
 	if (nullptr == Game->mMyCharacter) return;
 	if (num_bytes == 0)return;
 
