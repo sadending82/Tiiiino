@@ -605,4 +605,17 @@ void DB::DisconnectDB()
 	mysql_close(GetmConn());
 }
 
+void DB::CreateDummyAccount(int count)
+{
+	for (int i = 0; i < count; ++i) {
+
+		char id[MAX_NAME_SIZE], pw[MAX_NAME_SIZE];
+		sprintf_s(id, "%d", i);
+		sprintf_s(pw, "%d", i);
+
+		InsertNewUser(id, (char)eDepartment::Game);
+		InsertNewAccount(id, pw);
+	}
+}
+
 #endif
