@@ -545,6 +545,16 @@ void Network::l_process_packet(unsigned char* p)
 
 		break;
 	}
+	case LC_SIGNUP_OK: 
+	{
+		LC_SIGNUP_OK_PACKET* packet = reinterpret_cast<LC_SIGNUP_OK_PACKET*>(p);
+		break;
+	}
+	case LC_SIGNUP_FAIL:
+	{
+		LC_SIGNUP_FAIL_PACKET* packet = reinterpret_cast<LC_SIGNUP_FAIL_PACKET*>(p);
+		break;
+	}
 	case LC_MATCH_RESPONSE:
 	{
 		LC_MATCH_RESPONSE_PACKET* packet = reinterpret_cast<LC_MATCH_RESPONSE_PACKET*>(p);

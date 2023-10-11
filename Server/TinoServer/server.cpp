@@ -348,6 +348,18 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 
 		break;
 	}
+	case DL_SIGNUP_OK:
+	{
+		DL_SIGNUP_OK_PACKET* p = reinterpret_cast<DL_SIGNUP_OK_PACKET*>(spacket);
+		SendSignUpOK(p->userKey);
+		break;
+	}
+	case DL_SIGNUP_FAIL:
+	{
+		DL_SIGNUP_FAIL_PACKET* p = reinterpret_cast<DL_SIGNUP_FAIL_PACKET*>(spacket);
+		SendSignUpFail(p->userKey);
+		break;
+	}
 	default:
 	{
 		break;
@@ -823,7 +835,23 @@ void Server::SendMatchResult(int key, int rank, int point)
 	packet.grade = mClients[key].mGrade;
 	packet.rank = rank;
 	packet.point = point;
-	packet.size = sizeof(LC_GAME_RESULT_PACKET);
+	packet.size = sizeof(packet);
 	packet.type = LC_GAME_RESULT;
+	mClients[key].DoSend(&packet);
+}
+
+void Server::SendSignUpOK(int key)
+{
+	LC_SIGNUP_OK_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = LC_SIGNUP_OK;
+	mClients[key].DoSend(&packet);
+}
+
+void Server::SendSignUpFail(int key)
+{
+	LC_SIGNUP_FAIL_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = LC_SIGNUP_FAIL;
 	mClients[key].DoSend(&packet);
 }

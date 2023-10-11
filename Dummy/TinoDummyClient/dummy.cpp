@@ -1,62 +1,12 @@
-#define _WINSOCK_DEPRECATED_NO_WARNINGS
-
-#include <WinSock2.h>
-#include <winsock.h>
-#include <Windows.h>
-#include <iostream>
-#include <thread>
-#include <vector>
-#include <unordered_set>
-#include <mutex>
-#include <atomic>
-#include <chrono>
-#include <queue>
-#include <array>
-#include <memory>
-
-using namespace std;
-using namespace chrono;
+#pragma once
+#include "dummy.h"
+#include <string>
 
 extern HWND		hWnd;
 
-const static int MAX_TEST = 1000;
-const static int MAX_CLIENTS = MAX_TEST * 2;
-const static int INVALID_ID = -1;
-const static int MAX_PACKET_SIZE = 255;
-const static int MAX_BUFF_SIZE = 255;
-
-#pragma comment (lib, "ws2_32.lib")
-
-#include "../../protocol.h"
-
 HANDLE g_hiocp;
 
-enum OPTYPE { OP_SEND, OP_RECV, OP_DO_MOVE };
-
 high_resolution_clock::time_point last_connect_time;
-
-struct OverlappedEx {
-	WSAOVERLAPPED over;
-	WSABUF wsabuf;
-	unsigned char IOCP_buf[MAX_BUFF_SIZE];
-	OPTYPE event_type;
-	int event_target;
-};
-
-struct CLIENT {
-	int id;
-	int x;
-	int y;
-	int z;
-	atomic_bool connected;
-
-	SOCKET client_socket;
-	OverlappedEx recv_over;
-	unsigned char packet_buf[MAX_PACKET_SIZE];
-	int prev_packet_data;
-	int curr_packet_size;
-	high_resolution_clock::time_point last_move_time;
-};
 
 array<int, MAX_CLIENTS> client_map;
 array<CLIENT, MAX_CLIENTS> g_clients;
@@ -68,6 +18,8 @@ int			global_delay;				// ms단위, 1000이 넘으면 클라이언트 증가 종료
 
 vector <thread*> worker_threads;
 thread test_thread;
+thread timer_thread;
+Timer* gTimer;
 
 float point_cloud[MAX_TEST * 2];
 
@@ -133,8 +85,7 @@ void ProcessPacket(int ci, unsigned char packet[])
 		if (move_packet->id < MAX_CLIENTS) {
 			int my_id = client_map[move_packet->id];
 			if (-1 != my_id) {
-				g_clients[my_id].x = move_packet->x;
-				g_clients[my_id].y = move_packet->y;
+				
 			}
 			if (ci == my_id) {
 				if (0 != move_packet->move_time) {
@@ -147,24 +98,15 @@ void ProcessPacket(int ci, unsigned char packet[])
 		}
 		break;
 	}
-	case SC_LOGIN_OK:
-	{
+	case LC_LOGIN_OK:{
 		g_clients[ci].connected = true;
 		active_clients++;
 		SC_LOGIN_OK_PACKET* login_packet = reinterpret_cast<SC_LOGIN_OK_PACKET*>(packet);
 		int my_id = ci;
 		client_map[login_packet->id] = my_id;
-		g_clients[my_id].id = login_packet->id;
-		g_clients[my_id].x = 888;
-		g_clients[my_id].y = 1566;
-		g_clients[my_id].z = 600;
-
-		//cs_packet_teleport t_packet;
-		//t_packet.size = sizeof(t_packet);
-		//t_packet.type = CS_PACKET_TELEPORT;
-		//SendPacket(my_id, &t_packet);
+		break;
 	}
-	break;
+
 	//case SC_PACKET_CHAT: break;
 	default: break;
 	}
@@ -239,7 +181,7 @@ void Worker_Thread()
 			}
 			delete over;
 		}
-		else if (OP_DO_MOVE == over->event_type) {
+		else if (OP_EVENT == over->event_type) {
 			// Not Implemented Yet
 			delete over;
 		}
@@ -272,7 +214,7 @@ void Adjust_Number_Of_Client()
 			max_limit = active_clients;
 			increasing = false;
 		}
-		if (100 > active_clients) return;
+		if (10 > active_clients) return;
 		if (ACCEPT_DELY * 10 > duration_cast<milliseconds>(duration).count()) return;
 		last_connect_time = high_resolution_clock::now();
 		DisconnectClient(client_to_close);
@@ -312,18 +254,25 @@ void Adjust_Number_Of_Client()
 	DWORD recv_flag = 0;
 	CreateIoCompletionPort(reinterpret_cast<HANDLE>(g_clients[num_connections].client_socket), g_hiocp, num_connections, 0);
 
-	CS_LOGIN_PACKET l_packet;
+	/*CL_SIGNUP_PACKET sPacket;
 
 	int temp = num_connections;
-	//sprintf_s(l_packet.name, "%d", temp);
-	//sprintf_s(l_packet.pw, "%s", "1234");
-	l_packet.size = sizeof(l_packet);
-	l_packet.type = CS_LOGIN;
-	l_packet.roomID = (temp / 8) % 8;
-	SendPacket(num_connections, &l_packet);
+	sPacket.size = sizeof(sPacket);
+	sPacket.type = CL_SIGNUP;
+	sprintf_s(sPacket.id, "%d", temp);
+	sprintf_s(sPacket.password, "%d", temp);
+	sPacket.department = 1;
+	SendPacket(num_connections, &sPacket);*/
 
+	CL_LOGIN_PACKET sPacket;
+	int temp = num_connections;
+	sPacket.size = sizeof(sPacket);
+	sPacket.type = CL_LOGIN;
+	sprintf_s(sPacket.id, "%d", temp);
+	sprintf_s(sPacket.password, "%d", temp);
+	SendPacket(num_connections, &sPacket)
 
-	int ret = WSARecv(g_clients[num_connections].client_socket, &g_clients[num_connections].recv_over.wsabuf, 1,
+	/*int ret = WSARecv(g_clients[num_connections].client_socket, &g_clients[num_connections].recv_over.wsabuf, 1,
 		NULL, &recv_flag, &g_clients[num_connections].recv_over.over, NULL);
 	if (SOCKET_ERROR == ret) {
 		int err_no = WSAGetLastError();
@@ -332,7 +281,7 @@ void Adjust_Number_Of_Client()
 			error_display("RECV ERROR", err_no);
 			goto fail_to_connect;
 		}
-	}
+	}*/
 	num_connections++;
 fail_to_connect:
 	return;
@@ -343,42 +292,45 @@ void Test_Thread()
 	while (true) {
 		//Sleep(max(20, global_delay));
 		Adjust_Number_Of_Client();
+	}
+}
 
-		for (int i = 0; i < num_connections; ++i) {
-			if (false == g_clients[i].connected) continue;
-			//60프레임으로 움직임 보내기.
-			if (g_clients[i].last_move_time + 0.016s > high_resolution_clock::now()) continue;
-			g_clients[i].last_move_time = high_resolution_clock::now();
-			CS_MOVE_PACKET my_packet;
-			my_packet.size = sizeof(my_packet);
-			my_packet.type = CS_MOVE;
+void mmdooeaosd()
+{
+	for (int i = 0; i < num_connections; ++i) {
+		if (false == g_clients[i].connected) continue;
+		//60프레임으로 움직임 보내기.
+		if (g_clients[i].last_move_time + 0.016s > high_resolution_clock::now()) continue;
+		g_clients[i].last_move_time = high_resolution_clock::now();
+		CS_MOVE_PACKET my_packet;
+		my_packet.size = sizeof(my_packet);
+		my_packet.type = CS_MOVE;
 
-			//g_clients[my_id].x = 888;
-			//g_clients[my_id].y = 1566;
-			//g_clients[my_id].z = 600;
-			switch (rand() % 4) {
-			case 0: 
-				g_clients[i].x = min(g_clients[i].x + 1, 1600);
-				my_packet.x = g_clients[i].x;
-				break;
-			case 1:
-				g_clients[i].x = max(g_clients[i].x - 1, 0);
-				my_packet.x = g_clients[i].x;
-				break;
-			case 2:
-				g_clients[i].y = min(g_clients[i].y + 1, 2300);
-				my_packet.y = g_clients[i].y;
-				break;
-			case 3:
-				g_clients[i].y = max(g_clients[i].y - 1, 700);
-				my_packet.y = g_clients[i].y;
-				break;
-			}
-			my_packet.z = g_clients[i].z;
-			my_packet.speed = 30;
-			my_packet.move_time = static_cast<unsigned>(duration_cast<milliseconds>(high_resolution_clock::now().time_since_epoch()).count());
-			SendPacket(i, &my_packet);
+		//g_clients[my_id].x = 888;
+		//g_clients[my_id].y = 1566;
+		//g_clients[my_id].z = 600;
+		switch (rand() % 4) {
+		case 0:
+			g_clients[i].x = min(g_clients[i].x + 1, 1600);
+			my_packet.x = g_clients[i].x;
+			break;
+		case 1:
+			g_clients[i].x = max(g_clients[i].x - 1, 0);
+			my_packet.x = g_clients[i].x;
+			break;
+		case 2:
+			g_clients[i].y = min(g_clients[i].y + 1, 2300);
+			my_packet.y = g_clients[i].y;
+			break;
+		case 3:
+			g_clients[i].y = max(g_clients[i].y - 1, 700);
+			my_packet.y = g_clients[i].y;
+			break;
 		}
+		my_packet.z = g_clients[i].z;
+		my_packet.speed = 30;
+		my_packet.move_time = static_cast<unsigned>(duration_cast<milliseconds>(high_resolution_clock::now().time_since_epoch()).count());
+		SendPacket(i, &my_packet);
 	}
 }
 
@@ -402,6 +354,9 @@ void InitializeNetwork()
 		worker_threads.push_back(new std::thread{ Worker_Thread });
 
 	test_thread = thread{ Test_Thread };
+
+	gTimer->Init(g_hiocp);
+	timer_thread = thread{ (&Timer::TimerMain, gTimer)};
 }
 
 void ShutdownNetwork()
@@ -411,6 +366,7 @@ void ShutdownNetwork()
 		pth->join();
 		delete pth;
 	}
+	timer_thread.join();
 }
 
 void Do_Network()
@@ -431,4 +387,3 @@ void GetPointCloud(int* size, float** points)
 	*size = index;
 	*points = point_cloud;
 }
-
