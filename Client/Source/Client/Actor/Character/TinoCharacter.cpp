@@ -1,5 +1,6 @@
 ﻿#include "Actor/Character/TinoCharacter.h"
 #include "Actor/Controller/TinoController.h"
+#include "Sound/SoundManager.h"
 #include "Global.h"
 
 #include "Network/Network.h"
@@ -274,6 +275,7 @@ void ATinoCharacter::OnAccelEffect()
 	//비네트 값을 조절해 가속 이펙트를 킴
 	Camera->PostProcessSettings.bOverride_VignetteIntensity = true;
 	Camera->PostProcessSettings.VignetteIntensity = CustomVignetteIntensity;
+	ASoundManager::GetSoundManager()->PlaySFX(ESFXType::ESFXType_ObstacleAccel);
 }
 
 void ATinoCharacter::OffAccelEffect()
@@ -573,7 +575,7 @@ void ATinoCharacter::EnableInputMode()
 
 UTexture* ATinoCharacter::GetTinoDepartTexture(EDepartment DepartmentNumber)
 {
-	if (DepartmentTextureMap.Num() <= 0)
+	if (DepartmentTextureMap.IsEmpty())
 	{
 		CLog::Log("DepartmentTextureMap is Empty");
 		return nullptr;

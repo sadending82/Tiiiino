@@ -2,6 +2,7 @@
 
 
 #include "Actor/Level/CustomLevel_Test.h"
+#include "Sound/SoundManager.h"
 #include "Network/Network.h"
 #include "Actor/Character/TinoCharacter.h"
 #include "Actor/Controller/TinoController.h"
@@ -35,6 +36,7 @@ void ACustomLevel_Test::BeginPlay() {
 	//To Loading ...
 
 	//To Do SomeThing ...
+	ASoundManager::GetSoundManager()->PlaySFX(ESFXType::ESFXType_RaceStart);
 
 }
 
@@ -68,7 +70,8 @@ bool ACustomLevel_Test::ConnGameServer()
 			send_movetogame_packet(Network::GetNetwork()->s_socket,Network::GetNetwork()->mDBUID,
 				TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterName), 0); 
 			GetWorld()->GetFirstPlayerController<ATinoController>()->SetInputGameMode();
-			
+			//ASoundManager::GetSoundManager()->PlaySFX(ESFXType::ESFXType_RaceStart);
+
 			return true;
 		}
 		else {
