@@ -31,4 +31,5 @@ private:
 	int mIsRun;
 	HANDLE mHiocp;
 	mutex mTimerLock;
+	thread timer_thread;
 };

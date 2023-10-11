@@ -171,7 +171,7 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		uniform_int_distribution<int> rLevel(MIN_LEVEL, MAX_LEVEL);
 		int randomlevel = rLevel(rng);
 		
-		packet.mapLevel = 2;
+		packet.mapLevel = randomlevel;
 		
 
 		int uidCount = 0;
