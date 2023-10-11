@@ -111,12 +111,12 @@ void Network::release()
 		WSACleanup();
 		if (!bLevelOpenTriggerEnabled)
 		{
-			//openlevel�� ���� release�� �ƴ϶�,
-			//editor���������� ����� release��� false������.
+			//openlevel로 인한 release가 아니라,
+						//editor중지때문에 생기는 release라면 false시켜줌.
 			bLoginFlag = false;
-			//editor���������̴ϱ� ���⵵ �׳� false�� �ٽ� �ʱ�ȭ.
+			//editor중지때문이니까 여기도 그냥 false로 다시 초기화.
 			bLevelOpenTriggerEnabled = false;
-			//editor ������ �ƴ϶� level ����� �Ҹ��� release���� ������� ���ƾ� �� ���� �� if�� �ȿ� �ֱ�.
+			//editor 중지가 아니라 level 변경시 불리는 release에서 변경되지 말아야 할 값은 이 if문 안에 넣기.
 			bIsConnectedLobby = 0;
 			bIsConnected = 0;
 			closesocket(l_socket);
@@ -340,7 +340,7 @@ void Network::process_packet(unsigned char* p)
 		mMyCharacter->SetDepartmentClothes(packet->department);
 		FVector location(240.f - ((packet->id % 4) * 160), 0 - (packet->id / 4 * 160), 0);
 		mMyCharacter->SetActorLocation(location);
-		//���Ἲ��
+		//연결성공
 		bIsConnected = true;
 		break;
 	}
@@ -360,7 +360,7 @@ void Network::process_packet(unsigned char* p)
 		{
 			if (move_id == mMyCharacter->GetClientID())
 			{
-				//���� �����ΰ� ó������ �ʴ´�.
+				//내가 움직인건 처리하지 않는다.
 			}
 			else if (mOtherCharacter[move_id] != nullptr)
 			{
@@ -385,7 +385,7 @@ void Network::process_packet(unsigned char* p)
 	{
 		SC_ADD_PLAYER_PACKET* packet = reinterpret_cast<SC_ADD_PLAYER_PACKET*>(p);
 		int id = packet->id;
-		//���� ���� ���̵��� �� ������� ���� ����. Ż��.
+		//나와 같은 아이디라면 또 만들어줄 이유 없음. 탈출.
 		if (id == mMyCharacter->GetClientID())
 			break;
 		if (nullptr != mOtherCharacter[id])
@@ -400,7 +400,7 @@ void Network::process_packet(unsigned char* p)
 
 		}
 		else {
-			FName path = TEXT("Blueprint'/Game/Characters/Tino/BP_TinoCharacter.BP_TinoCharacter_C'"); //_C�� �� �ٿ��� �ȴٰ� ��.
+			FName path = TEXT("Blueprint'/Game/Characters/Tino/BP_TinoCharacter.BP_TinoCharacter_C'"); //_C를 꼭 붙여야 된다고 함.
 			UClass* GeneratedInventoryBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 			FTransform trans(FQuat(packet->rx, packet->ry, packet->rz, packet->rw), FVector(888, 1566, -10000 + (id * 150)));
 			auto mc = mMyCharacter->GetWorld()->SpawnActorDeferred<ATinoCharacter>(GeneratedInventoryBP, trans);
@@ -453,24 +453,24 @@ void Network::process_packet(unsigned char* p)
 			{
 			case 1:
 				mOtherCharacter[id]->Jump();
-				//����
+				//점프
 				break;
 			case 2:
 				mOtherCharacter[id]->Dive();
-				//���̺�
+				//다이브
 				break;
 			case 3:
 				mOtherCharacter[id]->PlayTumbleMontage();
-				//����(�Һ�)
+				//착지(텀블)
 				//mOtherCharacter[id]->Dive();
 				break;
 			case 4:
 				mOtherCharacter[id]->OnGrab();
 				break;
-				//���
+				//잡기
 			case 5:
 				mOtherCharacter[id]->OffGrab();
-				//������
+				//잡기취소
 				break;
 
 			default:
@@ -490,7 +490,7 @@ void Network::process_packet(unsigned char* p)
 		}
 		mMyCharacter->InGameWidgetInstance->LevelStartCountdown();
 		//
-		// ī��Ʈ�ٿ� UI ����� object�� ó�� ����ȭ.
+		// 카운트다운 UI 띄우기및 object들 처음 동기화.
 		//
 		break;
 	}
@@ -499,7 +499,7 @@ void Network::process_packet(unsigned char* p)
 		mMyCharacter->InGameWidgetInstance->LevelStart();
 		mMyCharacter->EnableInputMode();
 		//
-		// �÷��̾�� ������ �� �ְ� �ϱ�.
+		// 플레이어들 움직일 수 있게 하기.
 		//
 		break;
 	}
@@ -518,7 +518,7 @@ void Network::process_packet(unsigned char* p)
 			mOtherCharacter[packet->id]->SetActorEnableCollision(false);
 			mOtherCharacter[packet->id]->SetActorHiddenInGame(true);
 			//
-			//UI�� ������ �ο� +1 Update
+			//UI에 도착한 인원 +1 Update
 			//
 		}
 		break;
@@ -528,7 +528,7 @@ void Network::process_packet(unsigned char* p)
 		SC_GAME_COUNTDOWN_START_PACKET* packet = reinterpret_cast<SC_GAME_COUNTDOWN_START_PACKET*>(p);
 
 		mMyCharacter->InGameWidgetInstance->LevelClearCountdown();
-		//ī��Ʈ�ٿ� UI ���� (Appear CountDown UI)
+		//카운트다운 UI 띄우기 (Appear CountDown UI)
 
 		break;
 	}
@@ -562,7 +562,7 @@ void Network::l_process_packet(unsigned char* p)
 		LC_LOGIN_OK_PACKET* packet = reinterpret_cast<LC_LOGIN_OK_PACKET*>(p);
 		mMyCharacter->SetClientID(packet->id);
 		mDBUID = packet->UID;
-		//���Ἲ��
+		//연결성공
 		bIsConnectedLobby = true;
 		CLog::Print("LC_LOGIN_OK IS CALLING");
 
@@ -605,7 +605,7 @@ void Network::l_process_packet(unsigned char* p)
 	case LC_MATCH_RESPONSE:
 	{
 		LC_MATCH_RESPONSE_PACKET* packet = reinterpret_cast<LC_MATCH_RESPONSE_PACKET*>(p);
-		//���Ӽ��� ���� �ڵ� ���߿� ip�� ��Ʈ�ѹ��� �Ѱܾ���.
+		//게임서버 연결 코드 나중에 ip랑 포트넘버도 넘겨야함.
 		UE_LOG(LogTemp, Error, TEXT("Game Match Responed"));
 		string maplv{ "Level" };
 		maplv += std::to_string(packet->mapLevel);
@@ -644,6 +644,14 @@ void CALLBACK recv_Gamecallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv
 {
 	WSA_OVER_EX* over = reinterpret_cast<WSA_OVER_EX*>(recv_over);
 	auto Game = Network::GetNetwork();
+	if (err != 0)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[%d]"), err);
+		if (Game->mMyCharacter)
+			Game->mMyCharacter->MakeAndShowDialog();
+		Game->release();
+		return;
+	}
 	if (nullptr == Game->mMyCharacter) return;
 	if (num_bytes == 0)return;
 
