@@ -1,6 +1,7 @@
 #pragma once
 
 
+constexpr const char* DBSERVERIP = "127.0.0.1";
 constexpr int DBSERVERPORT = 3700;
 
 constexpr int MAXGAMESERVER = 2;

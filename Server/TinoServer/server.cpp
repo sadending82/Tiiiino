@@ -581,7 +581,7 @@ void Server::Init()
 	::memset(&serverAddr, 0, sizeof(serverAddr));
 	serverAddr.sin_family = AF_INET;
 	serverAddr.sin_port = htons(DBSERVERPORT);
-	inet_pton(AF_INET, SERVERIP, &serverAddr.sin_addr);
+	inet_pton(AF_INET, DBSERVERIP, &serverAddr.sin_addr);
 
 	if (connect(LDsocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR) {
 		DEBUGMSGNOPARAM("DBconnection failed\n");
@@ -782,6 +782,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 	}
 	case eEVENT_TYPE::EV_CONTROL:
 	{
+		cout << " control\n";
 		for (int i = 0; i < MAX_USER; i++) {
 			if (mClients[i].mState == eSessionState::ST_FREE)
 			{
