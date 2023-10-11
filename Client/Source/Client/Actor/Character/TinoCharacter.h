@@ -145,6 +145,20 @@ public:
 	UPROPERTY()
 		UInGameUIWidget* InGameWidgetInstance = nullptr;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
+		TSubclassOf<UCreateAccountsWidget> CreateAccountsWidgetClass;
+	UPROPERTY()
+		UCreateAccountsWidget* CreateAccountsInstance = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
+		TSubclassOf<ULoginUIWidget> LoginWidgetClass;
+	UPROPERTY()
+		ULoginUIWidget* LoginUIInstance = nullptr;
+
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+		void SetLoginUIInstance();
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+		void SetCreateAccountsInstance();
 private:
 	//키입력 관련 함수
 	void OnMoveForward(float Axis);

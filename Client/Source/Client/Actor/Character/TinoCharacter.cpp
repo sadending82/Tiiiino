@@ -12,7 +12,8 @@
 #include "MenuUI/InGameUIWidget.h"
 #include "MenuUI/DialogUIWidget.h"
 #include "MenuUI/InGameTimerWidget.h"
-
+#include "CreateAccountsWidget.h"
+#include "LoginUIWidget.h"
 
 ATinoCharacter::ATinoCharacter()
 	:MaxDiveTime(3.f),
@@ -70,6 +71,10 @@ void ATinoCharacter::BeginPlay()
 	{
 		if (GetController()->IsPlayerController())
 		{
+			// UI 위젯 생성
+			SetLoginUIInstance();
+			SetCreateAccountsInstance();
+
 			//카메라 각도 제한(마우스 Y축 아래로 제한)
 			UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->ViewPitchMax = 0.f;
 		}
@@ -347,6 +352,32 @@ void ATinoCharacter::SetIsAirForNetwork(bool val)
 UCharacterAnimInstance* ATinoCharacter::GetTinoAnimInstance()
 {
 	return Cast<UCharacterAnimInstance>(GetMesh()->GetAnimInstance());
+}
+
+void ATinoCharacter::SetLoginUIInstance()
+{
+	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (!!TinoController)
+	{
+		LoginUIInstance = Cast<ULoginUIWidget>(TinoController->GetCurrentWidget());
+		if (LoginUIInstance == nullptr)
+		{
+
+		}
+	}
+}
+
+void ATinoCharacter::SetCreateAccountsInstance()
+{
+	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (!!TinoController)
+	{
+		CreateAccountsInstance = Cast<UCreateAccountsWidget>(TinoController->GetCurrentWidget());
+		if (CreateAccountsInstance == nullptr)
+		{
+
+		}
+	}
 }
 
 void ATinoCharacter::OnMoveForward(float Axis)
