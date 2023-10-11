@@ -72,8 +72,8 @@ void ATinoCharacter::BeginPlay()
 		if (GetController()->IsPlayerController())
 		{
 			// UI 위젯 생성
-			SetLoginUIInstance();
-			SetCreateAccountsInstance();
+			//SetLoginUIInstance();
+			//SetCreateAccountsInstance();
 
 			//카메라 각도 제한(마우스 Y축 아래로 제한)
 			UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->ViewPitchMax = 0.f;
