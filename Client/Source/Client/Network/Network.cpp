@@ -522,7 +522,8 @@ void Network::process_packet(unsigned char* p)
 		SC_GAME_END_PACKET* packet = reinterpret_cast<SC_GAME_END_PACKET*>(p);
 		bGameEndFlag = true;
 		closesocket(s_socket);
-		mMyCharacter->InGameWidgetInstance->ShowResultUI();
+		mMyCharacter->InGameWidgetInstance->LevelClear();
+		mMyCharacter->InGameWidgetInstance->ShowResultUI(); //블프 delegate불러주는함수임.
 
 		break;
 	}
