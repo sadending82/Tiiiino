@@ -25,7 +25,8 @@ void ACustomLevel_Test::BeginPlay() {
 	UClass* GeneratedCharacterBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 	FTransform trans;
 	srand(time(NULL));
-	trans.SetRotation(trans.GetRotation() + FQuat(0, 0, 90, 0));
+	;
+	trans.SetRotation(FRotator(0, 90, 0).Quaternion());
 	mMyCharacterSpawnPosition.Y += (rand() % 10) * 10;
 	trans.SetLocation(trans.GetLocation() + mMyCharacterSpawnPosition);
 	auto mc1 = GetWorld()->SpawnActorDeferred<ATinoCharacter>(GeneratedCharacterBP, trans);
