@@ -701,7 +701,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 		// half room max
 		system_clock::time_point tTime = system_clock::now();
 		mHighListLock.lock();
-		if (mMatchListHighTier.size() >= MAX_ROOM_USER / 2) // high list
+		if (mMatchListHighTier.size() >= MAX_ROOM_USER / 2 && mMatchListHighTier.size() < MAX_ROOM_USER) // high list
 		{
 			if (tTime - mClients[mMatchListHighTier.front()].mMatchStartTime >= milliseconds(20000))
 				{
@@ -738,7 +738,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 		}
 		mHighListLock.unlock();
 		mLowListlock.lock();
-		if (mMatchListLowTier.size() >= MAX_ROOM_USER / 2)
+		if (mMatchListLowTier.size() >= MAX_ROOM_USER / 2 && mMatchListLowTier.size() < MAX_ROOM_USER)
 		{
 			if (tTime - mClients[mMatchListLowTier.front()].mMatchStartTime >= milliseconds(20000))
 			{
@@ -779,7 +779,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 		EV_UpdateMatchPacket p;
 		p.size = sizeof(EV_UpdateMatchPacket);
 		p.type = eCompType::OP_EVENT;
-		pTimer->PushEvent(1, eEVENT_TYPE::EV_MATCH_UP, 5000, reinterpret_cast<unsigned char*>(&p));
+		pTimer->PushEvent(1, eEVENT_TYPE::EV_MATCH_UP, 1000, reinterpret_cast<unsigned char*>(&p));
 
 		break;
 	}

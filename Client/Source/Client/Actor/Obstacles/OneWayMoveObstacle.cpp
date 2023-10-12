@@ -23,7 +23,8 @@ AOneWayMoveObstacle::AOneWayMoveObstacle()
 void AOneWayMoveObstacle::BeginPlay()
 {
 	Super::BeginPlay();
-
+	if(OriginalLocation.IsZero())
+		OriginalLocation = GetActorLocation();
 	// 임시적으로 추가하였음
 	// 실제로는 네트워크에서 패킷을 보내 주었을 때에 변경해주어야 함
 	bIsStartMove = true;
@@ -35,5 +36,9 @@ void AOneWayMoveObstacle::Tick(float DeltaTime)
 	if (bIsStartMove)
 	{
 		AddActorWorldOffset(DirectionArrow->GetForwardVector() * MoveSpeed * DeltaTime);
+		if ((OriginalLocation - GetActorLocation()).Length() > MoveDistance)
+		{
+			SetActorLocation(OriginalLocation);
+		}
 	}
 }
