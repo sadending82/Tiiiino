@@ -114,6 +114,16 @@ public:
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 		void SetCreateAccountsInstance();
 
+	//Accessory
+
+	//소켓 이름과 메시를 정해줘야함
+	UFUNCTION(Blueprintcallable, Category = "Accessory")
+		void WearAccessory();
+
+	//임시 나중에 상점 생기면 수정할것
+	UPROPERTY(EditDefaultsOnly, Category = "Accessory")
+	TArray<TSubclassOf<class AAccessoryItem>> AccessoryInvetory;
+
 	//Getter & Setter
 	FORCEINLINE void SetMovementState(EMovementState State) { MovementState = State; }
 	FORCEINLINE void SetMaxTumbleTime(float MaxTime) { MaxTumbledTime = MaxTime; }
