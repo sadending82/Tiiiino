@@ -229,7 +229,7 @@ void ATinoCharacter::MakeAndShowDialogInLobby()
 {
 	DialogWidget = CreateWidget<UDialogUIWidget>(GetWorld(), DialogWidgetClass);
 	DialogWidget->AddToViewport();
-	//DialogWidget->RenderDisconnectNetworkWindow();
+	DialogWidget->RenderDisconnectNetworkWindow();
 }
 
 void ATinoCharacter::MakeAndShowDialogInGame()
@@ -237,6 +237,7 @@ void ATinoCharacter::MakeAndShowDialogInGame()
 	if (true == Network::GetNetwork()->bGameEndFlag) return;
 	DialogWidget = CreateWidget<UDialogUIWidget>(GetWorld(), DialogWidgetClass);
 	DialogWidget->AddToViewport();
+	DialogWidget->RenderDisconnectNetworkWindow();
 }
 
 void ATinoCharacter::SetDepartmentClothes(int department)
