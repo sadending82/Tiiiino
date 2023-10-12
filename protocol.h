@@ -11,6 +11,7 @@ constexpr int MAX_USER = 300;
 constexpr int MAX_OBJECT = 3000;
 constexpr int MAX_NAME_SIZE = 36 + 1;	//닉네임, 중복검사 X
 constexpr int MAX_ROOM_USER = 8;
+constexpr int MAX_VERSION_SIZE = 10;
 
 // Object Event Time
 constexpr int DELAY_TIME_EXEC_BREAKDOOR = 1000;
