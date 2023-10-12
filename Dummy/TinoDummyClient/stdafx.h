@@ -28,11 +28,13 @@
 using namespace std;
 using namespace chrono;
 
-const static int MAX_TEST = 5;//1000;
-const static int MAX_CLIENTS = MAX_TEST * 2;
+const static int MAX_TEST = 21;//1000;
+const static int START_CLIENT = 14;
+const static int MAX_CLIENTS = 21;// MAX_TEST * 2;
 const static int INVALID_ID = -1;
 const static int MAX_PACKET_SIZE = 255;
 const static int MAX_BUFF_SIZE = 255;
+constexpr const char* GAMEVERSION = "1.2.0";
 
 #pragma comment (lib, "ws2_32.lib")
 

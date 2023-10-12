@@ -78,6 +78,7 @@ bool ACustomLevel_Test::ConnGameServer()
 			return true;
 		}
 		else {
+			player->MakeAndShowDialog();
 			CLog::Log("Connect Fail!");
 		}
 	}
@@ -127,7 +128,7 @@ bool ACustomLevel_Test::ConnLobbyServer()
 		return true;
 	}
 	else {
-
+		player->MakeAndShowDialog();
 		CLog::Log("Connect Fail!");
 	}
 
