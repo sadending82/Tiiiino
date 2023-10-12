@@ -22,8 +22,14 @@ void AClientGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 	GetWorld()->SpawnActor<ASoundManager>(SoundMangerClass);
-	auto LevelName = ConvertBGMTypeMap[UGameplayStatics::GetCurrentLevelName(GetWorld())];
-	ASoundManager::GetSoundManager()->SetBGM(LevelName);
+	EBGMType LevelType;
+
+	if (UGameplayStatics::GetCurrentLevelName(GetWorld()) == "Lobby")
+		LevelType = EBGMType::EBGMType_Lobby;
+	else
+		LevelType = EBGMType::EBGMType_Race;
+
+	ASoundManager::GetSoundManager()->SetBGM(LevelType);
 	ASoundManager::GetSoundManager()->PlayBGM();
 	
 }

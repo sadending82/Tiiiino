@@ -108,6 +108,11 @@ public:
 
 	void MakeAndShowDialog();
 
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+		void SetLoginUIInstance();
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+		void SetCreateAccountsInstance();
+
 	//Getter & Setter
 	FORCEINLINE void SetMovementState(EMovementState State) { MovementState = State; }
 	FORCEINLINE void SetMaxTumbleTime(float MaxTime) { MaxTumbledTime = MaxTime; }
@@ -124,9 +129,6 @@ public:
 	void SetIsAirForNetwork(bool val);
 
 	class UCharacterAnimInstance* GetTinoAnimInstance();
-
-	UPROPERTY()
-	bool bIsSpactateModeEnabled = false;
 
 public:
 
@@ -157,10 +159,10 @@ public:
 	UPROPERTY()
 		ULoginUIWidget* LoginUIInstance = nullptr;
 
-	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-		void SetLoginUIInstance();
-	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-		void SetCreateAccountsInstance();
+	UPROPERTY()
+		bool bIsSpactateModeEnabled = false;
+	UPROPERTY(EditAnywhere, Category = "Sound")
+		bool bIsPlaySelf;
 private:
 	//키입력 관련 함수
 	void OnMoveForward(float Axis);
@@ -260,8 +262,7 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation | Grab")
 		bool bShowDebugTrace;
-	UPROPERTY(EditAnywhere, Category = "MouseCusor")
-		bool bShowMouse;
+
 	FTimerHandle DiveTimer;
 	FTimerHandle GrabTimer;
 	FTimerHandle GrabCoolTimer;
