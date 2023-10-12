@@ -21,9 +21,9 @@ void UAN_PlayFootStep::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBas
 	if (TinoCharacter  && TinoCharacter->bIsSpactateModeEnabled == false)
 	{
 		if(TinoCharacter->bIsPlaySelf && TinoCharacter->bIsControlledPlayer)
-			ASoundManager::GetSoundManager()->PlaySFX(FootstepCue);
+			ASoundManager::GetSoundManager()->PlaySFX(FootstepCue, TinoCharacter->GetActorLocation());
 		else if (TinoCharacter->bIsPlaySelf == false)
-			ASoundManager::GetSoundManager()->PlaySFX(FootstepCue);
+			ASoundManager::GetSoundManager()->PlaySFX(FootstepCue, TinoCharacter->GetActorLocation());
 
 	}
 }

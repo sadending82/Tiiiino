@@ -172,6 +172,15 @@ void send_login_packet(SOCKET& sock, const char* id, const char* passWord)
 	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
 }
 
+void send_logout_packet(SOCKET& sock)
+{
+	CL_LOGOUT_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = CL_LOGOUT;
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+}
+
 void send_match_packet(SOCKET& sock)
 {
 	CL_MATCH_PACKET packet;

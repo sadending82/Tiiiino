@@ -79,6 +79,16 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 		SendLogin(cID, p->id, p->password);
 		break;
 	}
+	case CL_LOGOUT: 
+	{
+		CL_LOGOUT_PACKET* p = reinterpret_cast<CL_LOGOUT_PACKET*>(cpacket);
+		LD_LOGOUT_PACKET pac;
+		pac.type = LD_LOGOUT;
+		pac.size = sizeof(LD_LOGOUT_PACKET);
+		pac.uid = mClients[cID].mUID;
+		mServers[0].DoSend(&pac);
+		break;
+	}
 	case CL_SIGNUP:
 	{
 		CL_SIGNUP_PACKET* rp = reinterpret_cast<CL_SIGNUP_PACKET*>(cpacket);
@@ -655,13 +665,18 @@ void Server::PlayerMatchIn(int cID)
 void Server::PlayerMatchOut(int cID)
 {
 	DEBUGMSGONEPARAM("[%s] 플레이어 매치 아웃\n", mClients[cID].mID);
+	mHighListLock.lock();
 	mMatchListHighTier.remove(cID);
+	mHighListLock.unlock();
+	mLowListlock.lock();
 	mMatchListLowTier.remove(cID);
-	if (mMatchListHighTier.size() > MAX_ROOM_USER / 2)
+	mLowListlock.unlock();
+
+	if (mMatchListHighTier.size() >= MAX_ROOM_USER / 2 && mMatchListHighTier.size() < MAX_ROOM_USER)
 	{
 		mClients[mMatchListHighTier.front()].mMatchStartTime = system_clock::now();
 	}
-	if (mMatchListLowTier.size() > MAX_ROOM_USER / 2)
+	if (mMatchListLowTier.size() >= MAX_ROOM_USER / 2 && mMatchListLowTier.size() < MAX_ROOM_USER)
 	{
 		mClients[mMatchListLowTier.front()].mMatchStartTime = system_clock::now();
 	}
