@@ -76,14 +76,7 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 	case CL_LOGIN:
 	{
 		CL_LOGIN_PACKET* p = reinterpret_cast<CL_LOGIN_PACKET*>(cpacket);
-		LD_LOGIN_PACKET pac;
-		pac.type = LD_LOGIN;
-		pac.size = sizeof(LD_LOGIN_PACKET);
-		pac.userKey = cID;
-		memcpy(pac.id, p->id, sizeof(pac.id));
-		memcpy(pac.password, p->password, sizeof(pac.password));
-		// send to db server
-		mServers[0].DoSend(&pac);
+		SendLogin(cID, p->id, p->password);
 		break;
 	}
 	case CL_LOGOUT: 
@@ -99,53 +92,17 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 	case CL_SIGNUP:
 	{
 		CL_SIGNUP_PACKET* rp = reinterpret_cast<CL_SIGNUP_PACKET*>(cpacket);
-		LD_SIGNUP_PACKET sp;
-		sp.size = sizeof(sp);
-		sp.type = LD_SIGNUP;
-		sp.department = rp->department;
-		sp.userKey = cID;
-		memcpy(sp.id, rp->id, sizeof(rp->id));
-		memcpy(sp.password, rp->password, sizeof(rp->password));
-		// send to db server
-		mServers[0].DoSend(&sp);
+		SendSignUp(cID, rp->id, rp->password, rp->department);
 		break;
 	}
 	case CL_MATCH:
 	{
-		DEBUGMSGONEPARAM("[%s] 플레이어 매치 시작\n", mClients[cID].mID);
-		if (mClients[cID].mGrade > 3.5)
-		{
-			mMatchListHighTier.push_back(cID);
-			if (mMatchListHighTier.size() == MAX_ROOM_USER / 2)
-			{
-				mClients[mMatchListHighTier.front()].mMatchStartTime = system_clock::now();
-			}
-		}
-		else
-		{
-			mMatchListLowTier.push_back(cID);
-			if (mMatchListLowTier.size() == MAX_ROOM_USER / 2)
-			{
-				mClients[mMatchListLowTier.front()].mMatchStartTime = system_clock::now();
-			}
-		}
-		mClients[cID].mState = eSessionState::ST_MATCH;
+		PlayerMatchIn(cID);
 		break;
 	}
 	case CL_MATCH_OUT:
 	{
-		DEBUGMSGONEPARAM("[%s] 플레이어 매치 아웃\n", mClients[cID].mID);
-		mMatchListHighTier.remove(cID);
-		mMatchListLowTier.remove(cID);
-		if (mMatchListHighTier.size() > MAX_ROOM_USER / 2)
-		{
-			mClients[mMatchListHighTier.front()].mMatchStartTime = system_clock::now();
-		}
-		if (mMatchListLowTier.size() > MAX_ROOM_USER / 2)
-		{
-			mClients[mMatchListLowTier.front()].mMatchStartTime = system_clock::now();
-		}
-		mClients[cID].mState = eSessionState::ST_LOBBY;
+		PlayerMatchOut(cID);
 		break;
 	}
 	default:
@@ -161,157 +118,25 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 	{
 	case GL_LOGIN:
 	{
-		GL_LOGIN_PACKET* p = reinterpret_cast<GL_LOGIN_PACKET*>(spacket);
-
 		DEBUGMSGNOPARAM("game server login\n");
-
 		break;
 	}
 	case GL_ROOM_READY:
 	{
 		GL_ROOM_READY_PACKET* p = reinterpret_cast<GL_ROOM_READY_PACKET*>(spacket);
-		LC_MATCH_RESPONSE_PACKET packet;
-		packet.size = sizeof(packet);
-		packet.type = LC_MATCH_RESPONSE;
-		memcpy(packet.gameServerIP, SERVERIP, sizeof(packet.gameServerIP));
-		packet.gameServerPortNum = GAMESERVERPORT;
-
-		random_device rd;
-		mt19937_64 rng(rd());
-		uniform_int_distribution<int> rLevel(MIN_LEVEL, MAX_LEVEL);
-		int randomlevel = rLevel(rng);
-		
-		packet.mapLevel = randomlevel;
-		
-
-		int uidCount = 0;
-		double userGradeSum = 0;
-		mRooms[p->roomID].mStateLock.lock();
-		mRooms[p->roomID].mState = eRoomState::RS_INGAME;
-		mRooms[p->roomID].mStateLock.unlock();
-		mRooms[p->roomID].mRoomLevel = randomlevel;
-		DEBUGMSGONEPARAM("레벨[%d] 준비완\n", randomlevel);
-		vector<int> delPlayerVector;
-		for (auto& player : mReadytoGame)
-		{
-			if (mClients[player].mRoomID == p->roomID)
-			{
-				strcpy_s(packet.hashs, mClients[player].mHashs);
-				mClients[player].DoSend(&packet);
-				mClients[player].mState = eSessionState::ST_INGAME;
-				userGradeSum += mClients[player].mGrade;
-
-				mRooms[mClients[player].mRoomID].mUID[uidCount] = mClients[player].mUID;
-				mRooms[mClients[player].mRoomID].mSockID[uidCount] = player;
-				mRooms[mClients[player].mRoomID].mGrade[uidCount] = mClients[player].mGrade;
-				uidCount++;
-				delPlayerVector.push_back(player);
-			}
-		}
-		mRooms[p->roomID].mUserNum = uidCount;
-		mRooms[p->roomID].mGradeAvg = userGradeSum / uidCount;
-		for (auto player : delPlayerVector)
-		{
-			mReadytoGame.remove(player);
-		}
-
+		SendMatchResponse(p->roomID);
 		break;
 	}
 	case GL_ROOM_RESET:
 	{
 		GL_ROOM_RESET_PACKET* p = reinterpret_cast<GL_ROOM_RESET_PACKET*>(spacket);
-		DEBUGMSGONEPARAM("방[%d] 리셋", p->roomID);
-		mRooms[p->roomID].mStateLock.lock();
-		mRooms[p->roomID].mState = eRoomState::RS_FREE;
-		ZeroMemory(mRooms[p->roomID].mUID, sizeof(mRooms[p->roomID].mUID));
-		ZeroMemory(mRooms[p->roomID].mSockID, sizeof(mRooms[p->roomID].mSockID));
-		ZeroMemory(mRooms[p->roomID].mGrade, sizeof(mRooms[p->roomID].mGrade));
-		mRooms[p->roomID].mUserNum = 0;
-		mRooms[p->roomID].mGradeAvg = 0;
-		mRooms[p->roomID].mUpdateCount = 0;
-		mRooms[p->roomID].mStateLock.unlock();
+		RoomReset(p->roomID);
 		break;
 	}
 	case GL_PLAYER_RESULT:
 	{
 		GL_PLAYER_RESULT_PACKET* p = reinterpret_cast<GL_PLAYER_RESULT_PACKET*>(spacket);
-		for (int i = 0; i < mRooms[p->roomID].mUserNum; i++)
-		{
-			if (mRooms[p->roomID].mUID[i] == p->uID)
-			{
-				if (mClients[mRooms[p->roomID].mSockID[i]].mUID == mRooms[p->roomID].mUID[i]) // player connected lobby server
-				{
-					double GradePerRank;
-					if (p->retire == true)
-					{
-						GradePerRank = -5;
-					}
-					else
-					{
-						GradePerRank = GRADE_FOR_SCORE[mRooms[p->roomID].mUserNum - MIN_USER][p->rank - 1]; // 등수 가중치
-					}
-					
-					double GAP = mRooms[p->roomID].mGradeAvg - mClients[mRooms[p->roomID].mSockID[i]].mGrade;
-					if (GAP < -4)
-					{
-						GAP = -4;
-					}
-					double temp = mRooms[p->roomID].mUserNum * GRADE_CON_NUM * (GradePerRank + GAP);
-					if (temp < 0)
-					{
-						temp *= mClients[mRooms[p->roomID].mSockID[i]].mGrade / 5;
-					}
-					mClients[mRooms[p->roomID].mSockID[i]].mStateLock.lock();
-					mClients[mRooms[p->roomID].mSockID[i]].mGrade += temp;
-					mClients[mRooms[p->roomID].mSockID[i]].mState = eSessionState::ST_LOBBY;
-					mClients[mRooms[p->roomID].mSockID[i]].mStateLock.unlock();
-					// to db server update
-					LD_UPDATE_GRADE_PACKET packet;
-					packet.grade = mClients[mRooms[p->roomID].mSockID[i]].mGrade;
-					packet.uid = mClients[mRooms[p->roomID].mSockID[i]].mUID;
-					packet.size = sizeof(LD_UPDATE_GRADE_PACKET);
-					packet.type = LD_UPDATE_GRADE;
-					mServers[0].DoSend(&packet);
-
-
-					SendMatchResult(mRooms[p->roomID].mSockID[i], p->rank, 0);
-
-					mRooms[p->roomID].mUpdateCount++;
-					DEBUGMSGONEPARAM("[%d]플레이어의 점수 ", packet.uid);
-					DEBUGMSGONEPARAM("[%f] 로비안끊김\n", packet.grade);
-					break;
-				}
-				else // player disconnected lobby server
-				{
-					double GradePerRank = GRADE_FOR_SCORE[mRooms[p->roomID].mUserNum - MIN_USER][p->rank - 1]; // 등수 가중치
-					if (p->retire = true)
-					{
-						GradePerRank = -5;
-					}
-					double GAP = mRooms[p->roomID].mGradeAvg - mRooms[p->roomID].mGrade[i];
-					if (GAP < -4)
-					{
-						GAP = -4;
-					}
-					double temp = mRooms[p->roomID].mUserNum * GRADE_CON_NUM * (GradePerRank + GAP);
-					if (temp < 0)
-					{
-						temp *= mRooms[p->roomID].mGrade[i] / 5;
-					}
-					// to db server update
-					LD_UPDATE_GRADE_PACKET packet;
-					packet.grade = mRooms[p->roomID].mGrade[i];
-					packet.uid = mRooms[p->roomID].mUID[i];
-					packet.size = sizeof(LD_UPDATE_GRADE_PACKET);
-					packet.type = LD_UPDATE_GRADE;
-					mServers[0].DoSend(&packet);
-					mRooms[p->roomID].mUpdateCount++;
-					DEBUGMSGONEPARAM("[%d]플레이어의 점수 ", packet.uid);
-					DEBUGMSGONEPARAM("[%f] 로비 끊김\n", packet.grade);
-					break;
-				}
-			}
-		}
+		SendPlayerResult(p->uID, p->roomID, p->retire, p->rank);
 		break;
 	}
 	case DL_LOGIN_OK:
@@ -334,14 +159,7 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		mClients[p->userKey].mState = eSessionState::ST_LOBBY;
 		mClients[p->userKey].mStateLock.unlock();
 
-		LC_LOGIN_OK_PACKET pac;
-		pac.type = LC_LOGIN_OK;
-		pac.size = sizeof(LC_LOGIN_OK_PACKET);
-		pac.id = p->userKey;
-		pac.RoomID = 0;
-		pac.UID = mClients[p->userKey].mUID;
-
-		mClients[p->userKey].DoSend(&pac);
+		SendLoginOK(p->userKey);
 
 		break;
 	}
@@ -711,7 +529,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 		// half room max
 		system_clock::time_point tTime = system_clock::now();
 		mHighListLock.lock();
-		if (mMatchListHighTier.size() >= MAX_ROOM_USER / 2) // high list
+		if (mMatchListHighTier.size() >= MAX_ROOM_USER / 2 && mMatchListHighTier.size() < MAX_ROOM_USER) // high list
 		{
 			if (tTime - mClients[mMatchListHighTier.front()].mMatchStartTime >= milliseconds(20000))
 				{
@@ -748,7 +566,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 		}
 		mHighListLock.unlock();
 		mLowListlock.lock();
-		if (mMatchListLowTier.size() >= MAX_ROOM_USER / 2)
+		if (mMatchListLowTier.size() >= MAX_ROOM_USER / 2 && mMatchListLowTier.size() < MAX_ROOM_USER)
 		{
 			if (tTime - mClients[mMatchListLowTier.front()].mMatchStartTime >= milliseconds(20000))
 			{
@@ -789,7 +607,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 		EV_UpdateMatchPacket p;
 		p.size = sizeof(EV_UpdateMatchPacket);
 		p.type = eCompType::OP_EVENT;
-		pTimer->PushEvent(1, eEVENT_TYPE::EV_MATCH_UP, 5000, reinterpret_cast<unsigned char*>(&p));
+		pTimer->PushEvent(1, eEVENT_TYPE::EV_MATCH_UP, 1000, reinterpret_cast<unsigned char*>(&p));
 
 		break;
 	}
@@ -822,6 +640,58 @@ void Server::ProcessEvent(unsigned char* cmessage)
 	}
 }
 
+void Server::PlayerMatchIn(int cID)
+{
+	DEBUGMSGONEPARAM("[%s] 플레이어 매치 시작\n", mClients[cID].mID);
+	if (mClients[cID].mGrade > 3.5)
+	{
+		mMatchListHighTier.push_back(cID);
+		if (mMatchListHighTier.size() == MAX_ROOM_USER / 2)
+		{
+			mClients[mMatchListHighTier.front()].mMatchStartTime = system_clock::now();
+		}
+	}
+	else
+	{
+		mMatchListLowTier.push_back(cID);
+		if (mMatchListLowTier.size() == MAX_ROOM_USER / 2)
+		{
+			mClients[mMatchListLowTier.front()].mMatchStartTime = system_clock::now();
+		}
+	}
+	mClients[cID].mState = eSessionState::ST_MATCH;
+}
+
+void Server::PlayerMatchOut(int cID)
+{
+	DEBUGMSGONEPARAM("[%s] 플레이어 매치 아웃\n", mClients[cID].mID);
+	mMatchListHighTier.remove(cID);
+	mMatchListLowTier.remove(cID);
+	if (mMatchListHighTier.size() > MAX_ROOM_USER / 2)
+	{
+		mClients[mMatchListHighTier.front()].mMatchStartTime = system_clock::now();
+	}
+	if (mMatchListLowTier.size() > MAX_ROOM_USER / 2)
+	{
+		mClients[mMatchListLowTier.front()].mMatchStartTime = system_clock::now();
+	}
+	mClients[cID].mState = eSessionState::ST_LOBBY;
+}
+
+void Server::RoomReset(int roomID)
+{
+	DEBUGMSGONEPARAM("방[%d] 리셋", roomID);
+	mRooms[roomID].mStateLock.lock();
+	mRooms[roomID].mState = eRoomState::RS_FREE;
+	ZeroMemory(mRooms[roomID].mUID, sizeof(mRooms[roomID].mUID));
+	ZeroMemory(mRooms[roomID].mSockID, sizeof(mRooms[roomID].mSockID));
+	ZeroMemory(mRooms[roomID].mGrade, sizeof(mRooms[roomID].mGrade));
+	mRooms[roomID].mUserNum = 0;
+	mRooms[roomID].mGradeAvg = 0;
+	mRooms[roomID].mUpdateCount = 0;
+	mRooms[roomID].mStateLock.unlock();
+}
+
 void Server::CheckDuplicateLogin(int uid)
 {
 	int target = -1;
@@ -842,6 +712,120 @@ void Server::CheckDuplicateLogin(int uid)
 			Disconnect(target);
 		}
 	}
+}
+
+void Server::SendPlayerResult(int uID, int roomID, bool retire, int rank)
+{
+	for (int i = 0; i < mRooms[roomID].mUserNum; i++)
+	{
+		if (mRooms[roomID].mUID[i] == uID)
+		{
+			if (mClients[mRooms[roomID].mSockID[i]].mUID == mRooms[roomID].mUID[i]) // player connected lobby server
+			{
+				double GradePerRank;
+				if (retire == true)
+				{
+					GradePerRank = -5;
+				}
+				else
+				{
+					GradePerRank = GRADE_FOR_SCORE[mRooms[roomID].mUserNum - MIN_USER][rank - 1]; // 등수 가중치
+				}
+
+				double GAP = mRooms[roomID].mGradeAvg - mClients[mRooms[roomID].mSockID[i]].mGrade;
+				if (GAP < -4)
+				{
+					GAP = -4;
+				}
+				double temp = mRooms[roomID].mUserNum * GRADE_CON_NUM * (GradePerRank + GAP);
+				if (temp < 0)
+				{
+					temp *= mClients[mRooms[roomID].mSockID[i]].mGrade / 5;
+				}
+				mClients[mRooms[roomID].mSockID[i]].mStateLock.lock();
+				mClients[mRooms[roomID].mSockID[i]].mGrade += temp;
+				mRooms[roomID].mGrade[i] = mClients[mRooms[roomID].mSockID[i]].mGrade;
+				mClients[mRooms[roomID].mSockID[i]].mState = eSessionState::ST_LOBBY;
+				mClients[mRooms[roomID].mSockID[i]].mStateLock.unlock();
+				// to db server update
+				SendGameResult(roomID, i);
+				SendMatchResult(mRooms[roomID].mSockID[i], rank, 0);
+				DEBUGMSGONEPARAM("[%d]플레이어의 점수 ", mClients[mRooms[roomID].mSockID[i]].mUID);
+				DEBUGMSGONEPARAM("[%f] 로비안끊김\n", mClients[mRooms[roomID].mSockID[i]].mGrade);
+				break;
+			}
+			else // player disconnected lobby server
+			{
+				double GradePerRank = GRADE_FOR_SCORE[mRooms[roomID].mUserNum - MIN_USER][rank - 1]; // 등수 가중치
+				if (retire = true)
+				{
+					GradePerRank = -5;
+				}
+				double GAP = mRooms[roomID].mGradeAvg - mRooms[roomID].mGrade[i];
+				if (GAP < -4)
+				{
+					GAP = -4;
+				}
+				double temp = mRooms[roomID].mUserNum * GRADE_CON_NUM * (GradePerRank + GAP);
+				if (temp < 0)
+				{
+					temp *= mRooms[roomID].mGrade[i] / 5;
+				}
+				mRooms[roomID].mGrade[i] += temp;
+				// to db server update
+				SendGameResult(roomID, i);
+				DEBUGMSGONEPARAM("[%d]플레이어의 점수 ", mRooms[roomID].mUID[i]);
+				DEBUGMSGONEPARAM("[%f] 로비 끊김\n", mRooms[roomID].mGrade[i]);
+				break;
+			}
+		}
+	}
+}
+
+void Server::SendLogin(int key, char* id, char* pass)
+{
+	LD_LOGIN_PACKET pac;
+	pac.type = LD_LOGIN;
+	pac.size = sizeof(LD_LOGIN_PACKET);
+	pac.userKey = key;
+	memcpy(pac.id, id, sizeof(pac.id));
+	memcpy(pac.password, pass, sizeof(pac.password));
+	mServers[0].DoSend(&pac);
+}
+
+void Server::SendSignUp(int key, char* id, char* pass, char depart)
+{
+	LD_SIGNUP_PACKET sp;
+	sp.size = sizeof(sp);
+	sp.type = LD_SIGNUP;
+	sp.department = depart;
+	sp.userKey = key;
+	memcpy(sp.id, id, sizeof(sp.id));
+	memcpy(sp.password, pass, sizeof(sp.password));
+	mServers[0].DoSend(&sp);
+}
+
+void Server::SendGameResult(int roomID, int key)
+{
+	LD_UPDATE_GRADE_PACKET packet;
+	packet.grade = mRooms[roomID].mGrade[key];
+	packet.uid = mRooms[roomID].mUID[key];
+	packet.size = sizeof(LD_UPDATE_GRADE_PACKET);
+	packet.type = LD_UPDATE_GRADE;
+	mServers[0].DoSend(&packet);
+	
+}
+
+void Server::SendLoginOK(int cID)
+{
+	LC_LOGIN_OK_PACKET pac;
+	pac.type = LC_LOGIN_OK;
+	pac.size = sizeof(LC_LOGIN_OK_PACKET);
+	pac.id = cID;
+	pac.RoomID = 0;
+	pac.UID = mClients[cID].mUID;
+
+	mClients[cID].DoSend(&pac);
 }
 
 void Server::SendDiconnectPacketToGameServer(int key, int uid, int roomID)
@@ -880,4 +864,52 @@ void Server::SendSignUpFail(int key)
 	packet.size = sizeof(packet);
 	packet.type = LC_SIGNUP_FAIL;
 	mClients[key].DoSend(&packet);
+}
+
+void Server::SendMatchResponse(int roomID)
+{
+	LC_MATCH_RESPONSE_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = LC_MATCH_RESPONSE;
+	memcpy(packet.gameServerIP, SERVERIP, sizeof(packet.gameServerIP));
+	packet.gameServerPortNum = GAMESERVERPORT;
+
+	random_device rd;
+	mt19937_64 rng(rd());
+	uniform_int_distribution<int> rLevel(MIN_LEVEL, MAX_LEVEL);
+	int randomlevel = rLevel(rng);
+
+	packet.mapLevel = randomlevel;
+
+
+	int uidCount = 0;
+	double userGradeSum = 0;
+	mRooms[roomID].mStateLock.lock();
+	mRooms[roomID].mState = eRoomState::RS_INGAME;
+	mRooms[roomID].mStateLock.unlock();
+	mRooms[roomID].mRoomLevel = randomlevel;
+	DEBUGMSGONEPARAM("레벨[%d] 준비완\n", randomlevel);
+	vector<int> delPlayerVector;
+	for (auto& player : mReadytoGame)
+	{
+		if (mClients[player].mRoomID == roomID)
+		{
+			strcpy_s(packet.hashs, mClients[player].mHashs);
+			mClients[player].DoSend(&packet);
+			mClients[player].mState = eSessionState::ST_INGAME;
+			userGradeSum += mClients[player].mGrade;
+
+			mRooms[mClients[player].mRoomID].mUID[uidCount] = mClients[player].mUID;
+			mRooms[mClients[player].mRoomID].mSockID[uidCount] = player;
+			mRooms[mClients[player].mRoomID].mGrade[uidCount] = mClients[player].mGrade;
+			uidCount++;
+			delPlayerVector.push_back(player);
+		}
+	}
+	mRooms[roomID].mUserNum = uidCount;
+	mRooms[roomID].mGradeAvg = userGradeSum / uidCount;
+	for (auto player : delPlayerVector)
+	{
+		mReadytoGame.remove(player);
+	}
 }

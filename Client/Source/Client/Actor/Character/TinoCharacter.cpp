@@ -125,7 +125,8 @@ void ATinoCharacter::Tick(float DeltaTime)
 					//GroundSpeedd = ServerStoreGroundSpeed;
 					//Update Interpolation (23-09-27)
 					GetCharacterMovement()->Velocity = ServerCharMovingSpeed;
-					SetActorLocation(FMath::Lerp(GetActorLocation(), ServerLocateLerp, 0.5));
+					//SetActorLocation(FMath::Lerp(GetActorLocation(), ServerLocateLerp, 0.5));
+					//SetActorRotation(FMath::Lerp(GetTransform().GetRotation(), ServerRotateLerp, 0.5));
 				}
 				else {
 					if (Network::GetNetwork()->bGameIsStart)

@@ -18,8 +18,12 @@ void UAN_PlayFootStep::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBas
 	Super::Notify(MeshComp, Animation, EventReference);
 
 	auto TinoCharacter = Cast<ATinoCharacter>(MeshComp->GetOwner());
-	if (TinoCharacter && TinoCharacter->bIsSpactateModeEnabled == false)
+	if (TinoCharacter  && TinoCharacter->bIsSpactateModeEnabled == false)
 	{
-		ASoundManager::GetSoundManager()->PlaySFX(FootstepCue);
+		if(TinoCharacter->bIsPlaySelf && TinoCharacter->bIsControlledPlayer)
+			ASoundManager::GetSoundManager()->PlaySFX(FootstepCue);
+		else if (TinoCharacter->bIsPlaySelf == false)
+			ASoundManager::GetSoundManager()->PlaySFX(FootstepCue);
+
 	}
 }

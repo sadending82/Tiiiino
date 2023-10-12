@@ -28,7 +28,7 @@
 using namespace std;
 using namespace chrono;
 
-const static int MAX_TEST = 6;//1000;
+const static int MAX_TEST = 5;//1000;
 const static int MAX_CLIENTS = MAX_TEST * 2;
 const static int INVALID_ID = -1;
 const static int MAX_PACKET_SIZE = 255;
