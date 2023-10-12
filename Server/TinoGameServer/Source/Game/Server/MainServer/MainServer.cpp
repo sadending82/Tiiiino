@@ -430,7 +430,6 @@ void MainServer::SendAllBroadCast(void* buf, const int bufSize)
 
 void MainServer::SendRoomBroadCast(const int roomID, void* buf, const int bufSize)
 {
-	int tmp = 0;
 	if (roomID < 0)
 		return;
 	Room* pRoom = mRooms[roomID];
@@ -460,7 +459,7 @@ void MainServer::SendRoomBroadCast(const int roomID, void* buf, const int bufSiz
 void MainServer::SendRoomSomeoneExcept(const int roomID, const int exceptSocketID, void* buf, const int bufSize)
 {
 	Room* pRoom = mRooms[roomID];
-	auto objects = pRoom->GetObjectsRef();
+	auto& objects = pRoom->GetObjectsRef();
 	for (int i = 0; i < MAX_ROOM_USER; ++i)
 	{
 		Player* OtherPlayer = dynamic_cast<Player*>(objects[i]);
@@ -555,7 +554,8 @@ bool MainServer::setPlayerInRoom(Player* player, const char verification[MAX_NAM
 				}
 			}
 			else {
-				DEBUGMSGONEPARAM("플레이어가 방 매칭정보에 존재하지않음. [%d]번째플레이어\n", player->GetSocketID());
+				//DEBUGMSGONEPARAM("플레이어가 방 매칭정보에 존재하지않음. [%d]번째플레이어\n", player->GetSocketID());
+				continue;
 				return false;
 			}
 		}
@@ -624,7 +624,13 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 			break;
 		}
 
+		if (player->GetRoomID() < 0)
+		{
+			DEBUGMSGONEPARAM("[%d]플레이어 ID에서 버그. 접속 해제", player->GetSocketID());
+			player->DisConnectAndReset();
+			break;
 
+		}
 		Room* pRoom = mRooms[player->GetRoomID()];
 		pRoom->AddObject(player);
 		{
@@ -755,7 +761,7 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 		}
 		Room* pRoom = mRooms[player->GetRoomID()];
 		DEBUGMSGNOPARAM("TheGameIsWaitting\n");
-		cout << player->GetID() << endl;
+		//cout << player->GetID() << endl;
 		pRoom->PlayerCntIncrease();
 		//--
 		//if (pRoom->IsAllPlayerReady())
