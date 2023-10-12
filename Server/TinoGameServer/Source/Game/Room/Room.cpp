@@ -270,7 +270,7 @@ bool Room::SettingRoomPlayer(const sPlayerInfo& playerInfo, const int& playerMax
 {
 	int playerCnt = -1;
 	setPlayerInfoWithCnt(playerInfo, playerMaxNum, playerCnt);
-	printf("방에 들어오는중. 현재 인원[%d]명, 방넘버[%d], 넘어오는패킷 [%d]\n", playerCnt, mRoomID, playerMaxNum);
+	//printf("방에 들어오는중. 현재 인원[%d]명, 방넘버[%d], 넘어오는패킷 [%d]\n", playerCnt, mRoomID, playerMaxNum);
 	if (playerCnt == playerMaxNum)
 	{
 		mRoomStateLock.lock();
