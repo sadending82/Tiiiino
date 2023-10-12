@@ -655,13 +655,18 @@ void Server::PlayerMatchIn(int cID)
 void Server::PlayerMatchOut(int cID)
 {
 	DEBUGMSGONEPARAM("[%s] 플레이어 매치 아웃\n", mClients[cID].mID);
+	mHighListLock.lock();
 	mMatchListHighTier.remove(cID);
+	mHighListLock.unlock();
+	mLowListlock.lock();
 	mMatchListLowTier.remove(cID);
-	if (mMatchListHighTier.size() > MAX_ROOM_USER / 2)
+	mLowListlock.unlock();
+
+	if (mMatchListHighTier.size() >= MAX_ROOM_USER / 2 && mMatchListHighTier.size() < MAX_ROOM_USER)
 	{
 		mClients[mMatchListHighTier.front()].mMatchStartTime = system_clock::now();
 	}
-	if (mMatchListLowTier.size() > MAX_ROOM_USER / 2)
+	if (mMatchListLowTier.size() >= MAX_ROOM_USER / 2 && mMatchListLowTier.size() < MAX_ROOM_USER)
 	{
 		mClients[mMatchListLowTier.front()].mMatchStartTime = system_clock::now();
 	}
