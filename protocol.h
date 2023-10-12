@@ -54,6 +54,7 @@ enum PacketType {
 
 	// Client To LobbyServer
 	CL_LOGIN,
+	CL_LOGOUT,
 	CL_SIGNUP,
 	CL_MATCH,
 	CL_MATCH_OUT,
@@ -146,6 +147,10 @@ struct CS_GAME_BREAKPLATFORM_PACKET : public PACKET {
 struct CL_LOGIN_PACKET :public PACKET {
 	char id[MAX_NAME_SIZE];
 	char password[MAX_NAME_SIZE];
+};
+
+struct CL_LOGOUT_PACKET :public PACKET {
+
 };
 
 struct CL_SIGNUP_PACKET :public PACKET {

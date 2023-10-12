@@ -86,6 +86,16 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 		mServers[0].DoSend(&pac);
 		break;
 	}
+	case CL_LOGOUT: 
+	{
+		CL_LOGOUT_PACKET* p = reinterpret_cast<CL_LOGOUT_PACKET*>(cpacket);
+		LD_LOGOUT_PACKET pac;
+		pac.type = LD_LOGOUT;
+		pac.size = sizeof(LD_LOGOUT_PACKET);
+		pac.size = mClients[cID].mUID;
+		mServers[0].DoSend(&pac);
+		break;
+	}
 	case CL_SIGNUP:
 	{
 		CL_SIGNUP_PACKET* rp = reinterpret_cast<CL_SIGNUP_PACKET*>(cpacket);
