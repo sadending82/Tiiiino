@@ -229,6 +229,7 @@ void ATinoCharacter::MakeAndShowDialog()
 {
 	DialogWidget = CreateWidget<UDialogUIWidget>(GetWorld(), DialogWidgetClass);
 	DialogWidget->AddToViewport();
+	DialogWidget->RenderDisconnectNetworkWindow();
 }
 
 void ATinoCharacter::SetDepartmentClothes(int department)
