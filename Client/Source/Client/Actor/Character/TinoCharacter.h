@@ -106,7 +106,8 @@ public:
 
 	void MakeAndShowHUD();	
 
-	void MakeAndShowDialog();
+	void MakeAndShowDialogInLobby();
+	void MakeAndShowDialogInGame();
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 		void SetLoginUIInstance();

@@ -105,6 +105,7 @@ void Network::release()
 		for (auto& p : mObjects)
 			p = nullptr;
 		mObjectCnt = 0;
+		bGameEndFlag = false;
 		//shutdown(s_socket, SD_BOTH);
 		closesocket(s_socket);
 		_prev_size = 0;
@@ -218,7 +219,7 @@ void send_control_packet(SOCKET& sock)
 			{
 				Game->bIsConnectedLobby = false;
 				if (Game->mMyCharacter)
-					Game->mMyCharacter->MakeAndShowDialog();
+					Game->mMyCharacter->MakeAndShowDialogInLobby();
 			}
 		}
 	}
@@ -268,7 +269,7 @@ void send_move_packet(SOCKET& sock, const bool& inair, const float& x, const flo
 			{
 				Game->bIsConnected = false;
 				if (Game->mMyCharacter)
-					Game->mMyCharacter->MakeAndShowDialog();
+					Game->mMyCharacter->MakeAndShowDialogInGame();
 			}
 		}
 		else {
@@ -519,6 +520,7 @@ void Network::process_packet(unsigned char* p)
 	}
 	case SC_GAME_END: {
 		SC_GAME_END_PACKET* packet = reinterpret_cast<SC_GAME_END_PACKET*>(p);
+		bGameEndFlag = true;
 		closesocket(s_socket);
 		mMyCharacter->InGameWidgetInstance->ShowResultUI();
 
@@ -669,7 +671,7 @@ void CALLBACK recv_Gamecallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv
 	{
 		UE_LOG(LogTemp, Error, TEXT("[%d]"), err);
 		if (Game->mMyCharacter)
-			Game->mMyCharacter->MakeAndShowDialog();
+			Game->mMyCharacter->MakeAndShowDialogInGame();
 		Game->release();
 		return;
 	}
@@ -702,7 +704,7 @@ void CALLBACK recv_Lobbycallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED rec
 	{
 		UE_LOG(LogTemp, Error, TEXT("[%d]"), err);
 		if (Game->mMyCharacter)
-			Game->mMyCharacter->MakeAndShowDialog();
+			Game->mMyCharacter->MakeAndShowDialogInLobby();
 		Game->release();
 		return;
 	}
@@ -745,7 +747,7 @@ bool Network::RecvPacketGame()
 		{
 			//error ! 
 			UE_LOG(LogTemp, Error, TEXT("return false"));
-			mMyCharacter->MakeAndShowDialog();
+			mMyCharacter->MakeAndShowDialogInGame();
 			return false;
 		}
 		else {
@@ -771,7 +773,7 @@ bool Network::RecvPacketLobby()
 		{
 			//error ! 
 			UE_LOG(LogTemp, Error, TEXT("return false"));
-			mMyCharacter->MakeAndShowDialog();
+			mMyCharacter->MakeAndShowDialogInLobby();
 			return false;
 		}
 		else {
