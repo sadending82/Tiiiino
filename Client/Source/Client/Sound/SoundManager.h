@@ -30,11 +30,11 @@ UCLASS()
 class CLIENT_API ASoundManager : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	ASoundManager();
-public:	
+public:
 	UFUNCTION(BlueprintPure)
 		static ASoundManager* GetSoundManager() { return SoundManagerInstance; }
 
@@ -44,10 +44,19 @@ public:
 		void PlayBGM();
 
 	UFUNCTION(BlueprintCallable)
-		void PlaySFX(ESFXType Type);
+		void PlaySFX(ESFXType Type, FVector Location = FVector::ZeroVector);
 	//UFUNCTION(BlueprintCallable)
-		void PlaySFX(class USoundCue* Sound);
-public:
+	void PlaySFX(class USoundCue* Sound, FVector Location = FVector::ZeroVector);
+
+	UFUNCTION(BlueprintPure)
+	FORCEINLINE	 float GetBGMVolume() const { return BGMVolume; }
+	UFUNCTION(BlueprintPure)
+	FORCEINLINE	 float GetSFXVolume() const { return SFXVolume; }
+	UFUNCTION(BlueprintCallable)
+		void SetBGMVolume(const float Volume);
+	UFUNCTION(BlueprintCallable)
+		void SetSFXVolume(const float Volume);
+
 
 
 private:
@@ -59,6 +68,11 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Sound")
 		class USoundCue* MainBGM;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Sound")
+		float BGMVolume;
+	UPROPERTY(EditDefaultsOnly, Category = "Sound")
+		float SFXVolume;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Sound")
 		TMap<EBGMType, USoundCue*> BGMSoundMap;
