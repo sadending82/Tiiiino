@@ -43,6 +43,7 @@ enum class EDepartment : uint8
 	EDepartment_EnergyElec UMETA(DisplayName = "EnergyElec"),
 	EDepartment_Bussiness UMETA(DisplayName = "Bussiness"),
 	EDepartment_Design UMETA(DisplayName = "Design"),
+	EDepartment_Staff UMETA(DisplayName = "Staff"),
 	EDepartment_MAX UMETA(DisplayName = "DefaultMAX")
 };
 
