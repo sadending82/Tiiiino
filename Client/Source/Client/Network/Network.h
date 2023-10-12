@@ -105,10 +105,12 @@ public:
 	int mGeneratedID;
 	bool bLevelOpenTriggerEnabled = false;	//게임종료로 인한 초기화가 아닌, OpenLevel로 인한 초기화 일때 제한을 걸기 위함. 
 	bool bLoginFlag = false;	//로그인시 true, Game한판이 끝나고 다시 로비로 돌아올 때 
+	bool bGameEndFlag = false;	//게임한판이 끝났을 때, 게임서버랑 closesocket을 해주는데, 이로 인해서 네트워크연결끊김이 뜨지않게 하기 위함.
 	//Flag가 true라면 로그인 창을 띄우지 않기 위해서 있는 트릭.
 	short GameServerPort = -1;		//게임서버 접속용 port
 	sGameResult GameResult;
 	int RecentLevelNum = -1;
+
 private:
 	bool isInit;
 	int mObjectCnt = 0;

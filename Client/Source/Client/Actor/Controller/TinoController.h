@@ -53,6 +53,7 @@ public:
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	UUserWidget* GetCurrentWidget() { return CurrentWidget; }
 
+	bool bIsLobbyConnected = false;
 public:
 	// Network Disconnect
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")

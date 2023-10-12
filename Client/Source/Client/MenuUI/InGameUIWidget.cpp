@@ -139,6 +139,12 @@ void UInGameUIWidget::LevelClearCountdown()
 	}
 }
 
+void UInGameUIWidget::LevelClear()
+{
+	RestTimeBorder->SetRenderOpacity(0.0);
+	GameTimeText->SetRenderOpacity(0.0);
+}
+
 void UInGameUIWidget::TimerTextChange(int RestGameTime, ETimerType Type)
 {
 	if (Type == ETimerType::ETT_LevelClear)
