@@ -3,8 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include <array>
 #include "Blueprint/UserWidget.h"
 #include "FinishGameUIWidget.generated.h"
+
+
 
 /**
  * 
@@ -25,7 +28,7 @@ public:
 	void EnterLobby();
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	void ShowResult(int rank, double grade, int point);
+	void ShowResult(int level, int rank, double grade, int point);
 
 
 	UPROPERTY(meta = (BindWidget))
@@ -40,6 +43,7 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UEditableText* EditPointText;
 
+	std::array<FString, 7 + 1> MapNameArray;
 
 private:
 	UPROPERTY(EditAnywhere, Category = "UMG_Game")

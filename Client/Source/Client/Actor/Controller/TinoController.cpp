@@ -131,12 +131,12 @@ void ATinoController::DisconnectNetwork()
 	}
 }
 
-void ATinoController::ShowGameResult(int rank, double grade, int point)
+void ATinoController::ShowGameResult(int level, int rank, double grade, int point)
 {
 	FinishGameUI = Cast<UFinishGameUIWidget>(CreateWidget(GetWorld(), FinishGameUIClass));
 	if (!!FinishGameUI)
 	{
-		FinishGameUI->ShowResult(rank, grade, point);
+		FinishGameUI->ShowResult(level, rank, grade, point);
 		FinishGameUI->AddToViewport();
 	}
 }

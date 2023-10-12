@@ -6,6 +6,7 @@
 
 void UFinishGameUIWidget::NativePreConstruct()
 {
+
 }
 
 void UFinishGameUIWidget::NativeDestruct()
@@ -20,10 +21,20 @@ void UFinishGameUIWidget::EnterLobby()
 	RemoveFromParent();
 }
 
-void UFinishGameUIWidget::ShowResult(int rank, double grade, int point)
+void UFinishGameUIWidget::ShowResult(int level, int rank, double grade, int point)
 {
+
+	MapNameArray[0] = L"None";
+	MapNameArray[1] = L"티노 동산";
+	MapNameArray[2] = L"신비한 티노의 정원";
+	MapNameArray[3] = L"무의 정원";
+	MapNameArray[4] = L"빙글빙글돌아가는맷돌";
+	MapNameArray[5] = L"티노의 우주여행";
+	MapNameArray[6] = L"떨어지면 망함";
+	MapNameArray[7] = L"몰?루";
+
 	// 맵 이름 입력
-	CurrentStage = L"[맵 이름]";	// 맵 이름 입력
+	CurrentStage = MapNameArray[level];	// 맵 이름 입력
 	FText CurrentStageText = FText::FromString(CurrentStage);
 	EditSTAGEText->SetText(CurrentStageText);
 

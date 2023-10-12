@@ -108,6 +108,7 @@ public:
 	//Flag가 true라면 로그인 창을 띄우지 않기 위해서 있는 트릭.
 	short GameServerPort = -1;		//게임서버 접속용 port
 	sGameResult GameResult;
+	int RecentLevelNum = -1;
 private:
 	bool isInit;
 	int mObjectCnt = 0;
@@ -135,8 +136,8 @@ public:
 	bool RecvPacketGame() ;
 	bool RecvPacketLobby();
 	// 112.152.55.49  127.0.0.1  , 112.153.53.142
-	const char* GAMESERVER_ADDR = "127.0.0.1";
-	const char* LOBBYSERVER_ADDR = "127.0.0.1";
+	const char* GAMESERVER_ADDR = "58.125.39.92";
+	const char* LOBBYSERVER_ADDR = "58.125.39.92";
 };
 
 
