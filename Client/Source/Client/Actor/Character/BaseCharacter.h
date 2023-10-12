@@ -39,7 +39,8 @@ public:
 	bool bIsConnected;	//임시 변수
 	float ServerSyncSpeed;	//서버 동기화용 애니메이션 스피드.
 	FVector ServerCharMovingSpeed;	//서버 동기화 움직임 보간처리용 변수
-
+	FVector ServerLocateLerp;		//서버 동기화 pos 보간
+	FQuat ServerRotateLerp;		//서버 동기화 rot 보간
 	bool bIsControlledPlayer = true;		//껍데기인지 플레이어인지 구분하는 변수(네트워크 종료를 위함) 껍데기는 false, 기본은 true
 
 };

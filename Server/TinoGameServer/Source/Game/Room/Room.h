@@ -29,6 +29,8 @@ public:
 	bool IsRoomReady();
 	bool IsRoomReadyComplete();
 	bool IsAllPlayerReady();
+	void RoomStartForce();
+	bool IsRoomStartForce();
 	void SetRoomEnd();
 	//이 함수는 락을 걸고 사용해야함.
 	eRoomState GetRoomState() const { return mRoomState; }

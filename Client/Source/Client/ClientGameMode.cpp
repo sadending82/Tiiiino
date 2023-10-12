@@ -2,7 +2,9 @@
 
 #include "ClientGameMode.h"
 #include "ClientCharacter.h"
-#include "UObject/ConstructorHelpers.h"
+#include "Global.h"
+
+#include "Sound/SoundManager.h"
 
 AClientGameMode::AClientGameMode()
 {
@@ -12,4 +14,22 @@ AClientGameMode::AClientGameMode()
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
+
+	//ASoundManager::GetSoundManager()->PlayBGM();
+}
+
+void AClientGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+	GetWorld()->SpawnActor<ASoundManager>(SoundMangerClass);
+	EBGMType LevelType;
+
+	if (UGameplayStatics::GetCurrentLevelName(GetWorld()) == "Lobby")
+		LevelType = EBGMType::EBGMType_Lobby;
+	else
+		LevelType = EBGMType::EBGMType_Race;
+
+	ASoundManager::GetSoundManager()->SetBGM(LevelType);
+	ASoundManager::GetSoundManager()->PlayBGM();
+	
 }

@@ -2,6 +2,7 @@
 
 
 #include "Actor/Obstacles/AcceleratePlate.h"
+#include "Actor/Character/TinoCharacter.h"
 #include "Global.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -37,17 +38,18 @@ void AAcceleratePlate::BeginPlay()
 
 void AAcceleratePlate::NotifyActorBeginOverlap(AActor* OtherActor)
 {
-	ACharacter* MyCharacter = Cast<ACharacter>(OtherActor);
+	ATinoCharacter* MyCharacter = Cast<ATinoCharacter>(OtherActor);
 	if (MyCharacter != nullptr)
 	{
 		bIsAccelerationOn = true;
 		MyCharacter->GetCharacterMovement()->MaxWalkSpeed = AccelSpeed;
+		MyCharacter->OnAccelEffect();
 	}
 }
 
 void AAcceleratePlate::NotifyActorEndOverlap(AActor* OtherActor)
 {
-	ACharacter* MyCharacter = Cast<ACharacter>(OtherActor);
+	ATinoCharacter* MyCharacter = Cast<ATinoCharacter>(OtherActor);
 	if (MyCharacter != nullptr)
 	{
 		bIsAccelerationOn = false;
@@ -77,6 +79,8 @@ void AAcceleratePlate::NotifyActorEndOverlap(AActor* OtherActor)
 		if (!bIsSomeoneAccelOn)
 		{
 			MyCharacter->GetCharacterMovement()->MaxWalkSpeed = BaseSpeed;
+			MyCharacter->OffAccelEffect();
+
 		}
 	}
 }

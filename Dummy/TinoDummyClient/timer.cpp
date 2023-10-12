@@ -9,6 +9,8 @@ void Timer::Init(HANDLE cHCP)
 	swap(mTimerQueue, empty_queue);
 
 	mIsRun = TRUE;
+
+	timer_thread = (thread(&Timer::TimerMain, this));
 }
 
 void Timer::PushEvent(int ckey, eEVENT_TYPE ceventType, int cdelayStartTime)

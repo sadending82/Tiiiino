@@ -48,6 +48,8 @@ public:
 
 	void DisconnectDB();
 
+	void CreateDummyAccount(int count);
+
 private:
 	MYSQL		mConn;
 	MYSQL_STMT* mStmt;

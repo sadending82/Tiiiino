@@ -26,7 +26,7 @@ Room::Room(int id)
 
 Room::~Room()
 {
-	for (auto object : mObjects)
+	for (auto& object : mObjects)
 	{
 		delete object;
 		object = nullptr;
@@ -59,10 +59,9 @@ void Room::RemovePlayer(Player* player)
 	for (int i = 0; i < MAX_ROOM_USER; ++i)
 	{
 		Player* p = dynamic_cast<Player*>(mObjects[i]);
-		if (!p) break;
+		if (!p) continue;
 		if (p->GetSocketID() == player->GetSocketID())
 		{
-			RemovePlayerInfo(p->GetUID());
 			mObjects[i] = nullptr;
 			return;
 		}
@@ -74,7 +73,7 @@ void Room::DisablePlayer(Player* player)
 	for (int i = 0; i < MAX_ROOM_USER; ++i)
 	{
 		Player* p = dynamic_cast<Player*>(mObjects[i]);
-		if (!p) break;
+		if (!p) continue;
 		if (p->GetSocketID() == player->GetSocketID())
 		{
 			//player socket state는 disconnect을 먼저 하면서 free로 바뀜.
@@ -88,6 +87,7 @@ void Room::DisablePlayer(Player* player)
 void Room::ResetGameRoom()
 {
 
+	DEBUGMSGONEPARAM("방 리셋 락 전 [%d]\n", mRoomID);
 	mRoomStateLock.lock();
 	if (mRoomState == eRoomState::ST_CLOSED)
 	{
@@ -98,19 +98,21 @@ void Room::ResetGameRoom()
 		mRoomStateLock.unlock();
 		return;
 	}
-	for (auto object : mObjects)
+	DEBUGMSGONEPARAM("방 리셋 불림 [%d]\n", mRoomID);
+	for (auto& object : mObjects)
 	{
 		if (!object) continue;
 		Player* player = dynamic_cast<Player*>(object);
 		if (player)
 		{
-			player->DisConnectAndReset();
+			player->DisConnectAndResetUseInRoom();
 		}
 		else {
 			object->Reset();
 		}
 		object = nullptr;
 	}
+	DEBUGMSGONEPARAM("애들 다 내보냄 [%d]\n", mRoomID);
 	mRoomStageKindof = eRoomStage::ST_AVOID;
 	mPlayerInfo.clear();
 	mPlayerSettingCnt = 0;
@@ -121,7 +123,9 @@ void Room::ResetGameRoom()
 	mGameEndTimer = false;
 	mGameStartTimer = false;
 
+
 	gMainServer->send_room_reset_packet(mRoomID);
+	DEBUGMSGONEPARAM("패킷까지 다 보냄 [%d]\n", mRoomID);
 }
 
 std::mutex& Room::GetRoomStateLockRef()
@@ -156,12 +160,13 @@ bool Room::IsRoomReadyComplete()
 bool Room::IsAllPlayerReady()
 {
 	mRoomReadyLock.lock();
-	if (mPlayerCnt != mPlayerMax) {
+	if (mPlayerCnt < mPlayerMax) {
 		mRoomReadyLock.unlock();
 		return false;
 	}
 	mRoomReadyLock.unlock();
 
+	DEBUGMSGONEPARAM("방 시작[%d]\n", mRoomID);
 	mRoomStateLock.lock();
 	if (mRoomState == eRoomState::ST_READY_COMPLETE)
 	{
@@ -176,17 +181,67 @@ bool Room::IsAllPlayerReady()
 
 }
 
+void Room::RoomStartForce()
+{
+	mRoomStateLock.lock();
+	if (mRoomState == eRoomState::ST_READY_COMPLETE)
+	{
+		mRoomState = eRoomState::ST_INGAME;
+		mRoomStateLock.unlock();
+	}
+	else {
+		mRoomStateLock.unlock();
+	}
+
+	mRoomReadyLock.lock();
+	mPlayerMax = mPlayerCnt.load();
+	mRoomReadyLock.unlock();
+}
+
+bool Room::IsRoomStartForce()
+{
+
+	mRoomReadyLock.lock();
+	if (mPlayerMax == mPlayerCnt)
+	{
+		mRoomReadyLock.unlock();
+		//이미 방이 시작한 상태.
+		return true;
+	}
+	mRoomReadyLock.unlock();
+	return false;
+}
+
 void Room::SetRoomEnd()
 {
 	mRoomStateLock.lock();
-	mRoomState = eRoomState::ST_CLOSED;	//곧 리셋 될 방.
-	mRoomStateLock.unlock();
+	if (mRoomState == eRoomState::ST_INGAME)
+	{
+		mRoomState = eRoomState::ST_CLOSED;	//곧 리셋 될 방.
+		mRoomStateLock.unlock();
+		return;
+	}
+	else {
+		mRoomStateLock.unlock();
+		return;
+	}
+
 }
 
 
 void Room::PlayerCntIncrease()
 {
+	mRoomReadyLock.lock();
 	mPlayerCnt++;
+
+	// 이 코드는 Force Start때 늦게 들어온 플레이어가
+	// Increase 할 때, Cnt가 Max보다 높으면 생기는
+	// Goal이 Max만큼만 해주니까 Cnt에서 Max뺀 만큼 타이머끝나기전에 껨 끝나는,,, 불상사를 방지하기 위한 코드
+	if (mPlayerMax < mPlayerCnt)
+	{
+		mPlayerMax = mPlayerCnt.load();
+	}
+	mRoomReadyLock.unlock();
 }
 
 void Room::PlayerMaxDecrease()
@@ -194,7 +249,8 @@ void Room::PlayerMaxDecrease()
 	mPlayerMax--;
 	if (mPlayerMax <= 0)
 	{
-		TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_RESET, eEventType::TYPE_TARGET, ROOM_RESET_TIME, 0, mRoomID);
+		DEBUGMSGONEPARAM("방 에누군가 나감 방이 끝남.[%d]\n", mRoomID);
+		TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_END, eEventType::TYPE_TARGET, 0, 10, mRoomID);
 	}
 }
 
@@ -214,12 +270,13 @@ bool Room::SettingRoomPlayer(const sPlayerInfo& playerInfo, const int& playerMax
 {
 	int playerCnt = -1;
 	setPlayerInfoWithCnt(playerInfo, playerMaxNum, playerCnt);
+	printf("방에 들어오는중. 현재 인원[%d]명, 방넘버[%d], 넘어오는패킷 [%d]\n", playerCnt, mRoomID, playerMaxNum);
 	if (playerCnt == playerMaxNum)
 	{
 		mRoomStateLock.lock();
 		if (mRoomState == eRoomState::ST_READY || mRoomState == eRoomState::ST_FREE)
 		{
-			DEBUGMSGONEPARAM("방 준비 완료. 현재 대기 인원[%d]명", mPlayerInfo.size());
+			DEBUGMSGONEPARAM("방 준비 완료. 현재 대기 인원[%d]명\n", mPlayerInfo.size());
 			mRoomState = eRoomState::ST_READY_COMPLETE;
 			mRoomStateLock.unlock();
 			return true;
@@ -300,6 +357,7 @@ void Room::PlayerArrive(Player* player)
 
 void Room::AllPlayerArrived()
 {
+	DEBUGMSGONEPARAM("설마 AllPlayerArrive에서? [%d]\n", mRoomID);
 	TimerThread::MakeTimerEventMilliSec(eCOMMAND_IOCP::CMD_GAME_END, eEventType::TYPE_BROADCAST_ROOM, 0, NULL, mRoomID);
 }
 
@@ -400,7 +458,7 @@ bool Room::IsGameEndOnce()
 	bool expect = 0;
 	if (std::atomic_compare_exchange_strong(reinterpret_cast<std::atomic_bool*>(&mGameEndFlag), &expect, 1))
 	{
-		DEBUGMSGNOPARAM("게임 끝 한 번 실행되야함\n");
+		DEBUGMSGONEPARAM("게임 끝 한 번 실행되야함 [%d]\n", mRoomID);
 		return true;
 	}
 	return false;

@@ -17,6 +17,8 @@ int main(int argc, char* argv[])
 	pSocket->Setm_pDB(pDB);
 #endif
 
+	//pDB->CreateDummyAccount(200);
+
 	pSocket->ServerReady();
 
 #ifdef RUN_DB

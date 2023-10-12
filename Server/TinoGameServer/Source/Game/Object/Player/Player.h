@@ -12,6 +12,7 @@ public:
     ~Player();
 
     void DisConnectAndReset();
+    void DisConnectAndResetUseInRoom();
     virtual void DisConnect() override;
     virtual void Reset() override;
     virtual bool RecvPacket() override;
