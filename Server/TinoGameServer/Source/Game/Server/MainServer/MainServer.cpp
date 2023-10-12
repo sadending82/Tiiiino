@@ -831,6 +831,11 @@ void MainServer::ProcessPacketLobby(const int serverID, unsigned char* p)
 
 		break;
 	}
+	case LG_USER_DISCONNECT: {
+		LG_USER_DISCONNECT_PACKET* packet = reinterpret_cast<LG_USER_DISCONNECT_PACKET*>(p);
+		
+		break;
+	}
 	default:
 		break;
 	}
