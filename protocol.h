@@ -11,6 +11,7 @@ constexpr int MAX_USER = 300;
 constexpr int MAX_OBJECT = 3000;
 constexpr int MAX_NAME_SIZE = 36 + 1;	//닉네임, 중복검사 X
 constexpr int MAX_ROOM_USER = 8;
+constexpr int MAX_VERSION_SIZE = 10;
 
 // Object Event Time
 constexpr int DELAY_TIME_EXEC_BREAKDOOR = 1000;
@@ -53,6 +54,7 @@ enum PacketType {
 
 	// Client To LobbyServer
 	CL_LOGIN,
+	CL_LOGOUT,
 	CL_SIGNUP,
 	CL_MATCH,
 	CL_MATCH_OUT,
@@ -145,6 +147,11 @@ struct CS_GAME_BREAKPLATFORM_PACKET : public PACKET {
 struct CL_LOGIN_PACKET :public PACKET {
 	char id[MAX_NAME_SIZE];
 	char password[MAX_NAME_SIZE];
+	char gameVersion[MAX_VERSION_SIZE];
+};
+
+struct CL_LOGOUT_PACKET :public PACKET {
+
 };
 
 struct CL_SIGNUP_PACKET :public PACKET {

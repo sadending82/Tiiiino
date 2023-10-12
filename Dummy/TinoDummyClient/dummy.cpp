@@ -385,6 +385,7 @@ void Adjust_Number_Of_Client()
 	sPacket.type = CL_LOGIN;
 	sprintf_s(sPacket.id, "%d", temp);
 	sprintf_s(sPacket.password, "%d", temp);
+	strcpy_s(sPacket.gameVersion, GAMEVERSION);
 	SendPacketToLobby(num_connections, &sPacket);
 
 	int ret = WSARecv(g_clients[num_connections].l_client_socket, &g_clients[num_connections].l_recv_over.wsabuf, 1,
@@ -450,7 +451,7 @@ void Test_Thread()
 
 void MoveWorker()
 {
-	for (int i = 0; i < num_connections; ++i) {
+	for (int i = START_CLIENT; i < num_connections; ++i) {
 		if (false == g_clients[i].connected) continue;
 		if (false == g_clients[i].bCanMove) continue;
 		//60프레임으로 움직임 보내기.
@@ -468,7 +469,7 @@ void InitializeNetwork()
 	}
 
 	for (auto& cl : client_map) cl = -1;
-	num_connections = 0;
+	num_connections = START_CLIENT;
 	last_connect_time = high_resolution_clock::now();
 
 	WSADATA	wsadata;
@@ -500,7 +501,7 @@ void Do_Network()
 void GetPointCloud(int* size, float** points)
 {
 	int index = 0;
-	for (int i = 0; i < num_connections; ++i)
+	for (int i = START_CLIENT; i < num_connections; ++i)
 		if (true == g_clients[i].connected) {
 			point_cloud[index * 2] = static_cast<float>(g_clients[i].x);
 			point_cloud[index * 2 + 1] = static_cast<float>(g_clients[i].y);
