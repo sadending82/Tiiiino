@@ -18,13 +18,28 @@ public:
 	void DoWorker();
 	void Init();
 	void ProcessEvent(unsigned char* cmessage);
+	void PlayerMatchIn(int cID);
+	void PlayerMatchOut(int cID);
+	void RoomReset(int roomID);
 
 	void CheckDuplicateLogin(int uid);
+
+
+	void SendPlayerResult(int uID, int roomID, bool retire, int rank);
+
+	// lobby to db
+	void SendLogin(int key, char* id, char* pass);
+	void SendSignUp(int key, char* id, char* pass, char depart);
+	void SendGameResult(int roomID, int key);
+
+
+	void SendLoginOK(int cID);
 
 	void SendDiconnectPacketToGameServer(int key, int uid, int roomID);
 	void SendMatchResult(int key, int rank, int point);
 	void SendSignUpOK(int key);
 	void SendSignUpFail(int key);
+	void SendMatchResponse(int roomID);
 public:
 	array <Session, MAX_USER> mClients;
 	array <Session, MAXGAMESERVER> mServers;
