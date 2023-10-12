@@ -43,6 +43,7 @@ enum class EDepartment : uint8
 	EDepartment_EnergyElec UMETA(DisplayName = "EnergyElec"),
 	EDepartment_Bussiness UMETA(DisplayName = "Bussiness"),
 	EDepartment_Design UMETA(DisplayName = "Design"),
+	EDepartment_Staff UMETA(DisplayName = "Staff"),
 	EDepartment_MAX UMETA(DisplayName = "DefaultMAX")
 };
 
@@ -113,6 +114,16 @@ public:
 		void SetLoginUIInstance();
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 		void SetCreateAccountsInstance();
+
+	//Accessory
+
+	//소켓 이름과 메시를 정해줘야함
+	UFUNCTION(Blueprintcallable, Category = "Accessory")
+		void WearAccessory();
+
+	//임시 나중에 상점 생기면 수정할것
+	UPROPERTY(EditDefaultsOnly, Category = "Accessory")
+	TArray<TSubclassOf<class AAccessoryItem>> AccessoryInvetory;
 
 	//Getter & Setter
 	FORCEINLINE void SetMovementState(EMovementState State) { MovementState = State; }

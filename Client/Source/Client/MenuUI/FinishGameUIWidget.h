@@ -20,6 +20,8 @@ class CLIENT_API UFinishGameUIWidget : public UUserWidget
 public:
 	virtual void NativePreConstruct() override;
 	virtual void NativeDestruct() override;
+	virtual void NativeConstruct() override;
+
 
 	UPROPERTY(meta = (BindWidget))
 	class UButton* EnterLobbyButton;
