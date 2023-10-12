@@ -142,11 +142,12 @@ void ACustomLevel_Test::ShowGameResult()
 
 	if (!!TinoController)
 	{
+		int level = Network::GetNetwork()->RecentLevelNum;
 		int rank = Network::GetNetwork()->GameResult.rank;
 		double grade = Network::GetNetwork()->GameResult.grade;
 		int point = Network::GetNetwork()->GameResult.point;
 
-		TinoController->ShowGameResult(rank, grade, point);
+		TinoController->ShowGameResult(level, rank, grade, point);
 	}
 }
 

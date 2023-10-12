@@ -628,6 +628,7 @@ void Network::l_process_packet(unsigned char* p)
 		//게임서버 연결 코드 나중에 ip랑 포트넘버도 넘겨야함.
 		UE_LOG(LogTemp, Error, TEXT("Game Match Responed"));
 		string maplv{ "Level" };
+		RecentLevelNum = packet->mapLevel;
 		maplv += std::to_string(packet->mapLevel);
 		UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName(maplv.c_str()));
 		strcpy_s(hashs, packet->hashs);
