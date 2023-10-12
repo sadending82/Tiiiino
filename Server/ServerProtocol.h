@@ -7,6 +7,8 @@ constexpr int DBSERVERPORT = 3700;
 constexpr int MAXGAMESERVER = 2;
 constexpr int MAX_ROOM = 100;
 
+#define CHECK_VERSION
+constexpr const char* GAMEVERSION = "1.2.0";
 
 constexpr unsigned long long INCODE_SERVER_PACKET = 0xFFFF'5137'0808'6310;
 
@@ -100,6 +102,7 @@ struct LG_USER_DISCONNECT_PACKET : public SPACKET {
 struct LD_LOGIN_PACKET :public SPACKET {
 	char	id[MAX_NAME_SIZE];
 	char	password[MAX_NAME_SIZE];
+	char	gameVersion[MAX_VERSION_SIZE];
 	int		userKey;
 };
 

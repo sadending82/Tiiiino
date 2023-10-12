@@ -19,8 +19,8 @@ public:
 	void SetIsConnectDB(bool b) { bIsConnectDB = b; }
 	bool GetIsConnectDB() { return bIsConnectDB; }
 #endif
-
-	bool CheckLogin(int key, const char* id, const char* password, int userid);
+	bool CheckVersion(const char* version);
+	bool CheckLogin(int key, const char* id, const char* password, int userid, const char* version);
 	bool CheckValidString(const char* str);
 
 	void SendLoginOK(int key, int uid, string& nickname, const char* id, double grade

@@ -28,7 +28,7 @@ public:
 	void SendPlayerResult(int uID, int roomID, bool retire, int rank);
 
 	// lobby to db
-	void SendLogin(int key, char* id, char* pass);
+	void SendLogin(int key, char* id, char* pass, char* version);
 	void SendSignUp(int key, char* id, char* pass, char depart);
 	void SendGameResult(int roomID, int key);
 

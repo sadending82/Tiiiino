@@ -76,7 +76,7 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 	case CL_LOGIN:
 	{
 		CL_LOGIN_PACKET* p = reinterpret_cast<CL_LOGIN_PACKET*>(cpacket);
-		SendLogin(cID, p->id, p->password);
+		SendLogin(cID, p->id, p->password, p->gameVersion);
 		break;
 	}
 	case CL_LOGOUT: 
@@ -787,7 +787,7 @@ void Server::SendPlayerResult(int uID, int roomID, bool retire, int rank)
 	}
 }
 
-void Server::SendLogin(int key, char* id, char* pass)
+void Server::SendLogin(int key, char* id, char* pass, char* version)
 {
 	LD_LOGIN_PACKET pac;
 	pac.type = LD_LOGIN;
@@ -795,6 +795,7 @@ void Server::SendLogin(int key, char* id, char* pass)
 	pac.userKey = key;
 	memcpy(pac.id, id, sizeof(pac.id));
 	memcpy(pac.password, pass, sizeof(pac.password));
+	memcpy(pac.gameVersion, version, sizeof(pac.gameVersion));
 	mServers[0].DoSend(&pac);
 }
 

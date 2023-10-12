@@ -167,6 +167,7 @@ void send_login_packet(SOCKET& sock, const char* id, const char* passWord)
 	packet.type = CL_LOGIN;
 	strcpy_s(packet.id, id);
 	strcpy_s(packet.password, passWord);
+	strcpy_s(packet.gameVersion, GAMEVERSION);
 	//strcpy_s(packet.name, TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterName));
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
 	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
