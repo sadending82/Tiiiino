@@ -23,6 +23,13 @@ public:
 	class UTextBlock* GameTimeText;
 
 	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* RestTimeText;
+
+	UPROPERTY(meta = (BindWidget))
+	class UBorder* RestTimeBorder;
+
+
+	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* StartCountDownText;
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
