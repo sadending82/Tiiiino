@@ -9,7 +9,6 @@
 #include "CoreMinimal.h"
 
 constexpr const char* GAMEVERSION = "1.2.0";
-constexpr const int MAX_VERSION_SIZE = 10;
 
 
 struct sGameResult {
