@@ -7,6 +7,7 @@
 #include "Actor/Controller/TinoController.h"
 #include "Actor/Character/TinoCharacter.h"
 #include "MenuUI/InGameTimerWidget.h"
+#include "Components/Border.h"
 #include "Network/Network.h"
 
 #include "Global.h"
@@ -131,6 +132,8 @@ void UInGameUIWidget::LevelClearCountdown()
 	// 누군가 결승선을 통과했을 때 레벨을 끝내기까지 남은시간 카운트다운
 	if (!!InGameTimer)
 	{
+		//RestTimeText->SetRenderOpacity(1.0);
+		RestTimeBorder->SetRenderOpacity(1.0);
 		GameTimeText->SetRenderOpacity(1.0);
 		InGameTimer->TimerStart(ETimerType::ETT_LevelClear);
 	}

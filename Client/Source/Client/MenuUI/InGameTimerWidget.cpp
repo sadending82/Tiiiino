@@ -28,7 +28,7 @@ void UInGameTimerWidget::TimerStart(ETimerType Type)
 			InGameUI = Network::GetNetwork()->mMyCharacter->InGameWidgetInstance;
 			if (Type == ETimerType::ETT_LevelClear)
 			{
-				RestGameTime = 20;
+				RestGameTime = 19;
 			}
 			else if (Type == ETimerType::ETT_LevelStart)
 			{
