@@ -179,9 +179,22 @@ void Socket::processPacket(int key, unsigned char* buf)
     }
 }
 
-// DB
-bool Socket::CheckLogin(int key, const char* id, const char* password, int userKey)
+bool Socket::CheckVersion(const char* version)
 {
+    if (strcmp(GAMEVERSION, version) == 0) return true;
+
+    return false;
+}
+
+// DB
+bool Socket::CheckLogin(int key, const char* id, const char* password, int userKey, const char* version)
+{
+#ifdef CHECK_VERSION
+    if (CheckVersion(version) == false) {
+        return false;
+    }
+#endif
+
 #ifdef RUN_DB
     int res = Getm_pDB()->CheckVerifyUser(id, password);
     if (res == false) {
@@ -293,7 +306,7 @@ void Socket::ProcessPacket_Login(int key, unsigned char* buf)
         return;
     }
 #ifdef RUN_DB
-    bool bResult = CheckLogin(key, p->id, p->password, p->userKey);
+    bool bResult = CheckLogin(key, p->id, p->password, p->userKey, p->gameVersion);
     if (bResult == false) {
         SendLoginFail(key, p->userKey);
     }
