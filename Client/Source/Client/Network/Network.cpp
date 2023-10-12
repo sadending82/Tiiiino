@@ -105,6 +105,7 @@ void Network::release()
 		for (auto& p : mObjects)
 			p = nullptr;
 		mObjectCnt = 0;
+		bGameEndFlag = false;
 		//shutdown(s_socket, SD_BOTH);
 		closesocket(s_socket);
 		_prev_size = 0;
@@ -218,7 +219,7 @@ void send_control_packet(SOCKET& sock)
 			{
 				Game->bIsConnectedLobby = false;
 				if (Game->mMyCharacter)
-					Game->mMyCharacter->MakeAndShowDialog();
+					Game->mMyCharacter->MakeAndShowDialogInLobby();
 			}
 		}
 	}
@@ -268,7 +269,7 @@ void send_move_packet(SOCKET& sock, const bool& inair, const float& x, const flo
 			{
 				Game->bIsConnected = false;
 				if (Game->mMyCharacter)
-					Game->mMyCharacter->MakeAndShowDialog();
+					Game->mMyCharacter->MakeAndShowDialogInGame();
 			}
 		}
 		else {
@@ -519,8 +520,10 @@ void Network::process_packet(unsigned char* p)
 	}
 	case SC_GAME_END: {
 		SC_GAME_END_PACKET* packet = reinterpret_cast<SC_GAME_END_PACKET*>(p);
+		bGameEndFlag = true;
 		closesocket(s_socket);
-		mMyCharacter->InGameWidgetInstance->ShowResultUI();
+		mMyCharacter->InGameWidgetInstance->LevelClear();
+		mMyCharacter->InGameWidgetInstance->ShowResultUI(); //블프 delegate불러주는함수임.
 
 		break;
 	}
@@ -628,6 +631,7 @@ void Network::l_process_packet(unsigned char* p)
 		//게임서버 연결 코드 나중에 ip랑 포트넘버도 넘겨야함.
 		UE_LOG(LogTemp, Error, TEXT("Game Match Responed"));
 		string maplv{ "Level" };
+		RecentLevelNum = packet->mapLevel;
 		maplv += std::to_string(packet->mapLevel);
 		UGameplayStatics::OpenLevel(mMyCharacter->GetWorld(), FName(maplv.c_str()));
 		strcpy_s(hashs, packet->hashs);
@@ -668,7 +672,7 @@ void CALLBACK recv_Gamecallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv
 	{
 		UE_LOG(LogTemp, Error, TEXT("[%d]"), err);
 		if (Game->mMyCharacter)
-			Game->mMyCharacter->MakeAndShowDialog();
+			Game->mMyCharacter->MakeAndShowDialogInGame();
 		Game->release();
 		return;
 	}
@@ -701,7 +705,7 @@ void CALLBACK recv_Lobbycallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED rec
 	{
 		UE_LOG(LogTemp, Error, TEXT("[%d]"), err);
 		if (Game->mMyCharacter)
-			Game->mMyCharacter->MakeAndShowDialog();
+			Game->mMyCharacter->MakeAndShowDialogInLobby();
 		Game->release();
 		return;
 	}
@@ -744,7 +748,7 @@ bool Network::RecvPacketGame()
 		{
 			//error ! 
 			UE_LOG(LogTemp, Error, TEXT("return false"));
-			mMyCharacter->MakeAndShowDialog();
+			mMyCharacter->MakeAndShowDialogInGame();
 			return false;
 		}
 		else {
@@ -770,7 +774,7 @@ bool Network::RecvPacketLobby()
 		{
 			//error ! 
 			UE_LOG(LogTemp, Error, TEXT("return false"));
-			mMyCharacter->MakeAndShowDialog();
+			mMyCharacter->MakeAndShowDialogInLobby();
 			return false;
 		}
 		else {

@@ -15,18 +15,21 @@ ATinoController::ATinoController()
 void ATinoController::BeginPlay()
 {
 	Super::BeginPlay();
+	DialogUI = Cast<UDialogUIWidget>(CreateWidget(GetWorld(), DialogUIClass));
 	if (StartingWidgetClass != nullptr && UGameplayStatics::GetCurrentLevelName(GetWorld()) == "Lobby")
 	{
 		if (false == Network::GetNetwork()->bIsConnectedLobby)
 		{
-			ChangeMenuWidget(StartingWidgetClass);
+			if(bIsLobbyConnected)
+				ChangeMenuWidget(StartingWidgetClass);		
+			else 
+				DisconnectNetwork();
 		}
 		else {
 			SetInputUIMode();
 		}
 	}
 	//ChangeMenuWidget(StartingWidgetClass);
-	DialogUI = Cast<UDialogUIWidget>(CreateWidget(GetWorld(), DialogUIClass));
 	
 }
 
@@ -131,12 +134,12 @@ void ATinoController::DisconnectNetwork()
 	}
 }
 
-void ATinoController::ShowGameResult(int rank, double grade, int point)
+void ATinoController::ShowGameResult(int level, int rank, double grade, int point)
 {
 	FinishGameUI = Cast<UFinishGameUIWidget>(CreateWidget(GetWorld(), FinishGameUIClass));
 	if (!!FinishGameUI)
 	{
-		FinishGameUI->ShowResult(rank, grade, point);
+		FinishGameUI->ShowResult(level, rank, grade, point);
 		FinishGameUI->AddToViewport();
 	}
 }

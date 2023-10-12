@@ -25,7 +25,8 @@ void ACustomLevel_Test::BeginPlay() {
 	UClass* GeneratedCharacterBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *path.ToString()));
 	FTransform trans;
 	srand(time(NULL));
-	trans.SetRotation(trans.GetRotation() + FQuat(0, 0, 90, 0));
+	;
+	trans.SetRotation(FRotator(0, 90, 0).Quaternion());
 	mMyCharacterSpawnPosition.Y += (rand() % 10) * 10;
 	trans.SetLocation(trans.GetLocation() + mMyCharacterSpawnPosition);
 	auto mc1 = GetWorld()->SpawnActorDeferred<ATinoCharacter>(GeneratedCharacterBP, trans);
@@ -78,7 +79,7 @@ bool ACustomLevel_Test::ConnGameServer()
 			return true;
 		}
 		else {
-			player->MakeAndShowDialog();
+			player->MakeAndShowDialogInGame();
 			CLog::Log("Connect Fail!");
 		}
 	}
@@ -125,10 +126,14 @@ bool ACustomLevel_Test::ConnLobbyServer()
 	{
 		GetWorld()->GetFirstPlayerController<ATinoController>()->SetInputUIMode();
 		CLog::Log("Connect Lobby Successfully");
+		auto controller = Cast<ATinoController>(player->GetController());
+		if (!!controller)
+		{
+			controller->bIsLobbyConnected = true;
+		}
 		return true;
 	}
 	else {
-		player->MakeAndShowDialog();
 		CLog::Log("Connect Fail!");
 	}
 
@@ -142,11 +147,12 @@ void ACustomLevel_Test::ShowGameResult()
 
 	if (!!TinoController)
 	{
+		int level = Network::GetNetwork()->RecentLevelNum;
 		int rank = Network::GetNetwork()->GameResult.rank;
 		double grade = Network::GetNetwork()->GameResult.grade;
 		int point = Network::GetNetwork()->GameResult.point;
 
-		TinoController->ShowGameResult(rank, grade, point);
+		TinoController->ShowGameResult(level, rank, grade, point);
 	}
 }
 

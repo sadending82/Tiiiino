@@ -1,20 +1,24 @@
 ﻿#include "Actor/Character/TinoCharacter.h"
 #include "Actor/Controller/TinoController.h"
-#include "Sound/SoundManager.h"
-#include "Global.h"
-
-#include "Network/Network.h"
-#include "GameFramework/SpringArmComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "Actor/Character/CharacterAnimInstance.h"
-#include "Camera/CameraComponent.h"
-#include "Components/CapsuleComponent.h"
-#include "Animation/AnimMontage.h"
+#include "Actor/Accessory/AccessoryItem.h"
+#include "Sound/SoundManager.h"
+
 #include "MenuUI/InGameUIWidget.h"
 #include "MenuUI/DialogUIWidget.h"
 #include "MenuUI/InGameTimerWidget.h"
 #include "CreateAccountsWidget.h"
 #include "LoginUIWidget.h"
+
+#include "Global.h"
+
+#include "Network/Network.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "Animation/AnimMontage.h"
+
 
 ATinoCharacter::ATinoCharacter()
 	:MaxDiveTime(3.f),
@@ -42,7 +46,6 @@ ATinoCharacter::ATinoCharacter()
 	SpringArm->bUsePawnControlRotation = true;
 	
 	OriginalRotationSpeed = GetCharacterMovement()->RotationRate;
-	
 }
 
 void ATinoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -225,17 +228,31 @@ void ATinoCharacter::MakeAndShowHUD()
 
 }
 
-void ATinoCharacter::MakeAndShowDialog()
+void ATinoCharacter::MakeAndShowDialogInLobby()
 {
 	DialogWidget = CreateWidget<UDialogUIWidget>(GetWorld(), DialogWidgetClass);
 	DialogWidget->AddToViewport();
+	DialogWidget->RenderDisconnectNetworkWindow();
+}
+
+void ATinoCharacter::MakeAndShowDialogInGame()
+{
+	if (true == Network::GetNetwork()->bGameEndFlag) return;
+	DialogWidget = CreateWidget<UDialogUIWidget>(GetWorld(), DialogWidgetClass);
+	DialogWidget->AddToViewport();
+	DialogWidget->RenderDisconnectNetworkWindow();
 }
 
 void ATinoCharacter::SetDepartmentClothes(int department)
 {
-	if (static_cast<int>(EDepartment::EDepartment_None) < department &&
-		static_cast<int>(EDepartment::EDepartment_MAX) > department)
+	EDepartment EnumValue = static_cast<EDepartment>(department);
+
+	if (EDepartment::EDepartment_None < EnumValue && EDepartment::EDepartment_MAX > EnumValue)
 	{
+		//Staff 전용
+		if (EDepartment::EDepartment_Staff == EnumValue)
+			WearAccessory();
+
 		auto DynamicMaterialMesh = GetMesh()->CreateDynamicMaterialInstance(0);
 		auto DepartmentTexture = GetTinoDepartTexture(static_cast<EDepartment>(department));
 		if (DepartmentTexture == nullptr)
@@ -382,6 +399,12 @@ void ATinoCharacter::SetCreateAccountsInstance()
 
 		}
 	}
+}
+
+void ATinoCharacter::WearAccessory()
+{
+	auto Accessory = AAccessoryItem::Spawn(GetWorld(), AccessoryInvetory[0], this);
+	Accessory->Equip();
 }
 
 void ATinoCharacter::OnMoveForward(float Axis)

@@ -53,6 +53,7 @@ public:
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	UUserWidget* GetCurrentWidget() { return CurrentWidget; }
 
+	bool bIsLobbyConnected = false;
 public:
 	// Network Disconnect
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
@@ -66,7 +67,7 @@ public:
 
 public:
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	void ShowGameResult(int rank, double grade, int point);
+	void ShowGameResult(int level, int rank, double grade, int point);
 
 	UPROPERTY(BlueprintReadOnly, Category = "UMG_Game")
 	class UFinishGameUIWidget* FinishGameUI;
