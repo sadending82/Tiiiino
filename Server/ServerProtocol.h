@@ -5,6 +5,7 @@ constexpr const char* DBSERVERIP = "127.0.0.1";
 constexpr int DBSERVERPORT = 3700;
 
 constexpr int MAXGAMESERVER = 2;
+constexpr int MAX_ROOM = 100;
 
 
 constexpr unsigned long long INCODE_SERVER_PACKET = 0xFFFF'5137'0808'6310;

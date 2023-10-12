@@ -9,10 +9,15 @@
 ASoundManager* ASoundManager::SoundManagerInstance = nullptr;
 
 ASoundManager::ASoundManager()
+	:BGMVolume(0.1f),
+	SFXVolume(0.3f)
 {
 	ASoundManager::SoundManagerInstance = this;
 	UHelpers::CreateComponent(this, &MainAudio, "MainAudio",GetRootComponent());
 	UHelpers::CreateComponent(this, &SFXAudio, "SFXAudio", GetRootComponent());
+
+	MainAudio->SetVolumeMultiplier(BGMVolume);
+	SFXAudio->SetVolumeMultiplier(SFXVolume);
 
 }
 
@@ -36,21 +41,35 @@ void ASoundManager::PlayBGM()
 
 }
 
-void ASoundManager::PlaySFX(ESFXType Type)
+void ASoundManager::PlaySFX(ESFXType Type, FVector Location)
 {
 	if (SoundManagerInstance && !SFXSoundMap.IsEmpty())
 	{
 		if (SFXSoundMap[Type] == nullptr) return;
-		SFXAudio->SetSound(SFXSoundMap[Type]);
-		SFXAudio->Play();
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), SFXSoundMap[Type], Location,SFXVolume);
+		//
+		//SFXSoundMap[Type]->PlaySound
+		//SFXAudio->SetSound();
+		//SFXAudio->
 	}
 }
 
-void ASoundManager::PlaySFX(USoundCue* Sound)
+void ASoundManager::PlaySFX(USoundCue* Sound, FVector Location)
 {
 	if (SoundManagerInstance && Sound)
 	{
-		SFXAudio->SetSound(Sound);
-		SFXAudio->Play();
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), Sound, Location, SFXVolume);
+		//SFXAudio->SetSound(Sound);
+		//SFXAudio->Play();
 	}
+}
+
+void ASoundManager::SetBGMVolume(const float Volume)
+{
+	MainAudio->SetVolumeMultiplier(BGMVolume);
+}
+
+void ASoundManager::SetSFXVolume(const float Volume)
+{
+	SFXAudio->SetVolumeMultiplier(SFXVolume);
 }
