@@ -126,10 +126,14 @@ bool ACustomLevel_Test::ConnLobbyServer()
 	{
 		GetWorld()->GetFirstPlayerController<ATinoController>()->SetInputUIMode();
 		CLog::Log("Connect Lobby Successfully");
+		auto controller = Cast<ATinoController>(player->GetController());
+		if (!!controller)
+		{
+			controller->bIsLobbyConnected = true;
+		}
 		return true;
 	}
 	else {
-		player->MakeAndShowDialog();
 		CLog::Log("Connect Fail!");
 	}
 
