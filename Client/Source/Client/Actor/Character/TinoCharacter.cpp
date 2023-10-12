@@ -245,9 +245,14 @@ void ATinoCharacter::MakeAndShowDialogInGame()
 
 void ATinoCharacter::SetDepartmentClothes(int department)
 {
-	if (static_cast<int>(EDepartment::EDepartment_None) < department &&
-		static_cast<int>(EDepartment::EDepartment_MAX) > department)
+	EDepartment EnumValue = static_cast<EDepartment>(department);
+
+	if (EDepartment::EDepartment_None < EnumValue && EDepartment::EDepartment_MAX > EnumValue)
 	{
+		//Staff 전용
+		if (EDepartment::EDepartment_Staff == EnumValue)
+			WearAccessory();
+
 		auto DynamicMaterialMesh = GetMesh()->CreateDynamicMaterialInstance(0);
 		auto DepartmentTexture = GetTinoDepartTexture(static_cast<EDepartment>(department));
 		if (DepartmentTexture == nullptr)
