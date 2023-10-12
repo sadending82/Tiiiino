@@ -43,7 +43,7 @@ public:
 public:
 	array <Session, MAX_USER> mClients;
 	array <Session, MAXGAMESERVER> mServers;
-	array <Room, MAXGAMESERVER * 10> mRooms;
+	array <Room, MAX_ROOM> mRooms;
 	list <int> mMatchListHighTier;
 	list <int> mMatchListLowTier;
 	list <int> mReadytoGame;
