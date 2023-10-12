@@ -146,6 +146,7 @@ struct CS_GAME_BREAKPLATFORM_PACKET : public PACKET {
 struct CL_LOGIN_PACKET :public PACKET {
 	char id[MAX_NAME_SIZE];
 	char password[MAX_NAME_SIZE];
+	char gameVersion[MAX_VERSION_SIZE];
 };
 
 struct CL_LOGOUT_PACKET :public PACKET {
