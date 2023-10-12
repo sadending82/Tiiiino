@@ -77,6 +77,10 @@ public:
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void LevelClearCountdown();
 
+	// 게임 종료시 인게임 UI 숨기기
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void LevelClear();
+
 	// 타이머 문구 체인지 20->19->18
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void TimerTextChange(int RestGameTime, ETimerType Type);
