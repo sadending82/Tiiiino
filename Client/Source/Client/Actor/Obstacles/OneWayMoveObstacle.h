@@ -29,4 +29,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(EditAnyWhere, Category = Stat, Meta = (AllowPrivateAccess = true)) float MoveSpeed = 50.f;
+	UPROPERTY(EditAnyWhere, Category = Stat, Meta = (AllowPrivateAccess = true)) float MoveDistance = 1000.f;
+	UPROPERTY(EditAnyWhere, Category = Stat, Meta = (AllowPrivateAccess = true)) FVector OriginalLocation;
+	
 };
