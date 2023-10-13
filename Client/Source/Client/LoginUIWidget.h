@@ -47,7 +47,11 @@ public:
 	UFUNCTION()
 	void InputLoginPassword(const FText& Text);
 
-	
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void CheckIDTextLength();
+
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void CheckPasswordTextLength();
 
 public:
 	// CreditUI
@@ -69,4 +73,7 @@ protected:
 
 	UPROPERTY()
 	UUserWidget* CurrentWidget;
+
+	UPROPERTY()
+	int32 MaxLength = 10;
 };
