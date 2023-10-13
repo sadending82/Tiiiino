@@ -135,7 +135,8 @@ public:
 	FORCEINLINE bool IsDivining() { return bIsDiving; }
 	FORCEINLINE float GetOriginalWalkSpeed() { return OriginalSpeed; }
 	FORCEINLINE FRotator GetOriginalRotationSpeed() { return OriginalRotationSpeed; }
-	
+	FORCEINLINE float GetGrade() const { return Grade; }
+	FORCEINLINE void SetGrade(const float EditGrade) { Grade = EditGrade; }
 	UFUNCTION(BlueprintCallable)
 	void SetDepartmentClothes(int department);
 
@@ -220,6 +221,9 @@ private:
 		class UAnimMontage* TumbleMontage;
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 		class UAnimMontage* GrabMontage;
+
+	UPROPERTY(VisibleDefaultsOnly, Category = "Stat")
+		float Grade;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation | Dive")
 		float MaxDiveTime;
