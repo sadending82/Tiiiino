@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/BoxComponent.h"
-#include "Global.h"
 #include "RespawnArea.generated.h"
 
 UCLASS()

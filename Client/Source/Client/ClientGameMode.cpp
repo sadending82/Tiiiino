@@ -4,7 +4,6 @@
 #include "ClientCharacter.h"
 #include "Global.h"
 
-#include "Sound/SoundManager.h"
 
 AClientGameMode::AClientGameMode()
 {

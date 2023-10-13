@@ -2,7 +2,6 @@
 #include "Actor/Controller/TinoController.h"
 #include "Actor/Character/CharacterAnimInstance.h"
 #include "Actor/Accessory/AccessoryItem.h"
-#include "Sound/SoundManager.h"
 
 #include "MenuUI/InGameUIWidget.h"
 #include "MenuUI/DialogUIWidget.h"
@@ -300,10 +299,13 @@ void ATinoCharacter::DiveEnd()
 
 void ATinoCharacter::OnAccelEffect()
 {
-	//비네트 값을 조절해 가속 이펙트를 킴
-	Camera->PostProcessSettings.bOverride_VignetteIntensity = true;
-	Camera->PostProcessSettings.VignetteIntensity = CustomVignetteIntensity;
-	ASoundManager::GetSoundManager()->PlaySFX(ESFXType::ESFXType_ObstacleAccel);
+	if (bIsControlledPlayer)
+	{
+		//비네트 값을 조절해 가속 이펙트를 킴
+		Camera->PostProcessSettings.bOverride_VignetteIntensity = true;
+		Camera->PostProcessSettings.VignetteIntensity = CustomVignetteIntensity;
+		ASoundManager::GetSoundManager()->PlaySFX2D(ESFXType::ESFXType_ObstacleAccel);
+	}
 }
 
 void ATinoCharacter::OffAccelEffect()
@@ -347,7 +349,7 @@ void ATinoCharacter::Dive()
 		bIsDiving = true;
 		SendAnimPacket(2);
 		PlayAnimMontage(DiveMontage);
-		GetWorldTimerManager().SetTimer(DiveTimer,this,&ATinoCharacter::DiveEnd, MaxDiveTime, false);
+		//GetWorldTimerManager().SetTimer(DiveTimer,this,&ATinoCharacter::DiveEnd, MaxDiveTime, false);
 	}
 }
 
@@ -454,6 +456,7 @@ void ATinoCharacter::Jump()
 	{
 		Super::Jump();
 		SendAnimPacket(1);
+		ASoundManager::GetSoundManager()->PlaySFXAtLocation(ESFXType::ESFXType_Jump,GetActorLocation());
 	}
 
 	if (GetController())
@@ -461,8 +464,17 @@ void ATinoCharacter::Jump()
 		if (!GetController()->IsPlayerController())
 		{
 			Super::Jump();
+			ASoundManager::GetSoundManager()->PlaySFXAtLocation(ESFXType::ESFXType_Jump, GetActorLocation());
 		}
 	}
+}
+
+void ATinoCharacter::Landed(const FHitResult& Hit)
+{
+	Super::Landed(Hit);
+
+	DiveEnd();
+	ASoundManager::GetSoundManager()->PlaySFXAtLocation(ESFXType::ESFXType_Land, GetActorLocation());
 }
 
 void ATinoCharacter::StopJumping()

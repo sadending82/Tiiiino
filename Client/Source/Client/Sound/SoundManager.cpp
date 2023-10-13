@@ -41,11 +41,24 @@ void ASoundManager::PlayBGM()
 
 }
 
-void ASoundManager::PlaySFX(ESFXType Type, FVector Location)
+void ASoundManager::PlaySFX2D(ESFXType Type)
 {
 	if (SoundManagerInstance && !SFXSoundMap.IsEmpty())
 	{
-		if (SFXSoundMap[Type] == nullptr) return;
+		if (SFXSoundMap.Contains(Type) == false) return;
+		UGameplayStatics::PlaySound2D(GetWorld(), SFXSoundMap[Type], SFXVolume);
+		//
+		//SFXSoundMap[Type]->PlaySound
+		//SFXAudio->SetSound();
+		//SFXAudio->
+	}
+}
+
+void ASoundManager::PlaySFXAtLocation(ESFXType Type, FVector Location)
+{
+	if (SoundManagerInstance && !SFXSoundMap.IsEmpty())
+	{
+		if (SFXSoundMap.Contains(Type) == false) return;
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), SFXSoundMap[Type], Location,SFXVolume);
 		//
 		//SFXSoundMap[Type]->PlaySound
@@ -54,7 +67,7 @@ void ASoundManager::PlaySFX(ESFXType Type, FVector Location)
 	}
 }
 
-void ASoundManager::PlaySFX(USoundCue* Sound, FVector Location)
+void ASoundManager::PlaySFXAtLocation(USoundCue* Sound, FVector Location)
 {
 	if (SoundManagerInstance && Sound)
 	{
