@@ -22,7 +22,7 @@ void ABaseObstacle::BeginPlay()
 	// 10/08 김혁동
 	// 그냥 부모에서 적용하면 되는 걸 각각의 자식에서 하고 있었으므로
 	// 부모에서 적용하는 것으로 변경하였음.
-	bIsStartMove = true;
+	//bIsStartMove = true;
 	
 }
 
