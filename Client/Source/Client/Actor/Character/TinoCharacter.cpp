@@ -511,6 +511,7 @@ void ATinoCharacter::OffGrab()
 	StopAnimMontage(GrabMontage);
 	if (GetController() && GetController()->IsPlayerController())
 		SetMovementState(EMovementState::EMS_Normal);
+	ASoundManager::GetSoundManager()->PlaySFXAtLocation(ESFXType::ESFXType_OffGrab, GetActorLocation());
 
 	SetGrabbedToNormal();
 
@@ -619,6 +620,7 @@ void ATinoCharacter::DetectTarget()
 			SetMovementState(EMovementState::EMS_Grabbing);
 			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			SetNormalToGrabbed();
+			ASoundManager::GetSoundManager()->PlaySFXAtLocation(ESFXType::ESFXType_OnGrab, GetActorLocation());
 		}
 		else
 		{

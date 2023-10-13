@@ -53,6 +53,7 @@ void ATinoController::ChangeMenuWidget(TSubclassOf<UUserWidget> NewWidgetClass)
 
 void ATinoController::CreateDummy()
 {
+	return;
 	if (TinoCharacterClass)
 	{
 		ATinoCharacter* Dummy = GetWorld()->SpawnActor<ATinoCharacter>(TinoCharacterClass);
