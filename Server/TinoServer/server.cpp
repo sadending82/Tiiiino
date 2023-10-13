@@ -842,7 +842,7 @@ void Server::SendDiconnectPacketToGameServer(int key, int uid, int roomID)
 	p.uID = uid;
 	p.roomID = roomID;
 	
-	mClients[key].DoSend(reinterpret_cast<char*>(&p));
+	mServers[1].DoSend(reinterpret_cast<char*>(&p));
 }
 
 void Server::SendMatchResult(int key, int rank, int point)
