@@ -39,7 +39,6 @@ void ACustomLevel_Test::BeginPlay() {
 	//To Loading ...
 
 	//To Do SomeThing ...
-	ASoundManager::GetSoundManager()->PlaySFX(ESFXType::ESFXType_RaceStart);
 
 }
 
