@@ -45,9 +45,17 @@ void UFinishGameUIWidget::ShowResult(int level, int rank, double grade, int poin
 
 
 	// 이 판 등수 입력
-	CurrentRank = rank;	// 등수 입력
-	FText CurrentRankText = FText::AsNumber(CurrentRank);
-	EditRANKText->SetText(CurrentRankText);
+	if (rank <= 0)
+	{
+		FText RetireText = FText::FromString("Retire");
+		EditRANKText->SetText(RetireText);
+	}
+	else
+	{
+		CurrentRank = rank;	// 등수 입력
+		FText CurrentRankText = FText::AsNumber(CurrentRank);
+		EditRANKText->SetText(CurrentRankText);
+	}
 
 
 	// 획득한 학점 입력
