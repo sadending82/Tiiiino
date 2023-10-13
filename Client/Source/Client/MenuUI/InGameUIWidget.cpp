@@ -124,6 +124,7 @@ void UInGameUIWidget::LevelStart()
 	// 카운트다운이 끝나고 화면에 go를 띄우는 동시에 레벨 시작
 	// 타이머 안보이도록 숨김
 	StartCountDownText->SetRenderOpacity(0.0);
+	ASoundManager::GetSoundManager()->PlaySFX2D(ESFXType::ESFXType_RaceStart);
 
 }
 

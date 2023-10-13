@@ -30,6 +30,7 @@ enum class ESFXType : uint8
 	ESFXType_WindBlow UMETA(DisplayName = "WindBlow"),
 	ESFXType_Jump UMETA(DisplayName = "Jump"),
 	ESFXType_Land UMETA(DisplayName = "Land"),
+	ESFXType_Trapoline UMETA(DisplayName = "Trapoline"),
 	ESFXType_ObstacleBounce UMETA(DisplayName = "ObstacleBounce"),
 	ESFXType_ObstacleAccel UMETA(DisplayName = "ObstacleAccel")
 };
@@ -75,6 +76,9 @@ private:
 		class UAudioComponent* MainAudio;
 	UPROPERTY(VisibleDefaultsOnly, Category = "Component")
 		class UAudioComponent* SFXAudio;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Sound")
+		class USoundAttenuation* AttenuationSettings;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Sound")
 		class USoundCue* MainBGM;
