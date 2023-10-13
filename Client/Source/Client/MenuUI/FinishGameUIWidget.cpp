@@ -30,12 +30,12 @@ void UFinishGameUIWidget::ShowResult(int level, int rank, double grade, int poin
 {
 	MapNameArray[0] = L"None";
 	MapNameArray[1] = L"티노 동산";
-	MapNameArray[2] = L"신비한 티노의 정원";
-	MapNameArray[3] = L"무의 정원";
-	MapNameArray[4] = L"빙글빙글돌아가는맷돌";
-	MapNameArray[5] = L"티노의 우주여행";
-	MapNameArray[6] = L"떨어지면 망함";
-	MapNameArray[7] = L"몰?루";
+	MapNameArray[2] = L"티노와 함께 춤을";
+	MapNameArray[3] = L"티노 L3라이센스 시험장";
+	MapNameArray[4] = L"선데이 티노";
+	MapNameArray[5] = L"스페이스 티노 2023";
+	MapNameArray[6] = L"티노 풀 회전!";
+	MapNameArray[7] = L"티노의 습격";
 
 
 	// 맵 이름 입력
