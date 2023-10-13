@@ -70,6 +70,8 @@ public:
 
 	virtual void Jump() override;
 
+	virtual void Landed(const FHitResult& Hit) override;
+
 public:
 
 	//다이브 관련 함수

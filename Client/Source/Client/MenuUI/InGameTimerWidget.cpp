@@ -53,6 +53,7 @@ void UInGameTimerWidget::TimerRun(ETimerType Type)
 		if (!!InGameUI)
 			InGameUI->TimerTextChange(RestGameTime, Type);
 	}
+	ASoundManager::GetSoundManager()->PlaySFX2D(ESFXType::ESFXType_RaceCountDown);
 	RestGameTime--;
 	// if Timer End
 	//TimerEnd(Type);

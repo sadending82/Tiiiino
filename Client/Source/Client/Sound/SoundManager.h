@@ -20,9 +20,18 @@ enum class ESFXType : uint8
 	ESFXType_None UMETA(DisplayName = "None"),
 	ESFXType_Footstep UMETA(DisplayName = "Footstep"),
 	ESFXType_Click UMETA(DisplayName = "Click"),
+	ESFXType_Horver UMETA(DisplayName = "Horver"),
+	ESFXType_Cancel UMETA(DisplayName = "Cancel"),
 	ESFXType_Respawn UMETA(DisplayName = "Respawn"),
 	ESFXType_RaceCountDown UMETA(DisplayName = "RaceCountDown"),
 	ESFXType_RaceStart UMETA(DisplayName = "RaceStart"),
+	ESFXType_RaceWin UMETA(DisplayName = "RaceWin"),
+	ESFXType_RaceDefeat UMETA(DisplayName = "RaceDefeat"),
+	ESFXType_WindBlow UMETA(DisplayName = "WindBlow"),
+	ESFXType_Jump UMETA(DisplayName = "Jump"),
+	ESFXType_Land UMETA(DisplayName = "Land"),
+	ESFXType_Trapoline UMETA(DisplayName = "Trapoline"),
+	ESFXType_ObstacleBounce UMETA(DisplayName = "ObstacleBounce"),
 	ESFXType_ObstacleAccel UMETA(DisplayName = "ObstacleAccel")
 };
 
@@ -44,9 +53,11 @@ public:
 		void PlayBGM();
 
 	UFUNCTION(BlueprintCallable)
-		void PlaySFX(ESFXType Type, FVector Location = FVector::ZeroVector);
+		void PlaySFX2D(ESFXType Type);
+	UFUNCTION(BlueprintCallable)
+		void PlaySFXAtLocation(ESFXType Type, FVector Location = FVector::ZeroVector);
 	//UFUNCTION(BlueprintCallable)
-	void PlaySFX(class USoundCue* Sound, FVector Location = FVector::ZeroVector);
+	void PlaySFXAtLocation(class USoundCue* Sound, FVector Location = FVector::ZeroVector);
 
 	UFUNCTION(BlueprintPure)
 	FORCEINLINE	 float GetBGMVolume() const { return BGMVolume; }
@@ -65,6 +76,9 @@ private:
 		class UAudioComponent* MainAudio;
 	UPROPERTY(VisibleDefaultsOnly, Category = "Component")
 		class UAudioComponent* SFXAudio;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Sound")
+		class USoundAttenuation* AttenuationSettings;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Sound")
 		class USoundCue* MainBGM;

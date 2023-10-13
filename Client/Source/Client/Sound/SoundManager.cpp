@@ -4,6 +4,7 @@
 #include "Global.h"
 
 #include "Components/AudioComponent.h"
+#include "Sound/SoundAttenuation.h"
 #include "Sound/SoundCue.h"
 
 ASoundManager* ASoundManager::SoundManagerInstance = nullptr;
@@ -15,10 +16,11 @@ ASoundManager::ASoundManager()
 	ASoundManager::SoundManagerInstance = this;
 	UHelpers::CreateComponent(this, &MainAudio, "MainAudio",GetRootComponent());
 	UHelpers::CreateComponent(this, &SFXAudio, "SFXAudio", GetRootComponent());
-
+	UHelpers::CreateActorComponent(this, &AttenuationSettings, "AttenuationSettings");
 	MainAudio->SetVolumeMultiplier(BGMVolume);
 	SFXAudio->SetVolumeMultiplier(SFXVolume);
 
+	
 }
 
 void ASoundManager::SetBGM(EBGMType Type)
@@ -41,12 +43,12 @@ void ASoundManager::PlayBGM()
 
 }
 
-void ASoundManager::PlaySFX(ESFXType Type, FVector Location)
+void ASoundManager::PlaySFX2D(ESFXType Type)
 {
 	if (SoundManagerInstance && !SFXSoundMap.IsEmpty())
 	{
-		if (SFXSoundMap[Type] == nullptr) return;
-		UGameplayStatics::PlaySoundAtLocation(GetWorld(), SFXSoundMap[Type], Location,SFXVolume);
+		if (SFXSoundMap.Contains(Type) == false) return;
+		UGameplayStatics::PlaySound2D(GetWorld(), SFXSoundMap[Type], SFXVolume);
 		//
 		//SFXSoundMap[Type]->PlaySound
 		//SFXAudio->SetSound();
@@ -54,7 +56,20 @@ void ASoundManager::PlaySFX(ESFXType Type, FVector Location)
 	}
 }
 
-void ASoundManager::PlaySFX(USoundCue* Sound, FVector Location)
+void ASoundManager::PlaySFXAtLocation(ESFXType Type, FVector Location)
+{
+	if (SoundManagerInstance && !SFXSoundMap.IsEmpty())
+	{
+		if (SFXSoundMap.Contains(Type) == false) return;
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), SFXSoundMap[Type], Location,SFXVolume, 1.f, 0.f, AttenuationSettings);
+		//
+		//SFXSoundMap[Type]->PlaySound
+		//SFXAudio->SetSound();
+		//SFXAudio->
+	}
+}
+
+void ASoundManager::PlaySFXAtLocation(USoundCue* Sound, FVector Location)
 {
 	if (SoundManagerInstance && Sound)
 	{

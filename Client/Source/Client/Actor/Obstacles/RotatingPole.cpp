@@ -32,6 +32,7 @@ void ARotatingPole::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimi
 		if (DoElasticCollision)
 		{
 			hitCharacter->LaunchCharacter(FVector(-HitNormal.X, -HitNormal.Y, fabs(HitNormal.Z)) * ElasticForce, false, false);
+			ASoundManager::GetSoundManager()->PlaySFXAtLocation(ESFXType::ESFXType_ObstacleBounce,hitCharacter->GetActorLocation());
 		}
 	}
 }

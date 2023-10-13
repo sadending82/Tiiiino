@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
+#include "Global.h"
+
 // Sets default values
 ARespawnArea::ARespawnArea()
 {
@@ -31,11 +33,7 @@ void ARespawnArea::NotifyActorBeginOverlap(AActor* OtherActor)
 	{
 		MyCharacter->SetActorLocation(RespawnPoint, false, (FHitResult*)nullptr, ETeleportType::ResetPhysics);
 		MyCharacter->GetCharacterMovement()->StopMovementImmediately();
-		ATinoCharacter* Tino = Cast<ATinoCharacter>(MyCharacter);
-		if (Tino != nullptr)
-		{
-			Tino->DiveEnd();
-		}
+		ASoundManager::GetSoundManager()->PlaySFXAtLocation(ESFXType::ESFXType_Respawn, MyCharacter->GetActorLocation());
 	}
 }
 

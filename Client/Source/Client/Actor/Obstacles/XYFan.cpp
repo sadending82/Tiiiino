@@ -28,6 +28,7 @@ void AXYFan::BeginPlay()
 
 	OverlapBox->OnComponentBeginOverlap.AddDynamic(this, &AXYFan::BoxBeginOverlap);
 	OverlapBox->OnComponentEndOverlap.AddDynamic(this, &AXYFan::BoxEndOverlap);
+
 }
 
 void AXYFan::Tick(float DeltaTime)
@@ -51,6 +52,8 @@ void AXYFan::BoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* O
 	auto OverlapCharacter = Cast<ACharacter>(OtherComp->GetOwner());
 	if (OverlapCharacter)
 	{
+		ASoundManager::GetSoundManager()->PlaySFXAtLocation(ESFXType::ESFXType_WindBlow, GetActorLocation());
+
 		auto Controller = OverlapCharacter->GetController();
 		if (!!Controller)
 		{
