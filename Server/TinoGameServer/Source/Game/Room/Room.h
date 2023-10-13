@@ -40,7 +40,7 @@ public:
 	bool SettingRoomPlayer(const sPlayerInfo& playerInfo, const int& playerMaxNum);
 	int GetPlayerRoomSyncID(const int uID);
 	sPlayerInfo GetPlayerInfo(const int uID);
-	
+	Player* GetPlayerWithUID(const int uID);
 	void PlayerArrive(Player* player);
 	void AllPlayerArrived();
 	//Object order

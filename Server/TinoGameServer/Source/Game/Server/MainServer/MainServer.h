@@ -38,6 +38,7 @@ public:
 	void send_login_ok_packet(const int player_id, const char* playername);
 	void send_login_ok_packet(const int player_id, void* buf);
 	SC_LOGIN_OK_PACKET make_login_ok_packet(const int playerSocketID, const int playerID, const char* playername);
+	SC_DISCONN_PACKET make_disconn_packet(const int playerUID);
 	void send_player_add_packet(const int playerID, void* buf, const int bufSize);
 	SC_ADD_PLAYER_PACKET make_player_add_packet(const int playerSocketID);
 	SC_PLAYER_REMOVE_PACKET make_player_remove_packet(const int playerRoomSyncID);
