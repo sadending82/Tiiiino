@@ -355,6 +355,14 @@ void Network::process_packet(unsigned char* p)
 		bIsConnected = true;
 		break;
 	}
+	case SC_DISCONN:
+	{
+		SC_DISCONN_PACKET* packet = reinterpret_cast<SC_DISCONN_PACKET*>(p);
+		if (packet->uid != mDBUID) break;
+		closesocket(s_socket);
+		mMyCharacter->MakeAndShowDialogInGame();
+		break;
+	}
 	case SC_GAME_PLAYERLOAD_OK:
 	{
 		SC_GAME_PLAYERLOAD_OK_PACKET* packet = reinterpret_cast<SC_GAME_PLAYERLOAD_OK_PACKET*>(p);

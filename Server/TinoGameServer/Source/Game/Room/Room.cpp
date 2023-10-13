@@ -336,6 +336,26 @@ sPlayerInfo Room::GetPlayerInfo(const int uID)
 	return sPlayerInfo();
 }
 
+Player* Room::GetPlayerWithUID(const int uID)
+{
+	Player* player = nullptr;
+	for (int i = 0; i < MAX_ROOM_USER; ++i)
+	{
+		if (nullptr != mObjects[i])
+		{
+			player = dynamic_cast<Player*>(mObjects[i]);
+			if (player)
+			{
+				if (uID == player->GetUID())
+				{
+					return player;
+				}
+			}
+		}
+	}
+	return player;
+}
+
 void Room::PlayerArrive(Player* player)
 {
 	int tRank = 0;
