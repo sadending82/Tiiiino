@@ -19,7 +19,7 @@ constexpr int DELAY_TIME_EXEC_BREAKPLATFORM = 3000;
 
 // Level min, max
 constexpr int MIN_LEVEL = 1;
-constexpr int MAX_LEVEL = 6;
+constexpr int MAX_LEVEL = 7;
 
 enum class eDepartment : char
 {
@@ -38,6 +38,7 @@ enum class eDepartment : char
 	EnergyElec,
 	Bussiness,
 	Design,
+	Staff
 };
 
 enum PacketType {
@@ -63,6 +64,7 @@ enum PacketType {
 	// GameServer To Client
 	SC_LOGIN_OK,
 	SC_LOGIN_FAIL,
+	SC_DISCONN,
 	SC_ADD_PLAYER,
 	SC_PLAYER_REMOVE,
 	SC_MOVE_PLAYER,
@@ -177,6 +179,11 @@ struct SC_LOGIN_OK_PACKET : public PACKET {
 	int		id;
 	char	department;
 };
+
+struct SC_DISCONN_PACKET : public PACKET {
+	int uid;
+};
+
 struct SC_MOVE_PLAYER_PACKET : public PACKET {
 	int		id;
 	float x, y, z;

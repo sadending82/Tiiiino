@@ -181,6 +181,16 @@ SC_LOGIN_OK_PACKET MainServer::make_login_ok_packet(const int playerSocketID, co
 	return packet;
 }
 
+SC_DISCONN_PACKET MainServer::make_disconn_packet(const int playerUID)
+{
+	SC_DISCONN_PACKET packet;
+	memset(&packet, 0, sizeof(SC_DISCONN_PACKET));
+	packet.size = sizeof(packet);
+	packet.type = SC_DISCONN;
+	packet.uid = playerUID;
+	return packet;
+}
+
 void MainServer::send_player_add_packet(const int playerID, void* buf, const int bufSize)
 {
 	auto player = dynamic_cast<Player*>(mObjects[playerID]);
@@ -833,7 +843,13 @@ void MainServer::ProcessPacketLobby(const int serverID, unsigned char* p)
 	}
 	case LG_USER_DISCONNECT: {
 		LG_USER_DISCONNECT_PACKET* packet = reinterpret_cast<LG_USER_DISCONNECT_PACKET*>(p);
-		
+		Room* pRoom = mRooms[packet->roomID];
+		Player* disConnPlayer = pRoom->GetPlayerWithUID(packet->uID);
+		if (nullptr != disConnPlayer)
+		{
+			auto sPacket = make_disconn_packet(disConnPlayer->GetUID());
+			SendMySelf(disConnPlayer->GetSocketID(), (void*)&sPacket, sizeof(sPacket));
+		}
 		break;
 	}
 	default:
