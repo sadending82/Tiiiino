@@ -70,6 +70,29 @@ void ULoginUIWidget::InputLoginPassword(const FText& Text)
 	// UE_LOG(LogTemp, Error, TEXT("UnExpected Tree PasswordInput"));
 }
 
+void ULoginUIWidget::CheckIDTextLength()
+{
+	// ID 글자수 제한
+	FText cur_text = LoginIDTextBox->GetText();
+	FString OriginalText = cur_text.ToString();
+	FString ClippedText = OriginalText.Left(MaxLength);
+	//LimitedText = FText::FromString(ClippedText);
+	cur_text = FText::FromString(ClippedText);
+	LoginIDTextBox->SetText(cur_text);
+
+	
+}
+
+void ULoginUIWidget::CheckPasswordTextLength()
+{
+	FText cur_text = LoginPasswordTextBox->GetText();
+	FString OriginalText = cur_text.ToString();
+	FString ClippedText = OriginalText.Left(MaxLength);
+	//LimitedText = FText::FromString(ClippedText);
+	cur_text = FText::FromString(ClippedText);
+	LoginPasswordTextBox->SetText(cur_text);
+}
+
 void ULoginUIWidget::ShowCreditUI()
 {
 	CreditUI = Cast<UCreditUIWidget>(CreateWidget(GetWorld(), CreditUIClass));
