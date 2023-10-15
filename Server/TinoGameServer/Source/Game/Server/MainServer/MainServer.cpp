@@ -144,26 +144,6 @@ void MainServer::SendPacketWithID(const int receiverID, void* buf, const int buf
 		player->SendPacket(buf, bufSize);
 }
 
-void MainServer::send_login_ok_packet(const int player_id, const char* playername)
-{
-	auto player = dynamic_cast<Player*>(mObjects[player_id]);
-	SC_LOGIN_OK_PACKET packet;
-	memset(&packet, 0, sizeof(SC_LOGIN_OK_PACKET));
-
-	packet.size = sizeof(packet);
-	packet.type = SC_LOGIN_OK;
-
-	packet.id = player_id;
-	//wcscpy(packet.name, playername);
-	player->SendPacket(&packet, sizeof(packet));
-}
-
-void MainServer::send_login_ok_packet(const int player_id, void* buf)
-{
-	auto player = dynamic_cast<Player*>(mObjects[player_id]);
-	SC_LOGIN_OK_PACKET packet = reinterpret_cast<SC_LOGIN_OK_PACKET&>(buf);
-	player->SendPacket(&packet, sizeof(packet));
-}
 
 SC_LOGIN_OK_PACKET MainServer::make_login_ok_packet(const int playerSocketID, const int playerID, const char* playername)
 {
@@ -191,12 +171,6 @@ SC_DISCONN_PACKET MainServer::make_disconn_packet(const int playerUID)
 	return packet;
 }
 
-void MainServer::send_player_add_packet(const int playerID, void* buf, const int bufSize)
-{
-	auto player = dynamic_cast<Player*>(mObjects[playerID]);
-	player->SendPacket(buf, bufSize);
-
-}
 
 SC_ADD_PLAYER_PACKET MainServer::make_player_add_packet(const int playerSocketID)
 {
@@ -261,31 +235,6 @@ void MainServer::send_player_result_packet(const int uID, const int rank,const i
 	mLobbyServer->SendPacket(&packet, sizeof(packet));
 }
 
-void MainServer::send_move_packet(const int player_id, const int mover_id, const bool inair, const float value, const float sx, const float sy, const float sz)
-{
-	auto player = reinterpret_cast<Player*>(mObjects[player_id]);
-	SC_MOVE_PLAYER_PACKET packet{};
-	packet.id = mover_id;
-	packet.size = sizeof(packet);
-	packet.type = SC_MOVE_PLAYER;
-	packet.inair = inair;
-	packet.x = mObjects[mover_id]->GetPosition().x;
-	packet.y = mObjects[mover_id]->GetPosition().y;
-	packet.z = mObjects[mover_id]->GetPosition().z;
-	packet.rx = mObjects[mover_id]->GetRotate().x;
-	packet.ry = mObjects[mover_id]->GetRotate().y;
-	packet.rz = mObjects[mover_id]->GetRotate().z;
-	packet.rw = mObjects[mover_id]->GetRotate().w;
-	auto mover = dynamic_cast<Player*>(mObjects[mover_id]);
-	if (mover)
-		packet.move_time = mover->GetMoveTime();
-	packet.speed = value;
-	packet.sx = sx;
-	packet.sy = sy;
-	packet.sz = sz;
-	player->SendPacket(&packet, sizeof(packet));
-}
-
 SC_MOVE_PLAYER_PACKET MainServer::make_move_packet(const int moverSocketID, const bool inair, const float value, const float sx, const float sy, const float sz)
 {
 	SC_MOVE_PLAYER_PACKET packet{};
@@ -310,10 +259,6 @@ SC_MOVE_PLAYER_PACKET MainServer::make_move_packet(const int moverSocketID, cons
 	return packet;
 }
 
-void MainServer::send_player_arrive_packet(const int player_id, const int arrive_id)
-{
-}
-
 SC_PLAYER_ARRIVE_PACKET MainServer::make_player_arrive_packet(const int arriveID)
 {
 	SC_PLAYER_ARRIVE_PACKET packet{};
@@ -324,9 +269,6 @@ SC_PLAYER_ARRIVE_PACKET MainServer::make_player_arrive_packet(const int arriveID
 	return packet;
 }
 
-void MainServer::send_game_countdown_start_packet(const int player_id)
-{
-}
 
 SC_GAME_COUNTDOWN_START_PACKET MainServer::make_game_countdown_start_packet()
 {

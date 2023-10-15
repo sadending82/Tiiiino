@@ -35,19 +35,13 @@ public:
 
 	//Server to client
 	void SendPacketWithID(const int receiverID, void* buf, const int bufSize);
-	void send_login_ok_packet(const int player_id, const char* playername);
-	void send_login_ok_packet(const int player_id, void* buf);
 	SC_LOGIN_OK_PACKET make_login_ok_packet(const int playerSocketID, const int playerID, const char* playername);
 	SC_DISCONN_PACKET make_disconn_packet(const int playerUID);
-	void send_player_add_packet(const int playerID, void* buf, const int bufSize);
 	SC_ADD_PLAYER_PACKET make_player_add_packet(const int playerSocketID);
 	SC_PLAYER_REMOVE_PACKET make_player_remove_packet(const int playerRoomSyncID);
-	void send_move_packet(const int player_id, const int mover_id, const bool inair, const float value, const float sx, const float sy, const float sz);
 	SC_MOVE_PLAYER_PACKET make_move_packet(const int moverSocketID, const bool inair, const float value, const float sx, const float sy, const float sz);
 	 
-	void send_player_arrive_packet(const int player_id,const int arrive_id);
 	SC_PLAYER_ARRIVE_PACKET make_player_arrive_packet(const int arriveID);
-	void send_game_countdown_start_packet(const int player_id);
 	SC_GAME_COUNTDOWN_START_PACKET make_game_countdown_start_packet();
 	SC_PING_PACKET make_ping_packet();
 	SC_ACTION_ANIM_PACKET make_action_packet(const int playerID, const char action);
