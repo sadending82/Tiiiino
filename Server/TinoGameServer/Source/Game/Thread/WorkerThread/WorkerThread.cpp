@@ -49,6 +49,16 @@ void WorkerThread::doThread()
 			delete wsa_ex;
 			break;
 		}
+		case eCOMMAND_IOCP::CMD_SERVER_CONN:
+		{
+			auto lobbyserver = mMainServer->GetLobbyServer();
+			lobbyserver->AcceptSetting(eSocketState::ST_ACCEPT, eCOMMAND_IOCP::CMD_SERVER_RECV, lobbyserver->GetSocket());
+			lobbyserver->PreRecvPacket(NULL, 0);
+			lobbyserver->RecvPacket();
+			delete wsa_ex;
+			std::cout << "Lobby Connect Complete\n";
+			break;
+		}
 		case eCOMMAND_IOCP::CMD_RECV: {
 			if (bytes == 0) {
 				auto t = dynamic_cast<Player*>(mMainServer->GetObjects()[client_id]);

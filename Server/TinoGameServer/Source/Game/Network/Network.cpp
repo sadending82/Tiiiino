@@ -109,7 +109,7 @@ bool Network::SendPacket(void* packet, int bytes)
 	return true;
 }
 
-void Network::AcceptSetting(const eSocketState& socketState, const eCOMMAND_IOCP& commandIocp, SOCKET& socket)
+void Network::AcceptSetting(const eSocketState& socketState, const eCOMMAND_IOCP& commandIocp, SOCKET socket)
 {
 	mSocketState = socketState;
 	mWsaOverEx.SetCmd(commandIocp);

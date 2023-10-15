@@ -54,7 +54,7 @@ public:
 	int GetMoveTime() const { return mLastMoveTime; }
 	void SetMoveTime(int movetime) { mLastMoveTime = movetime; }
 
-	void AcceptSetting(const eSocketState& socketState,const eCOMMAND_IOCP& commandIocp,SOCKET& socket);
+	void AcceptSetting(const eSocketState& socketState,const eCOMMAND_IOCP& commandIocp,SOCKET socket);
 protected:
 	WSA_OVER_EX mWsaOverEx;
 

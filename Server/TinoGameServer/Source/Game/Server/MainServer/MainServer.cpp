@@ -101,7 +101,6 @@ void MainServer::init()
 		room->Init();
 		mRooms.insert(make_pair(i, room));
 	}
-	connectLobbyServer();
 	mWorkerThreadRef = new WorkerThread(this);
 	mTimerThreadRef = new TimerThread();
 	std::cout << "Creating Worker Threads\n";
@@ -114,6 +113,7 @@ void MainServer::init()
 	for (int i = 0; i < (int)si.dwNumberOfProcessors; ++i)
 		mWorkerThreads.emplace_back(&WorkerThread::doThread, mWorkerThreadRef);
 	mTimerThread = thread(&TimerThread::doThread, mTimerThreadRef);
+	connectLobbyServer();
 }
 
 void MainServer::run()
