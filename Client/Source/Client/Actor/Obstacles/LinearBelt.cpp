@@ -29,7 +29,7 @@ void ALinearBelt::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UMaterialInstanceDynamic* MIBelt = UMaterialInstanceDynamic::Create(Mesh->GetMaterial(1), this);
+	UMaterialInstanceDynamic* MIBelt = Mesh->CreateDynamicMaterialInstance(1);
 	MIBelt->SetVectorParameterValue(FName(TEXT("MaterialSpeed")), FLinearColor(0.f, MaterialSpeedY, 0.f, 0.f));
 	Mesh->SetMaterial(1, MIBelt);
 

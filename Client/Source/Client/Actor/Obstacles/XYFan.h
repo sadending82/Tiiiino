@@ -25,13 +25,6 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION()
-		void BoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-			UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	UFUNCTION()
-		void BoxEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-			UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
 private:
 
 	UPROPERTY(VisibleDefaultsOnly, Category = "Component")
@@ -49,6 +42,8 @@ private:
 		float FanPower;
 	UPROPERTY(EditAnywhere, Category = "Stat")
 		float FanRotateSpeed;
+	UPROPERTY(EditDefaultsOnly, Category = "Stat")
+		TSubclassOf<class ATinoCharacter> OverlapFilter;
 	UPROPERTY(VisibleAnywhere, Category = "Stat")
-		TSet<ACharacter*> OverlappingActors;
+		TSet<AActor*> OverlappingActors;
 };
