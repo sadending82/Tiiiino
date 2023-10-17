@@ -242,6 +242,55 @@ void ATinoCharacter::MakeAndShowDialogInGame()
 	DialogWidget->RenderDisconnectNetworkWindow();
 }
 
+void ATinoCharacter::SetLoginUIInstance()
+{
+	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (!!TinoController)
+	{
+		LoginUIInstance = Cast<ULoginUIWidget>(TinoController->GetCurrentWidget());
+		if (LoginUIInstance == nullptr)
+		{
+
+		}
+	}
+}
+
+void ATinoCharacter::SetCreateAccountsInstance()
+{
+	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (!!TinoController)
+	{
+		CreateAccountsInstance = Cast<UCreateAccountsWidget>(TinoController->GetCurrentWidget());
+		if (CreateAccountsInstance == nullptr)
+		{
+
+		}
+	}
+}
+
+void ATinoCharacter::TimerStart(ETimerType type)
+{
+	Type = type;
+	GetWorldTimerManager().SetTimer(UITimerHandle, this, &ATinoCharacter::TimerRun, true, true);
+}
+
+void ATinoCharacter::TimerRun()
+{
+
+	// 유효성 확인
+	if (!!InGameUITimerInstance)
+	{
+		// UInGameUIWidget의 TimerRun 함수 호출
+		InGameUITimerInstance->TimerRun(Type);
+
+		if (InGameUITimerInstance->GetRestGameTime() < 0)
+		{
+			InGameUITimerInstance->TimerEnd(Type);
+			GetWorldTimerManager().ClearTimer(UITimerHandle);
+		}
+	}
+}
+
 void ATinoCharacter::SetDepartmentClothes(int department)
 {
 	EDepartment EnumValue = static_cast<EDepartment>(department);
@@ -252,16 +301,16 @@ void ATinoCharacter::SetDepartmentClothes(int department)
 		if (EDepartment::EDepartment_Staff == EnumValue)
 			WearAccessory();
 
-		auto DynamicMaterialMesh = GetMesh()->CreateDynamicMaterialInstance(0);
+		auto DynamicMaterialInstance = GetMesh()->CreateDynamicMaterialInstance(0);
 		auto DepartmentTexture = GetTinoDepartTexture(static_cast<EDepartment>(department));
 		if (DepartmentTexture == nullptr)
 		{
 			CLog::Log("Fail to Get Department Texture!");
 			return;
 		}
-		DynamicMaterialMesh->SetTextureParameterValue(TEXT("Department"), DepartmentTexture);
-		if (DynamicMaterialMesh)
-			GetMesh()->SetMaterial(0, DynamicMaterialMesh);
+		DynamicMaterialInstance->SetTextureParameterValue(TEXT("Department"), DepartmentTexture);
+		if (DynamicMaterialInstance)
+			GetMesh()->SetMaterial(0, DynamicMaterialInstance);
 	}
 	else
 	{
@@ -319,29 +368,6 @@ void ATinoCharacter::SetOriginalSpeed()
 	GetCharacterMovement()->MaxWalkSpeed = OriginalSpeed;
 }
 
-void ATinoCharacter::TimerStart(ETimerType type)
-{
-	Type = type;
-	GetWorldTimerManager().SetTimer(UITimerHandle, this, &ATinoCharacter::TimerRun, true,true);
-}
-
-void ATinoCharacter::TimerRun()
-{
-
-	// 유효성 확인
-	if (!!InGameUITimerInstance)
-	{
-		// UInGameUIWidget의 TimerRun 함수 호출
-		InGameUITimerInstance->TimerRun(Type);
-
-		if (InGameUITimerInstance->GetRestGameTime() < 0)
-		{
-			InGameUITimerInstance->TimerEnd(Type);
-			GetWorldTimerManager().ClearTimer(UITimerHandle);
-		}
-	}
-}
-
 void ATinoCharacter::Dive()
 {
 	if (DiveMontage && CanDive())
@@ -375,32 +401,6 @@ void ATinoCharacter::SetIsAirForNetwork(bool val)
 UCharacterAnimInstance* ATinoCharacter::GetTinoAnimInstance()
 {
 	return Cast<UCharacterAnimInstance>(GetMesh()->GetAnimInstance());
-}
-
-void ATinoCharacter::SetLoginUIInstance()
-{
-	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	if (!!TinoController)
-	{
-		LoginUIInstance = Cast<ULoginUIWidget>(TinoController->GetCurrentWidget());
-		if (LoginUIInstance == nullptr)
-		{
-
-		}
-	}
-}
-
-void ATinoCharacter::SetCreateAccountsInstance()
-{
-	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	if (!!TinoController)
-	{
-		CreateAccountsInstance = Cast<UCreateAccountsWidget>(TinoController->GetCurrentWidget());
-		if (CreateAccountsInstance == nullptr)
-		{
-
-		}
-	}
 }
 
 void ATinoCharacter::WearAccessory()
@@ -452,21 +452,15 @@ void ATinoCharacter::CreateDummy()
 
 void ATinoCharacter::Jump()
 {
-	if (CanMove() && GetCharacterMovement()->IsFalling() == false)
+	bool bCanJump = (CanMove() && GetCharacterMovement()->IsFalling() == false);
+
+	if (bIsControlledPlayer == false || bCanJump == true)
 	{
 		Super::Jump();
 		SendAnimPacket(1);
-		ASoundManager::GetSoundManager()->PlaySFXAtLocation(ESFXType::ESFXType_Jump,GetActorLocation());
+		ASoundManager::GetSoundManager()->PlaySFXAtLocation(ESFXType::ESFXType_Jump, GetActorLocation());
 	}
-
-	if (GetController())
-	{
-		if (!GetController()->IsPlayerController())
-		{
-			Super::Jump();
-			ASoundManager::GetSoundManager()->PlaySFXAtLocation(ESFXType::ESFXType_Jump, GetActorLocation());
-		}
-	}
+	
 }
 
 void ATinoCharacter::Landed(const FHitResult& Hit)
@@ -498,8 +492,6 @@ void ATinoCharacter::OnGrab()
 	PlayAnimMontage(GrabMontage);
 	//if (GetController() && GetController()->IsPlayerController())
 		//CLog::Print("GrabOn");
-	
-
 }
 
 void ATinoCharacter::OffGrab()
@@ -515,8 +507,7 @@ void ATinoCharacter::OffGrab()
 	if (GetController() && GetController()->IsPlayerController())
 		SetMovementState(EMovementState::EMS_Normal);
 	
-	SetGrabbedToNormal();
-
+	SetTargetGrabbedToNormal();
 
 	bIsGrabbing = false;
 	bIsGrabCoolTime = true;
@@ -532,11 +523,9 @@ void ATinoCharacter::OffGrab()
 
 	//if (GetController() && GetController()->IsPlayerController())
 		//CLog::Print("GrabOff");
-
-
 }
 
-void ATinoCharacter::SetNormalToGrabbed()
+void ATinoCharacter::SetTargetNormalToGrabbed()
 {
 	if (!!Target)
 	{
@@ -549,7 +538,7 @@ void ATinoCharacter::SetNormalToGrabbed()
 		CLog::Log("Target is Nullptr");
 }
 
-void ATinoCharacter::SetGrabbedToNormal()
+void ATinoCharacter::SetTargetGrabbedToNormal()
 {
 	if (!!Target)
 	{
@@ -567,9 +556,8 @@ void ATinoCharacter::SetGrabbedToNormal()
 
 void ATinoCharacter::GrabBegin()
 {
-	//그랩 쿨타임 시작
+	//그랩 지속시간 시작
 	//if (GetController() && GetController()->IsPlayerController())
-		//CLog::Print("Grab Timer ON");
 	GetWorldTimerManager().SetTimer(GrabTimer, this, &ATinoCharacter::OffGrab, MaxGrabTime, false);
 }
 
@@ -621,7 +609,7 @@ void ATinoCharacter::DetectTarget()
 		{
 			SetMovementState(EMovementState::EMS_Grabbing);
 			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-			SetNormalToGrabbed();
+			SetTargetNormalToGrabbed();
 			ASoundManager::GetSoundManager()->PlaySFXAtLocation(ESFXType::ESFXType_OnGrab, GetActorLocation());
 		}
 		else
