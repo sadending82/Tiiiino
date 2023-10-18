@@ -13,7 +13,7 @@
 ASpeedRing::ASpeedRing()
 	:ChangeSpeed(600.f), DurationTime(3.0f)
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
 	UHelpers::CreateComponent<USceneComponent>(this, &SceneComponent, "SceneComponent");
@@ -35,37 +35,28 @@ void ASpeedRing::Tick(float DeltaTime)
 
 }
 
-void ASpeedRing::BoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, 
+void ASpeedRing::BoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	auto OverlapCharacter = Cast<ATinoCharacter>(OtherComp->GetOwner());
 	if (OverlapCharacter)
 	{
-		auto Controller = OverlapCharacter->GetController();
-		if (!!Controller)
+		if (OverlapCharacter->bIsControlledPlayer)
 		{
-			if (Controller->IsPlayerController())
-			{
-				//본인 속도만 바꾼다. 
-				if(GetWorldTimerManager().IsTimerActive(SpeedRingTImer) == true) 
-				{	//타이머 중복 방지, 이미있으면 삭제하고 다시 생성
-					GetWorldTimerManager().ClearTimer(SpeedRingTImer);
+			//본인 속도만 바꾼다. 
+			if (GetWorldTimerManager().IsTimerActive(SpeedRingTImer) == true)
+			{	//타이머 중복 방지, 이미있으면 삭제하고 다시 생성
+				GetWorldTimerManager().ClearTimer(SpeedRingTImer);
+			}
+			OverlapCharacter->GetCharacterMovement()->MaxWalkSpeed = ChangeSpeed;
+			OverlapCharacter->OnAccelEffect();
+			GetWorldTimerManager().SetTimer(SpeedRingTImer, [this, OverlapCharacter]()
+				{
+					OverlapCharacter->SetOriginalSpeed();
+					OverlapCharacter->OffAccelEffect();
 				}
-				OverlapCharacter->GetCharacterMovement()->MaxWalkSpeed = ChangeSpeed;
-				OverlapCharacter->OnAccelEffect();
-				GetWorldTimerManager().SetTimer(SpeedRingTImer, [this, OverlapCharacter]()
-					{
-						OverlapCharacter->SetOriginalSpeed();
-						OverlapCharacter->OffAccelEffect();
-					}
-				, DurationTime, false);
+			, DurationTime, false);
 
-			}
-			else
-			{
-				//SendPacket
-				//send_obstacle_packet(Network::GetNetwork()->s_socket,ObjectID??);
-			}
 		}
 	}
 }

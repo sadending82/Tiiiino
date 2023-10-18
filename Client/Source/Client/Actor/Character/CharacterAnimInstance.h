@@ -39,5 +39,5 @@ protected:
 
 private:
 	UPROPERTY()
-		class ACharacter* OwnerCharacter;
+		class ATinoCharacter* OwnerCharacter;
 };

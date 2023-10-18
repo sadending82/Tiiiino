@@ -88,8 +88,8 @@ public:
 	void OnGrab();
 	void OffGrab();
 
-	void SetNormalToGrabbed();
-	void SetGrabbedToNormal();
+	void SetTargetNormalToGrabbed();
+	void SetTargetGrabbedToNormal();
 
 	void DetectTarget();
 	void GrabBegin();
@@ -146,7 +146,7 @@ public:
 	class UCharacterAnimInstance* GetTinoAnimInstance();
 
 public:
-
+	//UI 관련 변수
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
 		TSubclassOf<class UDialogUIWidget> DialogWidgetClass;
 	UPROPERTY()
