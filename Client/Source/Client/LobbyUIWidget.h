@@ -35,4 +35,7 @@ public:
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void TryBack();
 
+	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
+		float Grade;
+
 };

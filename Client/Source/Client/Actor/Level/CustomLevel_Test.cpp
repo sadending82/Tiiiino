@@ -72,7 +72,6 @@ bool ACustomLevel_Test::ConnGameServer()
 			send_movetogame_packet(Network::GetNetwork()->s_socket,Network::GetNetwork()->mDBUID,
 				TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterName), 0); 
 			GetWorld()->GetFirstPlayerController<ATinoController>()->SetInputGameMode();
-			//ASoundManager::GetSoundManager()->PlaySFX(ESFXType::ESFXType_RaceStart);
 
 			Network::GetNetwork()->mMyCharacter->DisableInputMode();
 			return true;

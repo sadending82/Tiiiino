@@ -117,6 +117,10 @@ public:
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 		void SetCreateAccountsInstance();
 
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+		UUserWidget* GetLobbyUIInstance();
+
+
 	//Accessory
 
 	//소켓 이름과 메시를 정해줘야함
@@ -135,8 +139,9 @@ public:
 	FORCEINLINE bool IsDivining() { return bIsDiving; }
 	FORCEINLINE float GetOriginalWalkSpeed() { return OriginalSpeed; }
 	FORCEINLINE FRotator GetOriginalRotationSpeed() { return OriginalRotationSpeed; }
-	FORCEINLINE float GetGrade() const { return Grade; }
-	FORCEINLINE void SetGrade(const float EditGrade) { Grade = EditGrade; }
+	float GetGrade() const;
+	void SetGrade(const float GradeValue);
+
 	UFUNCTION(BlueprintCallable)
 	void SetDepartmentClothes(int department);
 
@@ -173,6 +178,8 @@ public:
 		TSubclassOf<ULoginUIWidget> LoginWidgetClass;
 	UPROPERTY()
 		ULoginUIWidget* LoginUIInstance = nullptr;
+
+
 
 	UPROPERTY()
 		bool bIsSpactateModeEnabled = false;

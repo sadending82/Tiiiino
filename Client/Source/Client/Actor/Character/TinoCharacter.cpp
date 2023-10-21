@@ -8,6 +8,7 @@
 #include "MenuUI/InGameTimerWidget.h"
 #include "CreateAccountsWidget.h"
 #include "LoginUIWidget.h"
+#include "LobbyUIWidget.h"
 
 #include "Global.h"
 
@@ -268,6 +269,16 @@ void ATinoCharacter::SetCreateAccountsInstance()
 	}
 }
 
+UUserWidget* ATinoCharacter::GetLobbyUIInstance()
+{
+	auto TinoController = GetController<ATinoController>();
+	if (!!TinoController)
+	{
+		return TinoController->GetLobbyUIIndstance();
+	}
+	return nullptr;
+}
+
 void ATinoCharacter::TimerStart(ETimerType type)
 {
 	Type = type;
@@ -288,6 +299,28 @@ void ATinoCharacter::TimerRun()
 			InGameUITimerInstance->TimerEnd(Type);
 			GetWorldTimerManager().ClearTimer(UITimerHandle);
 		}
+	}
+}
+
+float ATinoCharacter::GetGrade() const
+{
+	float grade = 0.f;
+
+	auto TinoController = GetController<ATinoController>();
+	if (!!TinoController)
+	{
+		grade = TinoController->GetGradeUI();
+	}
+
+	return grade;
+}
+
+void ATinoCharacter::SetGrade(const float GradeValue)
+{
+	auto TinoController = GetController<ATinoController>();
+	if (!!TinoController)
+	{
+		TinoController->SetGradeUI(GradeValue);
 	}
 }
 

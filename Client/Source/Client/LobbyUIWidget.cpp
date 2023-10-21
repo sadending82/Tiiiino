@@ -8,6 +8,7 @@
 
 void ULobbyUIWidget::NativePreConstruct()
 {
+	Grade = 0.f;
 }
 
 void ULobbyUIWidget::NativeDestruct()

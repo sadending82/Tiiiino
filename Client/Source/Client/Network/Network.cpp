@@ -651,6 +651,7 @@ void Network::l_process_packet(unsigned char* p)
 		GameResult.rank = packet->rank;
 		GameResult.grade = packet->grade;
 		GameResult.point = packet->point;
+		mMyCharacter->SetGrade(packet->grade);
 		break;
 	}
 	case LC_CONTROL: {
