@@ -42,7 +42,7 @@ void ATrampoline::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, U
 	{
 		hitCharacter->LaunchCharacter(FVector(0.f, 0.f, ElasticForce), false, false);
 		JumpingMesh->PlayAnimation(HitAnimation, false);
-		ASoundManager::GetSoundManager()->PlaySFXAtLocation(ESFXType::ESFXType_Trapoline, GetActorLocation());
+		ASoundManager::GetSoundManager()->PlaySFXAtLocation(this,ESFXType::ESFXType_Trapoline, GetActorLocation());
 	}
 }
 

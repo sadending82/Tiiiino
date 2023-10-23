@@ -1,5 +1,7 @@
 #include "cSecurity.h"
 
+#ifdef RUN_DB
+
 string Security::GenerateSalt()
 {
 	unsigned char salt[SALT_LENGTH];
@@ -47,3 +49,4 @@ bool Security::VerifyPassword(string password, string hashedPassword, string sal
 
 	return true;
 }
+#endif 

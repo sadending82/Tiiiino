@@ -14,13 +14,13 @@ ASoundManager::ASoundManager()
 	SFXVolume(0.3f)
 {
 	ASoundManager::SoundManagerInstance = this;
-	UHelpers::CreateComponent(this, &MainAudio, "MainAudio",GetRootComponent());
-	UHelpers::CreateComponent(this, &SFXAudio, "SFXAudio", GetRootComponent());
+	UHelpers::CreateComponent(this, &SceneComponent, "SceneComponent", GetRootComponent());
+	UHelpers::CreateComponent(this, &MainAudio, "MainAudio", SceneComponent);
+	UHelpers::CreateComponent(this, &SFXAudio, "SFXAudio", SceneComponent);
 	UHelpers::CreateActorComponent(this, &AttenuationSettings, "AttenuationSettings");
 	MainAudio->SetVolumeMultiplier(BGMVolume);
 	SFXAudio->SetVolumeMultiplier(SFXVolume);
 
-	
 }
 
 void ASoundManager::SetBGM(EBGMType Type)
@@ -48,34 +48,30 @@ void ASoundManager::PlaySFX2D(ESFXType Type)
 	if (SoundManagerInstance && !SFXSoundMap.IsEmpty())
 	{
 		if (SFXSoundMap.Contains(Type) == false) return;
-		UGameplayStatics::PlaySound2D(GetWorld(), SFXSoundMap[Type], SFXVolume);
-		//
-		//SFXSoundMap[Type]->PlaySound
-		//SFXAudio->SetSound();
-		//SFXAudio->
+		
+		SFXAudio->SetSound(SFXSoundMap[Type]);
+		SFXAudio->Play();
 	}
 }
 
-void ASoundManager::PlaySFXAtLocation(ESFXType Type, FVector Location)
+void ASoundManager::PlaySFXAtLocation(AActor* PlayActor, ESFXType Type, FVector Location, USoundCue* Sound)
 {
 	if (SoundManagerInstance && !SFXSoundMap.IsEmpty())
 	{
-		if (SFXSoundMap.Contains(Type) == false) return;
-		UGameplayStatics::PlaySoundAtLocation(GetWorld(), SFXSoundMap[Type], Location,SFXVolume, 1.f, 0.f, AttenuationSettings);
-		//
-		//SFXSoundMap[Type]->PlaySound
-		//SFXAudio->SetSound();
-		//SFXAudio->
-	}
-}
+		if (SFXSoundMap.Contains(Type) == false)
+		{
+			CLog::Log("This Sound doesn't exist");
+			return;
+		}
 
-void ASoundManager::PlaySFXAtLocation(USoundCue* Sound, FVector Location)
-{
-	if (SoundManagerInstance && Sound)
-	{
-		UGameplayStatics::PlaySoundAtLocation(GetWorld(), Sound, Location, SFXVolume);
-		//SFXAudio->SetSound(Sound);
-		//SFXAudio->Play();
+		//재생할 액터에 채널이 달려있나 확인
+		if (SFXChannelMap.Contains(Type) == false)
+			AttachSFXChannel(PlayActor, Type);
+		//지정된 사운드가 있으면 그걸로 교체후 재생
+		if (!!Sound)
+			SFXChannelMap[Type]->SetSound(Sound);
+
+		SFXChannelMap[Type]->Play();
 	}
 }
 
@@ -87,4 +83,21 @@ void ASoundManager::SetBGMVolume(const float Volume)
 void ASoundManager::SetSFXVolume(const float Volume)
 {
 	SFXAudio->SetVolumeMultiplier(SFXVolume);
+}
+
+void ASoundManager::AttachSFXChannel(AActor* AttachActor, ESFXType Type)
+{
+	FName Name = FName( "SFxChannel" + StaticCast<int32>(Type));
+	UAudioComponent* SFXChannel = NewObject<UAudioComponent>(AttachActor, UAudioComponent::StaticClass(), Name);
+	
+	if (SFXChannelMap.Contains(Type) == false)
+	{
+		SFXChannelMap.Add(Type, SFXChannel);
+		SFXChannel->SetSound(SFXSoundMap[Type]);
+		SFXChannel->AttenuationSettings = AttenuationSettings;
+		SFXChannel->RegisterComponent();
+		SFXChannel->AttachToComponent(AttachActor->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+	}
+	else
+		CLog::Log("This SFXType already exist");
 }

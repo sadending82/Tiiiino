@@ -86,6 +86,6 @@ void AFallingWall::ActionObject()
 
 	FieldSystemComponent->ApplyPhysicsField(true, EFieldPhysicsType::Field_ExternalClusterStrain, nullptr, RadialFalloff);
 	FieldSystemComponent->ApplyPhysicsField(true, EFieldPhysicsType::Field_LinearForce, MetaData, RadialVector);
-	ASoundManager::GetSoundManager()->PlaySFXAtLocation(ESFXType::ESFXType_ObstacleDestruction, FieldLocation);
+	ASoundManager::GetSoundManager()->PlaySFXAtLocation(this, ESFXType::ESFXType_ObstacleDestruction, FieldLocation);
 	//DrawDebugSphere(GetWorld(), FieldLocation, 25.f, 12, FColor::Red, true, 30.f, 0, 1.f);
 }

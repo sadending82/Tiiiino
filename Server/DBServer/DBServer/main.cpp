@@ -8,9 +8,9 @@ int main(int argc, char* argv[])
 	std::wcout.imbue(std::locale("korean"));
 
 	Socket* pSocket = new Socket;
-	Security* pSecurity = new Security;
 
 #ifdef RUN_DB
+	Security* pSecurity = new Security;
 	DB* pDB = new DB;
 	pDB->SetmSecurity(pSecurity);
 	pDB->ConnectDB();
