@@ -1,8 +1,10 @@
 #pragma once
 
 #include "stdafx.h"
+#ifdef RUN_DB
 #include <openssl/sha.h>
 #include <openssl/rand.h>
+#endif 
 
 class Security {
 public:
