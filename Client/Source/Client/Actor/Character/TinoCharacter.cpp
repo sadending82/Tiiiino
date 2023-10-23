@@ -491,7 +491,7 @@ void ATinoCharacter::Jump()
 	{
 		Super::Jump();
 		SendAnimPacket(1);
-		ASoundManager::GetSoundManager()->PlaySFXAtLocation(ESFXType::ESFXType_Jump, GetActorLocation());
+		ASoundManager::GetSoundManager()->PlaySFXAtLocation(this,ESFXType::ESFXType_Jump, GetActorLocation());
 	}
 	
 }
@@ -501,7 +501,7 @@ void ATinoCharacter::Landed(const FHitResult& Hit)
 	Super::Landed(Hit);
 
 	DiveEnd();
-	ASoundManager::GetSoundManager()->PlaySFXAtLocation(ESFXType::ESFXType_Land, GetActorLocation());
+	ASoundManager::GetSoundManager()->PlaySFXAtLocation(this, ESFXType::ESFXType_Land, GetActorLocation());
 }
 
 void ATinoCharacter::StopJumping()
@@ -534,7 +534,7 @@ void ATinoCharacter::OffGrab()
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
 	if (MovementState == EMovementState::EMS_Grabbing)
-		ASoundManager::GetSoundManager()->PlaySFXAtLocation(ESFXType::ESFXType_OffGrab, GetActorLocation());
+		ASoundManager::GetSoundManager()->PlaySFXAtLocation(this, ESFXType::ESFXType_OffGrab, GetActorLocation());
 
 	StopAnimMontage(GrabMontage);
 	if (GetController() && GetController()->IsPlayerController())
@@ -643,7 +643,7 @@ void ATinoCharacter::DetectTarget()
 			SetMovementState(EMovementState::EMS_Grabbing);
 			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			SetTargetNormalToGrabbed();
-			ASoundManager::GetSoundManager()->PlaySFXAtLocation(ESFXType::ESFXType_OnGrab, GetActorLocation());
+			ASoundManager::GetSoundManager()->PlaySFXAtLocation(this, ESFXType::ESFXType_OnGrab, GetActorLocation());
 		}
 		else
 		{
