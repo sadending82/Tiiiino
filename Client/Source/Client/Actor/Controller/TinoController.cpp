@@ -4,6 +4,8 @@
 #include "Network/Network.h"
 #include "MenuUI/DialogUIWidget.h"
 #include "MenuUI/FinishGameUIWidget.h"
+#include "LobbyUIWidget.h"
+
 #include "Global.h"
 
 ATinoController::ATinoController()
@@ -15,6 +17,10 @@ ATinoController::ATinoController()
 void ATinoController::BeginPlay()
 {
 	Super::BeginPlay();
+
+	//로비 인스턴스 생성(인스턴스 한번만 생성하고 재사용)
+	SetLobbyInstance();
+
 	DialogUI = Cast<UDialogUIWidget>(CreateWidget(GetWorld(), DialogUIClass));
 	if (StartingWidgetClass != nullptr && UGameplayStatics::GetCurrentLevelName(GetWorld()) == "Lobby")
 	{
@@ -31,6 +37,14 @@ void ATinoController::BeginPlay()
 	}
 	//ChangeMenuWidget(StartingWidgetClass);
 	
+}
+
+void ATinoController::SetLobbyInstance()
+{
+	if (!!LobbyWidgetClass)
+	{
+		LobbyUIInstance = CreateWidget<ULobbyUIWidget>(GetWorld(), LobbyWidgetClass);
+	}
 }
 
 void ATinoController::ChangeMenuWidget(TSubclassOf<UUserWidget> NewWidgetClass)
@@ -122,6 +136,17 @@ void ATinoController::UIAlertMessage(EDialogUICheck check)
 		DialogUI->RenderUIAlertMessage();
 		DialogUI->AddToViewport();
 	}
+}
+
+void ATinoController::SetGradeUI(float GradeValue)
+{
+	if (LobbyUIInstance)LobbyUIInstance->Grade = GradeValue;
+}
+
+float ATinoController::GetGradeUI()
+{
+	if (LobbyUIInstance) return LobbyUIInstance->Grade;
+	return 0.f;
 }
 
 void ATinoController::DisconnectNetwork()
