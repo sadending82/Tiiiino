@@ -43,13 +43,13 @@ bool DB::ExecuteQuery()
 	return true;
 }
 
-tuple<string, string, double, int> DB::SelectUserData(const int uid)
+tuple<string, double, int> DB::SelectUserData(const int uid)
 {
-	string query = "SELECT id, nick, grade, point FROM userinfo WHERE uid = ?";
+	string query = "SELECT id, grade, point FROM userinfo WHERE uid = ?";
 
 	if (mysql_stmt_prepare(GetmStmt(), query.c_str(), query.length()) != 0) {
 		DEBUGMSGONEPARAM("SelectUserData stmt prepare error: %s\n", mysql_stmt_error(GetmStmt()));
-		return tuple<string, string, double, int>();
+		return tuple<string, double, int>();
 	}
 
 	MYSQL_BIND paramBind;
@@ -59,14 +59,13 @@ tuple<string, string, double, int> DB::SelectUserData(const int uid)
 
 	if (mysql_stmt_bind_param(GetmStmt(), &paramBind) != 0) {
 		DEBUGMSGONEPARAM("SelectUserData stmt param bind error: %s\n", mysql_stmt_error(GetmStmt()));
-		return tuple<string, string, double, int>();
+		return tuple<string,  double, int>();
 	}
 
-	const int resColNum = 4;
+	const int resColNum = 3;
 	MYSQL_BIND resultBinds[resColNum];
 	memset(resultBinds, 0, sizeof(resultBinds));
 	char bindID[MAX_NAME_SIZE];
-	char bindNickname[MAX_NAME_SIZE];
 	double bindgrade;
 	int bindPoint;
 	{
@@ -74,41 +73,37 @@ tuple<string, string, double, int> DB::SelectUserData(const int uid)
 		resultBinds[0].buffer_length = sizeof(bindID);
 		resultBinds[0].buffer = bindID;
 
-		resultBinds[1].buffer_type = MYSQL_TYPE_STRING;
-		resultBinds[1].buffer_length = sizeof(bindNickname);
-		resultBinds[1].buffer = bindNickname;
+		resultBinds[1].buffer_type = MYSQL_TYPE_DOUBLE;
+		resultBinds[1].buffer = &bindgrade;
 
-		resultBinds[2].buffer_type = MYSQL_TYPE_DOUBLE;
-		resultBinds[2].buffer = &bindgrade;
-
-		resultBinds[3].buffer_type = MYSQL_TYPE_LONG;
-		resultBinds[3].buffer = &bindPoint;
+		resultBinds[2].buffer_type = MYSQL_TYPE_LONG;
+		resultBinds[2].buffer = &bindPoint;
 
 	}
 
 	if (mysql_stmt_bind_result(GetmStmt(), resultBinds) != 0) {
 		DEBUGMSGONEPARAM("SelectUserData stmt result bind error: %s\n", mysql_stmt_error(GetmStmt()));
-		return tuple<string, string, double, int>();
+		return tuple<string, double, int>();
 	}
 
 	if (ExecuteQuery() == false) {
-		return tuple<string, string, double, int>();
+		return tuple<string, double, int>();
 	}
 
 	if (mysql_stmt_fetch(GetmStmt()) != 0) {
-		return tuple<string, string, double, int>();
+		return tuple<string, double, int>();
 	}
 
-	return make_tuple(bindID, bindNickname, bindgrade, bindPoint);
+	return make_tuple(bindID, bindgrade, bindPoint);
 }
 
-tuple<int, string, double, int, bool, char> DB::SelectUserDataForLogin(const string& id)
+tuple<int, double, int, bool, char> DB::SelectUserDataForLogin(const string& id)
 {
-	string query = "SELECT UID, nick, grade, point, state, department FROM tiiiino.userinfo WHERE id = ?";
+	string query = "SELECT UID, grade, point, state, department FROM tiiiino.userinfo WHERE id = ?";
 
 	if (mysql_stmt_prepare(GetmStmt(), query.c_str(), query.length()) != 0) {
 		DEBUGMSGONEPARAM("SelectUserData stmt prepare error: %s\n", mysql_stmt_error(GetmStmt()));
-		return tuple<int, string, double, int, bool, char>();
+		return tuple<int, double, int, bool, char>();
 	}
 
 	MYSQL_BIND paramBind;
@@ -121,14 +116,13 @@ tuple<int, string, double, int, bool, char> DB::SelectUserDataForLogin(const str
 
 	if (mysql_stmt_bind_param(GetmStmt(), &paramBind) != 0) {
 		DEBUGMSGONEPARAM("SelectUserData stmt param bind error: %s\n", mysql_stmt_error(GetmStmt()));
-		return tuple<int, string, double, int, bool, char>();
+		return tuple<int,  double, int, bool, char>();
 	}
 
-	const int resColNum = 6;
+	const int resColNum = 5;
 	MYSQL_BIND resultBinds[resColNum];
 	memset(resultBinds, 0, sizeof(resultBinds));
 	int bindUID, bindPoint;
-	char bindNickname[MAX_NAME_SIZE];
 	double bindGrade;
 	int bindState;
 	int bindDepartment;
@@ -136,37 +130,33 @@ tuple<int, string, double, int, bool, char> DB::SelectUserDataForLogin(const str
 		resultBinds[0].buffer_type = MYSQL_TYPE_LONG;
 		resultBinds[0].buffer = &bindUID;
 
-		resultBinds[1].buffer_type = MYSQL_TYPE_STRING;
-		resultBinds[1].buffer_length = sizeof(bindNickname);
-		resultBinds[1].buffer = bindNickname;
+		resultBinds[1].buffer_type = MYSQL_TYPE_DOUBLE;
+		resultBinds[1].buffer = &bindGrade;
 
-		resultBinds[2].buffer_type = MYSQL_TYPE_DOUBLE;
-		resultBinds[2].buffer = &bindGrade;
+		resultBinds[2].buffer_type = MYSQL_TYPE_LONG;
+		resultBinds[2].buffer = &bindPoint;
 
 		resultBinds[3].buffer_type = MYSQL_TYPE_LONG;
-		resultBinds[3].buffer = &bindPoint;
+		resultBinds[3].buffer = &bindState;
 
 		resultBinds[4].buffer_type = MYSQL_TYPE_LONG;
-		resultBinds[4].buffer = &bindState;
-
-		resultBinds[5].buffer_type = MYSQL_TYPE_LONG;
-		resultBinds[5].buffer = &bindDepartment;
+		resultBinds[4].buffer = &bindDepartment;
 	}
 
 	if (mysql_stmt_bind_result(GetmStmt(), resultBinds) != 0) {
 		DEBUGMSGONEPARAM("SelectUserData stmt result bind error: %s\n", mysql_stmt_error(GetmStmt()));
-		return tuple<int, string, double, int, bool, char>();
+		return tuple<int, double, int, bool, char>();
 	}
 
 	if (ExecuteQuery() == false) {
-		return tuple<int, string, double, int, bool, char>();
+		return tuple<int, double, int, bool, char>();
 	}
 
 	if (mysql_stmt_fetch(GetmStmt()) != 0) {
-		return tuple<int, string, double, int, bool, char>();
+		return tuple<int, double, int, bool, char>();
 	}
 
-	return make_tuple(bindUID, bindNickname, bindGrade, bindPoint, bindState, static_cast<char>(bindDepartment));
+	return make_tuple(bindUID, bindGrade, bindPoint, bindState, static_cast<char>(bindDepartment));
 }
 
 vector<string> DB::SelectHash(const string& id)
@@ -370,39 +360,6 @@ bool DB::UpdateUserConnectionState(const int uid, const int state)
 
 	if (mysql_stmt_bind_param(GetmStmt(), binds) != 0) {
 		DEBUGMSGONEPARAM("UpdateUserConnectionState stmt bind error: %s\n", mysql_stmt_error(GetmStmt()));
-		return false;
-	}
-
-	if (ExecuteQuery() == false) {
-		return false;
-	}
-
-	return true;
-}
-
-bool DB::UpdateUserNickname(const int uid, const string& nicknameToChange)
-{
-	string query = "UPDATE userinfo SET nick = ? WHERE UID = ?";
-
-	if (mysql_stmt_prepare(GetmStmt(), query.c_str(), query.length()) != 0) {
-		DEBUGMSGONEPARAM("InsertNewUser stmt prepare error: %s\n", mysql_stmt_error(GetmStmt()));
-		return false;
-	}
-
-	const int colNum = 2;
-
-	MYSQL_BIND binds[colNum];
-	memset(binds, 0, sizeof(binds));
-
-	binds[0].buffer_type = MYSQL_TYPE_STRING;
-	binds[0].buffer = (void*)nicknameToChange.c_str();
-	binds[0].buffer_length = nicknameToChange.length();
-
-	binds[1].buffer_type = MYSQL_TYPE_LONG;
-	binds[1].buffer = (void*)&uid;
-
-	if (mysql_stmt_bind_param(GetmStmt(), binds) != 0) {
-		DEBUGMSGONEPARAM("UpdateUserNickname stmt bind error: %s\n", mysql_stmt_error(GetmStmt()));
 		return false;
 	}
 

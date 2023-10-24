@@ -160,10 +160,6 @@ void Socket::processPacket(int key, unsigned char* buf)
         ProcessPacket_SignUp(key, buf);
         break;
     }
-    case LD_UPDATE_NICKNAME: {
-        ProcessPacket_UpdateNickname(key, buf);
-        break;
-    }
     case LD_UPDATE_GRADE: {
         ProcessPacket_UpdateGrade(key, buf);
         break;
@@ -209,13 +205,12 @@ bool Socket::CheckLogin(int key, const char* id, const char* password, int userK
     }
 
     int uid = get<0>(userData);
-    string nickname = get<1>(userData);
-    double grade = get<2>(userData);
-    int point = get<3>(userData);
-    int state = get<4>(userData);
-    char department = get<5>(userData);
+    double grade = get<1>(userData);
+    int point = get<2>(userData);
+    int state = get<3>(userData);
+    char department = get<4>(userData);
 
-    SendLoginOK(key, uid, nickname, id, grade, point, state, department, userKey);
+    SendLoginOK(key, uid, id, grade, point, state, department, userKey);
 
     if (state == FALSE)
         Getm_pDB()->UpdateUserConnectionState(uid, true);
@@ -239,7 +234,7 @@ bool Socket::CheckValidString(const char* input)
 }
 
 // SendPacket
-void Socket::SendLoginOK(int key, int uid, string nickname, const char* id
+void Socket::SendLoginOK(int key, int uid, const char* id
     , double grade, int point, int state, char department, int userKey)
 {
     DL_LOGIN_OK_PACKET p;
@@ -247,9 +242,6 @@ void Socket::SendLoginOK(int key, int uid, string nickname, const char* id
     p.type = SPacketType::DL_LOGIN_OK;
     p.uid = uid;
     memcpy(p.id, id, sizeof(p.id));
-    size_t lengthToCopy = min(nickname.size(), sizeof(p.nickname) - 1);
-    memcpy(p.nickname, nickname.c_str(), lengthToCopy);
-    p.nickname[lengthToCopy] = '\0';
     p.grade = grade;
     p.point = point;
     p.connState = state;
@@ -288,16 +280,6 @@ void Socket::SendSignUpFail(int key, int userKey)
     mSessions[key].DoSend((void*)(&p));
 }
 
-void Socket::SendUpdateNicknameOK(int key, int userKey)
-{
-    DL_UPDATE_NICKNAME_OK_PACKET p;
-    p.size = sizeof(DL_UPDATE_NICKNAME_OK_PACKET);
-    p.type = SPacketType::DL_UPDATE_NICKNAME_OK;
-    p.userKey = userKey;
-
-    mSessions[key].DoSend((void*)(&p));
-}
-
 // ProcessPacket
 void Socket::ProcessPacket_Login(int key, unsigned char* buf)
 {
@@ -313,7 +295,7 @@ void Socket::ProcessPacket_Login(int key, unsigned char* buf)
 
     int uid = SetUIDForTest();
 
-    SendLoginOK(key, uid, p->id, p->id
+    SendLoginOK(key, uid, p->id
         , 3.0, 100000, 1, 0, p->userKey);
 }
 
@@ -350,17 +332,6 @@ void Socket::ProcessPacket_SignUp(int key, unsigned char* buf)
 #endif
     DEBUGMSGONEPARAM("Sign Up new user success / ID: %s\n", p->id);
     SendSignUpOK(key, p->userKey);
-}
-
-void Socket::ProcessPacket_UpdateNickname(int key, unsigned char* buf)
-{
-    LD_UPDATE_NICKNAME_PACKET* p = reinterpret_cast<LD_UPDATE_NICKNAME_PACKET*>(buf);
-#ifdef RUN_DB
-    bool bResult = Getm_pDB()->UpdateUserNickname(p->uid, p->nickname);
-    if (bResult == true) {
-        SendUpdateNicknameOK(key, p->userKey);
-    }
-#endif
 }
 
 void Socket::ProcessPacket_UpdateGrade(int key, unsigned char* buf)

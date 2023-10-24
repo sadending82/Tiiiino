@@ -23,17 +23,15 @@ public:
 	bool CheckLogin(int key, const char* id, const char* password, int userid, const char* version);
 	bool CheckValidString(const char* str);
 
-	void SendLoginOK(int key, int uid, string nickname, const char* id, double grade
+	void SendLoginOK(int key, int uid, const char* id, double grade
 		, int point, int state, char department, int userid);
 	void SendLoginFail(int key, int userKey);
 	void SendSignUpOK(int key, int userKey);
 	void SendSignUpFail(int key, int userKey);
-	void SendUpdateNicknameOK(int key, int userKey);
 
 	void ProcessPacket_Login(int key, unsigned char* buf);
 	void ProcessPacket_Logout(unsigned char* buf);
 	void ProcessPacket_SignUp(int key, unsigned char* buf);
-	void ProcessPacket_UpdateNickname(int key, unsigned char* buf); 
 	void ProcessPacket_UpdateGrade(int key, unsigned char* buf);
 
 	void ProcessPacket_ChangeDepartment(int key, unsigned char* buf);

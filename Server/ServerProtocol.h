@@ -37,14 +37,12 @@ enum SPacketType {
 	LD_LOGIN,
 	LD_LOGOUT,
 	LD_SIGNUP,
-	LD_UPDATE_NICKNAME,
 	LD_UPDATE_GRADE,
 	LD_CHANGE_DEPARTMENT,
 
 	// DBServer To LobbyServer
 	DL_LOGIN_OK,
 	DL_LOGIN_FAIL,
-	DL_UPDATE_NICKNAME_OK,
 	DL_CHANGE_DEPARTMENT_OK,
 	DL_SIGNUP_OK,
 	DL_SIGNUP_FAIL
@@ -117,12 +115,6 @@ struct LD_SIGNUP_PACKET :public SPACKET {
 	int		userKey;
 };
 
-struct LD_UPDATE_NICKNAME_PACKET :public SPACKET {
-	char	nickname[MAX_NAME_SIZE];
-	int		uid;
-	int		userKey;
-};
-
 struct LD_UPDATE_GRADE_PACKET :public SPACKET {
 	int		uid;
 	double	grade;
@@ -136,7 +128,6 @@ struct LD_CHANGE_DEPARTMENT_PACKET :public SPACKET {
 struct DL_LOGIN_OK_PACKET :public SPACKET {
 	int		uid;
 	char	id[MAX_NAME_SIZE];
-	char	nickname[MAX_NAME_SIZE];
 	char	department;
 	double	grade;
 	int		point;
@@ -146,10 +137,6 @@ struct DL_LOGIN_OK_PACKET :public SPACKET {
 
 struct DL_LOGIN_FAIL_PACKET :public SPACKET {
 	int		errorCode;
-	int		userKey;
-};
-
-struct DL_UPDATE_NICKNAME_OK_PACKET :public SPACKET {
 	int		userKey;
 };
 
