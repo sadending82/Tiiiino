@@ -21,3 +21,5 @@ void SendGameLoadAck(int key);
 void SendGameServerLoginPacket(int key);
 
 void SendPingPacket(int key, const long long ping);
+
+string MakeDummyID(int num);

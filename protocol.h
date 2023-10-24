@@ -260,6 +260,7 @@ struct SC_GAME_BREAKPLATFORM_PACKET : public PACKET {
 struct LC_LOGIN_OK_PACKET : public PACKET {
 	int id;
 	int UID;
+	double grade;
 	int RoomID;
 };
 
