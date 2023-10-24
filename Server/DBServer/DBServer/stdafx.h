@@ -14,6 +14,7 @@
 
 #include <windows.h>  
 #include <locale.h>
+#include <cctype>
 
 #define UNICODE  
 
@@ -32,7 +33,7 @@ constexpr const char* ADMIN_ID = "admin";
 
 //###############################
 //###############################
-//#define RUN_DB
+#define RUN_DB
 //###############################
 //###############################
 

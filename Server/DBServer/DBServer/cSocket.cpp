@@ -230,9 +230,11 @@ bool Socket::CheckValidString(const char* input)
 {
     string str = input;
 
-    if (str.find_first_of(" !@#$%^&*()_+{}[];:'\"<>,.?") != std::string::npos) {
-        return false;
+    for (wchar_t c : str) {
+        if (iswpunct(c)) return false;
+        if (0xAC00 <= c && c <= 0xD7A3) return false;
     }
+
     return true;
 }
 
@@ -330,10 +332,12 @@ void Socket::ProcessPacket_SignUp(int key, unsigned char* buf)
     if (CheckValidString(p->id) != true) {
         DEBUGMSGONEPARAM("User Input Invaild Charactor In ID / ID: %s\n", p->id);
         SendSignUpFail(key, p->userKey);
+        return;
     }
     if (CheckValidString(p->password) != true) {
         DEBUGMSGONEPARAM("User Input Invaild Charactor In Password / PW: %s\n", p->password);
         SendSignUpFail(key, p->userKey);
+        return;
     }
 
 #ifdef RUN_DB
