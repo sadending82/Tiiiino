@@ -111,7 +111,8 @@ bool ACustomLevel_Test::ConnLobbyServer()
 
 				// 결과창 출력
 				ShowGameResult();
-
+				//학점 재반영 (게임 종료 -> 로비)
+				TinoController->SetGradeUI(Network::GetNetwork()->GameResult.grade);
 				Network::GetNetwork()->GameResult = sGameResult{}; // 결과 처리 했으니 비워주기.
 			}
 			CLog::Log("Connect Lobby Against Successfully");
