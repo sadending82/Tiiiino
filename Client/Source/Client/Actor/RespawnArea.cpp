@@ -33,7 +33,7 @@ void ARespawnArea::NotifyActorBeginOverlap(AActor* OtherActor)
 	{
 		MyCharacter->SetActorLocation(RespawnPoint, false, (FHitResult*)nullptr, ETeleportType::ResetPhysics);
 		MyCharacter->GetCharacterMovement()->StopMovementImmediately();
-		ASoundManager::GetSoundManager()->PlaySFXAtLocation(ESFXType::ESFXType_Respawn, MyCharacter->GetActorLocation());
+		ASoundManager::GetSoundManager()->PlaySFXAtLocation(this,ESFXType::ESFXType_Respawn, MyCharacter->GetActorLocation());
 	}
 }
 

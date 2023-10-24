@@ -27,15 +27,17 @@ void WorkerThread::doThread()
 		int client_id = static_cast<int>(iocp_key);
 		WSA_OVER_EX* wsa_ex = reinterpret_cast<WSA_OVER_EX*>(overlapped);
 		if (FALSE == ret) {
-			int err_no = WSAGetLastError();
-			DEBUGMSGNOPARAM("GQCS Error\n");
-			mMainServer->ErrorDisplay(err_no);
 			if (wsa_ex->GetCmd() == eCOMMAND_IOCP::CMD_SEND)
+			{
 				delete wsa_ex;
-			else if(wsa_ex->GetCmd() == eCOMMAND_IOCP::CMD_RECV)
+			}
+			else if (wsa_ex->GetCmd() == eCOMMAND_IOCP::CMD_RECV)
 			{
 				auto t = dynamic_cast<Player*>(mMainServer->GetObjects()[client_id]);
 				if (t) {
+					int err_no = WSAGetLastError();
+					DEBUGMSGNOPARAM("GQCS Error\n");
+					mMainServer->ErrorDisplay(err_no);
 					std::cout << "GQCS DISCONN\n";
 					t->DisConnectAndReset();
 				}				
@@ -62,7 +64,13 @@ void WorkerThread::doThread()
 		case eCOMMAND_IOCP::CMD_RECV: {
 			if (bytes == 0) {
 				auto t = dynamic_cast<Player*>(mMainServer->GetObjects()[client_id]);
-				if (t) t->DisConnectAndReset();
+				if (t) {
+					int err_no = WSAGetLastError();
+					DEBUGMSGNOPARAM("GQCS Error\n");
+					mMainServer->ErrorDisplay(err_no);
+					std::cout << "GQCS DISCONN\n";
+					t->DisConnectAndReset();
+				}	
 				break;
 			}
 
