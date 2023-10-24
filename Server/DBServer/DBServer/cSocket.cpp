@@ -230,14 +230,14 @@ bool Socket::CheckValidString(const char* input)
 {
     string str = input;
 
-    if (str.find_first_of("!@#$%^&*()_+{}[];:'\"<>,.?") != std::string::npos) {
+    if (str.find_first_of(" !@#$%^&*()_+{}[];:'\"<>,.?") != std::string::npos) {
         return false;
     }
     return true;
 }
 
 // SendPacket
-void Socket::SendLoginOK(int key, int uid, string& nickname, const char* id
+void Socket::SendLoginOK(int key, int uid, string nickname, const char* id
     , double grade, int point, int state, char department, int userKey)
 {
     DL_LOGIN_OK_PACKET p;
@@ -301,16 +301,18 @@ void Socket::ProcessPacket_Login(int key, unsigned char* buf)
 {
     LD_LOGIN_PACKET* p = reinterpret_cast<LD_LOGIN_PACKET*>(buf);
 
-    if (strcmp(p->id, ADMIN_ID) == 0) {
-        Admin_Login(key, buf);
-        return;
-    }
 #ifdef RUN_DB
     bool bResult = CheckLogin(key, p->id, p->password, p->userKey, p->gameVersion);
     if (bResult == false) {
         SendLoginFail(key, p->userKey);
     }
+    return;
 #endif
+
+    int uid = SetUIDForTest();
+
+    SendLoginOK(key, uid, p->id, p->id
+        , 3.0, 100000, 1, 0, p->userKey);
 }
 
 void Socket::ProcessPacket_Logout(unsigned char* buf)
@@ -400,34 +402,7 @@ void Socket::ProcessPacket_ChangeDepartment(int key, unsigned char* buf)
 }
 
 
-// ADMIN
-int Socket::SetAdminUID()
+int Socket::SetUIDForTest()
 {
-    int cnt = ADMIN_START_UID;
-    while (true) {
-        if (cnt == ADMIN_LAST_UID)
-            return INVALIDKEY;
-        if (bAdminLogin[cnt] == false) {
-            return cnt;
-        }
-        else
-            ++cnt;
-    }
-}
-
-void Socket::Admin_Login(int key, unsigned char* buf)
-{
-    LD_LOGIN_PACKET* p = reinterpret_cast<LD_LOGIN_PACKET*>(buf);
-
-    int uid = atoi(p->password);
-
-    if (uid < 1 && 10 < uid) {
-        SendLoginFail(key, p->userKey);
-        return;
-    }
-
-    string id = string(ADMIN_ID) + string(p->password);
-
-    SendLoginOK(key, uid, id, id.c_str()
-        , 3.0, 100000, 1, 0, p->userKey);
+    return testUID++;
 }

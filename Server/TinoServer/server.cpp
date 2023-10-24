@@ -828,6 +828,7 @@ void Server::SendLoginOK(int cID)
 	pac.type = LC_LOGIN_OK;
 	pac.size = sizeof(LC_LOGIN_OK_PACKET);
 	pac.id = cID;
+	pac.grade = mClients[cID].mGrade;
 	pac.RoomID = 0;
 	pac.UID = mClients[cID].mUID;
 

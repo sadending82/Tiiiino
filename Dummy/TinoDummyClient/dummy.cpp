@@ -380,11 +380,11 @@ void Adjust_Number_Of_Client()
 	CreateIoCompletionPort(reinterpret_cast<HANDLE>(g_clients[num_connections].l_client_socket), g_hiocp, num_connections, 0);
 
 	CL_LOGIN_PACKET sPacket;
-	int temp = num_connections;
 	sPacket.size = sizeof(sPacket);
 	sPacket.type = CL_LOGIN;
-	sprintf_s(sPacket.id, "%d", temp);
-	sprintf_s(sPacket.password, "%d", temp);
+	int num = num_connections;
+	strcpy_s(sPacket.id, MakeDummyID(num).c_str());
+	sprintf_s(sPacket.password, "%d", num);
 	strcpy_s(sPacket.gameVersion, GAMEVERSION);
 	SendPacketToLobby(num_connections, &sPacket);
 
@@ -579,4 +579,11 @@ void SendPingPacket(int key, const long long ping)
 	packet.ping = ping;
 
 	SendPacketToGame(key, &packet);
+}
+
+string MakeDummyID(int num)
+{
+	string id = "dummy" + to_string(num);
+
+	return id;
 }
