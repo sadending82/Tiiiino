@@ -485,9 +485,7 @@ void ATinoCharacter::CreateDummy()
 
 void ATinoCharacter::Jump()
 {
-	bool bCanJump = (CanMove() && GetCharacterMovement()->IsFalling() == false);
-
-	if (bIsControlledPlayer == false || bCanJump == true)
+	if (bIsControlledPlayer == false || CanJump())
 	{
 		Super::Jump();
 		SendAnimPacket(1);
@@ -717,6 +715,7 @@ bool ATinoCharacter::CanDive()
 		break;
 	}
 	ret &= (bIsDiving == false);
+	ret &= (bIsSpactateModeEnabled == false);
 	return ret;
 }
 
@@ -739,6 +738,16 @@ bool ATinoCharacter::CanGrab()
 		break;
 	}
 
+	ret &= (bIsSpactateModeEnabled == false);
+	return ret;
+}
+
+bool ATinoCharacter::CanJump()
+{
+	bool ret = true;
+
+	ret &= (CanMove() && GetCharacterMovement()->IsFalling() == false);
+	ret &= (bIsSpactateModeEnabled == false);
 
 	return ret;
 }

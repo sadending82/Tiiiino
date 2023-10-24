@@ -23,6 +23,7 @@ enum class EMovementState : uint8
 	EMS_Dive UMETA(DisplayName = "Dive"),
 	EMS_Grabbing UMETA(DisplayName = "Grabbing"),
 	EMS_IsGrabbed UMETA(DisplayName = "IsGrabbed"),
+	EMS_GameEnd UMETA(DisplayName = "GameEnd"),
 	EMS_MAX UMETA(DisplayName = "DefaultMAX")
 };
 
@@ -132,6 +133,7 @@ public:
 	TArray<TSubclassOf<class AAccessoryItem>> AccessoryInvetory;
 
 	//Getter & Setter
+	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void SetMovementState(EMovementState State) { MovementState = State; }
 	FORCEINLINE void SetMaxTumbleTime(float MaxTime) { MaxTumbledTime = MaxTime; }
 	FORCEINLINE EMovementState GetMovementState() { return MovementState; }
@@ -202,6 +204,7 @@ private:
 	bool CanMove();
 	bool CanDive();
 	bool CanGrab();
+	bool CanJump();
 
 	bool CanTumble(float DeltaTime);
 	void PlayTumbleMontage(float DeltaTime);
