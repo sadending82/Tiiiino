@@ -152,7 +152,6 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		mClients[p->userKey].mStateLock.lock();
 		mClients[p->userKey].mGrade = p->grade;
 		mClients[p->userKey].mDepartment = p->department;
-		strcpy_s(mClients[p->userKey].mNickName, p->nickname);
 		strcpy_s(mClients[p->userKey].mID, p->id);
 		mClients[p->userKey].mPoint = p->point;
 		mClients[p->userKey].mUID = p->uid;

@@ -25,16 +25,15 @@ public:
 	bool ConnectDB();
 	bool ExecuteQuery();
 
-	tuple<string, string, double, int> SelectUserData(const int uid);
-	tuple<int, string, double, int, bool, char> SelectUserDataForLogin(const string& id);
+	tuple<ID, GRADE, POINT> SelectUserData(const int uid);
+	tuple<UNIQUEID, GRADE, POINT, STATE, DEPARTMENT> SelectUserDataForLogin(const string& id);
 	vector<string> SelectHash(const string& id); // Index 0: hash / Index 1: salt
-	tuple<double, char> SelectUserGradeAndDepartment(const int uid);
+	tuple<GRADE, DEPARTMENT> SelectUserGradeAndDepartment(const int uid);
 
 	bool InsertNewUser(const string& id, const char department);
 	bool InsertNewAccount(const string& id, const string& password);
 
 	bool UpdateUserConnectionState(const int uid, const int state);
-	bool UpdateUserNickname(const int uid, const string& nicknameToChange);
 	bool UpdateUserGrade(const int uid, double grade);
 	bool UpdateUserPoint(const int uid, unsigned int point);
 	bool UpdateUserDepartment(const int uid, const char department);

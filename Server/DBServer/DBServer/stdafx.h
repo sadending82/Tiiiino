@@ -14,8 +14,17 @@
 
 #include <windows.h>  
 #include <locale.h>
+#include <cctype>
 
 #define UNICODE  
+
+#define ID string
+#define UNIQUEID int
+#define GRADE double
+#define POINT int
+#define STATE bool
+#define DEPARTMENT char
+
 
 constexpr int MAXLOBBY = 10;
 constexpr int INVALIDKEY = -1;
@@ -32,7 +41,7 @@ constexpr const char* ADMIN_ID = "admin";
 
 //###############################
 //###############################
-//#define RUN_DB
+#define RUN_DB
 //###############################
 //###############################
 
