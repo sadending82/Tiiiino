@@ -140,7 +140,17 @@ void ATinoController::UIAlertMessage(EDialogUICheck check)
 
 void ATinoController::SetGradeUI(float GradeValue)
 {
-	if (LobbyUIInstance)LobbyUIInstance->Grade = GradeValue;
+	if (LobbyUIInstance)
+	{
+		LobbyUIInstance->Grade = GradeValue;
+	}
+	//CreateWidget으로 매번 CurrentWidget을 생성해줄때는 아래코드
+	//UI별로 객체를 생성해서 사용하면 위코드를 사용할것
+	auto lobby = Cast<ULobbyUIWidget>(CurrentWidget);
+	if (lobby)
+	{
+		lobby->Grade = GradeValue;
+	}
 }
 
 float ATinoController::GetGradeUI()

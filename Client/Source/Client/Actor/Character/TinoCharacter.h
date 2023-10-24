@@ -141,8 +141,9 @@ public:
 	FORCEINLINE bool IsDivining() { return bIsDiving; }
 	FORCEINLINE float GetOriginalWalkSpeed() { return OriginalSpeed; }
 	FORCEINLINE FRotator GetOriginalRotationSpeed() { return OriginalRotationSpeed; }
-	float GetGrade() const;
-	void SetGrade(const float GradeValue);
+	FORCEINLINE float GetGrade() const { return Grade; }
+	FORCEINLINE void SetGrade(const float GradeValue) { Grade = GradeValue; };
+	void SetGradeUI(const double GradeValue);
 
 	UFUNCTION(BlueprintCallable)
 	void SetDepartmentClothes(int department);

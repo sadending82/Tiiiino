@@ -591,13 +591,14 @@ void Network::l_process_packet(unsigned char* p)
 		bIsConnectedLobby = true;
 		CLog::Print("LC_LOGIN_OK IS CALLING");
 
+		//아래 코드 7줄을 함수 하나로 묶자 mMyCharacter->LoginOK();TinoController->LoginOK(); 이런 느낌
 		auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(mMyCharacter->GetWorld(), 0));
 		if (TinoController == nullptr)
 		{
 			CLog::Print("TinoController is nullptr");
 		}
 		TinoController->ChangeMenuWidget(TinoController->GetLobbyWidgetClass());
-
+		mMyCharacter->SetGradeUI(packet->grade);
 		break;
 	}
 	case LC_LOGIN_FAIL:
@@ -651,7 +652,6 @@ void Network::l_process_packet(unsigned char* p)
 		GameResult.rank = packet->rank;
 		GameResult.grade = packet->grade;
 		GameResult.point = packet->point;
-		mMyCharacter->SetGrade(packet->grade);
 		break;
 	}
 	case LC_CONTROL: {

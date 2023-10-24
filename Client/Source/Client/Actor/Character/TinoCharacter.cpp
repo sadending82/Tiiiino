@@ -26,7 +26,7 @@ ATinoCharacter::ATinoCharacter()
 	MaxGrabTime(3.0f),
 	GrabCoolTime(1.0f),
 	GrabbedSpeed(100.f),
-	GrabbedRotationSpeed(FRotator(0.f,0.f,108.f)),
+	GrabbedRotationSpeed(FRotator(0.f, 0.f, 108.f)),
 	DetectDist(100.f),
 	DetectRadius(50.f),
 	DetectAngle(60.f),
@@ -44,7 +44,7 @@ ATinoCharacter::ATinoCharacter()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	SpringArm->bDoCollisionTest = false;
 	SpringArm->bUsePawnControlRotation = true;
-	
+
 	OriginalRotationSpeed = GetCharacterMovement()->RotationRate;
 }
 
@@ -122,7 +122,6 @@ void ATinoCharacter::Tick(float DeltaTime)
 			{
 				if (!GetController()->IsPlayerController())
 				{
-					
 					//서버랑 연결 돼 있을 때만 상대 캐릭터 보간하려
 					//Update GroundSpeedd (22-04-05)
 					//GroundSpeedd = ServerStoreGroundSpeed;
@@ -145,14 +144,12 @@ void ATinoCharacter::Tick(float DeltaTime)
 
 						float CharXYVelocity = ((ACharacter::GetCharacterMovement()->Velocity) * FVector(1.f, 1.f, 0.f)).Size();
 					}
-
 				}
 			}
-			
 		}
 
 		PlayTumbleMontage(DeltaTime);
-		
+
 		if (MovementState == EMovementState::EMS_Grabbing && Target != nullptr)
 		{
 			SetActorLocation(Target->GetActorLocation() - GetActorForwardVector() * TargetInterval);
@@ -302,25 +299,14 @@ void ATinoCharacter::TimerRun()
 	}
 }
 
-float ATinoCharacter::GetGrade() const
+void ATinoCharacter::SetGradeUI(const double GradeValue)
 {
-	float grade = 0.f;
-
+	float value = StaticCast<float>(GradeValue);
 	auto TinoController = GetController<ATinoController>();
 	if (!!TinoController)
 	{
-		grade = TinoController->GetGradeUI();
-	}
-
-	return grade;
-}
-
-void ATinoCharacter::SetGrade(const float GradeValue)
-{
-	auto TinoController = GetController<ATinoController>();
-	if (!!TinoController)
-	{
-		TinoController->SetGradeUI(GradeValue);
+		SetGrade(value);
+		TinoController->SetGradeUI(value);
 	}
 }
 
@@ -347,7 +333,7 @@ void ATinoCharacter::SetDepartmentClothes(int department)
 	}
 	else
 	{
-		CLog::Print("Department value is Invalid. Check Server",1, 10.f,FColor::Red);
+		CLog::Print("Department value is Invalid. Check Server", 1, 10.f, FColor::Red);
 	}
 }
 
@@ -469,13 +455,13 @@ void ATinoCharacter::OnMoveRight(float Axis)
 void ATinoCharacter::OnHorizonLock(float Axis)
 {
 	if (bIsControlledPlayer && PlayerController->bShowMouseCursor == true) return;
-		AddControllerYawInput(Axis);
+	AddControllerYawInput(Axis);
 }
 
 void ATinoCharacter::OnVerticalLock(float Axis)
 {
 	if (bIsControlledPlayer && PlayerController->bShowMouseCursor == true) return;
-		AddControllerPitchInput(Axis);
+	AddControllerPitchInput(Axis);
 }
 
 void ATinoCharacter::CreateDummy()
@@ -489,9 +475,9 @@ void ATinoCharacter::Jump()
 	{
 		Super::Jump();
 		SendAnimPacket(1);
-		ASoundManager::GetSoundManager()->PlaySFXAtLocation(this,ESFXType::ESFXType_Jump, GetActorLocation());
+		ASoundManager::GetSoundManager()->PlaySFXAtLocation(this, ESFXType::ESFXType_Jump, GetActorLocation());
 	}
-	
+
 }
 
 void ATinoCharacter::Landed(const FHitResult& Hit)
@@ -537,7 +523,7 @@ void ATinoCharacter::OffGrab()
 	StopAnimMontage(GrabMontage);
 	if (GetController() && GetController()->IsPlayerController())
 		SetMovementState(EMovementState::EMS_Normal);
-	
+
 	SetTargetGrabbedToNormal();
 
 	bIsGrabbing = false;
@@ -620,13 +606,13 @@ void ATinoCharacter::DetectTarget()
 	{
 		Target = HitResult.GetActor();
 		//float ScalarValue = GetActorForwardVector().Dot(Target->GetActorForwardVector());
-		
+
 		// 이미 잡힌 캐릭터나 잡고있는 캐릭터는 잡기 대상이 될 수 없다(기차 방지)
 		EMovementState TargetState = Cast<ATinoCharacter>(Target)->GetMovementState();
 		switch (TargetState)
 		{
-		case EMovementState::EMS_Grabbing :
-		case EMovementState::EMS_IsGrabbed :
+		case EMovementState::EMS_Grabbing:
+		case EMovementState::EMS_IsGrabbed:
 			Target = nullptr;
 			return;
 		default:
@@ -651,7 +637,7 @@ void ATinoCharacter::DetectTarget()
 		//앞뒤 판정
 		/*if (ScalarValue > 0)
 		{
-			
+
 		}
 		else
 		{
