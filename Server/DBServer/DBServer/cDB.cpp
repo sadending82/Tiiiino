@@ -43,13 +43,13 @@ bool DB::ExecuteQuery()
 	return true;
 }
 
-tuple<string, double, int> DB::SelectUserData(const int uid)
+tuple<ID, GRADE, POINT> DB::SelectUserData(const int uid)
 {
 	string query = "SELECT id, grade, point FROM userinfo WHERE uid = ?";
 
 	if (mysql_stmt_prepare(GetmStmt(), query.c_str(), query.length()) != 0) {
 		DEBUGMSGONEPARAM("SelectUserData stmt prepare error: %s\n", mysql_stmt_error(GetmStmt()));
-		return tuple<string, double, int>();
+		return tuple<ID, GRADE, POINT>();
 	}
 
 	MYSQL_BIND paramBind;
@@ -59,7 +59,7 @@ tuple<string, double, int> DB::SelectUserData(const int uid)
 
 	if (mysql_stmt_bind_param(GetmStmt(), &paramBind) != 0) {
 		DEBUGMSGONEPARAM("SelectUserData stmt param bind error: %s\n", mysql_stmt_error(GetmStmt()));
-		return tuple<string,  double, int>();
+		return tuple<ID, GRADE, POINT>();
 	}
 
 	const int resColNum = 3;
@@ -83,27 +83,27 @@ tuple<string, double, int> DB::SelectUserData(const int uid)
 
 	if (mysql_stmt_bind_result(GetmStmt(), resultBinds) != 0) {
 		DEBUGMSGONEPARAM("SelectUserData stmt result bind error: %s\n", mysql_stmt_error(GetmStmt()));
-		return tuple<string, double, int>();
+		return tuple<ID, GRADE, POINT>();
 	}
 
 	if (ExecuteQuery() == false) {
-		return tuple<string, double, int>();
+		return tuple<ID, GRADE, POINT>();
 	}
 
 	if (mysql_stmt_fetch(GetmStmt()) != 0) {
-		return tuple<string, double, int>();
+		return tuple<ID, GRADE, POINT>();
 	}
 
 	return make_tuple(bindID, bindgrade, bindPoint);
 }
 
-tuple<int, double, int, bool, char> DB::SelectUserDataForLogin(const string& id)
+tuple<UNIQUEID, GRADE, POINT, STATE, DEPARTMENT> DB::SelectUserDataForLogin(const string& id)
 {
 	string query = "SELECT UID, grade, point, state, department FROM tiiiino.userinfo WHERE id = ?";
 
 	if (mysql_stmt_prepare(GetmStmt(), query.c_str(), query.length()) != 0) {
 		DEBUGMSGONEPARAM("SelectUserData stmt prepare error: %s\n", mysql_stmt_error(GetmStmt()));
-		return tuple<int, double, int, bool, char>();
+		return tuple<UNIQUEID, GRADE, POINT, STATE, DEPARTMENT>();
 	}
 
 	MYSQL_BIND paramBind;
@@ -116,7 +116,7 @@ tuple<int, double, int, bool, char> DB::SelectUserDataForLogin(const string& id)
 
 	if (mysql_stmt_bind_param(GetmStmt(), &paramBind) != 0) {
 		DEBUGMSGONEPARAM("SelectUserData stmt param bind error: %s\n", mysql_stmt_error(GetmStmt()));
-		return tuple<int,  double, int, bool, char>();
+		return tuple<UNIQUEID, GRADE, POINT, STATE, DEPARTMENT>();
 	}
 
 	const int resColNum = 5;
@@ -145,15 +145,15 @@ tuple<int, double, int, bool, char> DB::SelectUserDataForLogin(const string& id)
 
 	if (mysql_stmt_bind_result(GetmStmt(), resultBinds) != 0) {
 		DEBUGMSGONEPARAM("SelectUserData stmt result bind error: %s\n", mysql_stmt_error(GetmStmt()));
-		return tuple<int, double, int, bool, char>();
+		return tuple<UNIQUEID, GRADE, POINT, STATE, DEPARTMENT>();
 	}
 
 	if (ExecuteQuery() == false) {
-		return tuple<int, double, int, bool, char>();
+		return tuple<UNIQUEID, GRADE, POINT, STATE, DEPARTMENT>();
 	}
 
 	if (mysql_stmt_fetch(GetmStmt()) != 0) {
-		return tuple<int, double, int, bool, char>();
+		return tuple<UNIQUEID, GRADE, POINT, STATE, DEPARTMENT>();
 	}
 
 	return make_tuple(bindUID, bindGrade, bindPoint, bindState, static_cast<char>(bindDepartment));
@@ -217,13 +217,13 @@ vector<string> DB::SelectHash(const string& id)
 	return result;
 }
 
-tuple<double, char> DB::SelectUserGradeAndDepartment(const int uid)
+tuple<GRADE, DEPARTMENT>  DB::SelectUserGradeAndDepartment(const int uid)
 {
 	string query = "SELECT grade, department FROM userinfo WHERE uid = ?";
 
 	if (mysql_stmt_prepare(GetmStmt(), query.c_str(), query.length()) != 0) {
 		DEBUGMSGONEPARAM("SelectUserData stmt prepare error: %s\n", mysql_stmt_error(GetmStmt()));
-		return tuple<double, char>();
+		return tuple<GRADE, DEPARTMENT>();
 	}
 
 	MYSQL_BIND paramBind;
@@ -233,7 +233,7 @@ tuple<double, char> DB::SelectUserGradeAndDepartment(const int uid)
 
 	if (mysql_stmt_bind_param(GetmStmt(), &paramBind) != 0) {
 		DEBUGMSGONEPARAM("SelectUserData stmt param bind error: %s\n", mysql_stmt_error(GetmStmt()));
-		return tuple<double, char>();
+		return tuple<GRADE, DEPARTMENT>();
 	}
 
 	const int resColNum = 2;
@@ -251,15 +251,15 @@ tuple<double, char> DB::SelectUserGradeAndDepartment(const int uid)
 
 	if (mysql_stmt_bind_result(GetmStmt(), resultBinds) != 0) {
 		DEBUGMSGONEPARAM("SelectUserData stmt result bind error: %s\n", mysql_stmt_error(GetmStmt()));
-		return tuple<double, char>();
+		return tuple<GRADE, DEPARTMENT>();
 	}
 
 	if (ExecuteQuery() == false) {
-		return tuple<double, char>();
+		return tuple<GRADE, DEPARTMENT>();
 	}
 
 	if (mysql_stmt_fetch(GetmStmt()) != 0) {
-		return tuple<double, char>();
+		return tuple<GRADE, DEPARTMENT>();
 	}
 
 	return make_tuple(bindGrade, static_cast<char>(bindDepartment));
@@ -567,7 +567,8 @@ void DB::CreateDummyAccount(int count)
 	for (int i = 0; i < count; ++i) {
 
 		char id[MAX_NAME_SIZE], pw[MAX_NAME_SIZE];
-		sprintf_s(id, "%d", i);
+		string dummyID = "dummy" + to_string(i);
+		strcpy_s(id, dummyID.c_str());
 		sprintf_s(pw, "%d", i);
 
 		InsertNewUser(id, (char)eDepartment::Game);

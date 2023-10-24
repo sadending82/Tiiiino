@@ -18,6 +18,14 @@
 
 #define UNICODE  
 
+#define ID string
+#define UNIQUEID int
+#define GRADE double
+#define POINT int
+#define STATE bool
+#define DEPARTMENT char
+
+
 constexpr int MAXLOBBY = 10;
 constexpr int INVALIDKEY = -1;
 constexpr int BUFSIZE = 200;
