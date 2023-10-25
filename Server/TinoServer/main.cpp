@@ -5,13 +5,10 @@
 #include "GameDataManager.h"
 
 Server* pServer = new Server;
-GameDataManager* pGDM = new GameDataManager;
 
 int main(int argc, char* argv[])
 {
 	wcout.imbue(locale("korean"));
-
-	pGDM->LoadCouponData();
 
 	pServer->Init();
 
