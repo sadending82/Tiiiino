@@ -726,10 +726,11 @@ void Server::SendPlayerResult(int uID, int roomID, bool retire, int rank)
 		{
 			if (mClients[mRooms[roomID].mSockID[i]].mUID == mRooms[roomID].mUID[i]) // player connected lobby server
 			{
+				// grade system
 				double GradePerRank;
 				if (retire == true)
 				{
-					GradePerRank = -5;
+					GradePerRank = -3;
 				}
 				else
 				{
@@ -746,9 +747,30 @@ void Server::SendPlayerResult(int uID, int roomID, bool retire, int rank)
 				{
 					temp *= mClients[mRooms[roomID].mSockID[i]].mGrade / 5;
 				}
+
+				// point system
+				int point;
+				if (retire == true)
+				{
+					if (rank == -1) // 탈주
+					{
+						point = 0;
+					}
+					else // 그냥 완주 못함
+					{
+						point = 50;
+					}
+				}
+				else
+				{
+					point = POINT_FOR_SCORE[mRooms[roomID].mUserNum - MIN_USER][rank - 1];
+				}
+
 				mClients[mRooms[roomID].mSockID[i]].mStateLock.lock();
 				mClients[mRooms[roomID].mSockID[i]].mGrade += temp;
 				mRooms[roomID].mGrade[i] = mClients[mRooms[roomID].mSockID[i]].mGrade;
+				mClients[mRooms[roomID].mSockID[i]].mPoint += point;
+				mRooms[roomID].mPoint[i] = mClients[mRooms[roomID].mSockID[i]].mPoint;
 				mClients[mRooms[roomID].mSockID[i]].mState = eSessionState::ST_LOBBY;
 				mClients[mRooms[roomID].mSockID[i]].mStateLock.unlock();
 				// to db server update
@@ -760,10 +782,11 @@ void Server::SendPlayerResult(int uID, int roomID, bool retire, int rank)
 			}
 			else // player disconnected lobby server
 			{
+				// grade system
 				double GradePerRank = GRADE_FOR_SCORE[mRooms[roomID].mUserNum - MIN_USER][rank - 1]; // 등수 가중치
 				if (retire = true)
 				{
-					GradePerRank = -5;
+					GradePerRank = -3;
 				}
 				double GAP = mRooms[roomID].mGradeAvg - mRooms[roomID].mGrade[i];
 				if (GAP < -4)
@@ -775,7 +798,28 @@ void Server::SendPlayerResult(int uID, int roomID, bool retire, int rank)
 				{
 					temp *= mRooms[roomID].mGrade[i] / 5;
 				}
+
+				// point system
+				int point;
+				if (retire == true)
+				{
+					if (rank == -1) // 탈주
+					{
+						point = 0;
+					}
+					else // 그냥 완주 못함
+					{
+						point = 50;
+					}
+				}
+				else
+				{
+					point = POINT_FOR_SCORE[mRooms[roomID].mUserNum - MIN_USER][rank - 1];
+				}
+
+
 				mRooms[roomID].mGrade[i] += temp;
+				mRooms[roomID].mPoint[i] += point;
 				// to db server update
 				SendGameResult(roomID, i);
 				DEBUGMSGONEPARAM("[%d]플레이어의 점수 ", mRooms[roomID].mUID[i]);
@@ -815,6 +859,7 @@ void Server::SendGameResult(int roomID, int key)
 	LD_UPDATE_GRADE_PACKET packet;
 	packet.grade = mRooms[roomID].mGrade[key];
 	packet.uid = mRooms[roomID].mUID[key];
+	packet.point = mRooms[roomID].mPoint[key];
 	packet.size = sizeof(LD_UPDATE_GRADE_PACKET);
 	packet.type = LD_UPDATE_GRADE;
 	mServers[0].DoSend(&packet);
@@ -828,6 +873,7 @@ void Server::SendLoginOK(int cID)
 	pac.size = sizeof(LC_LOGIN_OK_PACKET);
 	pac.id = cID;
 	pac.grade = mClients[cID].mGrade;
+	pac.point = mClients[cID].mPoint;
 	pac.RoomID = 0;
 	pac.UID = mClients[cID].mUID;
 
@@ -908,6 +954,7 @@ void Server::SendMatchResponse(int roomID)
 			mRooms[mClients[player].mRoomID].mUID[uidCount] = mClients[player].mUID;
 			mRooms[mClients[player].mRoomID].mSockID[uidCount] = player;
 			mRooms[mClients[player].mRoomID].mGrade[uidCount] = mClients[player].mGrade;
+			mRooms[mClients[player].mRoomID].mPoint[uidCount] = mClients[player].mPoint;
 			uidCount++;
 			delPlayerVector.push_back(player);
 		}
