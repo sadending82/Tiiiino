@@ -2,7 +2,7 @@
 
 
 #include "MenuUI/FinishGameUIWidget.h"
-#include "Components/EditableText.h"
+#include "Components/TextBlock.h"
 
 void UFinishGameUIWidget::NativePreConstruct()
 {
@@ -41,33 +41,33 @@ void UFinishGameUIWidget::ShowResult(int level, int rank, double grade, int poin
 	// 맵 이름 입력
 	CurrentStage = MapNameArray[level];	// 맵 이름 입력
 	FText CurrentStageText = FText::FromString(CurrentStage);
-	EditSTAGEText->SetText(CurrentStageText);
+	StageNameText->SetText(CurrentStageText);
 
 
 	// 이 판 등수 입력
 	if (rank <= 0)
 	{
 		FText RetireText = FText::FromString("Retire");
-		EditRANKText->SetText(RetireText);
+		RankNameText->SetText(RetireText);
 	}
 	else
 	{
 		CurrentRank = rank;	// 등수 입력
 		FText CurrentRankText = FText::AsNumber(CurrentRank);
-		EditRANKText->SetText(CurrentRankText);
+		RankNameText->SetText(CurrentRankText);
 	}
 
 
 	// 획득한 학점 입력
 	GainGrade = grade;	// 등수 입력
 	FText GainGradeText = FText::AsNumber(GainGrade);
-	EditGradeText->SetText(GainGradeText);
+	GradeNameText->SetText(GainGradeText);
 
 
 	// 획득한 포인트 입력
 	GainPoint = point;	// 등수 입력
 	FText GainPointText = FText::AsNumber(GainPoint);
-	EditPointText->SetText(GainPointText);
+	PointNameText->SetText(GainPointText);
 
 }
 
