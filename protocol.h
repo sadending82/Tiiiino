@@ -261,6 +261,7 @@ struct LC_LOGIN_OK_PACKET : public PACKET {
 	int id;
 	int UID;
 	double grade;
+	int point;
 	int RoomID;
 };
 

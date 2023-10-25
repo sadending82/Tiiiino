@@ -51,3 +51,24 @@ void UCreateAccountsWidget::CheckCreateAccount(bool check)
 	}
 }
 
+void UCreateAccountsWidget::CheckIDTextLength()
+{
+	// ID 글자수 제한
+	FText cur_text = CreateIDTextBox->GetText();
+	FString OriginalText = cur_text.ToString();
+	FString ClippedText = OriginalText.Left(MaxLength);
+	//LimitedText = FText::FromString(ClippedText);
+	cur_text = FText::FromString(ClippedText);
+	CreateIDTextBox->SetText(cur_text);
+}
+
+void UCreateAccountsWidget::CheckPasswordTextLength()
+{
+	FText cur_text = CreatePasswordTextBox->GetText();
+	FString OriginalText = cur_text.ToString();
+	FString ClippedText = OriginalText.Left(MaxLength);
+	//LimitedText = FText::FromString(ClippedText);
+	cur_text = FText::FromString(ClippedText);
+	CreatePasswordTextBox->SetText(cur_text);
+}
+

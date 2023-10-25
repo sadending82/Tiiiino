@@ -118,6 +118,7 @@ struct LD_SIGNUP_PACKET :public SPACKET {
 struct LD_UPDATE_GRADE_PACKET :public SPACKET {
 	int		uid;
 	double	grade;
+	int		point;
 };
 
 struct LD_CHANGE_DEPARTMENT_PACKET :public SPACKET {
