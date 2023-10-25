@@ -34,16 +34,16 @@ public:
 
 
 	UPROPERTY(meta = (BindWidget))
-	class UEditableText* EditSTAGEText;
+	class UTextBlock* StageNameText;
 
 	UPROPERTY(meta = (BindWidget))
-	class UEditableText* EditRANKText;
+	class UTextBlock* RankNameText;
 
 	UPROPERTY(meta = (BindWidget))
-	class UEditableText* EditGradeText;
+	class UTextBlock* GradeNameText;
 
 	UPROPERTY(meta = (BindWidget))
-	class UEditableText* EditPointText;
+	class UTextBlock* PointNameText;
 
 	std::array<FString, 7 + 1> MapNameArray;
 
