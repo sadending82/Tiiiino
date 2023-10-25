@@ -63,15 +63,18 @@ void ASoundManager::PlaySFXAtLocation(AActor* PlayActor, ESFXType Type, FVector 
 			CLog::Log("This Sound doesn't exist");
 			return;
 		}
-
+		//액터당 채널 하나를 사용한다, 한액터에서 두가지소리를 동시에내는경우는 드물다
+		//걷기 사운드를 내면서 점프사운드내기? -> 실제로 일어나지 않는 일
 		//재생할 액터에 채널이 달려있나 확인
-		if (SFXChannelMap.Contains(Type) == false)
+		if (SFXChannelMap.Contains(PlayActor->GetName()) == false)
 			AttachSFXChannel(PlayActor, Type);
-		//지정된 사운드가 있으면 그걸로 교체후 재생
-		if (!!Sound)
-			SFXChannelMap[Type]->SetSound(Sound);
 
-		SFXChannelMap[Type]->Play();
+		SFXChannelMap[PlayActor->GetName()]->SetSound(SFXSoundMap[Type]);
+		//미리 지정한 사운드가 있으면 그걸로 교체후 재생
+		if (!!Sound)
+			SFXChannelMap[PlayActor->GetName()]->SetSound(Sound);
+
+		SFXChannelMap[PlayActor->GetName()]->Play();
 	}
 }
 
@@ -90,9 +93,9 @@ void ASoundManager::AttachSFXChannel(AActor* AttachActor, ESFXType Type)
 	FName Name = FName( "SFxChannel" + StaticCast<int32>(Type));
 	UAudioComponent* SFXChannel = NewObject<UAudioComponent>(AttachActor, UAudioComponent::StaticClass(), Name);
 	
-	if (SFXChannelMap.Contains(Type) == false)
+	if (SFXChannelMap.Contains(AttachActor->GetName()) == false)
 	{
-		SFXChannelMap.Add(Type, SFXChannel);
+		SFXChannelMap.Add(AttachActor->GetName(), SFXChannel);
 		SFXChannel->SetSound(SFXSoundMap[Type]);
 		SFXChannel->AttenuationSettings = AttenuationSettings;
 		SFXChannel->RegisterComponent();

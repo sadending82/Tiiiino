@@ -103,8 +103,9 @@ private:
 		TMap<EBGMType, USoundCue*> BGMSoundMap;
 	UPROPERTY(EditDefaultsOnly, Category = "Sound")
 		TMap<ESFXType, USoundCue*> SFXSoundMap;
+	//액터이름으로 채널을 가져올것
 	UPROPERTY(VisibleAnywhere,meta=(Tooltip="AutoCreate"), Category = "Sound")
-		TMap<ESFXType, UAudioComponent*> SFXChannelMap;
+		TMap<FString, UAudioComponent*> SFXChannelMap;
 
 	static ASoundManager* SoundManagerInstance;
 };
