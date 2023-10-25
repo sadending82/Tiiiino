@@ -27,7 +27,6 @@ void UANS_Dive::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase*
 		//Player Launch
 		FVector forwardVector = TinoCharacter->GetActorForwardVector();
 		TinoCharacter->LaunchCharacter(FVector(forwardVector.X* DiveSpeed,forwardVector.Y*DiveSpeed,  DiveSpeedZ),true,true);
-		TinoCharacter->SetMovementState(EMovementState::EMS_Dive);
 	}
 
 }

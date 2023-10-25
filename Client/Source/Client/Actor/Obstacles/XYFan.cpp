@@ -25,18 +25,25 @@ AXYFan::AXYFan()
 void AXYFan::BeginPlay()
 {
 	Super::BeginPlay();
+
+	
 }
 
 void AXYFan::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	if (bIsPlayWindSFX == false)
+	{
+		bIsPlayWindSFX = true;
+		ASoundManager::GetSoundManager()->PlaySFXAtLocation(this, ESFXType::ESFXType_WindBlow, GetActorLocation());
+	}
 	//비주얼용 회전
 	FanMesh->AddLocalRotation(FRotator(0.0f, FanRotateSpeed * DeltaTime, 0.0f));
 
 	OverlapBox->GetOverlappingActors(OverlappingActors, OverlapFilter);
 	if (OverlappingActors.Num() > 0)
 	{
+		
 		for (auto actor : OverlappingActors)
 		{
 			actor->AddActorWorldOffset(DirectionArrow->GetForwardVector() * FanPower * DeltaTime, true);
