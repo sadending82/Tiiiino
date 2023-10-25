@@ -56,7 +56,7 @@ void ASoundManager::PlaySFX2D(ESFXType Type)
 
 void ASoundManager::PlaySFXAtLocation(AActor* PlayActor, ESFXType Type, FVector Location, USoundCue* Sound)
 {
-	if (SoundManagerInstance && !SFXSoundMap.IsEmpty())
+	if (!!SoundManagerInstance && SFXSoundMap.IsEmpty() == false)
 	{
 		if (SFXSoundMap.Contains(Type) == false)
 		{
@@ -76,6 +76,7 @@ void ASoundManager::PlaySFXAtLocation(AActor* PlayActor, ESFXType Type, FVector 
 
 		SFXChannelMap[PlayActor->GetName()]->Play();
 	}
+		
 }
 
 void ASoundManager::SetBGMVolume(const float Volume)

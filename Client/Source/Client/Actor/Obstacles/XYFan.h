@@ -38,6 +38,8 @@ private:
 	UPROPERTY(VisibleDefaultsOnly, Category = "Component")
 		class UArrowComponent* DirectionArrow;
 
+	UPROPERTY(VisibleAnywhere)
+	bool bIsPlayWindSFX = false;
 	UPROPERTY(EditAnywhere, Category = "Stat")
 		float FanPower;
 	UPROPERTY(EditAnywhere, Category = "Stat")
