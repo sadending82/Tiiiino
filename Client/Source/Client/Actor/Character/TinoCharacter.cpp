@@ -394,6 +394,7 @@ void ATinoCharacter::Dive()
 		bIsDiving = true;
 		SendAnimPacket(2);
 		PlayAnimMontage(DiveMontage);
+		SetMovementState(EMovementState::EMS_Dive);
 		//GetWorldTimerManager().SetTimer(DiveTimer,this,&ATinoCharacter::DiveEnd, MaxDiveTime, false);
 	}
 }
@@ -513,20 +514,20 @@ void ATinoCharacter::OnGrab()
 
 void ATinoCharacter::OffGrab()
 {
+	bIsGrabbing = false;
+	if (Target == nullptr) return;
 	SendAnimPacket(5);
 
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
 	if (MovementState == EMovementState::EMS_Grabbing)
+	{
+		StopAnimMontage(GrabMontage);
 		ASoundManager::GetSoundManager()->PlaySFXAtLocation(this, ESFXType::ESFXType_OffGrab, GetActorLocation());
-
-	StopAnimMontage(GrabMontage);
-	if (GetController() && GetController()->IsPlayerController())
 		SetMovementState(EMovementState::EMS_Normal);
-
+	}
 	SetTargetGrabbedToNormal();
 
-	bIsGrabbing = false;
 	bIsGrabCoolTime = true;
 
 	if (GetWorldTimerManager().IsTimerActive(GrabCoolTimer) == false)
@@ -710,7 +711,10 @@ bool ATinoCharacter::CanGrab()
 	bool ret = false;
 
 	if (bIsGrabCoolTime == true)
+	{
 		ret = false;
+		return ret;
+	}
 
 	switch (MovementState)
 	{
