@@ -46,4 +46,14 @@ public:
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void CheckCreateAccount(bool check);
+
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void CheckIDTextLength();
+
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void CheckPasswordTextLength();
+
+protected:
+	UPROPERTY()
+	int32 MaxLength = 10;
 };
