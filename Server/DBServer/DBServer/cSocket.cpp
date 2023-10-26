@@ -328,7 +328,7 @@ void Socket::ProcessPacket_Login(int key, unsigned char* buf)
     int uid = SetUIDForTest();
 
     SendLoginOK(key, uid, p->id
-        , 3.0, 100000, 1, 0, p->userKey, 0);
+        , 3.0, 100000, 1, 0, 0, 0, p->userKey);
 }
 
 void Socket::ProcessPacket_Logout(unsigned char* buf)
