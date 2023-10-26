@@ -19,7 +19,7 @@ constexpr int DELAY_TIME_EXEC_BREAKPLATFORM = 3000;
 
 // Level min, max
 constexpr int MIN_LEVEL = 1;
-constexpr int MAX_LEVEL = 7;
+constexpr int MAX_LEVEL = 8;
 
 enum class eDepartment : char
 {
