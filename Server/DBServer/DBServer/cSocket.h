@@ -28,12 +28,13 @@ public:
 	void SendLoginFail(int key, int userKey);
 	void SendSignUpOK(int key, int userKey);
 	void SendSignUpFail(int key, int userKey);
+	void SendInventory(int key, long long inventoryFlag, int userKey);
 
 	void ProcessPacket_Login(int key, unsigned char* buf);
 	void ProcessPacket_Logout(unsigned char* buf);
 	void ProcessPacket_SignUp(int key, unsigned char* buf);
 	void ProcessPacket_UpdateGrade(int key, unsigned char* buf);
-
+	void ProcessPacket_Inventory(int key, unsigned char* buf);
 	void ProcessPacket_ChangeDepartment(int key, unsigned char* buf);
 
 	int SetUIDForTest();

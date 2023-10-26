@@ -21,6 +21,7 @@ public:
 		mGrade = 0;
 		mPoint = 0;
 		mEquippedItems = 0;
+		mInventory = 0;
 		mMatchStartTime = system_clock::now();
 	}
 	~Session() {}
@@ -58,6 +59,7 @@ public:
 	int		mPrevRemain;
 	int		mDepartment;
 	long long mEquippedItems;
+	long long mInventory;
 	int		mRoomID;	//수민이 임시로 추가해놓음. 얘가 몇번 방에 있는지 확인하기 위함.
 	char		mHashs[MAX_NAME_SIZE];	//수민이 추가함. 이 hash값을 사용하여 겜서버에서 클라 검증을 할 예정.
 };

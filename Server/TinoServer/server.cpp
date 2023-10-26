@@ -189,6 +189,12 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		SendSignUpFail(p->userKey);
 		break;
 	}
+	case DL_INVENTORY:
+	{
+		DL_INVENTORY_PACKET* p = reinterpret_cast<DL_INVENTORY_PACKET*>(spacket);
+
+		break;
+	}
 	default:
 	{
 		break;

@@ -168,6 +168,10 @@ void Socket::processPacket(int key, unsigned char* buf)
         ProcessPacket_ChangeDepartment(key, buf);
         break;
     }
+    case LD_INVENTORY: {
+        ProcessPacket_Inventory(key, buf);
+        break;
+    }
     default:
     {
         break;
@@ -283,6 +287,17 @@ void Socket::SendSignUpFail(int key, int userKey)
     mSessions[key].DoSend((void*)(&p));
 }
 
+void Socket::SendInventory(int key, long long inventoryFlag, int userKey)
+{
+    DL_INVENTORY_PACKET p;
+    p.size = sizeof(DL_INVENTORY_PACKET);
+    p.type = SPacketType::DL_INVENTORY;
+    p.inventoryFlag = inventoryFlag;
+    p.userKey = userKey;
+
+    mSessions[key].DoSend((void*)(&p));
+}
+
 // ProcessPacket
 void Socket::ProcessPacket_Login(int key, unsigned char* buf)
 {
@@ -367,6 +382,16 @@ void Socket::ProcessPacket_UpdateGrade(int key, unsigned char* buf)
     }
 
 #endif
+}
+
+void Socket::ProcessPacket_Inventory(int key, unsigned char* buf)
+{
+    LD_INVENTORY_PACKET* p = reinterpret_cast<LD_INVENTORY_PACKET*>(buf);
+    long long bitFlag = 0;
+#ifdef RUN_DB
+    bitFlag = Getm_pDB()->SelectInventory(p->uid);
+#endif
+    SendInventory(key, bitFlag, p->userKey);
 }
 
 void Socket::ProcessPacket_ChangeDepartment(int key, unsigned char* buf)

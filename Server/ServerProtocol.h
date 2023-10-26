@@ -39,6 +39,7 @@ enum SPacketType {
 	LD_SIGNUP,
 	LD_UPDATE_GRADE,
 	LD_CHANGE_DEPARTMENT,
+	LD_INVENTORY,
 
 	// DBServer To LobbyServer
 	DL_LOGIN_OK,
@@ -125,6 +126,11 @@ struct LD_UPDATE_GRADE_PACKET :public SPACKET {
 struct LD_CHANGE_DEPARTMENT_PACKET :public SPACKET {
 	char	department;
 	int		uid;
+};
+
+struct LD_INVENTORY_PACKET :public SPACKET {
+	int		uid;
+	int		userKey;
 };
 
 struct DL_LOGIN_OK_PACKET :public SPACKET {
