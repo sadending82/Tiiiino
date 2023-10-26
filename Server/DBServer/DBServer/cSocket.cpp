@@ -209,8 +209,9 @@ bool Socket::CheckLogin(int key, const char* id, const char* password, int userK
     int point = get<2>(userData);
     int state = get<3>(userData);
     char department = get<4>(userData);
+    long long equippedItems = get<5>(userData);
 
-    SendLoginOK(key, uid, id, grade, point, state, department, userKey);
+    SendLoginOK(key, uid, id, grade, point, state, department, equippedItems, userKey);
 
     if (state == FALSE)
         Getm_pDB()->UpdateUserConnectionState(uid, true);
@@ -235,7 +236,8 @@ bool Socket::CheckValidString(const char* input)
 
 // SendPacket
 void Socket::SendLoginOK(int key, int uid, const char* id
-    , double grade, int point, int state, char department, int userKey)
+    , double grade, int point, int state, char department
+    , long long equippedItemFlag, int userKey)
 {
     DL_LOGIN_OK_PACKET p;
     p.size = sizeof(DL_LOGIN_OK_PACKET);
@@ -247,6 +249,7 @@ void Socket::SendLoginOK(int key, int uid, const char* id
     p.connState = state;
     p.department = department;
     p.userKey = userKey;
+    p.equipmentflag = equippedItemFlag;
 
     mSessions[key].DoSend((void*)(&p));
 }
@@ -296,7 +299,7 @@ void Socket::ProcessPacket_Login(int key, unsigned char* buf)
     int uid = SetUIDForTest();
 
     SendLoginOK(key, uid, p->id
-        , 3.0, 100000, 1, 0, p->userKey);
+        , 3.0, 100000, 1, 0, p->userKey, 0);
 }
 
 void Socket::ProcessPacket_Logout(unsigned char* buf)

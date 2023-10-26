@@ -263,6 +263,7 @@ struct LC_LOGIN_OK_PACKET : public PACKET {
 	double grade;
 	int point;
 	int RoomID;
+	long long equippedItems;
 };
 
 struct 	LC_LOGIN_FAIL_PACKET :public PACKET {

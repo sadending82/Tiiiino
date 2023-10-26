@@ -26,7 +26,7 @@ public:
 	bool ExecuteQuery();
 
 	tuple<ID, GRADE, POINT> SelectUserData(const int uid);
-	tuple<UNIQUEID, GRADE, POINT, STATE, DEPARTMENT> SelectUserDataForLogin(const string& id);
+	tuple<UNIQUEID, GRADE, POINT, STATE, DEPARTMENT, EQUIPMENT_BITFLAG> SelectUserDataForLogin(const string& id);
 	vector<string> SelectHash(const string& id); // Index 0: hash / Index 1: salt
 	tuple<GRADE, DEPARTMENT> SelectUserGradeAndDepartment(const int uid);
 	long long SelectInventory(const int uid);

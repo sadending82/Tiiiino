@@ -24,7 +24,7 @@ public:
 	bool CheckValidString(const char* str);
 
 	void SendLoginOK(int key, int uid, const char* id, double grade
-		, int point, int state, char department, int userid);
+		, int point, int state, char department, long long equippedItemFlag, int userid);
 	void SendLoginFail(int key, int userKey);
 	void SendSignUpOK(int key, int userKey);
 	void SendSignUpFail(int key, int userKey);

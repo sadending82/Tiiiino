@@ -24,6 +24,7 @@
 #define POINT int
 #define STATE bool
 #define DEPARTMENT char
+#define EQUIPMENT_BITFLAG long long
 
 
 constexpr int MAXLOBBY = 10;

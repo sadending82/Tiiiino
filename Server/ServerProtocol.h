@@ -45,7 +45,8 @@ enum SPacketType {
 	DL_LOGIN_FAIL,
 	DL_CHANGE_DEPARTMENT_OK,
 	DL_SIGNUP_OK,
-	DL_SIGNUP_FAIL
+	DL_SIGNUP_FAIL,
+	DL_INVENTORY
 };
 
 
@@ -134,6 +135,7 @@ struct DL_LOGIN_OK_PACKET :public SPACKET {
 	int		point;
 	int		userKey;
 	bool	connState;
+	long long	equipmentflag;
 };
 
 struct DL_LOGIN_FAIL_PACKET :public SPACKET {
@@ -148,6 +150,11 @@ struct DL_SIGNUP_OK_PACKET :public SPACKET {
 struct DL_SIGNUP_FAIL_PACKET :public SPACKET {
 	int		errorCode;
 	int		userKey;
+};
+
+struct DL_INVENTORY_PACKET :public SPACKET {
+	long long	inventoryFlag;
+	int			userKey;
 };
 
 #pragma pack (pop)
