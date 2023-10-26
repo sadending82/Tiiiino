@@ -25,7 +25,7 @@ void UInGameTimerWidget::TimerStart(ETimerType Type)
 		auto TinoCharacter = TinoController->GetPawn<ATinoCharacter>();
 		if (!!TinoCharacter)
 		{
-			InGameUI = Network::GetNetwork()->mMyCharacter->InGameWidgetInstance;
+			InGameUI = TinoController->InGameUIInstance;
 			if (Type == ETimerType::ETT_LevelClear)
 			{
 				RestGameTime = 19;
@@ -34,7 +34,7 @@ void UInGameTimerWidget::TimerStart(ETimerType Type)
 			{
 				RestGameTime = 3;
 			}
-			TinoCharacter->TimerStart(Type);
+			TinoController->TimerStart(Type);
 			
 		}
 	}
@@ -43,16 +43,9 @@ void UInGameTimerWidget::TimerStart(ETimerType Type)
 
 void UInGameTimerWidget::TimerRun(ETimerType Type)
 {
-	if (Type == ETimerType::ETT_LevelClear)
-	{
-		if (!!InGameUI)
-			InGameUI->TimerTextChange(RestGameTime, Type);
-	}
-	else if (Type == ETimerType::ETT_LevelStart)
-	{
-		if (!!InGameUI)
-			InGameUI->TimerTextChange(RestGameTime, Type);
-	}
+	if (!!InGameUI)
+		InGameUI->TimerTextChange(RestGameTime, Type);
+
 	ASoundManager::GetSoundManager()->PlaySFX2D(ESFXType::ESFXType_RaceCountDown);
 	RestGameTime--;
 	// if Timer End

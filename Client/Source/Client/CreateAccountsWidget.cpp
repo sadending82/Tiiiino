@@ -2,6 +2,7 @@
 
 
 #include "CreateAccountsWidget.h"
+#include "LoginUIWidget.h"
 #include "Actor/Controller/TinoController.h"
 #include "Components/EditableTextBox.h"
 #include "Network/Network.h"
@@ -18,7 +19,7 @@ void UCreateAccountsWidget::NativeDestruct()
 void UCreateAccountsWidget::TryBack()
 {
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	TinoController->ChangeMenuWidget(TinoController->GetStartingWidgetClass());
+	TinoController->ChangeMenuWidget(TinoController->LoginUIInstance);
 }
 
 void UCreateAccountsWidget::TryCreateAccounts()

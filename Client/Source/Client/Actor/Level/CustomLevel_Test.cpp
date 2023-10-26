@@ -3,6 +3,7 @@
 
 #include "Actor/Level/CustomLevel_Test.h"
 #include "Sound/SoundManager.h"
+#include "LobbyUIWidget.h"
 #include "Network/Network.h"
 #include "Actor/Character/TinoCharacter.h"
 #include "Actor/Controller/TinoController.h"
@@ -99,7 +100,8 @@ bool ACustomLevel_Test::ConnLobbyServer()
 			CLog::Log("TinoController is nullptr, Connect Lobby Against Is Fail");
 		}
 		else {
-			TinoController->ChangeMenuWidget(TinoController->GetLobbyWidgetClass());
+			TinoController->InitializeUIInstance();
+			TinoController->ChangeMenuWidget(TinoController->LobbyUIInstance);
 			// 여기서 결과 UI를 띄워줌
 			if (-1 != Network::GetNetwork()->GameResult.point)
 			{

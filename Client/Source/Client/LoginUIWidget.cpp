@@ -4,6 +4,7 @@
 #include "LoginUIWidget.h"
 #include "Components/Button.h"
 #include "Components/EditableTextBox.h"
+#include "CreateAccountsWidget.h"
 #include "Actor/Controller/TinoController.h"
 #include "GameFramework/Pawn.h"
 #include "Network/Network.h"
@@ -55,7 +56,7 @@ void ULoginUIWidget::TryNewAccounts()
 
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	if (!!TinoController)
-		TinoController->ChangeMenuWidget(TinoController->GetCreateAccountsWidgetClass());
+		TinoController->ChangeMenuWidget(TinoController->CreateAccountsUIInstance);
 }
 
 void ULoginUIWidget::InputLoginID(const FText& Text)

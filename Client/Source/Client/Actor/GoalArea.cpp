@@ -4,6 +4,7 @@
 #include "Actor/GoalArea.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Actor/Controller/TinoController.h"
 #include "Actor/Character/TinoCharacter.h"
 #include "MenuUI/InGameUIWidget.h"
 #include "Global.h"
@@ -36,39 +37,37 @@ void AGoalArea::Tick(float DeltaTime)
 
 void AGoalArea::BoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	ACharacter* OverlapCharacter = Cast<ACharacter>(OtherComp->GetOwner());
-	if (OverlapCharacter)
-	{
-		AController* Controller = OverlapCharacter->GetController();
-		if (!!Controller)
-		{
-			if (Controller->IsPlayerController())
-			{
-				// ¹Ú½º ÄÄÆ÷³ÍÆ®¿¡ ³» Ä³¸¯ÅÍ°¡ ´ê¾Ò´Ù!
-				send_goal_packet(Network::GetNetwork()->s_socket);
+    ACharacter* OverlapCharacter = Cast<ACharacter>(OtherComp->GetOwner());
+    
 
-				// Ä³¸¯ÅÍ¸¦ ¾Èº¸ÀÌ°Ô ÇÏ°í Äİ¸®Á¯µµ off
-				PlayerDisable(OverlapCharacter);
-				// UI Å¸ÀÌ¸Ó »ı¼º°ú UI °á°ú Ãâ·ÂÀº ÀÎ°ÔÀÓ UI°¡ ¿Ï¼ºµÇ´Â ´ë·Î Ãß°¡
-				ATinoCharacter* myTinoChar = Cast<ATinoCharacter>(OverlapCharacter);
+    if (OverlapCharacter)
+    {
+        ATinoController* Controller = OverlapCharacter->GetController<ATinoController>();
+        if (!!Controller)
+        {
+            if (Controller->IsPlayerController())
+            {
+                // ë°•ìŠ¤ ì»´í¬ë„ŒíŠ¸ì— ë‚´ ìºë¦­í„°ê°€ ë‹¿ì•˜ë‹¤!
+                send_goal_packet(Network::GetNetwork()->s_socket);
 
-				if (myTinoChar != nullptr)
-				{
-					myTinoChar->bIsSpactateModeEnabled = true;
-					if (myTinoChar->InGameWidgetInstance != nullptr)
-					{
-						myTinoChar->InGameWidgetInstance->bLevelClearCheck = true;
-					}
-					
-				}
+                // ìºë¦­í„°ë¥¼ ì•ˆë³´ì´ê²Œ í•˜ê³  ì½œë¦¬ì ¼ë„ off
+                PlayerDisable(OverlapCharacter);
+                // UI íƒ€ì´ë¨¸ ìƒì„±ê³¼ UI ê²°ê³¼ ì¶œë ¥ì€ ì¸ê²Œì„ UIê°€ ì™„ì„±ë˜ëŠ” ëŒ€ë¡œ ì¶”ê°€
+                ATinoCharacter* myTinoChar = Cast<ATinoCharacter>(OverlapCharacter);
 
-				// °üÀü ¸ğµå º¯È¯...? -> Àº ÇÒÁÙ ¸ğ¸§
+                if (myTinoChar != nullptr)
+                {
+                    myTinoChar->bIsSpactateModeEnabled = true;
+                    Controller->InGameUIInstance->bLevelClearCheck = true;
+                }
 
-			}
-		}
-		else
-			CLog::Log("Controller is nullptr");
-	}
+                // ê´€ì „ ëª¨ë“œ ë³€í™˜...? -> ì€ í• ì¤„ ëª¨ë¦„
+
+            }
+        }
+        else
+            CLog::Log("Controller is nullptr");
+    }
 }
 
 void AGoalArea::PlayerDisable(ACharacter* Character)
