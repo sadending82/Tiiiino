@@ -302,7 +302,6 @@ UUserWidget* ATinoCharacter::GetLobbyUIInstance()
 
 void ATinoCharacter::TimerStart(ETimerType type)
 {
-	auto Type = GetController<ATinoController>()->Type;
 	Type = type;
 	GetWorldTimerManager().SetTimer(UITimerHandle, this, &ATinoCharacter::TimerRun, true, true);
 }
@@ -310,7 +309,7 @@ void ATinoCharacter::TimerStart(ETimerType type)
 void ATinoCharacter::TimerRun()
 {
 	auto InGameUITimerInstance = GetController<ATinoController>()->InGameUITimerInstance;
-	auto Type = GetController<ATinoController>()->Type;
+
 	// 유효성 확인
 	if (!!InGameUITimerInstance)
 	{

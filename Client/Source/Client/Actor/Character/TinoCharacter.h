@@ -274,4 +274,8 @@ private:
 	FTimerHandle GrabTimer;
 	FTimerHandle GrabCoolTimer;
 	FTimerHandle UITimerHandle;
+
+
+	UPROPERTY()
+	ETimerType Type;
 };

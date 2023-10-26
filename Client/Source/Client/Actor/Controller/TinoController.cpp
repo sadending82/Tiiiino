@@ -88,42 +88,42 @@ void ATinoController::SetInputGameMode()
 
 void ATinoController::OpenInGameUI()
 {
-	if (!!DialogUI)
+	if (!!DialogUIInstance)
 	{
-		DialogUI->RenderInGameMenuUI();
-		DialogUI->AddToViewport();
+		DialogUIInstance->RenderInGameMenuUI();
+		DialogUIInstance->AddToViewport();
 	}
 }
 
 void ATinoController::RemoveDialogUI()
 {
-	if (!!DialogUI)
+	if (!!DialogUIInstance)
 	{
-		DialogUI->ResetWindow();
-		DialogUI->RemoveFromParent();
+		DialogUIInstance->ResetWindow();
+		DialogUIInstance->RemoveFromParent();
 	}
 }
 
 void ATinoController::UIAlertMessage(EDialogUICheck check)
 {
-	if (!!DialogUI)
+	if (!!DialogUIInstance)
 	{
-		DialogUI->FixedAlertMessage();
+		DialogUIInstance->FixedAlertMessage();
 		if (check == EDialogUICheck::EDC_LoginFailed)
 		{
-			DialogUI->SetLoginFailedUI();
+			DialogUIInstance->SetLoginFailedUI();
 		}
 		else if (check == EDialogUICheck::EDC_CASuccess)
 		{
-			DialogUI->SetCreateAccountSuccessUI();
+			DialogUIInstance->SetCreateAccountSuccessUI();
 		}
 		else if (check == EDialogUICheck::EDC_CAFailed)
 		{
-			DialogUI->SetCreateAccountFailedUI();
+			DialogUIInstance->SetCreateAccountFailedUI();
 		}
 
-		DialogUI->RenderUIAlertMessage();
-		DialogUI->AddToViewport();
+		DialogUIInstance->RenderUIAlertMessage();
+		DialogUIInstance->AddToViewport();
 	}
 }
 
@@ -152,10 +152,10 @@ void ATinoController::DisconnectNetwork()
 {
 	// if Network is disconnected 
 
-	if (!!DialogUI)
+	if (!!DialogUIInstance)
 	{
-		DialogUI->RenderDisconnectNetworkWindow();
-		DialogUI->AddToViewport();
+		DialogUIInstance->RenderDisconnectNetworkWindow();
+		DialogUIInstance->AddToViewport();
 	}
 }
 
@@ -184,9 +184,9 @@ void ATinoController::InitializeUIInstance()
 	{
 		CreateAccountsUIInstance = CreateWidget<UCreateAccountsWidget>(GetWorld(), CreateAccountsWidgetClass);
 	}
-	if (!!DialogUIClass)
+	if (!!DialogWidgetClass)
 	{
-		DialogUI = Cast<UDialogUIWidget>(CreateWidget(GetWorld(), DialogUIClass));
+		DialogUIInstance = Cast<UDialogUIWidget>(CreateWidget(GetWorld(), DialogWidgetClass));
 	}
 	if (!!InGameUITimerWidgetClass)
 	{

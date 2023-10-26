@@ -61,12 +61,6 @@ public:
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void DisconnectNetwork();
 
-	UPROPERTY(BlueprintReadOnly, Category = "UMG_Game")
-	class UDialogUIWidget* DialogUI;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
-	class TSubclassOf<UDialogUIWidget> DialogUIClass;
-
 public:
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void ShowGameResult(int level, int rank, double grade, int point);
@@ -122,12 +116,8 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "UMG_Game")
 	class UFinishGameUIWidget* FinishGameUIInstance = nullptr;
 	
-
 	UPROPERTY()
 	UUserWidget* CurrentWidget;
-	
-	UPROPERTY()
-	ETimerType Type;
 
 private:
 	

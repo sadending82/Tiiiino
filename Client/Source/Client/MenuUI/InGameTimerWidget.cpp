@@ -43,16 +43,9 @@ void UInGameTimerWidget::TimerStart(ETimerType Type)
 
 void UInGameTimerWidget::TimerRun(ETimerType Type)
 {
-	if (Type == ETimerType::ETT_LevelClear)
-	{
-		if (!!InGameUI)
-			InGameUI->TimerTextChange(RestGameTime, Type);
-	}
-	else if (Type == ETimerType::ETT_LevelStart)
-	{
-		if (!!InGameUI)
-			InGameUI->TimerTextChange(RestGameTime, Type);
-	}
+	if (!!InGameUI)
+		InGameUI->TimerTextChange(RestGameTime, Type);
+
 	ASoundManager::GetSoundManager()->PlaySFX2D(ESFXType::ESFXType_RaceCountDown);
 	RestGameTime--;
 	// if Timer End
