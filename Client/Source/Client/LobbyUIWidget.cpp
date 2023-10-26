@@ -2,6 +2,7 @@
 
 
 #include "LobbyUIWidget.h"
+#include "LoginUIWidget.h"
 #include "Actor/Controller/TinoController.h"
 #include "Network/Network.h"
 #include "Global.h"
@@ -42,5 +43,5 @@ void ULobbyUIWidget::TryBack()
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	send_matchout_packet(Network::GetNetwork()->l_socket);
 	send_logout_packet(Network::GetNetwork()->l_socket);
-	TinoController->ChangeMenuWidget(TinoController->GetStartingWidgetClass());
+	TinoController->ChangeMenuWidget(TinoController->LoginUIInstance);
 }

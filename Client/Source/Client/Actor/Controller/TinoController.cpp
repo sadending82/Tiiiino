@@ -17,17 +17,16 @@ ATinoController::ATinoController()
 void ATinoController::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	// UI ì¸ìŠ¤í„´ìŠ¤ ì´ˆê¸°í™”
+	InitializeUIInstance();
 
-	//·Îºñ ÀÎ½ºÅÏ½º »ı¼º(ÀÎ½ºÅÏ½º ÇÑ¹ø¸¸ »ı¼ºÇÏ°í Àç»ç¿ë)
-	SetLobbyInstance();
-
-	DialogUI = Cast<UDialogUIWidget>(CreateWidget(GetWorld(), DialogUIClass));
-	if (StartingWidgetClass != nullptr && UGameplayStatics::GetCurrentLevelName(GetWorld()) == "Lobby")
+	if (LoginWidgetClass != nullptr && UGameplayStatics::GetCurrentLevelName(GetWorld()) == "Lobby")
 	{
 		if (false == Network::GetNetwork()->bIsConnectedLobby)
 		{
 			if(bIsLobbyConnected)
-				ChangeMenuWidget(StartingWidgetClass);		
+				ChangeMenuWidget(LoginUIInstance);		
 			else 
 				DisconnectNetwork();
 		}
@@ -39,15 +38,7 @@ void ATinoController::BeginPlay()
 	
 }
 
-void ATinoController::SetLobbyInstance()
-{
-	if (!!LobbyWidgetClass)
-	{
-		LobbyUIInstance = CreateWidget<ULobbyUIWidget>(GetWorld(), LobbyWidgetClass);
-	}
-}
-
-void ATinoController::ChangeMenuWidget(TSubclassOf<UUserWidget> NewWidgetClass)
+void ATinoController::ChangeMenuWidget(UUserWidget* NewWidgetClass)
 {
 	if (CurrentWidget != nullptr)
 	{
@@ -57,11 +48,9 @@ void ATinoController::ChangeMenuWidget(TSubclassOf<UUserWidget> NewWidgetClass)
 
 	if (NewWidgetClass != nullptr)
 	{
-		CurrentWidget = CreateWidget(GetWorld(), NewWidgetClass);
-		if (CurrentWidget != nullptr)
-		{
-			CurrentWidget->AddToViewport();
-		}
+		CurrentWidget = NewWidgetClass;
+		CurrentWidget->AddToViewport();
+		
 	}
 }
 
@@ -144,8 +133,8 @@ void ATinoController::SetGradeUI(float GradeValue)
 	{
 		LobbyUIInstance->Grade = GradeValue;
 	}
-	//CreateWidgetÀ¸·Î ¸Å¹ø CurrentWidgetÀ» »ı¼ºÇØÁÙ¶§´Â ¾Æ·¡ÄÚµå
-	//UIº°·Î °´Ã¼¸¦ »ı¼ºÇØ¼­ »ç¿ëÇÏ¸é À§ÄÚµå¸¦ »ç¿ëÇÒ°Í
+	//CreateWidgetìœ¼ë¡œ ë§¤ë²ˆ CurrentWidgetì„ ìƒì„±í•´ì¤„ë•ŒëŠ” ì•„ë˜ì½”ë“œ
+	//UIë³„ë¡œ ê°ì²´ë¥¼ ìƒì„±í•´ì„œ ì‚¬ìš©í•˜ë©´ ìœ„ì½”ë“œë¥¼ ì‚¬ìš©í• ê²ƒ
 	auto lobby = Cast<ULobbyUIWidget>(CurrentWidget);
 	if (lobby)
 	{
@@ -172,10 +161,43 @@ void ATinoController::DisconnectNetwork()
 
 void ATinoController::ShowGameResult(int level, int rank, double grade, int point)
 {
-	FinishGameUI = Cast<UFinishGameUIWidget>(CreateWidget(GetWorld(), FinishGameUIClass));
-	if (!!FinishGameUI)
+
+	if (!!FinishGameUIInstance)
 	{
-		FinishGameUI->ShowResult(level, rank, grade, point);
-		FinishGameUI->AddToViewport();
+		FinishGameUIInstance->ShowResult(level, rank, grade, point);
+		FinishGameUIInstance->AddToViewport();
+	}
+}
+
+void ATinoController::InitializeUIInstance()
+{
+	
+	if (!!LoginWidgetClass)
+	{
+		LoginUIInstance = CreateWidget<ULoginUIWidget>(GetWorld(), LoginWidgetClass);
+	}
+	if (!!LobbyWidgetClass)
+	{
+		LobbyUIInstance = CreateWidget<ULobbyUIWidget>(GetWorld(), LobbyWidgetClass);
+	}
+	if (!!CreateAccountsWidgetClass)
+	{
+		CreateAccountsUIInstance = CreateWidget<UCreateAccountsWidget>(GetWorld(), CreateAccountsWidgetClass);
+	}
+	if (!!DialogUIClass)
+	{
+		DialogUI = Cast<UDialogUIWidget>(CreateWidget(GetWorld(), DialogUIClass));
+	}
+	if (!!InGameUITimerWidgetClass)
+	{
+		InGameUITimerInstance = CreateWidget<UInGameTimerWidget>(GetWorld(), InGameUITimerWidgetClass);
+	}
+	if (!!InGameWidgetClass)
+	{
+		InGameUIInstance = CreateWidget<UInGameUIWidget>(GetWorld(), InGameWidgetClass);
+	}
+	if (!!FinishGameUIWidgetClass)
+	{
+		FinishGameUIInstance = CreateWidget<UFinishGameUIWidget>(GetWorld(), FinishGameUIWidgetClass);
 	}
 }

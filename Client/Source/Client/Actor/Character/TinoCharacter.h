@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Actor/Character/BaseCharacter.h"
 #include "MenuUI/InGameUIWidget.h"
-#include "MenuUI/InGameTimerWidget.h"
+
 #include "CreateAccountsWidget.h"
 #include "LoginUIWidget.h"
 #include "TinoCharacter.generated.h"
@@ -110,17 +110,22 @@ public:
 
 	void MakeAndShowHUD();	
 
+
+	void MakeAndShowLoginFail();
+	void MakeAndShowCreateAccountsSignUpOK();
+	void MakeAndShowCreateAccountsSignUpFail();
+
+	void MakeAndShowLevelStartCountdown();
+	void MakeAndShowInGameLevelStart();
+	void MakeAndShowInGameLevelClear();
+	void MakeAndShowInGameShowResult();
+	void MakeAndShowInGameClearCountdown();
+
 	void MakeAndShowDialogInLobby();
 	void MakeAndShowDialogInGame();
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-		void SetLoginUIInstance();
-	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-		void SetCreateAccountsInstance();
-
-	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 		UUserWidget* GetLobbyUIInstance();
-
 
 	//Accessory
 
@@ -153,34 +158,7 @@ public:
 
 	class UCharacterAnimInstance* GetTinoAnimInstance();
 
-public:
-	//UI 관련 변수
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
-		TSubclassOf<class UDialogUIWidget> DialogWidgetClass;
-	UPROPERTY()
-		class UDialogUIWidget* DialogWidget = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
-		TSubclassOf<UInGameTimerWidget> InGameUITimerClass;
-	UPROPERTY()
-		UInGameTimerWidget* InGameUITimerInstance = nullptr;
-	UPROPERTY()
-		ETimerType Type;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
-		TSubclassOf<UInGameUIWidget> InGameWidgetClass;
-	UPROPERTY()
-		UInGameUIWidget* InGameWidgetInstance = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
-		TSubclassOf<UCreateAccountsWidget> CreateAccountsWidgetClass;
-	UPROPERTY()
-		UCreateAccountsWidget* CreateAccountsInstance = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
-		TSubclassOf<ULoginUIWidget> LoginWidgetClass;
-	UPROPERTY()
-		ULoginUIWidget* LoginUIInstance = nullptr;
 
 
 

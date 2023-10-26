@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "Blueprint/UserWidget.h"
+#include "MenuUI/InGameTimerWidget.h"
 #include "TinoController.generated.h"
 
 /**
@@ -29,7 +30,7 @@ public:
 
 public:
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	void ChangeMenuWidget(TSubclassOf<UUserWidget> NewWidgetClass);
+	void ChangeMenuWidget(UUserWidget* NewWidgetClass);
 	
 	void CreateDummy();
 
@@ -44,11 +45,6 @@ public:
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void UIAlertMessage(EDialogUICheck check);
-
-	//APlayerController* GetController();
-	TSubclassOf<UUserWidget> GetLobbyWidgetClass() const { return LobbyWidgetClass; }
-	TSubclassOf<UUserWidget> GetStartingWidgetClass() const { return StartingWidgetClass; }
-	TSubclassOf<UUserWidget> GetCreateAccountsWidgetClass() const { return CreateAccountsWidgetClass; }
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	UUserWidget* GetCurrentWidget() { return CurrentWidget; }
@@ -75,35 +71,63 @@ public:
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void ShowGameResult(int level, int rank, double grade, int point);
 
-	UPROPERTY(BlueprintReadOnly, Category = "UMG_Game")
-	class UFinishGameUIWidget* FinishGameUI;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
-	class TSubclassOf<UFinishGameUIWidget> FinishGameUIClass;
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void InitializeUIInstance();
 
 protected:
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
-	TSubclassOf<UUserWidget> StartingWidgetClass;
+public:
+	//UI 관련 변수
 
+	// LoginUI
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
-	TSubclassOf<UUserWidget> LobbyWidgetClass;
-	
+	TSubclassOf<class ULoginUIWidget> LoginWidgetClass;
+	UPROPERTY()
+	class ULoginUIWidget* LoginUIInstance = nullptr;
+
+	// LobbyUI
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
-	TSubclassOf<UUserWidget> CreateAccountsWidgetClass;
-	
+	TSubclassOf<class ULobbyUIWidget> LobbyWidgetClass;
+	UPROPERTY()
+	class ULobbyUIWidget* LobbyUIInstance = nullptr;
+
+	// CreateAccountsUI
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
+	TSubclassOf<class UCreateAccountsWidget> CreateAccountsWidgetClass;
+	UPROPERTY()
+	class UCreateAccountsWidget* CreateAccountsUIInstance = nullptr;
+
+	// DialogUI
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
+	TSubclassOf<class UDialogUIWidget> DialogWidgetClass;
+	UPROPERTY()
+	class UDialogUIWidget* DialogUIInstance = nullptr;
+
+	// InGameTimerUI
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
+	TSubclassOf<class UInGameTimerWidget> InGameUITimerWidgetClass;
+	UPROPERTY()
+	class UInGameTimerWidget* InGameUITimerInstance = nullptr;
+
+	// InGameUI
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
+	TSubclassOf<class UInGameUIWidget> InGameWidgetClass;
+	UPROPERTY()
+	class UInGameUIWidget* InGameUIInstance = nullptr;
+
+	// FinishGameUI
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
+	TSubclassOf<class UFinishGameUIWidget> FinishGameUIWidgetClass;
+	UPROPERTY(BlueprintReadOnly, Category = "UMG_Game")
+	class UFinishGameUIWidget* FinishGameUIInstance = nullptr;
 	
 
 	UPROPERTY()
 	UUserWidget* CurrentWidget;
+	
 	UPROPERTY()
-		class ULobbyUIWidget* LobbyUIInstance = nullptr;
-
-private:
-
-	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-		void SetLobbyInstance();
+	ETimerType Type;
 
 private:
 	

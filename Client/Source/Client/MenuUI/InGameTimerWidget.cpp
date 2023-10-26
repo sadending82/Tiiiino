@@ -25,7 +25,7 @@ void UInGameTimerWidget::TimerStart(ETimerType Type)
 		auto TinoCharacter = TinoController->GetPawn<ATinoCharacter>();
 		if (!!TinoCharacter)
 		{
-			InGameUI = Network::GetNetwork()->mMyCharacter->InGameWidgetInstance;
+			InGameUI = TinoController->InGameUIInstance;
 			if (Type == ETimerType::ETT_LevelClear)
 			{
 				RestGameTime = 19;
