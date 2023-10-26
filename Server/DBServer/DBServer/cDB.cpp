@@ -265,6 +265,48 @@ tuple<GRADE, DEPARTMENT>  DB::SelectUserGradeAndDepartment(const int uid)
 	return make_tuple(bindGrade, static_cast<char>(bindDepartment));
 }
 
+long long DB::SelectInventory(const int uid)
+{
+	string query = "SELECT items FROM inventory WHERE uid = ?";
+
+	if (mysql_stmt_prepare(GetmStmt(), query.c_str(), query.length()) != 0) {
+		DEBUGMSGONEPARAM("Select Inventory stmt prepare error: %s\n", mysql_stmt_error(GetmStmt()));
+		return -1;
+	}
+
+	MYSQL_BIND paramBind;
+	memset(&paramBind, 0, sizeof(paramBind));
+	paramBind.buffer_type = MYSQL_TYPE_LONG;
+	paramBind.buffer = (void*)&uid;
+
+	if (mysql_stmt_bind_param(GetmStmt(), &paramBind) != 0) {
+		DEBUGMSGONEPARAM("Select Inventory stmt param bind error: %s\n", mysql_stmt_error(GetmStmt()));
+		return -1;
+	}
+
+	MYSQL_BIND resultBind;
+	memset(&resultBind, 0, sizeof(resultBind));
+	long long bindItems = 0;
+	resultBind.buffer_type = MYSQL_TYPE_LONGLONG;
+	resultBind.buffer = (void*)&bindItems;
+
+	if (mysql_stmt_bind_result(GetmStmt(), &resultBind) != 0) {
+		DEBUGMSGONEPARAM("Select Inventory stmt result bind error: %s\n", mysql_stmt_error(GetmStmt()));
+		return -1;
+	}
+
+	if (ExecuteQuery() == false) {
+		return -1;
+	}
+
+	if (mysql_stmt_fetch(GetmStmt()) != 0) {
+		DEBUGMSGONEPARAM("Select Inventory stmt result fetch error: %s\n", mysql_stmt_error(GetmStmt()));
+		return -1;
+	}
+
+	return bindItems;
+}
+
 bool DB::InsertNewUser(const string& id, const char department)
 {
 	string query = "INSERT INTO userinfo (ID, department) VALUES (?, ?)";
@@ -336,6 +378,12 @@ bool DB::InsertNewAccount(const string& id, const string& password)
 	}
 
 	return true;
+}
+
+bool DB::InsertNewInventory(const int uid)
+{
+
+	return false;
 }
 
 bool DB::UpdateUserConnectionState(const int uid, const int state)
@@ -466,6 +514,43 @@ bool DB::UpdateUserDepartment(const int uid, const char department)
 	return true;
 }
 
+bool DB::UpdateInventory(const int uid, const int itemCode)
+{
+	string query = "INSERT INTO inventory (uid, items) VALUES (?, ?) ON DUPLICATE KEY UPDATE items = items | ?";
+
+	if (mysql_stmt_prepare(GetmStmt(), query.c_str(), query.length()) != 0) {
+		DEBUGMSGONEPARAM("UpdateInventory stmt prepare error: %s\n", mysql_stmt_error(GetmStmt()));
+		return false;
+	}
+
+	const int num = 3;
+
+	uint64_t bit = 1ULL << itemCode;
+
+	MYSQL_BIND binds[num];
+	memset(binds, 0, sizeof(binds));
+
+	binds[0].buffer_type = MYSQL_TYPE_LONG;
+	binds[0].buffer = (void*)&uid;
+
+	binds[1].buffer_type = MYSQL_TYPE_LONGLONG;
+	binds[1].buffer = (void*)&bit;
+
+	binds[2].buffer_type = MYSQL_TYPE_LONGLONG;
+	binds[2].buffer = (void*)&bit;
+
+	if (mysql_stmt_bind_param(GetmStmt(), binds) != 0) {
+		DEBUGMSGONEPARAM("UpdateInventory stmt bind error: %s\n", mysql_stmt_error(GetmStmt()));
+		return false;
+	}
+
+	if (ExecuteQuery() == false) {
+		return false;
+	}
+
+	return true;
+}
+
 bool DB::DeleteAccount(const string& id)
 {
 	string query = "Delete FROM account WHERE ID = ?";
@@ -484,6 +569,41 @@ bool DB::DeleteAccount(const string& id)
 
 	if (mysql_stmt_bind_param(GetmStmt(), &bind) != 0) {
 		DEBUGMSGONEPARAM("Delete Account stmt bind error: %s\n", mysql_stmt_error(GetmStmt()));
+		return false;
+	}
+
+	if (ExecuteQuery() == false) {
+		return false;
+	}
+
+	return true;
+}
+
+bool DB::DeleteItemInInventory(const int uid, const int itemCode)
+{
+	string query = "UPDATE inventory SET items = items & ~? WHERE UID = ?";
+
+	if (mysql_stmt_prepare(GetmStmt(), query.c_str(), query.length()) != 0) {
+		DEBUGMSGONEPARAM("DeleteItemInInventory stmt prepare error: %s\n", mysql_stmt_error(GetmStmt()));
+		return false;
+	}
+
+	const int num = 2;
+
+	uint64_t bit = 1ULL << itemCode;
+
+	MYSQL_BIND binds[num];
+	memset(binds, 0, sizeof(binds));
+
+
+	binds[0].buffer_type = MYSQL_TYPE_LONGLONG;
+	binds[0].buffer = (void*)&bit;
+
+	binds[1].buffer_type = MYSQL_TYPE_LONG;
+	binds[1].buffer = (void*)&uid;
+
+	if (mysql_stmt_bind_param(GetmStmt(), binds) != 0) {
+		DEBUGMSGONEPARAM("DeleteItemInInventory stmt bind error: %s\n", mysql_stmt_error(GetmStmt()));
 		return false;
 	}
 
@@ -521,9 +641,9 @@ bool DB::CheckVerifyUser(const string& id, const string& password)
 	return GetmSecurity()->VerifyPassword(password, hash, salt);
 }
 
-bool DB::UpdateRanking(const char department, const int incrementScore)
+bool DB::UpdateRanking(const char department, const int incrementPoint)
 {
-	string query = "INSERT INTO department_rank (department, score) VALUES (?, ?) ON DUPLICATE KEY UPDATE score = score + ?";
+	string query = "INSERT INTO department_rank (department, point) VALUES (?, ?) ON DUPLICATE KEY UPDATE point = point + ?";
 
 	if (mysql_stmt_prepare(GetmStmt(), query.c_str(), query.length()) != 0) {
 		DEBUGMSGONEPARAM("UpdateRanking stmt prepare error: %s\n", mysql_stmt_error(GetmStmt()));
@@ -539,10 +659,10 @@ bool DB::UpdateRanking(const char department, const int incrementScore)
 	binds[0].buffer = (void*)&department;
 
 	binds[1].buffer_type = MYSQL_TYPE_LONG;
-	binds[1].buffer = (void*)&incrementScore;
+	binds[1].buffer = (void*)&incrementPoint;
 
 	binds[2].buffer_type = MYSQL_TYPE_LONG;
-	binds[2].buffer = (void*)&incrementScore;
+	binds[2].buffer = (void*)&incrementPoint;
 
 	if (mysql_stmt_bind_param(GetmStmt(), binds) != 0) {
 		DEBUGMSGONEPARAM("UpdateRanking stmt bind error: %s\n", mysql_stmt_error(GetmStmt()));

@@ -34,11 +34,6 @@ constexpr int STARTKEY = 1;
 
 constexpr int SALT_LENGTH = 10;
 
-constexpr int ADMIN_START_UID = 1;
-constexpr int ADMIN_LAST_UID = 10;
-
-constexpr const char* ADMIN_ID = "admin";
-
 //###############################
 //###############################
 #define RUN_DB

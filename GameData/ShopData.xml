@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <productlist>
+    <product>
+      <code>1</code>
+      <name>sunglasses</name>
+      <price>100</price>
+    </product>
+    <product>
+      <code>2</code>
+      <name>glasses</name>
+      <price>100</price>
+    </product>
+    <product>
+      <code>3</code>
+      <name>crown</name>
+      <price>100</price>
+    </product>
+    <product>
+      <code>4</code>
+      <name>hat</name>
+      <price>100</price>
+    </product>
+  </productlist>
+</root>
