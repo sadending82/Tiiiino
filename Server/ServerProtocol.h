@@ -40,6 +40,9 @@ enum SPacketType {
 	LD_UPDATE_GRADE,
 	LD_CHANGE_DEPARTMENT,
 	LD_INVENTORY,
+	LD_EQUIP_ITEM,
+	LD_UNEQUIP_ITEM,
+	LD_BUY_ITEM,
 
 	// DBServer To LobbyServer
 	DL_LOGIN_OK,
@@ -133,6 +136,25 @@ struct LD_INVENTORY_PACKET :public SPACKET {
 	int		userKey;
 };
 
+struct LD_EQUIP_ITEM_PACKET :public SPACKET {
+	int			uid;
+	long long	itemCode;
+	int			userKey;
+};
+
+struct LD_UNEQUIP_ITEM_PACKET :public SPACKET {
+	int			uid;
+	long long	itemCode;
+	int			userKey;
+};
+
+struct LD_BUY_ITEM_PACKET :public SPACKET {
+	int			uid;
+	long long	itemCode;
+	int			price;
+	int			userKey;
+};
+
 struct DL_LOGIN_OK_PACKET :public SPACKET {
 	int		uid;
 	char	id[MAX_NAME_SIZE];
@@ -142,6 +164,7 @@ struct DL_LOGIN_OK_PACKET :public SPACKET {
 	int		userKey;
 	bool	connState;
 	long long	equipmentflag;
+	long long	inventoryflag;
 };
 
 struct DL_LOGIN_FAIL_PACKET :public SPACKET {

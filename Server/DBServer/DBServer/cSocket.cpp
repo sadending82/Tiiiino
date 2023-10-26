@@ -172,6 +172,18 @@ void Socket::processPacket(int key, unsigned char* buf)
         ProcessPacket_Inventory(key, buf);
         break;
     }
+    case LD_EQUIP_ITEM: {
+        ProcessPacket_EquipItem(key, buf);
+        break;
+    }
+    case LD_UNEQUIP_ITEM: {
+        ProcessPacket_UnequipItem(key, buf);
+        break;
+    }
+    case LD_BUY_ITEM: {
+        ProcessPacket_BuyItem(key, buf);
+        break;
+    }
     default:
     {
         break;
@@ -214,8 +226,9 @@ bool Socket::CheckLogin(int key, const char* id, const char* password, int userK
     int state = get<3>(userData);
     char department = get<4>(userData);
     long long equippedItems = get<5>(userData);
+    long long inventoryItems = Getm_pDB()->SelectInventory(uid);
 
-    SendLoginOK(key, uid, id, grade, point, state, department, equippedItems, userKey);
+    SendLoginOK(key, uid, id, grade, point, state, department, equippedItems, inventoryItems, userKey);
 
     if (state == FALSE)
         Getm_pDB()->UpdateUserConnectionState(uid, true);
@@ -241,7 +254,7 @@ bool Socket::CheckValidString(const char* input)
 // SendPacket
 void Socket::SendLoginOK(int key, int uid, const char* id
     , double grade, int point, int state, char department
-    , long long equippedItemFlag, int userKey)
+    , long long equippedItemFlag, long long inventoryFlag, int userKey)
 {
     DL_LOGIN_OK_PACKET p;
     p.size = sizeof(DL_LOGIN_OK_PACKET);
@@ -254,6 +267,7 @@ void Socket::SendLoginOK(int key, int uid, const char* id
     p.department = department;
     p.userKey = userKey;
     p.equipmentflag = equippedItemFlag;
+    p.inventoryflag = inventoryFlag;
 
     mSessions[key].DoSend((void*)(&p));
 }
@@ -405,6 +419,45 @@ void Socket::ProcessPacket_ChangeDepartment(int key, unsigned char* buf)
 #endif
 }
 
+void Socket::ProcessPacket_EquipItem(int key, unsigned char* buf)
+{
+    LD_EQUIP_ITEM_PACKET* p = reinterpret_cast<LD_EQUIP_ITEM_PACKET*>(buf);
+#ifdef RUN_DB
+    bool bResult = Getm_pDB()->UpdateEquipItem(p->uid, p->itemCode);
+    if (bResult != true) {
+
+    }
+#endif
+}
+
+void Socket::ProcessPacket_UnequipItem(int key, unsigned char* buf)
+{
+    LD_UNEQUIP_ITEM_PACKET* p = reinterpret_cast<LD_UNEQUIP_ITEM_PACKET*>(buf);
+#ifdef RUN_DB
+    bool bResult = Getm_pDB()->UpdateUnequipItem(p->uid, p->itemCode);
+    if (bResult != true) {
+
+    }
+#endif
+}
+
+void Socket::ProcessPacket_BuyItem(int key, unsigned char* buf)
+{
+    LD_BUY_ITEM_PACKET* p = reinterpret_cast<LD_BUY_ITEM_PACKET*>(buf);
+#ifdef RUN_DB
+
+    bool bResult = Getm_pDB()->UpdateUserPoint(p->uid, -p->price);
+    if (bResult != true) {
+
+        return;
+    }
+
+    bResult = Getm_pDB()->UpdateInventory(p->uid, p->itemCode);
+    if (bResult != true) {
+        Getm_pDB()->UpdateUserPoint(p->uid, p->price);
+    }
+#endif
+}
 
 int Socket::SetUIDForTest()
 {

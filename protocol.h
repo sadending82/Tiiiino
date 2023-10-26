@@ -51,7 +51,7 @@ enum PacketType {
 	// Client To GameServer
 	CS_LOGIN,
 	CS_MOVE,
-    CS_CHAT,
+	CS_CHAT,
 	CS_GOAL,
 	CS_PING,
 	CS_ACTION,
@@ -66,6 +66,9 @@ enum PacketType {
 	CL_MATCH,
 	CL_MATCH_OUT,
 	CL_CONTROL,
+	CL_EQUIP_ITEM,
+	CL_UNEQUIP_ITEM,
+	CL_BUY_ITEM,
 
 	// GameServer To Client
 	SC_LOGIN_OK,
@@ -94,6 +97,8 @@ enum PacketType {
 	LC_MATCH_RESPONSE,
 	LC_GAME_RESULT,
 	LC_CONTROL,
+	LC_BUYITEM_OK,
+	LC_BUYITEM_FAIL,
 };
 
 #pragma pack (push, 1)
@@ -178,6 +183,18 @@ struct CL_MATCH_OUT_PACKET : public PACKET {
 
 struct CL_CONTROL_PACKET : public PACKET {
 
+};
+
+struct CL_EQUIP_ITEM_PACKET : public PACKET {
+	int itemCode;
+};
+
+struct CL_UNEQUIP_ITEM_PACKET : public PACKET {
+	int itemCode;
+};
+
+struct CL_BUY_ITEM_PACKET : public PACKET {
+	int itemCode;
 };
 //-----------------------------------
 
