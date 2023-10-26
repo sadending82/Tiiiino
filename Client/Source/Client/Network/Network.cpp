@@ -590,7 +590,16 @@ void Network::l_process_packet(unsigned char* p)
 		//연결성공
 		bIsConnectedLobby = true;
 		CLog::Print("LC_LOGIN_OK IS CALLING");
+		//아이템 장착 사용법 
+		long long TestItemFlag = 0b0000'0000'0000'0000'0000'0000'0000'0100'0000'0000'0000'0000'0000'0000'0000'0000;
+		if ((packet->equippedItems & TestItemFlag))
+		{
+			//장착중 (장착이 아니라면 and 연산에서 다 false가 나와 0이라 if문 안들어옴)
+			//Equip !
+			//TestItemFlag는 xml에 들어가 있을 예정.
+		}
 
+		//
 		mMyCharacter->SetGradeUI(packet->grade);
 		break;
 	}
