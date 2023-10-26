@@ -511,7 +511,7 @@ void Network::process_packet(unsigned char* p)
 			if (obj)
 				obj->EnableMoveStart(true);
 		}
-		mMyCharacter->InGameWidgetInstance->LevelStartCountdown();
+		mMyCharacter->MakeAndShowLevelStartCountdown();
 		//
 		// 카운트다운 UI 띄우기및 object들 처음 동기화.
 		//
@@ -519,7 +519,7 @@ void Network::process_packet(unsigned char* p)
 	}
 	case SC_GAME_START: {
 		SC_GAME_START_PACKET* packet = reinterpret_cast<SC_GAME_START_PACKET*>(p);
-		mMyCharacter->InGameWidgetInstance->LevelStart();
+		mMyCharacter->MakeAndShowInGameLevelStart();
 		mMyCharacter->EnableInputMode();
 		//
 		// 플레이어들 움직일 수 있게 하기.
@@ -530,8 +530,8 @@ void Network::process_packet(unsigned char* p)
 		SC_GAME_END_PACKET* packet = reinterpret_cast<SC_GAME_END_PACKET*>(p);
 		bGameEndFlag = true;
 		closesocket(s_socket);
-		mMyCharacter->InGameWidgetInstance->LevelClear();
-		mMyCharacter->InGameWidgetInstance->ShowResultUI(); //블프 delegate불러주는함수임.
+		mMyCharacter->MakeAndShowInGameLevelClear();
+		mMyCharacter->MakeAndShowInGameShowResult();	//블프 delegate불러주는함수임.
 
 		break;
 	}
@@ -552,7 +552,7 @@ void Network::process_packet(unsigned char* p)
 	{
 		SC_GAME_COUNTDOWN_START_PACKET* packet = reinterpret_cast<SC_GAME_COUNTDOWN_START_PACKET*>(p);
 
-		mMyCharacter->InGameWidgetInstance->LevelClearCountdown();
+		mMyCharacter->MakeAndShowInGameClearCountdown();
 		//카운트다운 UI 띄우기 (Appear CountDown UI)
 
 		break;
@@ -591,13 +591,6 @@ void Network::l_process_packet(unsigned char* p)
 		bIsConnectedLobby = true;
 		CLog::Print("LC_LOGIN_OK IS CALLING");
 
-		//아래 코드 7줄을 함수 하나로 묶자 mMyCharacter->LoginOK();TinoController->LoginOK(); 이런 느낌
-		auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(mMyCharacter->GetWorld(), 0));
-		if (TinoController == nullptr)
-		{
-			CLog::Print("TinoController is nullptr");
-		}
-		TinoController->ChangeMenuWidget(TinoController->GetLobbyWidgetClass());
 		mMyCharacter->SetGradeUI(packet->grade);
 		break;
 	}
@@ -606,9 +599,7 @@ void Network::l_process_packet(unsigned char* p)
 		LC_LOGIN_FAIL_PACKET* packet = reinterpret_cast<LC_LOGIN_FAIL_PACKET*>(p);
 
 		// 로그인 실패 UI 띄움
-		if (mMyCharacter->LoginUIInstance == nullptr)
-			mMyCharacter->SetLoginUIInstance();
-		mMyCharacter->LoginUIInstance->UIAlertMessage();
+		mMyCharacter->MakeAndShowLoginFail();
 
 		break;
 	}
@@ -617,9 +608,7 @@ void Network::l_process_packet(unsigned char* p)
 		LC_SIGNUP_OK_PACKET* packet = reinterpret_cast<LC_SIGNUP_OK_PACKET*>(p);
 
 		// 회원가입 성공 UI 띄움
-		if (mMyCharacter->CreateAccountsInstance == nullptr)
-			mMyCharacter->SetCreateAccountsInstance();
-		mMyCharacter->CreateAccountsInstance->CheckCreateAccount(true);
+		mMyCharacter->MakeAndShowCreateAccountsSignUpOK();
 
 		break;
 	}
@@ -628,9 +617,7 @@ void Network::l_process_packet(unsigned char* p)
 		LC_SIGNUP_FAIL_PACKET* packet = reinterpret_cast<LC_SIGNUP_FAIL_PACKET*>(p);
 
 		// 회원가입 실패 UI 띄움
-		if (mMyCharacter->CreateAccountsInstance == nullptr)
-			mMyCharacter->SetCreateAccountsInstance();
-		mMyCharacter->CreateAccountsInstance->CheckCreateAccount(false);
+		mMyCharacter->MakeAndShowCreateAccountsSignUpFail();
 
 		break;
 	}

@@ -214,10 +214,12 @@ void ATinoCharacter::Align()
 
 void ATinoCharacter::MakeAndShowHUD()
 {
-	InGameWidgetInstance = CreateWidget<UInGameUIWidget>(GetWorld(), InGameWidgetClass);
+	auto InGameWidgetInstance = GetController<ATinoController>()->InGameUIInstance;
+	auto InGameUITimerInstance = GetController<ATinoController>()->InGameUITimerInstance;
+
+
 	InGameWidgetInstance->AddToViewport();
 
-	InGameUITimerInstance = CreateWidget<UInGameTimerWidget>(GetWorld(), InGameUITimerClass);
 	InGameUITimerInstance->SetInGameUI(InGameWidgetInstance);
 	InGameUITimerInstance->AddToViewport();
 
@@ -225,9 +227,57 @@ void ATinoCharacter::MakeAndShowHUD()
 
 }
 
+void ATinoCharacter::MakeAndShowLoginFail()
+{
+	auto LoginUIWidget = GetController<ATinoController>()->LoginUIInstance;
+	LoginUIWidget->UIAlertMessage();
+}
+
+void ATinoCharacter::MakeAndShowCreateAccountsSignUpOK()
+{
+	auto CreateAccountWidget = GetController<ATinoController>()->CreateAccountsUIInstance;
+	CreateAccountWidget->CheckCreateAccount(true);
+}
+
+void ATinoCharacter::MakeAndShowCreateAccountsSignUpFail()
+{
+	auto CreateAccountWidget = GetController<ATinoController>()->CreateAccountsUIInstance;
+	CreateAccountWidget->CheckCreateAccount(false);
+}
+
+void ATinoCharacter::MakeAndShowLevelStartCountdown()
+{
+	auto InGameWidget = GetController<ATinoController>()->InGameUIInstance;
+	InGameWidget->LevelStartCountdown();
+}
+
+void ATinoCharacter::MakeAndShowInGameLevelStart()
+{
+	auto InGameWidget = GetController<ATinoController>()->InGameUIInstance;
+	InGameWidget->LevelStart();
+}
+
+void ATinoCharacter::MakeAndShowInGameLevelClear()
+{
+	auto InGameWidget = GetController<ATinoController>()->InGameUIInstance;
+	InGameWidget->LevelClear();
+}
+
+void ATinoCharacter::MakeAndShowInGameShowResult()
+{
+	auto InGameWidget = GetController<ATinoController>()->InGameUIInstance;
+	InGameWidget->ShowResultUI();
+}
+
+void ATinoCharacter::MakeAndShowInGameClearCountdown()
+{
+	auto InGameWidget = GetController<ATinoController>()->InGameUIInstance;
+	InGameWidget->LevelClearCountdown();
+}
+
 void ATinoCharacter::MakeAndShowDialogInLobby()
 {
-	DialogWidget = CreateWidget<UDialogUIWidget>(GetWorld(), DialogWidgetClass);
+	auto DialogWidget = GetController<ATinoController>()->DialogUIInstance;
 	DialogWidget->AddToViewport();
 	DialogWidget->RenderDisconnectNetworkWindow();
 }
@@ -235,35 +285,9 @@ void ATinoCharacter::MakeAndShowDialogInLobby()
 void ATinoCharacter::MakeAndShowDialogInGame()
 {
 	if (true == Network::GetNetwork()->bGameEndFlag) return;
-	DialogWidget = CreateWidget<UDialogUIWidget>(GetWorld(), DialogWidgetClass);
+	auto DialogWidget = GetController<ATinoController>()->DialogUIInstance;
 	DialogWidget->AddToViewport();
 	DialogWidget->RenderDisconnectNetworkWindow();
-}
-
-void ATinoCharacter::SetLoginUIInstance()
-{
-	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	if (!!TinoController)
-	{
-		LoginUIInstance = Cast<ULoginUIWidget>(TinoController->GetCurrentWidget());
-		if (LoginUIInstance == nullptr)
-		{
-
-		}
-	}
-}
-
-void ATinoCharacter::SetCreateAccountsInstance()
-{
-	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	if (!!TinoController)
-	{
-		CreateAccountsInstance = Cast<UCreateAccountsWidget>(TinoController->GetCurrentWidget());
-		if (CreateAccountsInstance == nullptr)
-		{
-
-		}
-	}
 }
 
 UUserWidget* ATinoCharacter::GetLobbyUIInstance()
@@ -276,35 +300,13 @@ UUserWidget* ATinoCharacter::GetLobbyUIInstance()
 	return nullptr;
 }
 
-void ATinoCharacter::TimerStart(ETimerType type)
-{
-	Type = type;
-	GetWorldTimerManager().SetTimer(UITimerHandle, this, &ATinoCharacter::TimerRun, true, true);
-}
-
-void ATinoCharacter::TimerRun()
-{
-
-	// 유효성 확인
-	if (!!InGameUITimerInstance)
-	{
-		// UInGameUIWidget의 TimerRun 함수 호출
-		InGameUITimerInstance->TimerRun(Type);
-
-		if (InGameUITimerInstance->GetRestGameTime() < 0)
-		{
-			InGameUITimerInstance->TimerEnd(Type);
-			GetWorldTimerManager().ClearTimer(UITimerHandle);
-		}
-	}
-}
-
 void ATinoCharacter::SetGradeUI(const double GradeValue)
 {
 	float value = StaticCast<float>(GradeValue);
 	auto TinoController = GetController<ATinoController>();
 	if (!!TinoController)
 	{
+		TinoController->ChangeMenuWidget(TinoController->LobbyUIInstance);
 		SetGrade(value);
 		TinoController->SetGradeUI(value);
 	}
