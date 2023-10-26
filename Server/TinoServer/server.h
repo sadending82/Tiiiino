@@ -3,7 +3,6 @@
 #include "Timer.h"
 #include "room.h"
 #include "../ServerProtocol.h"
-#include "GameDataManager.h"
 
 constexpr int MAX_THREAD = 6;
 constexpr int INVALID_KEY = -1;
@@ -41,8 +40,6 @@ public:
 	void SendSignUpOK(int key);
 	void SendSignUpFail(int key);
 	void SendMatchResponse(int roomID);
-
-	void LoadGameData();
 public:
 	array <Session, MAX_USER> mClients;
 	array <Session, MAXGAMESERVER> mServers;
@@ -57,6 +54,4 @@ private:
 	HANDLE mHCP;
 	vector <thread> mWorkerThreads;
 	Timer* pTimer;
-
-	GameDataManager* pGameDataManager;
 };

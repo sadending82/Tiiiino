@@ -446,8 +446,6 @@ void Server::Init()
 	for (int i = 0; i < (int)si.dwNumberOfProcessors; ++i)
 		mWorkerThreads.emplace_back(thread(&Server::DoWorker, this));
 
-	LoadGameData();
-
 	pTimer = new Timer;
 	pTimer->Init(mHCP);
 
@@ -966,29 +964,5 @@ void Server::SendMatchResponse(int roomID)
 	for (auto player : delPlayerVector)
 	{
 		mReadytoGame.remove(player);
-	}
-}
-
-void Server::LoadGameData()
-{
-	pGameDataManager = new GameDataManager;
-	bool result = pGameDataManager->LoadItemData();
-	if (result == false) {
-		DEBUGMSGNOPARAM("Load Game Data Failed\n");
-		return;
-	}
-	result = pGameDataManager->LoadShopData();
-	if (result == false) {
-		DEBUGMSGNOPARAM("Load Game Data Failed\n");
-		return;
-	}
-	result = pGameDataManager->LoadCouponData();
-	if (result == false) {
-		DEBUGMSGNOPARAM("Load Game Data Failed\n");
-		return;
-	}
-
-	if (result == true) {
-		DEBUGMSGNOPARAM("Load Game Data Failed\n");
 	}
 }

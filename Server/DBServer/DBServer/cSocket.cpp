@@ -338,6 +338,11 @@ void Socket::ProcessPacket_UpdateGrade(int key, unsigned char* buf)
 {
     LD_UPDATE_GRADE_PACKET* p = reinterpret_cast<LD_UPDATE_GRADE_PACKET*>(buf);
 
+    if (ADMIN_START_UID <= p->uid 
+        && p->uid <= ADMIN_LAST_UID) {
+        return;
+    }
+
 #ifdef RUN_DB
 
     auto userData = Getm_pDB()->SelectUserGradeAndDepartment(p->uid);
