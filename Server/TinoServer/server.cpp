@@ -446,6 +446,7 @@ void Server::Init()
 	for (int i = 0; i < (int)si.dwNumberOfProcessors; ++i)
 		mWorkerThreads.emplace_back(thread(&Server::DoWorker, this));
 
+	// Item Data Load
 	LoadGameData();
 
 	pTimer = new Timer;
@@ -989,6 +990,6 @@ void Server::LoadGameData()
 	}
 
 	if (result == true) {
-		DEBUGMSGNOPARAM("Load Game Data Failed\n");
+		DEBUGMSGNOPARAM("Load Game Data Succeed\n");
 	}
 }

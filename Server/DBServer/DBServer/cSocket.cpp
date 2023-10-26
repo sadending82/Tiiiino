@@ -349,13 +349,19 @@ void Socket::ProcessPacket_UpdateGrade(int key, unsigned char* buf)
         DEBUGMSGONEPARAM("Update User Grade failed / UID: %d\n", p->uid);
     }
 
-    // 랭킹에 반영할 점수 나중에 수정
-    /*int score = 100;
-
-    bResult = Getm_pDB()->UpdateRanking(department, score);
+    bResult = Getm_pDB()->UpdateUserPoint(p->uid, p->point);
     if (bResult != true) {
-        cout << "Update Ranking failed\n";
-    }*/
+        Getm_pDB()->UpdateUserGrade(p->uid, gradeBeforeUpdate);
+        DEBUGMSGONEPARAM("Update User Grade failed / UID: %d\n", p->uid);
+        return;
+    }
+
+    bResult = Getm_pDB()->UpdateRanking(department, p->point);
+    if (bResult != true) {
+        Getm_pDB()->UpdateUserGrade(p->uid, gradeBeforeUpdate);
+        Getm_pDB()->UpdateUserPoint(p->uid, -p->point);
+        DEBUGMSGONEPARAM("Update Ranking failed / UID: %d\n", p->uid);
+    }
 
 #endif
 }

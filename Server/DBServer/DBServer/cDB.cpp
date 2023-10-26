@@ -452,7 +452,7 @@ bool DB::UpdateUserGrade(const int uid, double grade)
 
 bool DB::UpdateUserPoint(const int uid, unsigned int point)
 {
-	string query = "UPDATE userinfo SET point = ? WHERE UID = ?";
+	string query = "UPDATE userinfo SET point = point + ? WHERE UID = ?";
 
 	if (mysql_stmt_prepare(GetmStmt(), query.c_str(), query.length()) != 0) {
 		DEBUGMSGONEPARAM("UpdateUserPoint stmt prepare error: %s\n", mysql_stmt_error(GetmStmt()));
