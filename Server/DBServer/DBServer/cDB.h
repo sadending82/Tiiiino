@@ -29,21 +29,24 @@ public:
 	tuple<UNIQUEID, GRADE, POINT, STATE, DEPARTMENT> SelectUserDataForLogin(const string& id);
 	vector<string> SelectHash(const string& id); // Index 0: hash / Index 1: salt
 	tuple<GRADE, DEPARTMENT> SelectUserGradeAndDepartment(const int uid);
+	long long SelectInventory(const int uid);
 
 	bool InsertNewUser(const string& id, const char department);
 	bool InsertNewAccount(const string& id, const string& password);
+	bool InsertNewInventory(const int uid);
 
 	bool UpdateUserConnectionState(const int uid, const int state);
 	bool UpdateUserGrade(const int uid, double grade);
 	bool UpdateUserPoint(const int uid, unsigned int point);
+	bool UpdateRanking(const char department, const int incrementPoint);
 	bool UpdateUserDepartment(const int uid, const char department);
+	bool UpdateInventory(const int uid, const int itemCode);
 
 	bool DeleteAccount(const string& id);
+	bool DeleteItemInInventory(const int uid, const int itemCode);
 
 	bool SignUpNewPlayer(const string& id, const string& password, const char department);
 	bool CheckVerifyUser(const string& id, const string& password);
-
-	bool UpdateRanking(const char department, const int incrementScore);
 
 	void DisconnectDB();
 
