@@ -103,10 +103,6 @@ public:
 	void OffAccelEffect();
 
 	void SetOriginalSpeed();
-	
-	//UI 관련 함수
-	void TimerStart(ETimerType type);
-	void TimerRun();
 
 	void MakeAndShowHUD();	
 
@@ -273,9 +269,5 @@ private:
 	FTimerHandle DiveTimer;
 	FTimerHandle GrabTimer;
 	FTimerHandle GrabCoolTimer;
-	FTimerHandle UITimerHandle;
 
-
-	UPROPERTY()
-	ETimerType Type;
 };

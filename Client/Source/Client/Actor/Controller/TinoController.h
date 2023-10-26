@@ -68,6 +68,9 @@ public:
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void InitializeUIInstance();
 
+	//UI 관련 함수
+	void TimerStart(ETimerType type);
+	void TimerRun();
 protected:
 	virtual void BeginPlay() override;
 
@@ -133,4 +136,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = "BPClass")
 		TSubclassOf<class ATinoCharacter> TinoCharacterClass;
 		
+	FTimerHandle UITimerHandle;
+
+	UPROPERTY()
+	ETimerType Type;
+
 };

@@ -300,30 +300,6 @@ UUserWidget* ATinoCharacter::GetLobbyUIInstance()
 	return nullptr;
 }
 
-void ATinoCharacter::TimerStart(ETimerType type)
-{
-	Type = type;
-	GetWorldTimerManager().SetTimer(UITimerHandle, this, &ATinoCharacter::TimerRun, true, true);
-}
-
-void ATinoCharacter::TimerRun()
-{
-	auto InGameUITimerInstance = GetController<ATinoController>()->InGameUITimerInstance;
-
-	// 유효성 확인
-	if (!!InGameUITimerInstance)
-	{
-		// UInGameUIWidget의 TimerRun 함수 호출
-		InGameUITimerInstance->TimerRun(Type);
-
-		if (InGameUITimerInstance->GetRestGameTime() < 0)
-		{
-			InGameUITimerInstance->TimerEnd(Type);
-			GetWorldTimerManager().ClearTimer(UITimerHandle);
-		}
-	}
-}
-
 void ATinoCharacter::SetGradeUI(const double GradeValue)
 {
 	float value = StaticCast<float>(GradeValue);

@@ -34,7 +34,7 @@ void UInGameTimerWidget::TimerStart(ETimerType Type)
 			{
 				RestGameTime = 3;
 			}
-			TinoCharacter->TimerStart(Type);
+			TinoController->TimerStart(Type);
 			
 		}
 	}

@@ -93,6 +93,7 @@ void ATinoController::OpenInGameUI()
 		DialogUIInstance->RenderInGameMenuUI();
 		DialogUIInstance->AddToViewport();
 	}
+	
 }
 
 void ATinoController::RemoveDialogUI()
@@ -206,5 +207,27 @@ void ATinoController::InitializeUIInstance()
 	{
 		if (FinishGameUIInstance == nullptr)
 			FinishGameUIInstance = CreateWidget<UFinishGameUIWidget>(GetWorld(), FinishGameUIWidgetClass);
+	}
+}
+
+void ATinoController::TimerStart(ETimerType type)
+{
+	Type = type;
+	GetWorldTimerManager().SetTimer(UITimerHandle, this, &ATinoController::TimerRun, true, true);
+}
+
+void ATinoController::TimerRun()
+{
+	// 유효성 확인
+	if (!!InGameUITimerInstance)
+	{
+		// UInGameUIWidget의 TimerRun 함수 호출
+		InGameUITimerInstance->TimerRun(Type);
+
+		if (InGameUITimerInstance->GetRestGameTime() < 0)
+		{
+			InGameUITimerInstance->TimerEnd(Type);
+			GetWorldTimerManager().ClearTimer(UITimerHandle);
+		}
 	}
 }
