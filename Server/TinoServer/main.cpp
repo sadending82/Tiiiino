@@ -2,7 +2,6 @@
 #include "stdafx.h"
 #include "Server.h"
 #include "Timer.h"
-#include "GameDataManager.h"
 
 Server* pServer = new Server;
 

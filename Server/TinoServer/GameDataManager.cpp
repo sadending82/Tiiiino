@@ -1,68 +1,83 @@
 #include "GameDataManager.h"
 
-void GameDataManager::LoadShopData()
+bool GameDataManager::LoadShopData()
 {
-	tinyxml2::XMLDocument doc;
-	
-	doc.LoadFile(SHOPDATAFILE);
+	try {
+		tinyxml2::XMLDocument doc;
 
-	tinyxml2::XMLElement* pRoot = doc.RootElement();
-	tinyxml2::XMLElement* pProductList = pRoot->FirstChildElement("productlist");
+		doc.LoadFile(SHOPDATAFILE);
 
-	for (tinyxml2::XMLElement* pProduct = pProductList->FirstChildElement("product")
-		; pProduct != NULL; pProduct = pProduct->NextSiblingElement()) {
+		tinyxml2::XMLElement* pRoot = doc.RootElement();
+		tinyxml2::XMLElement* pProductList = pRoot->FirstChildElement("productlist");
 
-		Item item;
-		item.itemCode = stoi(pProduct->FirstChildElement("code")->GetText());
-		item.name = pProduct->FirstChildElement("name")->GetText();
-		item.price = stoi(pProduct->FirstChildElement("price")->GetText());
+		for (tinyxml2::XMLElement* pProduct = pProductList->FirstChildElement("product")
+			; pProduct != NULL; pProduct = pProduct->NextSiblingElement()) {
 
-		cout << item.name << endl;
+			Item item;
+			item.itemCode = stoi(pProduct->FirstChildElement("code")->GetText());
+			item.name = pProduct->FirstChildElement("name")->GetText();
+			item.price = stoi(pProduct->FirstChildElement("price")->GetText());
 
-		ShopProductsList[item.itemCode] = item;
+			ShopProductsList[item.itemCode] = item;
+		}
+		return true;
+	}
+	catch(exception ex){ 
+		DEBUGMSGNOPARAM("Load Shop Data Failed\n");
+		return false;
 	}
 }
 
-void GameDataManager::LoadItemData()
+bool GameDataManager::LoadItemData()
 {
-	tinyxml2::XMLDocument doc;
+	try {
+		tinyxml2::XMLDocument doc;
 
-	doc.LoadFile(ITEMDATAFILE);
+		doc.LoadFile(ITEMDATAFILE);
 
-	tinyxml2::XMLElement* pRoot = doc.RootElement();
-	tinyxml2::XMLElement* pItemList = pRoot->FirstChildElement("itemlist");
+		tinyxml2::XMLElement* pRoot = doc.RootElement();
+		tinyxml2::XMLElement* pItemList = pRoot->FirstChildElement("itemlist");
 
-	for (tinyxml2::XMLElement* pItem = pItemList->FirstChildElement("item")
-		; pItem != NULL; pItem = pItem->NextSiblingElement()) {
+		for (tinyxml2::XMLElement* pItem = pItemList->FirstChildElement("item")
+			; pItem != NULL; pItem = pItem->NextSiblingElement()) {
 
-		Item item;
-		item.itemCode = stoi(pItem->FirstChildElement("code")->GetText());
-		item.name = pItem->FirstChildElement("name")->GetText();
-		item.price = stoi(pItem->FirstChildElement("price")->GetText());
+			Item item;
+			item.itemCode = stoi(pItem->FirstChildElement("code")->GetText());
+			item.name = pItem->FirstChildElement("name")->GetText();
+			item.price = stoi(pItem->FirstChildElement("price")->GetText());
 
-		cout << item.name << endl;
-
-		ShopProductsList[item.itemCode] = item;
+			ShopProductsList[item.itemCode] = item;
+		}
+		return true;
+	}
+	catch (exception ex) {
+		DEBUGMSGNOPARAM("Load Item Data Failed\n");
+		return false;
 	}
 }
 
-void GameDataManager::LoadCouponData()
+bool GameDataManager::LoadCouponData()
 {
-	tinyxml2::XMLDocument doc;
+	try {
+		tinyxml2::XMLDocument doc;
 
-	doc.LoadFile(COUPONDATAFILE);
+		doc.LoadFile(COUPONDATAFILE);
 
-	tinyxml2::XMLElement* pRoot = doc.RootElement();
-	tinyxml2::XMLElement* pCouponList = pRoot->FirstChildElement("couponlist");
+		tinyxml2::XMLElement* pRoot = doc.RootElement();
+		tinyxml2::XMLElement* pCouponList = pRoot->FirstChildElement("couponlist");
 
-	for (tinyxml2::XMLElement* pCoupon = pCouponList->FirstChildElement("coupon")
-		; pCoupon != NULL; pCoupon = pCoupon->NextSiblingElement()) {
+		for (tinyxml2::XMLElement* pCoupon = pCouponList->FirstChildElement("coupon")
+			; pCoupon != NULL; pCoupon = pCoupon->NextSiblingElement()) {
 
-		string couponCode = pCoupon->FirstChildElement("couponCode")->GetText();
-		int itemCode = stoi(pCoupon->FirstChildElement("itemCode")->GetText());
+			string couponCode = pCoupon->FirstChildElement("couponCode")->GetText();
+			int itemCode = stoi(pCoupon->FirstChildElement("itemCode")->GetText());
 
-		cout << couponCode << " // " << itemCode << endl;
-
-		CouponList[couponCode] = itemCode;
+			CouponList[couponCode] = itemCode;
+		}
+		return true;
+	}
+	catch (exception ex) {
+		DEBUGMSGNOPARAM("Load Coupon Data Failed\n");
+		return false;
 	}
 }

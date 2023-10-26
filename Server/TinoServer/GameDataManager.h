@@ -19,9 +19,9 @@ struct Item
 class GameDataManager
 {
 public:
-	void			LoadShopData();
-	void			LoadItemData();
-	void			LoadCouponData();
+	bool			LoadShopData();
+	bool			LoadItemData();
+	bool			LoadCouponData();
 
 	map<int, Item>	GetShopProductsList() { return ShopProductsList; }
 	map<int, Item>	GetItemList() { return ItemList; }
