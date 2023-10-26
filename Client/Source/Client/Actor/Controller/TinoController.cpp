@@ -174,37 +174,37 @@ void ATinoController::InitializeUIInstance()
 	
 	if (!!LoginWidgetClass)
 	{
-		if (!!LoginUIInstance)
+		if (LoginUIInstance == nullptr)
 			LoginUIInstance = CreateWidget<ULoginUIWidget>(GetWorld(), LoginWidgetClass);
 	}
 	if (!!LobbyWidgetClass)
 	{
-		if(!!LobbyUIInstance)
+		if(LobbyUIInstance == nullptr)
 			LobbyUIInstance = CreateWidget<ULobbyUIWidget>(GetWorld(), LobbyWidgetClass);
 	}
 	if (!!CreateAccountsWidgetClass)
 	{
-		if (!!CreateAccountsUIInstance)
+		if (CreateAccountsUIInstance == nullptr)
 			CreateAccountsUIInstance = CreateWidget<UCreateAccountsWidget>(GetWorld(), CreateAccountsWidgetClass);
 	}
 	if (!!DialogWidgetClass)
 	{
-		if (!!DialogUIInstance)
+		if (DialogUIInstance == nullptr)
 			DialogUIInstance = Cast<UDialogUIWidget>(CreateWidget(GetWorld(), DialogWidgetClass));
 	}
 	if (!!InGameUITimerWidgetClass)
 	{
-		if (!!InGameUITimerInstance)
+		if (InGameUITimerInstance == nullptr)
 			InGameUITimerInstance = CreateWidget<UInGameTimerWidget>(GetWorld(), InGameUITimerWidgetClass);
 	}
 	if (!!InGameWidgetClass)
 	{
-		if (!!InGameUIInstance)
+		if (InGameUIInstance == nullptr)
 			InGameUIInstance = CreateWidget<UInGameUIWidget>(GetWorld(), InGameWidgetClass);
 	}
 	if (!!FinishGameUIWidgetClass)
 	{
-		if (!!FinishGameUIInstance)
+		if (FinishGameUIInstance == nullptr)
 			FinishGameUIInstance = CreateWidget<UFinishGameUIWidget>(GetWorld(), FinishGameUIWidgetClass);
 	}
 }
