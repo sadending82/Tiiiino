@@ -97,13 +97,13 @@ tuple<ID, GRADE, POINT> DB::SelectUserData(const int uid)
 	return make_tuple(bindID, bindgrade, bindPoint);
 }
 
-tuple<UNIQUEID, GRADE, POINT, STATE, DEPARTMENT> DB::SelectUserDataForLogin(const string& id)
+tuple<UNIQUEID, GRADE, POINT, STATE, DEPARTMENT, EQUIPMENT_BITFLAG> DB::SelectUserDataForLogin(const string& id)
 {
-	string query = "SELECT UID, grade, point, state, department FROM tiiiino.userinfo WHERE id = ?";
+	string query = "SELECT UID, grade, point, state, department, equippedItems FROM tiiiino.userinfo WHERE id = ?";
 
 	if (mysql_stmt_prepare(GetmStmt(), query.c_str(), query.length()) != 0) {
 		DEBUGMSGONEPARAM("SelectUserData stmt prepare error: %s\n", mysql_stmt_error(GetmStmt()));
-		return tuple<UNIQUEID, GRADE, POINT, STATE, DEPARTMENT>();
+		return tuple<UNIQUEID, GRADE, POINT, STATE, DEPARTMENT, EQUIPMENT_BITFLAG>();
 	}
 
 	MYSQL_BIND paramBind;
@@ -116,16 +116,17 @@ tuple<UNIQUEID, GRADE, POINT, STATE, DEPARTMENT> DB::SelectUserDataForLogin(cons
 
 	if (mysql_stmt_bind_param(GetmStmt(), &paramBind) != 0) {
 		DEBUGMSGONEPARAM("SelectUserData stmt param bind error: %s\n", mysql_stmt_error(GetmStmt()));
-		return tuple<UNIQUEID, GRADE, POINT, STATE, DEPARTMENT>();
+		return tuple<UNIQUEID, GRADE, POINT, STATE, DEPARTMENT, EQUIPMENT_BITFLAG>();
 	}
 
-	const int resColNum = 5;
+	const int resColNum = 6;
 	MYSQL_BIND resultBinds[resColNum];
 	memset(resultBinds, 0, sizeof(resultBinds));
 	int bindUID, bindPoint;
 	double bindGrade;
 	int bindState;
 	int bindDepartment;
+	long long bindEquippedItems;
 	{
 		resultBinds[0].buffer_type = MYSQL_TYPE_LONG;
 		resultBinds[0].buffer = &bindUID;
@@ -141,22 +142,26 @@ tuple<UNIQUEID, GRADE, POINT, STATE, DEPARTMENT> DB::SelectUserDataForLogin(cons
 
 		resultBinds[4].buffer_type = MYSQL_TYPE_LONG;
 		resultBinds[4].buffer = &bindDepartment;
+
+		resultBinds[5].buffer_type = MYSQL_TYPE_LONGLONG;
+		resultBinds[5].buffer = &bindEquippedItems;
 	}
 
 	if (mysql_stmt_bind_result(GetmStmt(), resultBinds) != 0) {
 		DEBUGMSGONEPARAM("SelectUserData stmt result bind error: %s\n", mysql_stmt_error(GetmStmt()));
-		return tuple<UNIQUEID, GRADE, POINT, STATE, DEPARTMENT>();
+		return tuple<UNIQUEID, GRADE, POINT, STATE, DEPARTMENT, EQUIPMENT_BITFLAG>();
 	}
 
 	if (ExecuteQuery() == false) {
-		return tuple<UNIQUEID, GRADE, POINT, STATE, DEPARTMENT>();
+		return tuple<UNIQUEID, GRADE, POINT, STATE, DEPARTMENT, EQUIPMENT_BITFLAG>();
 	}
 
 	if (mysql_stmt_fetch(GetmStmt()) != 0) {
-		return tuple<UNIQUEID, GRADE, POINT, STATE, DEPARTMENT>();
+		return tuple<UNIQUEID, GRADE, POINT, STATE, DEPARTMENT, EQUIPMENT_BITFLAG>();
 	}
 
-	return make_tuple(bindUID, bindGrade, bindPoint, bindState, static_cast<char>(bindDepartment));
+	return make_tuple(bindUID, bindGrade, bindPoint
+		, bindState, static_cast<char>(bindDepartment), bindEquippedItems);
 }
 
 vector<string> DB::SelectHash(const string& id)
@@ -243,10 +248,10 @@ tuple<GRADE, DEPARTMENT>  DB::SelectUserGradeAndDepartment(const int uid)
 	double bindGrade;
 	{
 		resultBinds[0].buffer_type = MYSQL_TYPE_DOUBLE;
-		resultBinds[0].buffer = (void*)&bindGrade;
+		resultBinds[0].buffer = &bindGrade;
 
 		resultBinds[1].buffer_type = MYSQL_TYPE_LONG;
-		resultBinds[1].buffer = (void*)&bindDepartment;
+		resultBinds[1].buffer = &bindDepartment;
 	}
 
 	if (mysql_stmt_bind_result(GetmStmt(), resultBinds) != 0) {
@@ -277,7 +282,7 @@ long long DB::SelectInventory(const int uid)
 	MYSQL_BIND paramBind;
 	memset(&paramBind, 0, sizeof(paramBind));
 	paramBind.buffer_type = MYSQL_TYPE_LONG;
-	paramBind.buffer = (void*)&uid;
+	paramBind.buffer = (void*)& uid;
 
 	if (mysql_stmt_bind_param(GetmStmt(), &paramBind) != 0) {
 		DEBUGMSGONEPARAM("Select Inventory stmt param bind error: %s\n", mysql_stmt_error(GetmStmt()));
@@ -288,7 +293,7 @@ long long DB::SelectInventory(const int uid)
 	memset(&resultBind, 0, sizeof(resultBind));
 	long long bindItems = 0;
 	resultBind.buffer_type = MYSQL_TYPE_LONGLONG;
-	resultBind.buffer = (void*)&bindItems;
+	resultBind.buffer = &bindItems;
 
 	if (mysql_stmt_bind_result(GetmStmt(), &resultBind) != 0) {
 		DEBUGMSGONEPARAM("Select Inventory stmt result bind error: %s\n", mysql_stmt_error(GetmStmt()));

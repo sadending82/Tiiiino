@@ -21,6 +21,12 @@ constexpr int DELAY_TIME_EXEC_BREAKPLATFORM = 3000;
 constexpr int MIN_LEVEL = 1;
 constexpr int MAX_LEVEL = 8;
 
+//item
+constexpr long long HEADEQUIP = 0b0000'0000'0000'0000'1111'1111'1111'1111'1111'1111'1111'1111'1111'1111'1111'1111;//48~63
+constexpr long long FACEEQUIP = 0b1111'1111'1111'1111'0000'0000'0000'0000'1111'1111'1111'1111'1111'1111'1111'1111;//32~47
+constexpr long long HANDEQUIP = 0b1111'1111'1111'1111'1111'1111'1111'1111'0000'0000'0000'0000'1111'1111'1111'1111;//16~31
+constexpr long long BACKEQUIP = 0b1111'1111'1111'1111'1111'1111'1111'1111'1111'1111'1111'1111'0000'0000'0000'0000;//0~15
+
 enum class eDepartment : char
 {
 
@@ -263,6 +269,7 @@ struct LC_LOGIN_OK_PACKET : public PACKET {
 	double grade;
 	int point;
 	int RoomID;
+	long long equippedItems;
 };
 
 struct 	LC_LOGIN_FAIL_PACKET :public PACKET {

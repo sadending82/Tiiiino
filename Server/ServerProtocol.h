@@ -39,13 +39,15 @@ enum SPacketType {
 	LD_SIGNUP,
 	LD_UPDATE_GRADE,
 	LD_CHANGE_DEPARTMENT,
+	LD_INVENTORY,
 
 	// DBServer To LobbyServer
 	DL_LOGIN_OK,
 	DL_LOGIN_FAIL,
 	DL_CHANGE_DEPARTMENT_OK,
 	DL_SIGNUP_OK,
-	DL_SIGNUP_FAIL
+	DL_SIGNUP_FAIL,
+	DL_INVENTORY
 };
 
 
@@ -126,6 +128,11 @@ struct LD_CHANGE_DEPARTMENT_PACKET :public SPACKET {
 	int		uid;
 };
 
+struct LD_INVENTORY_PACKET :public SPACKET {
+	int		uid;
+	int		userKey;
+};
+
 struct DL_LOGIN_OK_PACKET :public SPACKET {
 	int		uid;
 	char	id[MAX_NAME_SIZE];
@@ -134,6 +141,7 @@ struct DL_LOGIN_OK_PACKET :public SPACKET {
 	int		point;
 	int		userKey;
 	bool	connState;
+	long long	equipmentflag;
 };
 
 struct DL_LOGIN_FAIL_PACKET :public SPACKET {
@@ -148,6 +156,11 @@ struct DL_SIGNUP_OK_PACKET :public SPACKET {
 struct DL_SIGNUP_FAIL_PACKET :public SPACKET {
 	int		errorCode;
 	int		userKey;
+};
+
+struct DL_INVENTORY_PACKET :public SPACKET {
+	long long	inventoryFlag;
+	int			userKey;
 };
 
 #pragma pack (pop)

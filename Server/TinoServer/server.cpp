@@ -156,6 +156,7 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		mClients[p->userKey].mPoint = p->point;
 		mClients[p->userKey].mUID = p->uid;
 		mClients[p->userKey].mState = eSessionState::ST_LOBBY;
+		mClients[p->userKey].mEquippedItems = p->equipmentflag;
 		mClients[p->userKey].mStateLock.unlock();
 
 		SendLoginOK(p->userKey);
@@ -186,6 +187,12 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 	{
 		DL_SIGNUP_FAIL_PACKET* p = reinterpret_cast<DL_SIGNUP_FAIL_PACKET*>(spacket);
 		SendSignUpFail(p->userKey);
+		break;
+	}
+	case DL_INVENTORY:
+	{
+		DL_INVENTORY_PACKET* p = reinterpret_cast<DL_INVENTORY_PACKET*>(spacket);
+
 		break;
 	}
 	default:
@@ -879,6 +886,9 @@ void Server::SendLoginOK(int cID)
 	pac.point = mClients[cID].mPoint;
 	pac.RoomID = 0;
 	pac.UID = mClients[cID].mUID;
+	pac.equippedItems = mClients[cID].mEquippedItems;
+
+	cout << pac.equippedItems << endl;
 
 	mClients[cID].DoSend(&pac);
 }

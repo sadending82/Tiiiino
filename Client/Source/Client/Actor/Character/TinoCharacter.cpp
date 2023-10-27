@@ -3,12 +3,12 @@
 #include "Actor/Character/CharacterAnimInstance.h"
 #include "Actor/Accessory/AccessoryItem.h"
 
-#include "MenuUI/InGameUIWidget.h"
 #include "MenuUI/DialogUIWidget.h"
+#include "MenuUI/InGameUIWidget.h"
 #include "MenuUI/InGameTimerWidget.h"
-#include "CreateAccountsWidget.h"
-#include "LoginUIWidget.h"
-#include "LobbyUIWidget.h"
+#include "MenuUI/LoginUIWidget.h"
+#include "MenuUI/CreateAccountsWidget.h"
+#include "MenuUI/LobbyUIWidget.h"
 
 #include "Global.h"
 
@@ -227,6 +227,25 @@ void ATinoCharacter::MakeAndShowHUD()
 
 }
 
+void ATinoCharacter::MakeAndShowLoginOK(const double GradeValue, const int PointValue)
+{
+	float GValue = StaticCast<float>(GradeValue);
+	int32 PValue = StaticCast<int32>(PointValue);
+	auto TinoController = GetController<ATinoController>();
+
+	if (!!TinoController)
+	{
+		SetGrade(GValue);
+		SetPoint(PValue);
+
+		TinoController->ChangeMenuWidget(TinoController->LobbyUIInstance);
+		auto LobbyUI = TinoController->LobbyUIInstance;
+		LobbyUI->Grade = GValue;
+		LobbyUI->Point = PValue;
+
+	}
+}
+
 void ATinoCharacter::MakeAndShowLoginFail()
 {
 	auto LoginUIWidget = GetController<ATinoController>()->LoginUIInstance;
@@ -288,28 +307,6 @@ void ATinoCharacter::MakeAndShowDialogInGame()
 	auto DialogWidget = GetController<ATinoController>()->DialogUIInstance;
 	DialogWidget->AddToViewport();
 	DialogWidget->RenderDisconnectNetworkWindow();
-}
-
-UUserWidget* ATinoCharacter::GetLobbyUIInstance()
-{
-	auto TinoController = GetController<ATinoController>();
-	if (!!TinoController)
-	{
-		return TinoController->GetLobbyUIIndstance();
-	}
-	return nullptr;
-}
-
-void ATinoCharacter::SetGradeUI(const double GradeValue)
-{
-	float value = StaticCast<float>(GradeValue);
-	auto TinoController = GetController<ATinoController>();
-	if (!!TinoController)
-	{
-		TinoController->ChangeMenuWidget(TinoController->LobbyUIInstance);
-		SetGrade(value);
-		TinoController->SetGradeUI(value);
-	}
 }
 
 void ATinoCharacter::SetDepartmentClothes(int department)
@@ -418,6 +415,11 @@ void ATinoCharacter::SetIsAirForNetwork(bool val)
 	{
 		AnimInstance->bIsAirForNetwork = val;
 	}
+}
+
+void ATinoCharacter::SetCollisionProfileName(const FName& CollisionName)
+{
+	GetCapsuleComponent()->SetCollisionProfileName(CollisionName);
 }
 
 UCharacterAnimInstance* ATinoCharacter::GetTinoAnimInstance()

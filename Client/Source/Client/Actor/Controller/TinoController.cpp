@@ -4,7 +4,11 @@
 #include "Network/Network.h"
 #include "MenuUI/DialogUIWidget.h"
 #include "MenuUI/FinishGameUIWidget.h"
-#include "LobbyUIWidget.h"
+#include "MenuUI/InGameTimerWidget.h"
+#include "MenuUI/LobbyUIWidget.h"
+#include "MenuUI/LoginUIWidget.h"
+#include "MenuUI/CreateAccountsWidget.h"
+#include "MenuUI/InGameUIWidget.h"
 
 #include "Global.h"
 
@@ -126,27 +130,6 @@ void ATinoController::UIAlertMessage(EDialogUICheck check)
 		DialogUIInstance->RenderUIAlertMessage();
 		DialogUIInstance->AddToViewport();
 	}
-}
-
-void ATinoController::SetGradeUI(float GradeValue)
-{
-	if (LobbyUIInstance)
-	{
-		LobbyUIInstance->Grade = GradeValue;
-	}
-	//CreateWidget으로 매번 CurrentWidget을 생성해줄때는 아래코드
-	//UI별로 객체를 생성해서 사용하면 위코드를 사용할것
-	auto lobby = Cast<ULobbyUIWidget>(CurrentWidget);
-	if (lobby)
-	{
-		lobby->Grade = GradeValue;
-	}
-}
-
-float ATinoController::GetGradeUI()
-{
-	if (LobbyUIInstance) return LobbyUIInstance->Grade;
-	return 0.f;
 }
 
 void ATinoController::DisconnectNetwork()
