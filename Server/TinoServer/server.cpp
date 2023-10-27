@@ -105,6 +105,18 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 		PlayerMatchOut(cID);
 		break;
 	}
+	case CL_EQUIP_ITEM:
+	{
+		break;
+	}
+	case CL_UNEQUIP_ITEM:
+	{
+		break;
+	}
+	case CL_BUY_ITEM:
+	{
+		break;
+	}
 	default:
 	{
 		break;
