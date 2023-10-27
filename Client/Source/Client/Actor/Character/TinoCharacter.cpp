@@ -3,12 +3,12 @@
 #include "Actor/Character/CharacterAnimInstance.h"
 #include "Actor/Accessory/AccessoryItem.h"
 
-#include "MenuUI/InGameUIWidget.h"
 #include "MenuUI/DialogUIWidget.h"
+#include "MenuUI/InGameUIWidget.h"
 #include "MenuUI/InGameTimerWidget.h"
-#include "CreateAccountsWidget.h"
-#include "LoginUIWidget.h"
-#include "LobbyUIWidget.h"
+#include "MenuUI/LoginUIWidget.h"
+#include "MenuUI/CreateAccountsWidget.h"
+#include "MenuUI/LobbyUIWidget.h"
 
 #include "Global.h"
 

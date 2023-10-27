@@ -5,12 +5,12 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "Blueprint/UserWidget.h"
-#include "MenuUI/InGameTimerWidget.h"
 #include "TinoController.generated.h"
 
 /**
  * 
  */
+enum class ETimerType : uint8;
 
 UENUM(BlueprintType)
 enum class EDialogUICheck : uint8

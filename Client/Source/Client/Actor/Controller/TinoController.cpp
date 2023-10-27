@@ -4,7 +4,11 @@
 #include "Network/Network.h"
 #include "MenuUI/DialogUIWidget.h"
 #include "MenuUI/FinishGameUIWidget.h"
-#include "LobbyUIWidget.h"
+#include "MenuUI/InGameTimerWidget.h"
+#include "MenuUI/LobbyUIWidget.h"
+#include "MenuUI/LoginUIWidget.h"
+#include "MenuUI/CreateAccountsWidget.h"
+#include "MenuUI/InGameUIWidget.h"
 
 #include "Global.h"
 

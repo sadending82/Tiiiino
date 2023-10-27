@@ -3,7 +3,7 @@
 
 #include "Actor/Level/CustomLevel_Test.h"
 #include "Sound/SoundManager.h"
-#include "LobbyUIWidget.h"
+#include "MenuUI/LobbyUIWidget.h"
 #include "Network/Network.h"
 #include "Actor/Character/TinoCharacter.h"
 #include "Actor/Controller/TinoController.h"

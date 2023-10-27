@@ -1,10 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "LoginUIWidget.h"
+#include "MenuUI/LoginUIWidget.h"
 #include "Components/Button.h"
 #include "Components/EditableTextBox.h"
-#include "CreateAccountsWidget.h"
+#include "MenuUI/CreateAccountsWidget.h"
 #include "Actor/Controller/TinoController.h"
 #include "GameFramework/Pawn.h"
 #include "Network/Network.h"
