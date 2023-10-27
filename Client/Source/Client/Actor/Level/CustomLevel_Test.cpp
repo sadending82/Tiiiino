@@ -3,7 +3,7 @@
 
 #include "Actor/Level/CustomLevel_Test.h"
 #include "Sound/SoundManager.h"
-#include "LobbyUIWidget.h"
+#include "MenuUI/LobbyUIWidget.h"
 #include "Network/Network.h"
 #include "Actor/Character/TinoCharacter.h"
 #include "Actor/Controller/TinoController.h"
@@ -101,7 +101,6 @@ bool ACustomLevel_Test::ConnLobbyServer()
 		}
 		else {
 			TinoController->InitializeUIInstance();
-			TinoController->ChangeMenuWidget(TinoController->LobbyUIInstance);
 			// 여기서 결과 UI를 띄워줌
 			if (-1 != Network::GetNetwork()->GameResult.point)
 			{
@@ -111,12 +110,13 @@ bool ACustomLevel_Test::ConnLobbyServer()
 				Network::GetNetwork()->GameResult.grade;
 				Network::GetNetwork()->GameResult.rank;
 
+				//학점 재반영 (게임 종료 -> 로비)
+				player->MakeAndShowLoginOK(Network::GetNetwork()->GameResult.grade, Network::GetNetwork()->GameResult.point);
 				// 결과창 출력
 				ShowGameResult();
-				//학점 재반영 (게임 종료 -> 로비)
-				TinoController->SetGradeUI(Network::GetNetwork()->GameResult.grade);
 				Network::GetNetwork()->GameResult = sGameResult{}; // 결과 처리 했으니 비워주기.
 			}
+
 			CLog::Log("Connect Lobby Against Successfully");
 		}
 		return true;

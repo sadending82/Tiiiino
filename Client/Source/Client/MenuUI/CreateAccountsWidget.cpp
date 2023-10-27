@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "CreateAccountsWidget.h"
-#include "LoginUIWidget.h"
+#include "MenuUI/CreateAccountsWidget.h"
+#include "MenuUI/LoginUIWidget.h"
 #include "Actor/Controller/TinoController.h"
 #include "Components/EditableTextBox.h"
 #include "Network/Network.h"

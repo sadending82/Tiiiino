@@ -5,12 +5,12 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "Blueprint/UserWidget.h"
-#include "MenuUI/InGameTimerWidget.h"
 #include "TinoController.generated.h"
 
 /**
  * 
  */
+enum class ETimerType : uint8;
 
 UENUM(BlueprintType)
 enum class EDialogUICheck : uint8
@@ -48,12 +48,6 @@ public:
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	UUserWidget* GetCurrentWidget() { return CurrentWidget; }
-	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-		class ULobbyUIWidget* GetLobbyUIIndstance() { return LobbyUIInstance; }
-	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-		void SetGradeUI(float GradeValue);
-	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-		float GetGradeUI();
 
 	bool bIsLobbyConnected = false;
 public:
