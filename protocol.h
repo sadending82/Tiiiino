@@ -27,6 +27,11 @@ constexpr long long FACEEQUIP = 0b1111'1111'1111'1111'0000'0000'0000'0000'1111'1
 constexpr long long HANDEQUIP = 0b1111'1111'1111'1111'1111'1111'1111'1111'0000'0000'0000'0000'1111'1111'1111'1111;//16~31
 constexpr long long BACKEQUIP = 0b1111'1111'1111'1111'1111'1111'1111'1111'1111'1111'1111'1111'0000'0000'0000'0000;//0~15
 
+constexpr int STARTCODE_HEADEQUIP = 48;
+constexpr int STARTCODE_FACEEQUIP = 32;
+constexpr int STARTCODE_HANDEQUIP = 16;
+constexpr int STARTCODE_BACKEQUIP = 0;
+
 enum class eDepartment : char
 {
 
@@ -51,7 +56,7 @@ enum PacketType {
 	// Client To GameServer
 	CS_LOGIN,
 	CS_MOVE,
-    CS_CHAT,
+	CS_CHAT,
 	CS_GOAL,
 	CS_PING,
 	CS_ACTION,
@@ -66,6 +71,10 @@ enum PacketType {
 	CL_MATCH,
 	CL_MATCH_OUT,
 	CL_CONTROL,
+	CL_EQUIP_ITEM,
+	CL_UNEQUIP_ITEM,
+	CL_BUY_ITEM,
+	CL_REFRESH_INVENTORY,
 
 	// GameServer To Client
 	SC_LOGIN_OK,
@@ -94,6 +103,9 @@ enum PacketType {
 	LC_MATCH_RESPONSE,
 	LC_GAME_RESULT,
 	LC_CONTROL,
+	LC_BUYITEM_OK,
+	LC_BUYITEM_FAIL,
+	LC_REFRESH_INVENTORY
 };
 
 #pragma pack (push, 1)
@@ -177,6 +189,22 @@ struct CL_MATCH_OUT_PACKET : public PACKET {
 };
 
 struct CL_CONTROL_PACKET : public PACKET {
+
+};
+
+struct CL_EQUIP_ITEM_PACKET : public PACKET {
+	int itemCode;
+};
+
+struct CL_UNEQUIP_ITEM_PACKET : public PACKET {
+	int itemCode;
+};
+
+struct CL_BUY_ITEM_PACKET : public PACKET {
+	int itemCode;
+};
+
+struct CL_REFRESH_INVENTORY_PACKET : public PACKET {
 
 };
 //-----------------------------------
@@ -299,6 +327,18 @@ struct LC_GAME_RESULT_PACKET : public PACKET {
 
 struct LC_CONTROL_PACKET :public PACKET {
 
+};
+
+struct LC_BUYITEM_OK_PACKET :public PACKET {
+
+};
+
+struct LC_BUYITEM_FAIL_PACKET :public PACKET {
+
+};
+
+struct LC_REFRESH_INVENTORY_PACKET : public PACKET {
+	long long inventoryFlag;
 };
 
 //--------------------------
