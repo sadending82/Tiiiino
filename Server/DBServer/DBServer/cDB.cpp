@@ -556,6 +556,39 @@ bool DB::UpdateInventory(const int uid, const int itemCode)
 	return true;
 }
 
+bool DB::UpdateEquipItemFlag(const int uid, long long bitFlag)
+{
+	string query = "UPDATE userinfo SET equippedItems = ? WHERE UID = ?";
+
+	if (mysql_stmt_prepare(GetmStmt(), query.c_str(), query.length()) != 0) {
+		DEBUGMSGONEPARAM("UpdateUnquipItem stmt prepare error: %s\n", mysql_stmt_error(GetmStmt()));
+		return false;
+	}
+
+	const int num = 2;
+
+	MYSQL_BIND binds[num];
+	memset(binds, 0, sizeof(binds));
+
+
+	binds[0].buffer_type = MYSQL_TYPE_LONGLONG;
+	binds[0].buffer = (void*)&bitFlag;
+
+	binds[1].buffer_type = MYSQL_TYPE_LONG;
+	binds[1].buffer = (void*)&uid;
+
+	if (mysql_stmt_bind_param(GetmStmt(), binds) != 0) {
+		DEBUGMSGONEPARAM("UpdateUnquipItem stmt bind error: %s\n", mysql_stmt_error(GetmStmt()));
+		return false;
+	}
+
+	if (ExecuteQuery() == false) {
+		return false;
+	}
+
+	return true;
+}
+
 bool DB::UpdateEquipItem(const int uid, const int itemCode)
 {
 	string query = "UPDATE userinfo SET equippedItems = equippedItems | ? WHERE UID = ?";

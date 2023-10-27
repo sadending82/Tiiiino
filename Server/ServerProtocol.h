@@ -50,7 +50,9 @@ enum SPacketType {
 	DL_CHANGE_DEPARTMENT_OK,
 	DL_SIGNUP_OK,
 	DL_SIGNUP_FAIL,
-	DL_INVENTORY
+	DL_INVENTORY,
+	DL_BUYITEM_OK,
+	DL_BUYITEM_FAIL,
 };
 
 
@@ -138,19 +140,19 @@ struct LD_INVENTORY_PACKET :public SPACKET {
 
 struct LD_EQUIP_ITEM_PACKET :public SPACKET {
 	int			uid;
-	long long	itemCode;
+	long long	equipmentFlag;
 	int			userKey;
 };
 
 struct LD_UNEQUIP_ITEM_PACKET :public SPACKET {
 	int			uid;
-	long long	itemCode;
+	int			itemCode;
 	int			userKey;
 };
 
 struct LD_BUY_ITEM_PACKET :public SPACKET {
 	int			uid;
-	long long	itemCode;
+	int			itemCode;
 	int			price;
 	int			userKey;
 };
@@ -185,5 +187,15 @@ struct DL_INVENTORY_PACKET :public SPACKET {
 	long long	inventoryFlag;
 	int			userKey;
 };
+
+struct DL_BUYITEM_OK_PACKET :public SPACKET {
+	int		itemCode;
+	int		userKey;
+};
+
+struct DL_BUYITEM_FAIL_PACKET :public SPACKET {
+	int		userKey;
+};
+
 
 #pragma pack (pop)

@@ -23,15 +23,21 @@ public:
 	void PlayerMatchOut(int cID);
 	void RoomReset(int roomID);
 
+	void EquipItem(int cID, int itemCode);
+	void UnequipItem(int cID, int itemCode);
+	void AddItemToInventory(int cID, int itemCode);
+
 	void CheckDuplicateLogin(int uid);
 
 
 	void SendPlayerResult(int uID, int roomID, bool retire, int rank);
 
 	// lobby to db
-	void SendLogin(int key, char* id, char* pass, char* version);
-	void SendSignUp(int key, char* id, char* pass, char depart);
+	void SendLogin(int cID, char* id, char* pass, char* version);
+	void SendSignUp(int cID, char* id, char* pass, char depart);
 	void SendGameResult(int roomID, int key);
+	void SendUpdateEquipmentFlag(int cID, int uid, long long equipmentFlag);
+	void SendBuyItem(int cID, int uid, int itemCode);
 
 
 	void SendLoginOK(int cID);
@@ -41,6 +47,9 @@ public:
 	void SendSignUpOK(int key);
 	void SendSignUpFail(int key);
 	void SendMatchResponse(int roomID);
+	void SendBuyOK(int key);
+	void SendBuyFail(int key);
+	void SendInventory(int key);
 
 	void LoadGameData();
 public:

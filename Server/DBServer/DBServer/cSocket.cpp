@@ -312,6 +312,27 @@ void Socket::SendInventory(int key, long long inventoryFlag, int userKey)
     mSessions[key].DoSend((void*)(&p));
 }
 
+void Socket::SendBuyItemOK(int key, int itemCode, int userKey)
+{
+    DL_BUYITEM_OK_PACKET p;
+    p.size = sizeof(DL_BUYITEM_OK_PACKET);
+    p.type = SPacketType::DL_BUYITEM_OK;
+    p.itemCode = itemCode;
+    p.userKey = userKey;
+
+    mSessions[key].DoSend((void*)(&p));
+}
+
+void Socket::SendBuyItemFail(int key, int userKey)
+{
+    DL_BUYITEM_FAIL_PACKET p;
+    p.size = sizeof(DL_BUYITEM_FAIL_PACKET);
+    p.type = SPacketType::DL_BUYITEM_FAIL;
+    p.userKey = userKey;
+
+    mSessions[key].DoSend((void*)(&p));
+}
+
 // ProcessPacket
 void Socket::ProcessPacket_Login(int key, unsigned char* buf)
 {
@@ -423,7 +444,7 @@ void Socket::ProcessPacket_EquipItem(int key, unsigned char* buf)
 {
     LD_EQUIP_ITEM_PACKET* p = reinterpret_cast<LD_EQUIP_ITEM_PACKET*>(buf);
 #ifdef RUN_DB
-    bool bResult = Getm_pDB()->UpdateEquipItem(p->uid, p->itemCode);
+    bool bResult = Getm_pDB()->UpdateEquipItemFlag(p->uid, p->equipmentFlag);
     if (bResult != true) {
 
     }
@@ -448,15 +469,19 @@ void Socket::ProcessPacket_BuyItem(int key, unsigned char* buf)
 
     bool bResult = Getm_pDB()->UpdateUserPoint(p->uid, -p->price);
     if (bResult != true) {
-
+        SendBuyItemFail(key, p->userKey);
         return;
     }
 
     bResult = Getm_pDB()->UpdateInventory(p->uid, p->itemCode);
     if (bResult != true) {
         Getm_pDB()->UpdateUserPoint(p->uid, p->price);
+        SendBuyItemFail(key, p->userKey);
+        return;
     }
 #endif
+
+    SendBuyItemOK(key, p->itemCode, p->userKey);
 }
 
 int Socket::SetUIDForTest()

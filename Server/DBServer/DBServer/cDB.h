@@ -41,6 +41,7 @@ public:
 	bool UpdateRanking(const char department, const int incrementPoint);
 	bool UpdateUserDepartment(const int uid, const char department);
 	bool UpdateInventory(const int uid, const int itemCode);
+	bool UpdateEquipItemFlag(const int uid, long long bitFlag);
 	bool UpdateEquipItem(const int uid, const int itemCode);
 	bool UpdateUnequipItem(const int uid, const int itemCode);
 

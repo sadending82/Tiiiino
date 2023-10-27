@@ -30,6 +30,8 @@ public:
 	void SendSignUpOK(int key, int userKey);
 	void SendSignUpFail(int key, int userKey);
 	void SendInventory(int key, long long inventoryFlag, int userKey);
+	void SendBuyItemOK(int key, int itemCode, int userKey);
+	void SendBuyItemFail(int key, int userKey);
 
 	void ProcessPacket_Login(int key, unsigned char* buf);
 	void ProcessPacket_Logout(unsigned char* buf);
