@@ -3,16 +3,11 @@
 #include "Network.h"
 #include <string>
 #include "Actor/Character/TinoCharacter.h"
-#include "Actor/Obstacles/BaseObstacle.h"
 #include "Actor/Controller/TinoController.h"
-#include "CreateAccountsWidget.h"
-#include "MenuUI/InGameUIWidget.h"
-#include "LoginUIWidget.h"
-#include "GameFramework/PlayerController.h"
-#include "Components/CapsuleComponent.h"
 #include "Actor/Character/CharacterAnimInstance.h"
-#include "Kismet/GameplayStatics.h"
-#include "Utilities/CLog.h"
+#include "Actor/Obstacles/BaseObstacle.h"
+
+#include "Global.h"
 
 
 void CALLBACK send_callback(DWORD err, DWORD num_byte, LPWSAOVERLAPPED send_over, DWORD flag);
@@ -437,7 +432,7 @@ void Network::process_packet(unsigned char* p)
 				mOtherCharacter[id] = mc;
 				mOtherCharacter[id]->GetMesh()->SetVisibility(true);
 				mOtherCharacter[id]->SetClientID(packet->id);
-				mOtherCharacter[id]->GetCapsuleComponent()->SetCollisionProfileName(TEXT("Empty"));
+				mOtherCharacter[id]->SetCollisionProfileName(TEXT("Empty"));
 				//mOtherCharacter[id]->CharacterName = FString(ANSI_TO_TCHAR(packet->name));
 				//mOtherCharacter[id]->skinType = packet->skintype;
 				//mOtherCharacter[id]->EquipSkin();
@@ -599,8 +594,8 @@ void Network::l_process_packet(unsigned char* p)
 			//TestItemFlag는 xml에 들어가 있을 예정.
 		}
 
-		//
-		mMyCharacter->SetGradeUI(packet->grade);
+		//학점과 포인트 표기
+		mMyCharacter->MakeAndShowLoginOK(packet->grade, packet->point);
 		break;
 	}
 	case LC_LOGIN_FAIL:

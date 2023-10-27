@@ -104,9 +104,10 @@ public:
 
 	void SetOriginalSpeed();
 
+	//UI 함수
 	void MakeAndShowHUD();	
 
-
+	void MakeAndShowLoginOK(const double GradeValue, const int PointValue);
 	void MakeAndShowLoginFail();
 	void MakeAndShowCreateAccountsSignUpOK();
 	void MakeAndShowCreateAccountsSignUpFail();
@@ -119,9 +120,6 @@ public:
 
 	void MakeAndShowDialogInLobby();
 	void MakeAndShowDialogInGame();
-
-	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-		UUserWidget* GetLobbyUIInstance();
 
 	//Accessory
 
@@ -144,7 +142,8 @@ public:
 	FORCEINLINE FRotator GetOriginalRotationSpeed() { return OriginalRotationSpeed; }
 	FORCEINLINE float GetGrade() const { return Grade; }
 	FORCEINLINE void SetGrade(const float GradeValue) { Grade = GradeValue; };
-	void SetGradeUI(const double GradeValue);
+	FORCEINLINE float GetPoint() const { return Point; }
+	FORCEINLINE void SetPoint(const float PointValue) { Point = PointValue; };
 
 	UFUNCTION(BlueprintCallable)
 	void SetDepartmentClothes(int department);
@@ -152,6 +151,7 @@ public:
 	bool GetIsAirForNetwork();
 	void SetIsAirForNetwork(bool val);
 
+	void SetCollisionProfileName(const FName& CollisionName);
 	class UCharacterAnimInstance* GetTinoAnimInstance();
 
 
@@ -209,6 +209,8 @@ private:
 
 	UPROPERTY(VisibleDefaultsOnly, Category = "Stat")
 		float Grade;
+	UPROPERTY(VisibleDefaultsOnly, Category = "Stat")
+		float Point;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation | Dive")
 		float MaxDiveTime;

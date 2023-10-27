@@ -37,5 +37,6 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
 		float Grade;
-
+	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
+		int32 Point;
 };

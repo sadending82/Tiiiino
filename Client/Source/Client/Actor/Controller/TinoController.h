@@ -48,12 +48,6 @@ public:
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	UUserWidget* GetCurrentWidget() { return CurrentWidget; }
-	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-		class ULobbyUIWidget* GetLobbyUIIndstance() { return LobbyUIInstance; }
-	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-		void SetGradeUI(float GradeValue);
-	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-		float GetGradeUI();
 
 	bool bIsLobbyConnected = false;
 public:
