@@ -11,7 +11,8 @@
 AAccessoryItem::AAccessoryItem()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	UHelpers::CreateComponent(this, &MeshComponent, "Mesh");
+	UHelpers::CreateComponent(this, &SceneComponent, "SceneComponent");
+	UHelpers::CreateComponent(this, &MeshComponent, "Mesh", SceneComponent);
 	MeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
