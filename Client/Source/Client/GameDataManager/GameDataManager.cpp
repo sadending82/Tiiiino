@@ -1,42 +1,53 @@
+#include <fstream>
+#include <sstream>
+#include <filesystem>
+#include <string>
 #include "GameDataManager.h"
 
 bool GameDataManager::CheckDataFile()
 {
-	SHOPDATAFILE = *FPaths::GameSourceDir() + EXTERNAL_SHOPDATAFILE;
-	ITEMDATAFILE = EXTERNAL_ITEMDATAFILE;
-	/*if (GetFileAttributesA(EXTERNAL_SHOPDATAFILE) == INVALID_FILE_ATTRIBUTES) {
-		SHOPDATAFILE = INTERNAL_SHOPDATAFILE;
-	}
-	else {
-		std::FILE* source = std::fopen(EXTERNAL_SHOPDATAFILE, "rb");
-		std::FILE* destination = std::fopen(INTERNAL_SHOPDATAFILE, "wb");
-		char buffer[1024];
-		std::size_t bytesRead;
-		while ((bytesRead = std::fread(buffer, 1, sizeof(buffer), source)) > 0) {
-			std::fwrite(buffer, 1, bytesRead, destination);
-		}
-		std::fclose(destination);
-		std::fclose(source);
+	std::string sourceFilePath{ TCHAR_TO_ANSI(*FPaths::GameSourceDir()) };
+	std::string launchFilePath{ TCHAR_TO_ANSI(*FPaths::LaunchDir()) };
+	sourceFilePath += EXTERNAL_SHOPDATAFILE;
 
-		SHOPDATAFILE = EXTERNAL_SHOPDATAFILE;
+	SHOPDATAFILE = launchFilePath + INTERNAL_SHOPDATAFILE;
+	ITEMDATAFILE = launchFilePath + INTERNAL_ITEMDATAFILE;
+
+	if (GetFileAttributesA(sourceFilePath.c_str()) != INVALID_FILE_ATTRIBUTES) {
+	
+		std::ifstream source(sourceFilePath, std::ios::binary);
+		std::stringstream ss;
+		if (source)	ss << source.rdbuf();
+		else UE_LOG(LogTemp, Error, TEXT("%s doesn't Exist"), sourceFilePath.c_str());
+		source.close();
+		std::filesystem::path dirPath = (launchFilePath + INTERNAL_DATADIR);
+		if (!std::filesystem::is_directory(dirPath)) std::filesystem::create_directories(dirPath);
+		std::ofstream destination(SHOPDATAFILE,std::ios::binary);
+		if (destination) destination << ss.str();
+		else UE_LOG(LogTemp, Error, TEXT("%s doesn't Exist"), SHOPDATAFILE.c_str());
+		destination.close();
 	}
 
-	if (GetFileAttributesA(EXTERNAL_ITEMDATAFILE) == INVALID_FILE_ATTRIBUTES) {
-		ITEMDATAFILE = INTERNAL_ITEMDATAFILE;
-	}
-	else {
-		std::FILE* source = std::fopen(EXTERNAL_ITEMDATAFILE, "rb");
-		std::FILE* destination = std::fopen(INTERNAL_ITEMDATAFILE, "wb");
-		char buffer[1024];
-		std::size_t bytesRead;
-		while ((bytesRead = std::fread(buffer, 1, sizeof(buffer), source)) > 0) {
-			std::fwrite(buffer, 1, bytesRead, destination);
-		}
-		std::fclose(destination);
-		std::fclose(source);
 
-		ITEMDATAFILE = EXTERNAL_ITEMDATAFILE;
-	}*/
+	//-----------------------------------
+	sourceFilePath = TCHAR_TO_ANSI(*FPaths::GameSourceDir());
+	sourceFilePath += EXTERNAL_ITEMDATAFILE;
+
+	if (GetFileAttributesA(sourceFilePath.c_str()) != INVALID_FILE_ATTRIBUTES) {
+
+		std::ifstream source(sourceFilePath, std::ios::binary);
+		std::stringstream ss;
+		if (source)	ss << source.rdbuf();
+		else UE_LOG(LogTemp, Error, TEXT("%s doesn't Exist"), sourceFilePath.c_str());
+		source.close();
+		std::filesystem::path dirPath = launchFilePath + INTERNAL_DATADIR;
+		if (!std::filesystem::is_directory(dirPath)) std::filesystem::create_directories(dirPath);
+		std::ofstream destination(ITEMDATAFILE, std::ios::binary);
+		if (destination) destination << ss.str();
+		else UE_LOG(LogTemp, Error, TEXT("%s doesn't Exist"), ITEMDATAFILE.c_str());
+		destination.close();
+	}
+
 
 	return true;
 }

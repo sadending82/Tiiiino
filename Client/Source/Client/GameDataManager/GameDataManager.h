@@ -15,8 +15,9 @@ constexpr int MAXITEM = 64;
 #define EXTERNAL_SHOPDATAFILE "../../GameData/ShopData.xml"
 #define EXTERNAL_ITEMDATAFILE "../../GameData/ItemData.xml"
 
-#define INTERNAL_SHOPDATAFILE "ShopData.xml"
-#define INTERNAL_ITEMDATAFILE "ItemData.xml"
+#define INTERNAL_DATADIR "/Data"
+#define INTERNAL_SHOPDATAFILE "/Data/ShopData.xml"
+#define INTERNAL_ITEMDATAFILE "/Data/ItemData.xml"
 
 struct Item
 {
