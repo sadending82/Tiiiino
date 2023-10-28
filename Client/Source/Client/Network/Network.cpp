@@ -9,7 +9,6 @@
 
 #include "Global.h"
 
-
 void CALLBACK send_callback(DWORD err, DWORD num_byte, LPWSAOVERLAPPED send_over, DWORD flag);
 void CALLBACK recv_Gamecallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv_over, DWORD flag);
 void CALLBACK recv_Lobbycallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv_over, DWORD flag);
@@ -79,8 +78,6 @@ bool Network::init()
 {
 	if (!isInit)
 	{
-
-		isInit = true;
 		WSAStartup(MAKEWORD(2, 2), &WSAData);
 		return true;
 	}
@@ -812,6 +809,15 @@ bool Network::ConnectServerGame()
 
 bool Network::ConnectServerLobby()
 {
+	bool result = pGDM->LoadShopData();
+	UE_LOG(LogTemp, Log, TEXT("Shop Data Load :: %s"), result ? TEXT("true") : TEXT("false"));
+	UE_LOG(LogTemp, Log, TEXT("tlqkf:: %s"), *pGDM->GetShopProductInfo(1).name);
+
+	result = pGDM->LoadItemData();
+	UE_LOG(LogTemp, Log, TEXT("Item Data Load :: %s"), result ? TEXT("true") : TEXT("false"));
+	UE_LOG(LogTemp, Log, TEXT("tlqkf:: %s"), *pGDM->GetItemInfo(1).name);
+	isInit = true;
+
 	if (bIsConnectedLobby) return false;
 	l_socket = WSASocketW(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);
 

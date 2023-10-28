@@ -7,6 +7,7 @@
 #include <WS2tcpip.h>
 #include "../../../../protocol.h"
 #include "CoreMinimal.h"
+#include "GameDataManager/GameDataManager.h"
 
 constexpr const char* GAMEVERSION = "1.2.0";
 
@@ -110,6 +111,8 @@ public:
 	short GameServerPort = -1;		//게임서버 접속용 port
 	sGameResult GameResult;
 	int RecentLevelNum = -1;
+
+	GameDataManager* pGDM = new GameDataManager;
 
 private:
 	bool isInit;

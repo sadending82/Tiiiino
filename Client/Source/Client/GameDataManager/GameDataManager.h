@@ -1,0 +1,48 @@
+#pragma once
+#include "tinyxml2.h"
+#include <map>
+#include <string>
+#include <iostream>
+#include <fstream>
+#include <Windows.h>
+
+#include "../Global.h"
+
+using namespace std;
+
+constexpr int MAXITEM = 64;
+
+#define EXTERNAL_SHOPDATAFILE "../../GameData/ShopData.xml"
+#define EXTERNAL_ITEMDATAFILE "../../GameData/ItemData.xml"
+
+#define INTERNAL_SHOPDATAFILE "ShopData.xml"
+#define INTERNAL_ITEMDATAFILE "ItemData.xml"
+
+struct Item
+{
+	int		itemCode;
+	FString	name;
+	int		price;
+};
+
+class GameDataManager
+{
+public:
+	bool			CheckDataFile();
+
+	bool			LoadShopData();
+	bool			LoadItemData();
+
+	map<int, Item>	GetShopProductsList() { return ShopProductsList; }
+	map<int, Item>	GetItemList() { return ItemList; }
+	Item			GetShopProductInfo(int itemCode) { return ShopProductsList[itemCode]; }
+	Item			GetItemInfo(int itemCode) { return ItemList[itemCode]; }
+
+private:
+	// key = itemCode
+	map<int, Item> ShopProductsList;
+	map<int, Item> ItemList;
+
+	string		SHOPDATAFILE;
+	string		ITEMDATAFILE;
+};
