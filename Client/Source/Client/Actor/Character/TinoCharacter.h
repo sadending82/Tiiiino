@@ -146,6 +146,7 @@ public:
 
 	bool GetIsAirForNetwork();
 	void SetIsAirForNetwork(bool val);
+	void SetNetworkLocation(const FVector& Location);
 
 	void SetCollisionProfileName(const FName& CollisionName);
 	class UCharacterAnimInstance* GetTinoAnimInstance();
@@ -170,19 +171,20 @@ private:
 	void CreateDummy();
 
 private:
-
-
+	
+	//티노 캐릭터에서만 사용하는 함수들
 	bool CanMove();
 	bool CanDive();
 	bool CanGrab();
 	bool CanJump();
-
 	bool CanTumble(float DeltaTime);
-	void PlayTumbleMontage(float DeltaTime);
+	//애니메이션 패킷을 전송함
+	bool SendAnimPacket(int32 AnimType);
 
+	void PlayTumbleMontage(float DeltaTime);
 	void Align();
 
-	bool SendAnimPacket(int32 AnimType);
+	void PlayerInterpolation(float DeltaTime);
 
 	UTexture* GetTinoDepartTexture(EDepartment DepartmentNumber);
 
@@ -239,6 +241,21 @@ private:
 		float OriginalSpeed;
 	UPROPERTY(EditDefaultsOnly, Category = "CharacterSpeed")
 		FRotator OriginalRotationSpeed;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Interpolation")
+		float InterTime = 0.5f;
+	UPROPERTY(VisibleAnywhere, Category = "Interpolation")
+		float CurrentInterTime;
+	UPROPERTY(EditDefaultsOnly, Category = "Interpolation")
+		float StopTime = 0.5f;
+	UPROPERTY(VisibleAnywhere, Category = "Interpolation")
+		float CurrentStopTime;
+	UPROPERTY(VisibleAnywhere, Category = "Interpolation")
+		FVector PreviousLocation;
+	UPROPERTY(VisibleAnywhere, Category = "Interpolation")
+		FVector PreviousVelocity;
+	UPROPERTY(VisibleAnywhere, Category = "Interpolation")
+		FVector InterVelocity;
 
 	UPROPERTY(VisibleAnywhere, Category = "Enums")
 		EMovementState MovementState;

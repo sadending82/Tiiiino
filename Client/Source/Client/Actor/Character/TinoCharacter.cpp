@@ -122,11 +122,12 @@ void ATinoCharacter::Tick(float DeltaTime)
 			{
 				if (!GetController()->IsPlayerController())
 				{
+					PlayerInterpolation(DeltaTime);
 					//서버랑 연결 돼 있을 때만 상대 캐릭터 보간하려
 					//Update GroundSpeedd (22-04-05)
 					//GroundSpeedd = ServerStoreGroundSpeed;
 					//Update Interpolation (23-09-27)
-					GetCharacterMovement()->Velocity = ServerCharMovingSpeed;
+					//GetCharacterMovement()->Velocity = ServerCharMovingSpeed;
 					//SetActorLocation(FMath::Lerp(GetActorLocation(), ServerLocateLerp, 0.5));
 					//SetActorRotation(FMath::Lerp(GetTransform().GetRotation(), ServerRotateLerp, 0.5));
 				}
@@ -169,6 +170,7 @@ void ATinoCharacter::Tick(float DeltaTime)
 			}
 		}
 
+		PreviousVelocity = GetVelocity();
 	}
 }
 bool ATinoCharacter::CanTumble(float DeltaTime)
@@ -210,6 +212,38 @@ void ATinoCharacter::PlayTumbleMontage(float DeltaTime)
 void ATinoCharacter::Align()
 {
 	GetController()->SetControlRotation(GetActorForwardVector().Rotation());
+}
+
+void ATinoCharacter::PlayerInterpolation(float DeltaTime)
+{
+	CurrentInterTime += DeltaTime;
+
+	//플레이어 정지시간 측정
+	if (FMath::Floor((PreviousVelocity.Length() - GetVelocity().Length())) == 0)
+		CurrentStopTime += DeltaTime;
+
+	//기준 시간 초과시 플레이어는 안움직이는 상태이다
+	if (CurrentStopTime >= StopTime)
+	{
+		CurrentStopTime -= StopTime;
+		GetCharacterMovement()->Velocity = FVector::ZeroVector;
+		PreviousVelocity = FVector::ZeroVector;
+	}
+
+	//현재속도만큼 입력에 더해주고
+	AddMovementInput(GetVelocity());
+
+	//InterTime마다 보간속도를구함
+	if (CurrentInterTime >= InterTime)
+	{
+		CurrentInterTime -= InterTime;
+		InterVelocity = PreviousLocation - GetActorLocation();
+	}
+
+	
+
+	if (InterVelocity.IsNearlyZero() == false)
+		SetActorLocation(GetActorLocation() + InterVelocity * DeltaTime);
 }
 
 void ATinoCharacter::MakeAndShowHUD()
@@ -307,6 +341,12 @@ void ATinoCharacter::MakeAndShowDialogInGame()
 	auto DialogWidget = GetController<ATinoController>()->DialogUIInstance;
 	DialogWidget->AddToViewport();
 	DialogWidget->RenderDisconnectNetworkWindow();
+}
+
+void ATinoCharacter::SetNetworkLocation(const FVector& Location)
+{
+	PreviousLocation = Location;
+	SetActorLocation(Location);
 }
 
 void ATinoCharacter::SetDepartmentClothes(int department)
