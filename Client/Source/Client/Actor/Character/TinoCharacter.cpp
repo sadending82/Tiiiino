@@ -115,6 +115,20 @@ void ATinoCharacter::Tick(float DeltaTime)
 		float PitchClamp = FMath::ClampAngle(Rotation.Pitch, -45.f, 30.f);
 		FRotator RotationControl(PitchClamp, Rotation.Yaw, Rotation.Roll);
 		SleepEx(0, true);
+		FVector TargetLocation = GetNetworkLocation();
+
+		if (MovementState == EMovementState::EMS_Grabbing && Target != nullptr)
+		{
+			if (bIsControlledPlayer == true)
+			{
+				if (CurrentInterTime >= InterTime)
+				{
+					SetActorLocation(TargetLocation - GetActorForwardVector() * TargetInterval);
+				}
+			}
+			else
+				SetActorLocation(TargetLocation - GetActorForwardVector() * TargetInterval);
+		}
 
 		if (Network::GetNetwork()->bIsConnected)
 		{
@@ -150,12 +164,7 @@ void ATinoCharacter::Tick(float DeltaTime)
 		}
 
 		PlayTumbleMontage(DeltaTime);
-
-		if (MovementState == EMovementState::EMS_Grabbing && Target != nullptr)
-		{
-			SetActorLocation(Target->GetActorLocation() - GetActorForwardVector() * TargetInterval);
-			//SetActorRotation(Target->GetActorRotation());
-		}
+		
 
 		// 10/04 가만히 있을 때 충돌하지 안흔 부분을 해결하기 위한 코드 추가
 		FHitResult OutHit;
@@ -559,10 +568,6 @@ void ATinoCharacter::OnGrab()
 void ATinoCharacter::OffGrab()
 {
 	bIsGrabbing = false;
-	if (Target == nullptr) return;
-	SendAnimPacket(5);
-
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
 	if (MovementState == EMovementState::EMS_Grabbing)
 	{
@@ -570,6 +575,14 @@ void ATinoCharacter::OffGrab()
 		ASoundManager::GetSoundManager()->PlaySFXAtLocation(this, ESFXType::ESFXType_OffGrab, GetActorLocation());
 		SetMovementState(EMovementState::EMS_Normal);
 	}
+
+	SendAnimPacket(5);
+
+	if (Target == nullptr) return;
+
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+
+	
 	SetTargetGrabbedToNormal();
 
 	bIsGrabCoolTime = true;
@@ -649,7 +662,7 @@ void ATinoCharacter::DetectTarget()
 
 	if (result && bIsGrabCoolTime == false)
 	{
-		Target = HitResult.GetActor();
+		Target = Cast<ATinoCharacter>(HitResult.GetActor());
 		//float ScalarValue = GetActorForwardVector().Dot(Target->GetActorForwardVector());
 
 		// 이미 잡힌 캐릭터나 잡고있는 캐릭터는 잡기 대상이 될 수 없다(기차 방지)

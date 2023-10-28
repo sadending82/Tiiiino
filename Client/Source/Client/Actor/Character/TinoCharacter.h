@@ -140,6 +140,7 @@ public:
 	FORCEINLINE void SetGrade(const float GradeValue) { Grade = GradeValue; };
 	FORCEINLINE float GetPoint() const { return Point; }
 	FORCEINLINE void SetPoint(const float PointValue) { Point = PointValue; };
+	FORCEINLINE FVector GetNetworkLocation() { return PreviousLocation; }
 
 	UFUNCTION(BlueprintCallable)
 	void SetDepartmentClothes(int department);
@@ -266,7 +267,7 @@ private:
 		TMap<EDepartment, UTexture*> DepartmentTextureMap;
 
 	UPROPERTY(VisibleAnywhere, Category = "Animation | Grab")
-		AActor* Target;
+		ATinoCharacter* Target;
 
 	UPROPERTY(VisibleAnywhere, Category = "Animation")
 		bool bCanTumbled;
