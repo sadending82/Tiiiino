@@ -35,6 +35,8 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = "Component")
+		class USceneComponent* SceneComponent;
+	UPROPERTY(EditDefaultsOnly, Category = "Component")
 		class UStaticMeshComponent* MeshComponent;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = "Owner")

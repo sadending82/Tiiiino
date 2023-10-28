@@ -2,29 +2,174 @@
 <root>
   <itemlist>
     <item>
+      <code>0</code>
+      <name>[등] 천사날개</name>
+      <price>150</price>
+    </item>
+    <item>
       <code>1</code>
-      <name>sunglasses</name>
-      <price>100</price>
+      <name>[등] 태엽</name>
+      <price>150</price>
     </item>
     <item>
       <code>2</code>
-      <name>glasses</name>
-      <price>100</price>
+      <name>[등] 금빛 태엽</name>
+      <price>300</price>
     </item>
     <item>
       <code>3</code>
-      <name>crown</name>
-      <price>100</price>
+      <name>[등] 은빛 태엽</name>
+      <price>300</price>
     </item>
     <item>
       <code>4</code>
-      <name>hat</name>
-      <price>100</price>
+      <name>[등] 삽</name>
+      <price>900</price>
     </item>
     <item>
       <code>5</code>
-      <name>sunglasses</name>
-      <price>100</price>
+      <name>[등] 딥 퍼플 윙</name>
+      <price>3600</price>
+    </item>
+    <item>
+      <code>6</code>
+      <name>[등] 퓨어 화이트 윙</name>
+      <price>18000</price>
+    </item>    
+     <item>
+      <code>16</code>
+      <name>[손] 다크 브래슬릿</name>
+      <price>150</price>
+    </item>
+    <item>
+      <code>17</code>
+      <name>[손] 레드 브래슬릿</name>
+      <price>150</price>
+    </item>
+    <item>
+      <code>18</code>
+      <name>[손] 그린 브래슬릿</name>
+      <price>150</price>
+    </item>
+    <item>
+      <code>19</code>
+      <name>[손] 내 손에 메론바</name>
+      <price>900</price>
+    </item>
+    <item>
+      <code>20</code>
+      <name>[손] 야구방망이</name>
+      <price>900</price>
+    </item>
+    <item>
+      <code>32</code>
+      <name>[얼굴] 블랙 선글라스</name>
+      <price>150</price>
+    </item>
+    <item>
+      <code>33</code>
+      <name>[얼굴] 블루 선글라스</name>
+      <price>150</price>
+    </item>
+    <item>
+      <code>34</code>
+      <name>[얼굴] 핑크 선글라스</name>
+      <price>150</price>
+    </item>
+    <item>
+      <code>35</code>
+      <name>[얼굴] 동글이 안경</name>
+      <price>150</price>
+    </item>
+    <item>
+      <code>36</code>
+      <name>[얼굴] 오리주둥이</name>
+      <price>300</price>
+    </item>
+    <item>
+      <code>37</code>
+      <name>[얼굴] 그림자 반가면</name>
+      <price>300</price>
+    </item>
+    <item>
+      <code>38</code>
+      <name>[얼굴] 백색 반가면</name>
+      <price>300</price>
+    </item>
+    <item>
+      <code>39</code>
+      <name>[얼굴] 내 입에 메론바</name>
+      <price>900</price>
+    </item>
+    <item>
+      <code>40</code>
+      <name>[얼굴] 파이프</name>
+      <price>900</price>
+    </item>
+    <item>
+      <code>48</code>
+      <name>[머리] 1st VIP 크라운</name>
+      <price>0</price>
+    </item>
+    <item>
+      <code>49</code>
+      <name>[머리] 새싹</name>
+      <price>10</price>
+    </item>
+    <item>
+      <code>50</code>
+      <name>[머리] 천사고리</name>
+      <price>150</price>
+    </item>
+    <item>
+      <code>51</code>
+      <name>[머리] 악마뿔</name>
+      <price>150</price>
+    </item>
+    <item>
+      <code>52</code>
+      <name>[머리] 계란초밥</name>
+      <price>150</price>
+    </item>
+    <item>
+      <code>53</code>
+      <name>[머리] 군함초밥</name>
+      <price>150</price>
+    </item>
+    <item>
+      <code>54</code>
+      <name>[머리] 새우초밥</name>
+      <price>150</price>
+    </item>
+    <item>
+      <code>55</code>
+      <name>[머리] 브라운 고양이 귀</name>
+      <price>300</price>
+    </item>
+    <item>
+      <code>56</code>
+      <name>[머리] 핑크 고양이 귀</name>
+      <price>300</price>
+    </item>
+    <item>
+      <code>57</code>
+      <name>[머리] 방울 고양이 귀</name>
+      <price>3600</price>
+    </item>
+    <item>
+      <code>58</code>
+      <name>[머리] 토끼 귀</name>
+      <price>9000</price>
+    </item>
+    <item>
+      <code>59</code>
+      <name>[머리] 블랙 토끼 귀</name>
+      <price>1200</price>
+    </item>
+    <item>
+      <code>60</code>
+      <name>[머리] 왕관</name>
+      <price>900</price>
     </item>
   </itemlist>
 </root>
