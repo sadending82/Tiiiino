@@ -21,3 +21,7 @@ void UInventoryUIWidget::TryBack()
 
 	TinoController->ChangeMenuWidget(TinoController->LobbyUIInstance);
 }
+
+void UInventoryUIWidget::ClickItemIcon()
+{
+}

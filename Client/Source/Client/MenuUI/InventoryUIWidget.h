@@ -23,5 +23,8 @@ public:
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void TryBack();
 public:
+	// 아이템 아이콘 클릭
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void ClickItemIcon();
 
 };
