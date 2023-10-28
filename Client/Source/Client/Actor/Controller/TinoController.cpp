@@ -9,6 +9,9 @@
 #include "MenuUI/LoginUIWidget.h"
 #include "MenuUI/CreateAccountsWidget.h"
 #include "MenuUI/InGameUIWidget.h"
+#include "MenuUI/StoreUIWidget.h"
+#include "MenuUI/InventoryUIWidget.h"
+
 
 #include "Global.h"
 
@@ -190,6 +193,16 @@ void ATinoController::InitializeUIInstance()
 	{
 		if (FinishGameUIInstance == nullptr)
 			FinishGameUIInstance = CreateWidget<UFinishGameUIWidget>(GetWorld(), FinishGameUIWidgetClass);
+	}
+	if (!!StoreUIWidgetClass)
+	{
+		if (StoreUIInstance == nullptr)
+			StoreUIInstance = CreateWidget<UStoreUIWidget>(GetWorld(), StoreUIWidgetClass);
+	}
+	if (!!InventoryUIWidgetClass)
+	{
+		if (InventoryUIInstance == nullptr)
+			InventoryUIInstance = CreateWidget<UInventoryUIWidget>(GetWorld(), InventoryUIWidgetClass);
 	}
 }
 

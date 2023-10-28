@@ -1,8 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "MenuUI/LobbyUIWidget.h"
+
 #include "MenuUI/StoreUIWidget.h"
+#include "MenuUI/LobbyUIWidget.h"
 #include "Actor/Controller/TinoController.h"
 #include "Network/Network.h"
 #include "Global.h"
