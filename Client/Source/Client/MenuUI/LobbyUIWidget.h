@@ -47,6 +47,13 @@ public:
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void TryEnterStore();
 
+	// 인벤토리로 이동
+	UPROPERTY(meta = (BindWidget))
+	class UButton* InventoryButton;
+
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void TryEnterInventory();
+	
 	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
 		float Grade;
 	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
