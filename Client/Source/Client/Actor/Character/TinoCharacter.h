@@ -244,11 +244,11 @@ private:
 		FRotator OriginalRotationSpeed;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Interpolation")
-		float InterTime = 0.5f;
+		float InterTime;
 	UPROPERTY(VisibleAnywhere, Category = "Interpolation")
 		float CurrentInterTime;
 	UPROPERTY(EditDefaultsOnly, Category = "Interpolation")
-		float StopTime = 0.5f;
+		float StopTime;
 	UPROPERTY(VisibleAnywhere, Category = "Interpolation")
 		float CurrentStopTime;
 	UPROPERTY(VisibleAnywhere, Category = "Interpolation")

@@ -32,6 +32,8 @@ ATinoCharacter::ATinoCharacter()
 	DetectAngle(60.f),
 	TargetInterval(50.f),
 	OriginalSpeed(400.f),
+	InterTime(0.03f),
+	StopTime(0.3f),
 	MovementState(EMovementState::EMS_Normal),
 	Department(EDepartment::EDepartment_Game),
 	Target(nullptr)
@@ -239,7 +241,8 @@ void ATinoCharacter::PlayerInterpolation(float DeltaTime)
 		PreviousVelocity = FVector::ZeroVector;
 	}
 
-	//현재속도만큼 입력에 더해주고
+	//네트워크에서 현재 프레임 받은 위치 - PreviousPosition(이전프레임에 서버에서 지정한 위치)
+	//아래에 넣기?
 	AddMovementInput(GetVelocity());
 
 	//InterTime마다 보간속도를구함
@@ -248,8 +251,6 @@ void ATinoCharacter::PlayerInterpolation(float DeltaTime)
 		CurrentInterTime -= InterTime;
 		InterVelocity = PreviousLocation - GetActorLocation();
 	}
-
-	
 
 	if (InterVelocity.IsNearlyZero() == false)
 		SetActorLocation(GetActorLocation() + InterVelocity * DeltaTime);
