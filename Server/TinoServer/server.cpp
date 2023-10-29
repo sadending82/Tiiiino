@@ -846,7 +846,7 @@ void Server::SendPlayerResult(int uID, int roomID, bool retire, int rank)
 				mClients[mRooms[roomID].mSockID[i]].mStateLock.lock();
 				mClients[mRooms[roomID].mSockID[i]].mGrade += temp;
 				mRooms[roomID].mGrade[i] = mClients[mRooms[roomID].mSockID[i]].mGrade;
-				mClients[mRooms[roomID].mSockID[i]].mPoint += point;
+				mClients[mRooms[roomID].mSockID[i]].mPoint = point;
 				mRooms[roomID].mPoint[i] = mClients[mRooms[roomID].mSockID[i]].mPoint;
 				mClients[mRooms[roomID].mSockID[i]].mState = eSessionState::ST_LOBBY;
 				mClients[mRooms[roomID].mSockID[i]].mStateLock.unlock();
@@ -897,7 +897,7 @@ void Server::SendPlayerResult(int uID, int roomID, bool retire, int rank)
 
 
 				mRooms[roomID].mGrade[i] += temp;
-				mRooms[roomID].mPoint[i] += point;
+				mRooms[roomID].mPoint[i] = point;
 				// to db server update
 				SendGameResult(roomID, i);
 				DEBUGMSGONEPARAM("[%d]플레이어의 점수 : ", mRooms[roomID].mUID[i]);
