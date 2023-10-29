@@ -11,10 +11,12 @@
 
 void UStoreUIWidget::NativePreConstruct()
 {
+	Super::NativePreConstruct();
 }
 
 void UStoreUIWidget::NativeDestruct()
 {
+	Super::NativeDestruct();
 }
 
 void UStoreUIWidget::TryBack()
@@ -26,13 +28,33 @@ void UStoreUIWidget::TryBack()
 
 void UStoreUIWidget::PurchaseItem()
 {
+	// Buy버튼 클릭
+	// StoreDialog 창 띄움
+}
 
+bool UStoreUIWidget::QualifyingPurchase()
+{
+	// 학점 제한여부 확인
+	if (true)
+	{
+		ShowPurchaseWarning(false);
+	}
+
+	// 보유 여부 확인
+	if (true)
+	{
+		ShowPurchaseWarning(true);
+	}
+
+	return true;
 }
 
 void UStoreUIWidget::MoveLeft()
 {
+	// 좌측 이동버튼 클릭
 }
 
 void UStoreUIWidget::MoveRight()
 {
+	// 우측 이동버튼 클릭
 }

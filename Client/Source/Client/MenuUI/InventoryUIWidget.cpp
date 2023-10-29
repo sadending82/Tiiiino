@@ -9,10 +9,12 @@
 
 void UInventoryUIWidget::NativePreConstruct()
 {
+	Super::NativePreConstruct();
 }
 
 void UInventoryUIWidget::NativeDestruct()
 {
+	Super::NativeDestruct();
 }
 
 void UInventoryUIWidget::TryBack()
