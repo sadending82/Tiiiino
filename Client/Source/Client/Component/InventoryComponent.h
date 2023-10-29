@@ -25,13 +25,13 @@ public:
 	//인벤토리내 아이템 추가되거나 제거시 브로드캐스트할 것
 	FOnInventoryUpdated OnInventoryUpdated;
 
-	FORCEINLINE TArray<FItemData> GetInventoryContents() { return InventoryContents; }
+	FORCEINLINE TArray<FItemData> GetInventoryContents() const { return InventoryContents; }
 
 	void AddItem(const FItemData& ItemData);
 
 protected:
 
-	UPROPERTY(VisibleAnywhere, Category = "Inventory")
+	UPROPERTY(EditDefaultsOnly,Category="Inventory")
 	TArray<FItemData> InventoryContents;
 		
 };

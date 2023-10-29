@@ -586,10 +586,10 @@ void Network::l_process_packet(unsigned char* p)
 		bIsConnectedLobby = true;
 		CLog::Print("LC_LOGIN_OK IS CALLING");
 		//아이템 장착 사용법 
-		long long TestItemFlag = 0b0000'0000'0000'0000'0000'0000'0000'0100'0000'0000'0000'0000'0000'0000'0000'0000;
+		long long TestItemFlag = 0b0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'1001;
+		mMyCharacter->SetInventoryFromEquippedCode(packet->equippedItems);
 		if ((packet->equippedItems & TestItemFlag))
 		{
-			mMyCharacter->SetInventoryFromEquippedCode(packet->equippedItems);
 			//장착중 (장착이 아니라면 and 연산에서 다 false가 나와 0이라 if문 안들어옴)
 			//Equip !
 			//TestItemFlag는 xml에 들어가 있을 예정.

@@ -49,7 +49,7 @@ void ATinoController::ChangeMenuWidget(UUserWidget* NewWidgetClass)
 {
 	if (CurrentWidget != nullptr)
 	{
-		CurrentWidget->RemoveFromViewport();
+		CurrentWidget->RemoveFromParent();
 		CurrentWidget = nullptr;
 	}
 

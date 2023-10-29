@@ -144,8 +144,17 @@ public:
 	FORCEINLINE void SetPoint(const float PointValue) { Point = PointValue; };
 	FORCEINLINE FVector GetNetworkLocation() { return PreviousLocation; }
 
+	//인벤토리에 저장된 데이터에 접근할 수 있음
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	TArray<FItemData> GetInventoryContents();
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+		void AddItemToInventory(const FItemData& Data);
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	FItemData GetItemDataFromItemCode(const int64& ItemCode);
-	void SetInventoryFromEquippedCode(const long long& EquippedItems);
+		void SetInventoryFromEquippedCode(const long long& EquippedItems);
+
 
 	UFUNCTION(BlueprintCallable)
 	void SetDepartmentClothes(int department);

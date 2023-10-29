@@ -364,13 +364,24 @@ void ATinoCharacter::SetNetworkLocation(const FVector& Location)
 	SetActorLocation(Location);
 }
 
+TArray<FItemData> ATinoCharacter::GetInventoryContents()
+{
+	return InventoryComponent->GetInventoryContents();
+}
+
+void ATinoCharacter::AddItemToInventory(const FItemData& Data)
+{
+	InventoryComponent->AddItem(Data);
+}
+
 FItemData ATinoCharacter::GetItemDataFromItemCode(const int64& ItemCode)
 {
 	auto GameMode = Cast<AClientGameMode>(GetWorld()->GetAuthGameMode());
 	auto Data = GameMode->GetItemData(ItemCode);
+	if (Data == nullptr) return FItemData();
 
 	FItemData ItemData;
-	ItemData.ItemCode = ItemCode;
+	ItemData.ItemCode = ItemCode; 
 	ItemData.EquipType = Data->EquipType;
 	ItemData.TextData = Data->TextData;
 	ItemData.NumericData = Data->NumericData;

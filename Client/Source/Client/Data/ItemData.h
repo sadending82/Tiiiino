@@ -15,40 +15,38 @@ enum class EEquipType : uint8
 	EEquipType_DefaultMax UMETA(DisplayName = "DefaultMax")
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FItemTextData
 {
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, meta = (ToolTip = "아이템 이름"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ToolTip = "아이템 이름"))
 		FText Name;
-	UPROPERTY(EditAnywhere, meta = (ToolTip = "아이템 설명 마우스 가져다대면 띄우기 가능"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ToolTip = "아이템 설명 마우스 가져다대면 띄우기 가능"))
 		FText Description;
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FItemNumericData
 {
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, meta = (ToolTip = "구매 조건"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ToolTip = "구매 조건"))
 		float PurchaseCondition;
-	UPROPERTY(EditAnywhere, meta = (ToolTip = "구매 제한 여부"))
-		bool bIsPurchasable;
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FItemAssetData
 {
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, meta = (ToolTip = "아이템 아이콘(인벤토리UI)"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ToolTip = "아이템 아이콘(인벤토리UI)"))
 		UTexture2D* Icon;
 
-	UPROPERTY(EditAnywhere, meta = (ToolTip = "사용할 블루프린트 클래스"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ToolTip = "사용할 블루프린트 클래스"))
 		TSubclassOf<class AAccessoryItem> BPClass;
 };
 
@@ -60,7 +58,7 @@ struct FItemData : public FTableRowBase
 
 public:
 	FItemData() :
-	ItemCode(),
+	ItemCode(-1),
 	EquipType(),
 	TextData(),
 	NumericData(),
@@ -70,21 +68,21 @@ public:
 
 	}
 
-	UPROPERTY(EditAnywhere, Category = "ItemData")
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "ItemData")
 		int64 ItemCode;
 
-	UPROPERTY(EditAnywhere, Category = "ItemData")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemData")
 
 		EEquipType EquipType;
 
-	UPROPERTY(EditAnywhere, Category = "ItemData")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemData")
 		FItemTextData TextData;
-	UPROPERTY(EditAnywhere, Category = "ItemData")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemData")
 		FItemNumericData NumericData;
-	UPROPERTY(EditAnywhere, Category = "ItemData")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemData")
 		FItemAssetData AssetData;
 
-	UPROPERTY(EditAnywhere, Category = "ItemData")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemData")
 		int32 SellValue;
 
 
