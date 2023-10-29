@@ -2,6 +2,7 @@
 
 #include "ClientGameMode.h"
 #include "ClientCharacter.h"
+#include "Data/ItemData.h"
 #include "Global.h"
 
 
@@ -15,6 +16,11 @@ AClientGameMode::AClientGameMode()
 	}
 
 	//ASoundManager::GetSoundManager()->PlayBGM();
+}
+
+FItemData* AClientGameMode::GetItemData(const int64& ItemCode) const
+{
+	return ItemData->FindRow<FItemData>(*FString::FromInt(ItemCode), TEXT(""));
 }
 
 void AClientGameMode::BeginPlay()

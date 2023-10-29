@@ -10,6 +10,9 @@
 #include "MenuUI/CreateAccountsWidget.h"
 #include "MenuUI/LobbyUIWidget.h"
 
+#include "Component/InventoryComponent.h"
+#include "ClientGameMode.h"
+#include "Data/ItemData.h"
 #include "Global.h"
 
 #include "Network/Network.h"
@@ -41,6 +44,7 @@ ATinoCharacter::ATinoCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 	UHelpers::CreateComponent<USpringArmComponent>(this, &SpringArm, "SpringArm", GetCapsuleComponent());
 	UHelpers::CreateComponent<UCameraComponent>(this, &Camera, "Camera", SpringArm);
+	UHelpers::CreateActorComponent<UInventoryComponent>(this, &InventoryComponent, "Inventory");
 
 	bUseControllerRotationYaw = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
@@ -73,6 +77,7 @@ void ATinoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 void ATinoCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
 	if (!!GetController())
 	{
 		if (GetController()->IsPlayerController())
@@ -357,6 +362,39 @@ void ATinoCharacter::SetNetworkLocation(const FVector& Location)
 {
 	PreviousLocation = Location;
 	SetActorLocation(Location);
+}
+
+FItemData ATinoCharacter::GetItemDataFromItemCode(const int64& ItemCode)
+{
+	auto GameMode = Cast<AClientGameMode>(GetWorld()->GetAuthGameMode());
+	auto Data = GameMode->GetItemData(ItemCode);
+
+	FItemData ItemData;
+	ItemData.ItemCode = ItemCode;
+	ItemData.EquipType = Data->EquipType;
+	ItemData.TextData = Data->TextData;
+	ItemData.NumericData = Data->NumericData;
+	ItemData.AssetData = Data->AssetData;
+	ItemData.SellValue = Data->SellValue;
+
+	return ItemData;
+}
+
+void ATinoCharacter::SetInventoryFromEquippedCode(const long long& EquippedItems)
+{
+	int64 IC = StaticCast<int64>(EquippedItems);
+
+	for (int64 i = 0; i < 64; ++i)
+	{
+		int Value = (EquippedItems >> i) & 1;
+
+		if (Value != 0)
+		{
+			int64 ItemCode = i + 1;
+			InventoryComponent->AddItem(GetItemDataFromItemCode(ItemCode));
+		}
+	}
+
 }
 
 void ATinoCharacter::SetDepartmentClothes(int department)

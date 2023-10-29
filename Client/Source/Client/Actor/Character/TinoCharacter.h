@@ -44,6 +44,8 @@ enum class EDepartment : uint8
 	EDepartment_MAX UMETA(DisplayName = "DefaultMAX")
 };
 
+struct FItemData;
+
 UCLASS()
 class CLIENT_API ATinoCharacter : public ABaseCharacter
 {
@@ -142,6 +144,9 @@ public:
 	FORCEINLINE void SetPoint(const float PointValue) { Point = PointValue; };
 	FORCEINLINE FVector GetNetworkLocation() { return PreviousLocation; }
 
+	FItemData GetItemDataFromItemCode(const int64& ItemCode);
+	void SetInventoryFromEquippedCode(const long long& EquippedItems);
+
 	UFUNCTION(BlueprintCallable)
 	void SetDepartmentClothes(int department);
 
@@ -151,9 +156,6 @@ public:
 
 	void SetCollisionProfileName(const FName& CollisionName);
 	class UCharacterAnimInstance* GetTinoAnimInstance();
-
-
-
 
 
 	UPROPERTY()
@@ -191,10 +193,12 @@ private:
 
 private:
 
-	UPROPERTY(VisibleDefaultsOnly)
+	UPROPERTY(VisibleDefaultsOnly, Category = "Component")
 		class USpringArmComponent* SpringArm;
-	UPROPERTY(VisibleDefaultsOnly)
+	UPROPERTY(VisibleDefaultsOnly, Category = "Component")
 		class UCameraComponent* Camera;
+	UPROPERTY(VisibleAnywhere, Category = "Component")
+		class UInventoryComponent* InventoryComponent;
 
 	UPROPERTY(VisibleDefaultsOnly)
 		class ATinoController* PlayerController;
