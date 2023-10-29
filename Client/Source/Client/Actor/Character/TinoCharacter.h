@@ -140,12 +140,14 @@ public:
 	FORCEINLINE void SetGrade(const float GradeValue) { Grade = GradeValue; };
 	FORCEINLINE float GetPoint() const { return Point; }
 	FORCEINLINE void SetPoint(const float PointValue) { Point = PointValue; };
+	FORCEINLINE FVector GetNetworkLocation() { return PreviousLocation; }
 
 	UFUNCTION(BlueprintCallable)
 	void SetDepartmentClothes(int department);
 
 	bool GetIsAirForNetwork();
 	void SetIsAirForNetwork(bool val);
+	void SetNetworkLocation(const FVector& Location);
 
 	void SetCollisionProfileName(const FName& CollisionName);
 	class UCharacterAnimInstance* GetTinoAnimInstance();
@@ -170,19 +172,20 @@ private:
 	void CreateDummy();
 
 private:
-
-
+	
+	//티노 캐릭터에서만 사용하는 함수들
 	bool CanMove();
 	bool CanDive();
 	bool CanGrab();
 	bool CanJump();
-
 	bool CanTumble(float DeltaTime);
-	void PlayTumbleMontage(float DeltaTime);
+	//애니메이션 패킷을 전송함
+	bool SendAnimPacket(int32 AnimType);
 
+	void PlayTumbleMontage(float DeltaTime);
 	void Align();
 
-	bool SendAnimPacket(int32 AnimType);
+	void PlayerInterpolation(float DeltaTime);
 
 	UTexture* GetTinoDepartTexture(EDepartment DepartmentNumber);
 
@@ -240,6 +243,21 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "CharacterSpeed")
 		FRotator OriginalRotationSpeed;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Interpolation")
+		float InterTime;
+	UPROPERTY(VisibleAnywhere, Category = "Interpolation")
+		float CurrentInterTime;
+	UPROPERTY(EditDefaultsOnly, Category = "Interpolation")
+		float StopTime;
+	UPROPERTY(VisibleAnywhere, Category = "Interpolation")
+		float CurrentStopTime;
+	UPROPERTY(VisibleAnywhere, Category = "Interpolation")
+		FVector PreviousLocation;
+	UPROPERTY(VisibleAnywhere, Category = "Interpolation")
+		FVector PreviousVelocity;
+	UPROPERTY(VisibleAnywhere, Category = "Interpolation")
+		FVector InterVelocity;
+
 	UPROPERTY(VisibleAnywhere, Category = "Enums")
 		EMovementState MovementState;
 	UPROPERTY(VisibleAnywhere, Category = "Enums")
@@ -249,7 +267,7 @@ private:
 		TMap<EDepartment, UTexture*> DepartmentTextureMap;
 
 	UPROPERTY(VisibleAnywhere, Category = "Animation | Grab")
-		AActor* Target;
+		ATinoCharacter* Target;
 
 	UPROPERTY(VisibleAnywhere, Category = "Animation")
 		bool bCanTumbled;
