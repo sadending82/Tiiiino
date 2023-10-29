@@ -589,6 +589,7 @@ void Network::l_process_packet(unsigned char* p)
 		long long TestItemFlag = 0b0000'0000'0000'0000'0000'0000'0000'0100'0000'0000'0000'0000'0000'0000'0000'0000;
 		if ((packet->equippedItems & TestItemFlag))
 		{
+			mMyCharacter->SetInventoryFromEquippedCode(packet->equippedItems);
 			//장착중 (장착이 아니라면 and 연산에서 다 false가 나와 0이라 if문 안들어옴)
 			//Equip !
 			//TestItemFlag는 xml에 들어가 있을 예정.
