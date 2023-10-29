@@ -32,6 +32,8 @@ ATinoCharacter::ATinoCharacter()
 	DetectAngle(60.f),
 	TargetInterval(50.f),
 	OriginalSpeed(400.f),
+	InterTime(0.03f),
+	StopTime(0.3f),
 	MovementState(EMovementState::EMS_Normal),
 	Department(EDepartment::EDepartment_Game),
 	Target(nullptr)
@@ -115,6 +117,20 @@ void ATinoCharacter::Tick(float DeltaTime)
 		float PitchClamp = FMath::ClampAngle(Rotation.Pitch, -45.f, 30.f);
 		FRotator RotationControl(PitchClamp, Rotation.Yaw, Rotation.Roll);
 		SleepEx(0, true);
+		FVector TargetLocation = GetNetworkLocation();
+
+		if (MovementState == EMovementState::EMS_Grabbing && Target != nullptr)
+		{
+			if (bIsControlledPlayer == true)
+			{
+				if (CurrentInterTime >= InterTime)
+				{
+					SetActorLocation(TargetLocation - GetActorForwardVector() * TargetInterval);
+				}
+			}
+			else
+				SetActorLocation(TargetLocation - GetActorForwardVector() * TargetInterval);
+		}
 
 		if (Network::GetNetwork()->bIsConnected)
 		{
@@ -122,11 +138,12 @@ void ATinoCharacter::Tick(float DeltaTime)
 			{
 				if (!GetController()->IsPlayerController())
 				{
+					PlayerInterpolation(DeltaTime);
 					//서버랑 연결 돼 있을 때만 상대 캐릭터 보간하려
 					//Update GroundSpeedd (22-04-05)
 					//GroundSpeedd = ServerStoreGroundSpeed;
 					//Update Interpolation (23-09-27)
-					GetCharacterMovement()->Velocity = ServerCharMovingSpeed;
+					//GetCharacterMovement()->Velocity = ServerCharMovingSpeed;
 					//SetActorLocation(FMath::Lerp(GetActorLocation(), ServerLocateLerp, 0.5));
 					//SetActorRotation(FMath::Lerp(GetTransform().GetRotation(), ServerRotateLerp, 0.5));
 				}
@@ -149,12 +166,7 @@ void ATinoCharacter::Tick(float DeltaTime)
 		}
 
 		PlayTumbleMontage(DeltaTime);
-
-		if (MovementState == EMovementState::EMS_Grabbing && Target != nullptr)
-		{
-			SetActorLocation(Target->GetActorLocation() - GetActorForwardVector() * TargetInterval);
-			//SetActorRotation(Target->GetActorRotation());
-		}
+		
 
 		// 10/04 가만히 있을 때 충돌하지 안흔 부분을 해결하기 위한 코드 추가
 		FHitResult OutHit;
@@ -169,6 +181,7 @@ void ATinoCharacter::Tick(float DeltaTime)
 			}
 		}
 
+		PreviousVelocity = GetVelocity();
 	}
 }
 bool ATinoCharacter::CanTumble(float DeltaTime)
@@ -210,6 +223,37 @@ void ATinoCharacter::PlayTumbleMontage(float DeltaTime)
 void ATinoCharacter::Align()
 {
 	GetController()->SetControlRotation(GetActorForwardVector().Rotation());
+}
+
+void ATinoCharacter::PlayerInterpolation(float DeltaTime)
+{
+	CurrentInterTime += DeltaTime;
+
+	//플레이어 정지시간 측정
+	if (FMath::Floor((PreviousVelocity.Length() - GetVelocity().Length())) == 0)
+		CurrentStopTime += DeltaTime;
+
+	//기준 시간 초과시 플레이어는 안움직이는 상태이다
+	if (CurrentStopTime >= StopTime)
+	{
+		CurrentStopTime -= StopTime;
+		GetCharacterMovement()->Velocity = FVector::ZeroVector;
+		PreviousVelocity = FVector::ZeroVector;
+	}
+
+	//네트워크에서 현재 프레임 받은 위치 - PreviousPosition(이전프레임에 서버에서 지정한 위치)
+	//아래에 넣기?
+	AddMovementInput(GetVelocity());
+
+	//InterTime마다 보간속도를구함
+	if (CurrentInterTime >= InterTime)
+	{
+		CurrentInterTime -= InterTime;
+		InterVelocity = PreviousLocation - GetActorLocation();
+	}
+
+	if (InterVelocity.IsNearlyZero() == false)
+		SetActorLocation(GetActorLocation() + InterVelocity * DeltaTime);
 }
 
 void ATinoCharacter::MakeAndShowHUD()
@@ -307,6 +351,12 @@ void ATinoCharacter::MakeAndShowDialogInGame()
 	auto DialogWidget = GetController<ATinoController>()->DialogUIInstance;
 	DialogWidget->AddToViewport();
 	DialogWidget->RenderDisconnectNetworkWindow();
+}
+
+void ATinoCharacter::SetNetworkLocation(const FVector& Location)
+{
+	PreviousLocation = Location;
+	SetActorLocation(Location);
 }
 
 void ATinoCharacter::SetDepartmentClothes(int department)
@@ -519,10 +569,6 @@ void ATinoCharacter::OnGrab()
 void ATinoCharacter::OffGrab()
 {
 	bIsGrabbing = false;
-	if (Target == nullptr) return;
-	SendAnimPacket(5);
-
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
 	if (MovementState == EMovementState::EMS_Grabbing)
 	{
@@ -530,6 +576,14 @@ void ATinoCharacter::OffGrab()
 		ASoundManager::GetSoundManager()->PlaySFXAtLocation(this, ESFXType::ESFXType_OffGrab, GetActorLocation());
 		SetMovementState(EMovementState::EMS_Normal);
 	}
+
+	SendAnimPacket(5);
+
+	if (Target == nullptr) return;
+
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+
+	
 	SetTargetGrabbedToNormal();
 
 	bIsGrabCoolTime = true;
@@ -609,7 +663,7 @@ void ATinoCharacter::DetectTarget()
 
 	if (result && bIsGrabCoolTime == false)
 	{
-		Target = HitResult.GetActor();
+		Target = Cast<ATinoCharacter>(HitResult.GetActor());
 		//float ScalarValue = GetActorForwardVector().Dot(Target->GetActorForwardVector());
 
 		// 이미 잡힌 캐릭터나 잡고있는 캐릭터는 잡기 대상이 될 수 없다(기차 방지)
