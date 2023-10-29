@@ -852,9 +852,10 @@ void Server::SendPlayerResult(int uID, int roomID, bool retire, int rank)
 				mClients[mRooms[roomID].mSockID[i]].mStateLock.unlock();
 				// to db server update
 				SendGameResult(roomID, i);
-				SendMatchResult(mRooms[roomID].mSockID[i], rank, 0);
-				DEBUGMSGONEPARAM("[%d]플레이어의 점수 ", mClients[mRooms[roomID].mSockID[i]].mUID);
-				DEBUGMSGONEPARAM("[%f] 로비안끊김\n", mClients[mRooms[roomID].mSockID[i]].mGrade);
+				SendMatchResult(mRooms[roomID].mSockID[i], rank, mRooms[roomID].mPoint[i]);
+				DEBUGMSGONEPARAM("[%d]플레이어의 점수 : ", mClients[mRooms[roomID].mSockID[i]].mUID);
+				DEBUGMSGONEPARAM("[%f] 로비안끊김    플레이어의 포인트 : ", mClients[mRooms[roomID].mSockID[i]].mGrade);
+				DEBUGMSGONEPARAM("[%d] 로비안끊김\n", mClients[mRooms[roomID].mSockID[i]].mPoint);
 				break;
 			}
 			else // player disconnected lobby server
@@ -899,8 +900,9 @@ void Server::SendPlayerResult(int uID, int roomID, bool retire, int rank)
 				mRooms[roomID].mPoint[i] += point;
 				// to db server update
 				SendGameResult(roomID, i);
-				DEBUGMSGONEPARAM("[%d]플레이어의 점수 ", mRooms[roomID].mUID[i]);
-				DEBUGMSGONEPARAM("[%f] 로비 끊김\n", mRooms[roomID].mGrade[i]);
+				DEBUGMSGONEPARAM("[%d]플레이어의 점수 : ", mRooms[roomID].mUID[i]);
+				DEBUGMSGONEPARAM("[%f] 로비 끊김  플레이어의 포인트 : ", mRooms[roomID].mGrade[i]);
+				DEBUGMSGONEPARAM("[%d] 로비 끊김\n", mRooms[roomID].mPoint[i]);
 				break;
 			}
 		}
