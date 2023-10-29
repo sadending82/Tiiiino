@@ -17,6 +17,7 @@ bool GameDataManager::LoadShopData()
 			item.itemCode = stoi(pProduct->FirstChildElement("code")->GetText());
 			item.name = pProduct->FirstChildElement("name")->GetText();
 			item.price = stoi(pProduct->FirstChildElement("price")->GetText());
+			item.cutline = stoi(pProduct->FirstChildElement("cutline")->GetText());
 
 			ShopProductsList[item.itemCode] = item;
 		}
@@ -46,7 +47,7 @@ bool GameDataManager::LoadItemData()
 			item.name = pItem->FirstChildElement("name")->GetText();
 			item.price = stoi(pItem->FirstChildElement("price")->GetText());
 
-			ShopProductsList[item.itemCode] = item;
+			ItemList[item.itemCode] = item;
 		}
 		return true;
 	}
