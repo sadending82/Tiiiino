@@ -23,6 +23,7 @@ Network::Network()
 	, bIsConnected(false)
 	, l_socket(INVALID_SOCKET)
 	, s_socket(INVALID_SOCKET)
+	, mGameDataManager(nullptr)
 {
 	for (int i = 0; i < MAX_USER; ++i)
 	{
@@ -84,6 +85,12 @@ bool Network::init()
 {
 	if (!isInit)
 	{
+		if (nullptr == mGameDataManager)
+		{
+			mGameDataManager = new GameDataManager;
+			mGameDataManager->CheckDataFile();
+		}
+
 		WSAStartup(MAKEWORD(2, 2), &WSAData);
 		return true;
 	}
@@ -108,14 +115,19 @@ void Network::release()
 		closesocket(s_socket);
 		_prev_size = 0;
 		WSACleanup();
-		if (!bLevelOpenTriggerEnabled)
+		if (!bLevelOpenTriggerEnabled)	//If Editor Stop, Call This
 		{
-			//openlevel로 인한 release가 아니라,
-						//editor중지때문에 생기는 release라면 false시켜줌.
+			// Called when the editor is stopped, not when changing levels.
+			
+			//If OpenLevel (Change Level), -> Character Destroy -> Network::Release Called
+			// Do not here
+			// But Editor Simulate Stop -> Character Destory -> Network::Release Called
+			// In Here
+			if(mGameDataManager)
+				delete mGameDataManager;
+			mGameDataManager = nullptr;
 			bLoginFlag = false;
-			//editor중지때문이니까 여기도 그냥 false로 다시 초기화.
 			bLevelOpenTriggerEnabled = false;
-			//editor 중지가 아니라 level 변경시 불리는 release에서 변경되지 말아야 할 값은 이 if문 안에 넣기.
 			bIsConnectedLobby = 0;
 			bIsConnected = 0;
 			closesocket(l_socket);

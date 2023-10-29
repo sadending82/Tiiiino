@@ -16,10 +16,10 @@
 void ACustomLevel_Test::BeginPlay() {
 
 	Super::BeginPlay();
-	Network::GetNetwork()->mGameDataManager = new GameDataManager;
-	Network::GetNetwork()->mGameDataManager->CheckDataFile();
-	Network::GetNetwork()->LoadItemData();
-	Network::GetNetwork()->bLevelOpenTriggerEnabled = false;	//레벨 시작됐으니 트리거 꺼줌.
+	auto Game = Network::GetNetwork();
+	Game->init();
+	Game->LoadItemData();
+	Game->bLevelOpenTriggerEnabled = false;	//레벨 시작됐으니 트리거 꺼줌.
 	/*
 	1. 캐릭터를 스폰하고 Network mMyCharacter에 연결
 	2. 서버에 연결함
@@ -38,7 +38,7 @@ void ACustomLevel_Test::BeginPlay() {
 	mc1->SpawnDefaultController();
 	mc1->AutoPossessPlayer = EAutoReceiveInput::Player0;
 	mc1->FinishSpawning(trans);
-	Network::GetNetwork()->mMyCharacter = mc1;
+	Game->mMyCharacter = mc1;
 	Conn();
 
 	//To Loading ...
@@ -51,7 +51,6 @@ void ACustomLevel_Test::BeginPlay() {
 bool ACustomLevel_Test::Conn()
 {
 	Super::Conn();
-	Network::GetNetwork()->init();
 
 	if (bGameserverConn)
 		return ConnGameServer();

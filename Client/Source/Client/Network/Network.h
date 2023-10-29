@@ -93,10 +93,19 @@ public:
 
 	void RegisterObjectNetwork(ABaseObstacle* object,int& ObjectID);
 
+
 	void LoadItemData();
 
-public:
 	void SetObjectNetID(ABaseObstacle* object, const int netID);
+
+public:
+	void error_display(int err_no);
+	bool ConnectServerGame();
+	bool ConnectServerLobby();
+	bool RecvPacketGame();
+	bool RecvPacketLobby();
+
+public:
 
 	ATinoCharacter* mMyCharacter;
 	FString MyCharacterName;
@@ -122,15 +131,12 @@ private:
 
 public:
 	WSADATA WSAData;
-	void error_display(int err_no);
 	bool bIsConnected = false;	//게임서버랑 연결이 되었는지,
 	bool bIsConnectedLobby = false;		//로비서버랑 연결이 되었는지
 	int mDBUID;
 	int ClientID;
 	bool bGameIsStart = false;
 	char hashs[MAX_NAME_SIZE];	// 서버 검증 값
-	bool ConnectServerGame();
-	bool ConnectServerLobby();
 	SOCKET s_socket;
 	SOCKADDR_IN server_addr;
 	WSA_OVER_EX recv_expover;
@@ -140,8 +146,6 @@ public:
 	SOCKADDR_IN l_server_addr;
 	WSA_OVER_EX l_recv_expover;
 	int			l_prev_size{};
-	bool RecvPacketGame() ;
-	bool RecvPacketLobby();
 	// 112.152.55.49  127.0.0.1  , 112.153.53.142
 	const char* GAMESERVER_ADDR = "127.0.0.1";
 	const char* LOBBYSERVER_ADDR = "127.0.0.1";
