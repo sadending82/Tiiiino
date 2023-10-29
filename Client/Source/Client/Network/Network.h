@@ -114,7 +114,7 @@ public:
 	sGameResult GameResult;
 	int RecentLevelNum = -1;
 
-	GameDataManager* pGDM = new GameDataManager;
+	GameDataManager* mGameDataManager;
 
 private:
 	bool isInit;

@@ -8,6 +8,7 @@
 #include "Actor/Character/TinoCharacter.h"
 #include "Actor/Controller/TinoController.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameDataManager/GameDataManager.h"
 
 #include "Global.h"
 
@@ -15,7 +16,8 @@
 void ACustomLevel_Test::BeginPlay() {
 
 	Super::BeginPlay();
-	Network::GetNetwork()->pGDM->CheckDataFile();
+	Network::GetNetwork()->mGameDataManager = new GameDataManager;
+	Network::GetNetwork()->mGameDataManager->CheckDataFile();
 	Network::GetNetwork()->LoadItemData();
 	Network::GetNetwork()->bLevelOpenTriggerEnabled = false;	//레벨 시작됐으니 트리거 꺼줌.
 	/*

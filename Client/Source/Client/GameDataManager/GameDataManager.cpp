@@ -1,4 +1,8 @@
 #pragma once
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <filesystem>
 #include "GameDataManager.h"
 
 bool GameDataManager::CheckDataFile()
@@ -71,6 +75,7 @@ bool GameDataManager::LoadShopData()
 			item.cutline = stoi(pProduct->FirstChildElement("cutline")->GetText());
 			ShopProductsList[item.itemCode] = item;
 		}
+		UE_LOG(LogTemp, Log, TEXT("Shop Data Load Succeed"));
 		return true;
 	}
 	catch(exception ex){ 
@@ -100,6 +105,7 @@ bool GameDataManager::LoadItemData()
 			item.price = stoi(pItem->FirstChildElement("price")->GetText());
 			ItemList[item.itemCode] = item;
 		}
+		UE_LOG(LogTemp, Log, TEXT("Item Data Load Succeed"));
 		return true;
 	}
 	catch (exception ex) {

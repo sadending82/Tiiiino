@@ -70,8 +70,8 @@ void Network::RegisterObjectNetwork(ABaseObstacle* object, int& ObjectID)
 
 void Network::LoadItemData()
 {
-	pGDM->LoadShopData();
-	pGDM->LoadItemData();
+	mGameDataManager->LoadShopData();
+	mGameDataManager->LoadItemData();
 }
 
 void Network::SetObjectNetID(ABaseObstacle* object, const int netID)
