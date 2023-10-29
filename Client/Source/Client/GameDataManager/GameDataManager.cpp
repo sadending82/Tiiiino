@@ -1,7 +1,4 @@
-#include <fstream>
-#include <sstream>
-#include <filesystem>
-#include <string>
+#pragma once
 #include "GameDataManager.h"
 
 bool GameDataManager::CheckDataFile()
@@ -29,7 +26,6 @@ bool GameDataManager::CheckDataFile()
 	}
 
 
-	//-----------------------------------
 	sourceFilePath = TCHAR_TO_ANSI(*FPaths::GameSourceDir());
 	sourceFilePath += EXTERNAL_ITEMDATAFILE;
 
@@ -57,12 +53,10 @@ bool GameDataManager::LoadShopData()
 	try {
 		tinyxml2::XMLDocument doc;
 
-		//if (doc.LoadFile(SHOPDATAFILE.c_str()) != tinyxml2::XMLError::XML_SUCCESS) return false;
-
-		std::string filepath{ TCHAR_TO_ANSI(*FPaths::GameSourceDir()) };
-		filepath += "../../GameData/ShopData.xml";
-
-		doc.LoadFile(filepath.c_str());
+		if (doc.LoadFile(SHOPDATAFILE.c_str()) != tinyxml2::XMLError::XML_SUCCESS) {
+			UE_LOG(LogTemp, Error, TEXT("%s Load Failed"), SHOPDATAFILE.c_str());
+			return false;
+		}
 
 		tinyxml2::XMLElement* pRoot = doc.RootElement();
 		tinyxml2::XMLElement* pProductList = pRoot->FirstChildElement("productlist");
@@ -74,7 +68,7 @@ bool GameDataManager::LoadShopData()
 			item.itemCode = stoi(pProduct->FirstChildElement("code")->GetText());
 			item.name = pProduct->FirstChildElement("name")->GetText();
 			item.price = stoi(pProduct->FirstChildElement("price")->GetText());
-
+			item.cutline = stoi(pProduct->FirstChildElement("cutline")->GetText());
 			ShopProductsList[item.itemCode] = item;
 		}
 		return true;
@@ -89,10 +83,10 @@ bool GameDataManager::LoadItemData()
 	try {
 		tinyxml2::XMLDocument doc;
 
-		std::string filepath{ TCHAR_TO_ANSI(*FPaths::GameSourceDir()) };
-		filepath += "../../GameData/ItemData.xml";
-
-		doc.LoadFile(filepath.c_str());
+		if (doc.LoadFile(ITEMDATAFILE.c_str()) != tinyxml2::XMLError::XML_SUCCESS) {
+			UE_LOG(LogTemp, Error, TEXT("%s Load Failed"), ITEMDATAFILE.c_str());
+			return false;
+		}
 
 		tinyxml2::XMLElement* pRoot = doc.RootElement();
 		tinyxml2::XMLElement* pItemList = pRoot->FirstChildElement("itemlist");
@@ -104,8 +98,7 @@ bool GameDataManager::LoadItemData()
 			item.itemCode = stoi(pItem->FirstChildElement("code")->GetText());
 			item.name = pItem->FirstChildElement("name")->GetText();
 			item.price = stoi(pItem->FirstChildElement("price")->GetText());
-
-			ShopProductsList[item.itemCode] = item;
+			ItemList[item.itemCode] = item;
 		}
 		return true;
 	}

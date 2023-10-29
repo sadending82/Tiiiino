@@ -5,6 +5,8 @@
 #include <iostream>
 #include <fstream>
 #include <Windows.h>
+#include <sstream>
+#include <filesystem>
 
 #include "../Global.h"
 
@@ -24,6 +26,7 @@ struct Item
 	int		itemCode;
 	FString	name;
 	int		price;
+	double  cutline = 0.0;
 };
 
 class GameDataManager

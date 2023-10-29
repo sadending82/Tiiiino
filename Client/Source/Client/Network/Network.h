@@ -93,6 +93,8 @@ public:
 
 	void RegisterObjectNetwork(ABaseObstacle* object,int& ObjectID);
 
+	void LoadItemData();
+
 public:
 	void SetObjectNetID(ABaseObstacle* object, const int netID);
 

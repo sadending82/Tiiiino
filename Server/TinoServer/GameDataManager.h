@@ -14,6 +14,7 @@ struct Item
 	int		itemCode;
 	string	name;
 	int		price;
+	double  cutline = 0.0;
 };
 
 class GameDataManager

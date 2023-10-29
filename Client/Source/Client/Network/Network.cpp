@@ -68,6 +68,12 @@ void Network::RegisterObjectNetwork(ABaseObstacle* object, int& ObjectID)
 	//}
 }
 
+void Network::LoadItemData()
+{
+	pGDM->LoadShopData();
+	pGDM->LoadItemData();
+}
+
 void Network::SetObjectNetID(ABaseObstacle* object, const int netID)
 {
 	mObjects[netID] = object;
@@ -809,13 +815,6 @@ bool Network::ConnectServerGame()
 
 bool Network::ConnectServerLobby()
 {
-	bool result = pGDM->LoadShopData();
-	UE_LOG(LogTemp, Log, TEXT("Shop Data Load :: %s"), result ? TEXT("true") : TEXT("false"));
-	UE_LOG(LogTemp, Log, TEXT("tlqkf:: %s"), *pGDM->GetShopProductInfo(1).name);
-
-	result = pGDM->LoadItemData();
-	UE_LOG(LogTemp, Log, TEXT("Item Data Load :: %s"), result ? TEXT("true") : TEXT("false"));
-	UE_LOG(LogTemp, Log, TEXT("tlqkf:: %s"), *pGDM->GetItemInfo(1).name);
 	isInit = true;
 
 	if (bIsConnectedLobby) return false;

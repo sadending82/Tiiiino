@@ -1104,17 +1104,17 @@ void Server::LoadGameData()
 	pGameDataManager = new GameDataManager;
 	bool result = pGameDataManager->LoadItemData();
 	if (result == false) {
-		DEBUGMSGNOPARAM("Load Game Data Failed\n");
+		DEBUGMSGNOPARAM("Load Item Data Failed\n");
 		return;
 	}
 	result = pGameDataManager->LoadShopData();
 	if (result == false) {
-		DEBUGMSGNOPARAM("Load Game Data Failed\n");
+		DEBUGMSGNOPARAM("Load Shop Data Failed\n");
 		return;
 	}
 	result = pGameDataManager->LoadCouponData();
 	if (result == false) {
-		DEBUGMSGNOPARAM("Load Game Data Failed\n");
+		DEBUGMSGNOPARAM("Load Coupon Data Failed\n");
 		return;
 	}
 
