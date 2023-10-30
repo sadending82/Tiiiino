@@ -38,6 +38,9 @@ void send_newaccount_packet(SOCKET& sock, const char* id, const char* passWord, 
 void send_match_packet(SOCKET& sock);
 void send_matchout_packet(SOCKET& sock);
 void send_control_packet(SOCKET& sock);
+void send_buyitem_packet(SOCKET& sock, const int itemCode);
+void send_equip_packet(SOCKET& sock, const int itemCode);
+void send_unequip_packet(SOCKET& sock, const int itemCode);
 //game packet
 void send_movetogame_packet(SOCKET& sock,const int uID, const char* id, const int& roomID);
 void send_move_packet(SOCKET& sock, const bool& inair, const float& x, const float& y, const float& z, FQuat& rotate, const float& value, const FVector& speedVec);

@@ -18,7 +18,6 @@ void ACustomLevel_Test::BeginPlay() {
 	Super::BeginPlay();
 	auto Game = Network::GetNetwork();
 	Game->init();
-	Game->LoadItemData();
 	Game->bLevelOpenTriggerEnabled = false;	//레벨 시작됐으니 트리거 꺼줌.
 	/*
 	1. 캐릭터를 스폰하고 Network mMyCharacter에 연결
