@@ -9,6 +9,7 @@
 #include "MenuUI/LoginUIWidget.h"
 #include "MenuUI/CreateAccountsWidget.h"
 #include "MenuUI/LobbyUIWidget.h"
+#include "MenuUI/StoreUIWidget.h"
 
 #include "Component/InventoryComponent.h"
 #include "ClientGameMode.h"
@@ -292,6 +293,9 @@ void ATinoCharacter::MakeAndShowLoginOK(const double GradeValue, const int Point
 		LobbyUI->Grade = GValue;
 		LobbyUI->Point = PValue;
 
+		auto StoreUI = TinoController->StoreUIInstance;
+		StoreUI->Grade = GValue;
+		StoreUI->Point = PValue;
 	}
 }
 
