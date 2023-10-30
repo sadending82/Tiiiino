@@ -53,12 +53,20 @@ public:
 	UPROPERTY()
 	class UStoreUIWidget* StoreDialogInstance = nullptr;
 
+	UPROPERTY(EditAnywhere, BlueprintReadwrite, Category = "UMG_Game")
+	int ItemNum;
+
 public:
 	// ÁÂ/¿ì ¾ÆÀÌÅÛ Ä­ ÀÌµ¿
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void MoveLeft();
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void MoveRight();
+
+	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
+	float Grade;
+	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
+	int32 Point;
 
 private:
 	UPROPERTY(EditAnywhere, Category = "UMG_Game")
