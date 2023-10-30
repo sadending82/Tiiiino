@@ -47,6 +47,9 @@ public:
 	UFUNCTION(BluePrintImplementableEvent, Category = "UMG_Game")
 	void ShowPurchaseWarning(bool check);
 
+	UFUNCTION(BluePrintImplementableEvent, Category = "UMG_Game")
+	void ChangePoint();
+
 	// StoreDialog
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
 	TSubclassOf<class UStoreUIWidget> StoreDialogWidgetClass;
@@ -67,6 +70,7 @@ public:
 	float Grade;
 	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
 	int32 Point;
+
 
 private:
 	UPROPERTY(EditAnywhere, Category = "UMG_Game")

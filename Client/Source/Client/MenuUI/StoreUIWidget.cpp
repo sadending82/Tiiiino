@@ -6,6 +6,7 @@
 #include "MenuUI/LobbyUIWidget.h"
 #include "Actor/Controller/TinoController.h"
 #include "Actor/Character/TinoCharacter.h"
+#include "Components/TextBlock.h"
 #include "Network/Network.h"
 #include "Global.h"
 
@@ -36,7 +37,7 @@ void UStoreUIWidget::PurchaseItem()
 	// Buy버튼 클릭
 	int32 price = 100;
 	Point -= price;
-
+	ChangePoint();
 	// StoreDialog 창 띄움
 }
 
