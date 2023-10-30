@@ -14,7 +14,6 @@ int main(int argc, char* argv[])
 	DB* pDB = new DB;
 	pDB->SetmSecurity(pSecurity);
 	pDB->ConnectDB();
-	pDB->SelectRanking();
 	pSocket->Setm_pDB(pDB);
 #endif
 	//pDB->CreateDummyAccount(100);
