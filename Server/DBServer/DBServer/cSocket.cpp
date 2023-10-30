@@ -312,12 +312,13 @@ void Socket::SendInventory(int key, long long inventoryFlag, int userKey)
     mSessions[key].DoSend((void*)(&p));
 }
 
-void Socket::SendBuyItemOK(int key, int itemCode, int userKey)
+void Socket::SendBuyItemOK(int key, int itemCode, int userKey, int pointAfterPurchase)
 {
     DL_BUYITEM_OK_PACKET p;
     p.size = sizeof(DL_BUYITEM_OK_PACKET);
     p.type = SPacketType::DL_BUYITEM_OK;
     p.itemCode = itemCode;
+    p.pointAfterPurchase = pointAfterPurchase;
     p.userKey = userKey;
 
     mSessions[key].DoSend((void*)(&p));
@@ -465,6 +466,7 @@ void Socket::ProcessPacket_UnequipItem(int key, unsigned char* buf)
 void Socket::ProcessPacket_BuyItem(int key, unsigned char* buf)
 {
     LD_BUY_ITEM_PACKET* p = reinterpret_cast<LD_BUY_ITEM_PACKET*>(buf);
+    int pointAfterPurchase = 0;
 #ifdef RUN_DB
 
     bool bResult = Getm_pDB()->UpdateUserPoint(p->uid, -p->price);
@@ -479,9 +481,12 @@ void Socket::ProcessPacket_BuyItem(int key, unsigned char* buf)
         SendBuyItemFail(key, p->userKey);
         return;
     }
+    
+    pointAfterPurchase = Getm_pDB()->SelectPoint(p->uid);
+
 #endif
 
-    SendBuyItemOK(key, p->itemCode, p->userKey);
+    SendBuyItemOK(key, p->itemCode, p->userKey, pointAfterPurchase);
 }
 
 int Socket::SetUIDForTest()

@@ -32,6 +32,13 @@ constexpr int STARTCODE_FACEEQUIP = 32;
 constexpr int STARTCODE_HANDEQUIP = 16;
 constexpr int STARTCODE_BACKEQUIP = 0;
 
+struct rankInfo
+{
+	char	department;
+	int		point;
+	int		rank;
+};
+
 enum class eDepartment : char
 {
 
@@ -330,7 +337,8 @@ struct LC_CONTROL_PACKET :public PACKET {
 };
 
 struct LC_BUYITEM_OK_PACKET :public PACKET {
-
+	int itemCode;
+	int	pointAfterPurchase;
 };
 
 struct LC_BUYITEM_FAIL_PACKET :public PACKET {
