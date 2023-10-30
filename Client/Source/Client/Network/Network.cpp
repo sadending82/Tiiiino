@@ -89,6 +89,7 @@ bool Network::init()
 		{
 			mGameDataManager = new GameDataManager;
 			mGameDataManager->CheckDataFile();
+			LoadItemData();
 		}
 
 		WSAStartup(MAKEWORD(2, 2), &WSAData);
@@ -233,6 +234,36 @@ void send_control_packet(SOCKET& sock)
 			}
 		}
 	}
+}
+
+void send_buyitem_packet(SOCKET& sock, const int itemCode)
+{
+	CL_BUY_ITEM_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = CL_BUY_ITEM;
+	packet.itemCode = itemCode;
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+}
+
+void send_equip_packet(SOCKET& sock, const int itemCode)
+{
+	CL_EQUIP_ITEM_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = CL_EQUIP_ITEM;
+	packet.itemCode = itemCode;
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+}
+
+void send_unequip_packet(SOCKET& sock, const int itemCode)
+{
+	CL_UNEQUIP_ITEM_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = CL_UNEQUIP_ITEM;
+	packet.itemCode = itemCode;
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
 }
 
 void send_movetogame_packet(SOCKET& sock, const int uID, const char* id, const int& roomID)
