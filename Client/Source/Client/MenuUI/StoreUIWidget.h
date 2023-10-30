@@ -70,4 +70,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
 	float Point;
 
+	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
+	int64 ClickItemCode;
+
 };

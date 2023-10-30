@@ -14,6 +14,7 @@
 void UStoreUIWidget::NativePreConstruct()
 {
 	Super::NativePreConstruct();
+
 	//auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	//auto TinoCharacter = TinoController->GetPawn<ATinoCharacter>();
 	//Grade = TinoCharacter->GetGrade();
@@ -35,8 +36,8 @@ void UStoreUIWidget::TryBack()
 void UStoreUIWidget::PurchaseItem()
 {
 	// Buy버튼 클릭
-	int32 price = 100;
-	Point -= price;
+	//int32 price = 100;
+	//Point -= price;
 	ChangePoint();
 	// StoreDialog 창 띄움
 }
@@ -56,7 +57,12 @@ bool UStoreUIWidget::QualifyingPurchase()
 
 		//ShowPurchaseWarning(true);
 	}
-
+	// 임시 게임데이터매니저에서 아이템데이터 불러오기
+	auto itemdata = Network::GetNetwork()->mGameDataManager->GetShopProductsList();
+	for (auto &data : itemdata)
+	{
+		int price = data.second.price;
+	}
 	return true;
 }
 
