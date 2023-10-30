@@ -47,29 +47,35 @@ bool UStoreUIWidget::QualifyingPurchase()
 	if (true)
 	{
 		
-		ShowPurchaseWarning(false);
+		//ShowPurchaseWarning(false);
 	}
 
 	// 보유 여부 확인
 	if (true)
 	{
 
-		ShowPurchaseWarning(true);
+		//ShowPurchaseWarning(true);
 	}
 
 	return true;
 }
 
+void UStoreUIWidget::AlreadyPurchase()
+{
+	ShowPurchaseWarning(true);
+}
+
+void UStoreUIWidget::LimitGrade()
+{
+	ShowPurchaseWarning(false);
+}
+
 void UStoreUIWidget::MoveLeft()
 {
 	// 좌측 이동버튼 클릭
-
-	ItemNum--;
-	
 }
 
 void UStoreUIWidget::MoveRight()
 {
 	// 우측 이동버튼 클릭
-	ItemNum++;
 }

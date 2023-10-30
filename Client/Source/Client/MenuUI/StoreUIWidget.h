@@ -43,6 +43,12 @@ public:
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	bool QualifyingPurchase();
 	
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void AlreadyPurchase();
+
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void LimitGrade();
+
 	// 아이템 구매 불가 사유 Dialog
 	UFUNCTION(BluePrintImplementableEvent, Category = "UMG_Game")
 	void ShowPurchaseWarning(bool check);
@@ -50,14 +56,15 @@ public:
 	UFUNCTION(BluePrintImplementableEvent, Category = "UMG_Game")
 	void ChangePoint();
 
+
+
 	// StoreDialog
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
 	TSubclassOf<class UStoreUIWidget> StoreDialogWidgetClass;
 	UPROPERTY()
 	class UStoreUIWidget* StoreDialogInstance = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadwrite, Category = "UMG_Game")
-	int ItemNum;
+
 
 public:
 	// 좌/우 아이템 칸 이동
