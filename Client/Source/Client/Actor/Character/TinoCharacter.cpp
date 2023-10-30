@@ -295,7 +295,7 @@ void ATinoCharacter::MakeAndShowLoginOK(const double GradeValue, const int Point
 
 		auto StoreUI = TinoController->StoreUIInstance;
 		StoreUI->Grade = GValue;
-		StoreUI->Grade = PValue;
+		StoreUI->Point = PValue;
 	}
 }
 

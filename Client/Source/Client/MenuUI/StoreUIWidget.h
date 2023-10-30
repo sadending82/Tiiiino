@@ -10,14 +10,6 @@
  * 
  */
 
-UENUM(BlueprintType)
-enum class EQualifyingPurchase : uint8
-{
-	EQP_AlreadyPurchase,	// 이미 구입함
-	EDC_GradeLimit,			// 학점 제한
-	EDC_Possible,			// 구매 가능
-};
-
 UCLASS()
 class CLIENT_API UStoreUIWidget : public UUserWidget
 {
@@ -76,10 +68,6 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
 	float Grade;
 	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
-	int32 Point;
+	float Point;
 
-
-private:
-	UPROPERTY(EditAnywhere, Category = "UMG_Game")
-	EQualifyingPurchase QualifyCheck = EQualifyingPurchase::EDC_Possible;
 };
