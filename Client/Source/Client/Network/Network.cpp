@@ -696,6 +696,21 @@ void Network::l_process_packet(unsigned char* p)
 		//send_control_packet(l_socket);
 		break;
 	}
+	case LC_BUYITEM_OK: {
+		LC_BUYITEM_OK_PACKET* packet = reinterpret_cast<LC_BUYITEM_OK_PACKET*>(p);
+
+		break;
+	}
+	case LC_BUYITEM_FAIL: {
+		LC_BUYITEM_FAIL_PACKET* packet = reinterpret_cast<LC_BUYITEM_FAIL_PACKET*>(p);
+
+		break;
+	}
+	case LC_REFRESH_INVENTORY: {
+		LC_REFRESH_INVENTORY_PACKET* packet = reinterpret_cast<LC_REFRESH_INVENTORY_PACKET*>(p);
+
+		break;
+	}
 	default:
 		break;
 	}
