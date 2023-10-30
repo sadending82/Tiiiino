@@ -56,7 +56,11 @@ public:
 	UPROPERTY()
 	class UStoreUIWidget* StoreDialogInstance = nullptr;
 
-
+	// StoreBuyResult
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
+	TSubclassOf<class UStoreUIWidget> StoreBuyResultWidgetClass;
+	UPROPERTY()
+	class UStoreUIWidget* StoreBuyResultInstance = nullptr;
 
 public:
 	// аб/©Л ╬фюлеш д╜ юл╣©

@@ -36,10 +36,13 @@ void UStoreUIWidget::TryBack()
 void UStoreUIWidget::PurchaseItem()
 {
 	// Buy¹öÆ° Å¬¸¯
-	//int32 price = 100;
-	//Point -= price;
+	int32 price = 100;
+	Point -= price;
 	ChangePoint();
-	// StoreDialog Ã¢ ¶ç¿ò
+	send_buyitem_packet(Network::GetNetwork()->l_socket, ClickItemCode);
+
+	// Store BuyResult Ã¢ ¶ç¿ò
+	// StoreBuyResultInstance->AddToViewport();
 }
 
 bool UStoreUIWidget::QualifyingPurchase()
