@@ -362,6 +362,17 @@ void ATinoCharacter::MakeAndShowDialogInGame()
 	DialogWidget->RenderDisconnectNetworkWindow();
 }
 
+void ATinoCharacter::MakeAndShowLobbyRankSystem()
+{
+	auto TinoController = GetController<ATinoController>();
+	if (!!TinoController)
+	{
+		TinoController->ChangeMenuWidget(TinoController->LobbyUIInstance);
+		auto LobbyUI = TinoController->LobbyUIInstance;
+		LobbyUI->GetRankData();
+	}
+}
+
 void ATinoCharacter::SetNetworkLocation(const FVector& Location)
 {
 	PreviousLocation = Location;

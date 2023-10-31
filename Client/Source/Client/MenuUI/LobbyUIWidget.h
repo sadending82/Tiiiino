@@ -58,4 +58,13 @@ public:
 		float Grade;
 	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
 		int32 Point;
+public:
+	// 랭크 시스템
+
+	// 서버에서 보내주는 랭크데이터 받음
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void GetRankData();
+
+	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
+	TArray<FString> DepartmentArray;
 };

@@ -118,7 +118,8 @@ public:
 
 	void MakeAndShowDialogInLobby();
 	void MakeAndShowDialogInGame();
-
+	void MakeAndShowLobbyRankSystem();
+	
 	//Accessory
 
 	//소켓 이름과 메시를 정해줘야함

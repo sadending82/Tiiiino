@@ -1,9 +1,10 @@
 #pragma once
+
+#include "GameDataManager.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <filesystem>
-#include "GameDataManager.h"
 
 bool GameDataManager::CheckDataFile()
 {
