@@ -24,7 +24,6 @@ bool GameDataManager::LoadShopData()
 			int nLen = MultiByteToWideChar(CP_UTF8, 0, uft8Name, strlen(uft8Name), NULL, NULL);
 			MultiByteToWideChar(CP_UTF8, 0, uft8Name, strlen(uft8Name), unicodeName, nLen);
 			item.name = wstring(unicodeName);
-			wcout << item.name << endl;
 
 
 			ShopProductsList[item.itemCode] = item;
