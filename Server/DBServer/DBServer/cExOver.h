@@ -15,7 +15,7 @@ public:
 		mOpType = eOpType::OP_RECV;
 		ZeroMemory(&mOver, sizeof(mOver));
 	}
-	ExOver(char* packet)
+	ExOver(unsigned char* packet)
 	{
 		mWsaBuf.len = packet[0];
 		mWsaBuf.buf = reinterpret_cast<char*>(mMessageBuf);

@@ -25,7 +25,8 @@ public:
 
 	void SendLoginOK(int key, int uid, const char* id, double grade
 		, int point, int state, char department
-		, long long equippedItemFlag, long long inventoryFlag, int userid);
+		, long long equippedItemFlag, long long inventoryFlag,
+		vector<rankInfo>& ranking, int userid);
 	void SendLoginFail(int key, int userKey);
 	void SendSignUpOK(int key, int userKey);
 	void SendSignUpFail(int key, int userKey);
@@ -34,17 +35,19 @@ public:
 	void SendBuyItemFail(int key, int userKey);
 	void SendUseCouponOK(int key, int itemCode, int userKey, long long inventoryFlag);
 	void SendUseCouponFail(int key, int userKey);
+	void SendRanking(int key, vector<rankInfo>& ranking, int userKey);
 
 	void ProcessPacket_Login(int key, unsigned char* buf);
 	void ProcessPacket_Logout(unsigned char* buf);
 	void ProcessPacket_SignUp(int key, unsigned char* buf);
 	void ProcessPacket_UpdateGrade(int key, unsigned char* buf);
-	void ProcessPacket_Inventory(int key, unsigned char* buf);
+	void ProcessPacket_RefreshInventory(int key, unsigned char* buf);
 	void ProcessPacket_ChangeDepartment(int key, unsigned char* buf);
 	void ProcessPacket_EquipItem(int key, unsigned char* buf);
 	void ProcessPacket_UnequipItem(int key, unsigned char* buf);
 	void ProcessPacket_BuyItem(int key, unsigned char* buf);
 	void ProcessPacket_UseCoupon(int key, unsigned char* buf);
+	void ProcessPacket_RefreshDepRank(int key, unsigned char* buf);
 
 	int SetUIDForTest();
 

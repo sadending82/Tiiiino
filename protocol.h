@@ -9,7 +9,7 @@ constexpr int BUF_SIZE = 200;
 
 constexpr int MAX_USER = 300;
 constexpr int MAX_OBJECT = 3000;
-constexpr int MAX_NAME_SIZE = 36 + 1;	//닉네임, 중복검사 X
+constexpr int MAX_NAME_SIZE = 20;	//닉네임, 중복검사 X
 constexpr int MAX_ROOM_USER = 8;
 constexpr int MAX_VERSION_SIZE = 10;
 
@@ -37,9 +37,8 @@ constexpr int RANK_COUNT = 10;
 
 struct rankInfo
 {
-	char	department;
-	int		point;
-	int		rank;
+	char	department	= 0;
+	int		point		= 0;
 };
 
 enum class eDepartment : char
@@ -315,9 +314,7 @@ struct LC_LOGIN_OK_PACKET : public PACKET {
 	int RoomID;
 	long long equippedItems;
 	long long inventoryFlag;
-	char departmentcode[RANK_COUNT];
-	char departmentpoint[RANK_COUNT];
-
+	rankInfo ranking[10];
 };
 
 struct 	LC_LOGIN_FAIL_PACKET :public PACKET {
@@ -364,8 +361,7 @@ struct LC_REFRESH_INVENTORY_PACKET : public PACKET {
 };
 
 struct LC_REFRESH_DEP_RANK_PACKET : public PACKET {
-	char departmentcode[RANK_COUNT];
-	char departmentpoint[RANK_COUNT];
+	rankInfo ranking[10];
 };
 //--------------------------
 struct EVENT {
