@@ -6,6 +6,8 @@
 #include "Actor/Controller/TinoController.h"
 #include "Actor/Character/CharacterAnimInstance.h"
 #include "Actor/Obstacles/BaseObstacle.h"
+#include "Data/ItemData.h"
+#include "MenuUI/StoreUIWidget.h"
 
 #include "Global.h"
 
@@ -642,7 +644,8 @@ void Network::l_process_packet(unsigned char* p)
 		CLog::Print("LC_LOGIN_OK IS CALLING");
 		//아이템 장착 사용법 
 		long long TestItemFlag = 0b0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'1001;
-		mMyCharacter->SetInventoryFromEquippedCode(packet->equippedItems);
+		mMyCharacter->SetInventoryFromInventoryFlag(packet->inventoryFlag);
+
 		if ((packet->equippedItems & TestItemFlag))
 		{
 			//장착중 (장착이 아니라면 and 연산에서 다 false가 나와 0이라 if문 안들어옴)
@@ -652,6 +655,7 @@ void Network::l_process_packet(unsigned char* p)
 
 		//학점과 포인트 표기
 		mMyCharacter->MakeAndShowLoginOK(packet->grade, packet->point);
+		mMyCharacter->MakeAndShowLobbyRankSystem(packet->ranking);
 		break;
 	}
 	case LC_LOGIN_FAIL:
@@ -707,7 +711,12 @@ void Network::l_process_packet(unsigned char* p)
 	}
 	case LC_BUYITEM_OK: {
 		LC_BUYITEM_OK_PACKET* packet = reinterpret_cast<LC_BUYITEM_OK_PACKET*>(p);
-
+		
+		mMyCharacter->AddItemToInventory(mMyCharacter->GetItemDataFromItemCode(3));
+		mMyCharacter->GetController<ATinoController>()->StoreUIInstance->StoreDialogInstance->RemoveFromParent();
+		mMyCharacter->MakeAndShowChangePoint(packet->pointAfterPurchase);
+		mMyCharacter->SetInventoryFromInventoryFlag(packet->inventoryFlag);
+		mMyCharacter->SetPoint(packet->pointAfterPurchase);
 		break;
 	}
 	case LC_BUYITEM_FAIL: {

@@ -362,6 +362,28 @@ void ATinoCharacter::MakeAndShowDialogInGame()
 	DialogWidget->RenderDisconnectNetworkWindow();
 }
 
+void ATinoCharacter::MakeAndShowLobbyRankSystem(rankInfo rank[])
+{
+	auto TinoController = GetController<ATinoController>();
+	if (!!TinoController)
+	{
+		TinoController->ChangeMenuWidget(TinoController->LobbyUIInstance);
+		auto LobbyUI = TinoController->LobbyUIInstance;
+		LobbyUI->GetRankData(rank);
+	}
+}
+
+void ATinoCharacter::MakeAndShowChangePoint(int AfterPoint)
+{
+	auto TinoController = GetController<ATinoController>();
+
+	if (!!TinoController)
+	{
+		auto StoreUI = TinoController->StoreUIInstance;
+		StoreUI->ChangePoint(AfterPoint);
+	}
+}
+
 void ATinoCharacter::SetNetworkLocation(const FVector& Location)
 {
 	PreviousLocation = Location;
@@ -395,7 +417,7 @@ FItemData ATinoCharacter::GetItemDataFromItemCode(const int64& ItemCode)
 	return ItemData;
 }
 
-void ATinoCharacter::SetInventoryFromEquippedCode(const long long& EquippedItems)
+void ATinoCharacter::SetInventoryFromInventoryFlag(const long long& EquippedItems)
 {
 	int64 IC = StaticCast<int64>(EquippedItems);
 

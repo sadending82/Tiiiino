@@ -1,4 +1,5 @@
 #pragma once
+
 #include "GameDataManager.h"
 #include <iostream>
 #include <fstream>

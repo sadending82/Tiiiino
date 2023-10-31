@@ -132,6 +132,10 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 		SendInventory(cID);
 		break;
 	}
+	case CL_REFRESH_DEP_RANK: {
+		SendRefreshRankingRequest(cID);
+		break;
+	}
 	default:
 	{
 		break;
@@ -217,13 +221,6 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		SendSignUpFail(p->userKey);
 		break;
 	}
-	case DL_INVENTORY:
-	{
-		DL_INVENTORY_PACKET* p = reinterpret_cast<DL_INVENTORY_PACKET*>(spacket);
-		// 일단 클라의 인벤토리 새로고침 요청을 로비에서 저장된 데이터로 보내게 해서 안씀
-		// 나중에 수정할지 말지 정해야함
-		break;
-	}
 	case DL_BUYITEM_OK:
 	{
 		DL_BUYITEM_OK_PACKET* p = reinterpret_cast<DL_BUYITEM_OK_PACKET*>(spacket);
@@ -238,6 +235,19 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		SendBuyFail(p->userKey);
 		break;
 	}
+	case DL_REFRESH_INVENTORY:
+	{
+		DL_REFRESH_INVENTORY_PACKET* p = reinterpret_cast<DL_REFRESH_INVENTORY_PACKET*>(spacket);
+		// 일단 클라의 인벤토리 새로고침 요청을 로비에서 저장된 데이터로 보내게 해서 안씀
+		// 나중에 수정할지 말지 정해야함
+		break;
+	}
+	case DL_REFRESH_DEP_RANK: {
+		DL_REFRESH_DEP_RANK_PACKET* p = reinterpret_cast<DL_REFRESH_DEP_RANK_PACKET*>(spacket);
+		SendRankingToClient(p->userKey, p->ranking);
+		break;
+	}
+	
 	default:
 	{
 		break;
@@ -975,7 +985,7 @@ void Server::SendBuyItem(int cID, int itemCode)
 	LD_BUY_ITEM_PACKET packet;
 
 	packet.size = sizeof(LD_EQUIP_ITEM_PACKET);
-	packet.type = LD_EQUIP_ITEM;
+	packet.type = LD_BUY_ITEM;
 	packet.uid = mClients[cID].mUID;
 	packet.itemCode = itemCode;
 	packet.price = pGameDataManager->GetShopProductInfo(itemCode).price;
@@ -984,6 +994,15 @@ void Server::SendBuyItem(int cID, int itemCode)
 	mServers[0].DoSend(&packet);
 }
 
+void Server::SendRefreshRankingRequest(int cID)
+{
+	LD_REFRESH_DEP_RANK_PACKET packet;
+	packet.size = sizeof(LD_REFRESH_DEP_RANK_PACKET);
+	packet.type = LD_REFRESH_DEP_RANK;
+	packet.userKey = cID;
+
+	mServers[0].DoSend(&packet);
+}
 
 void Server::SendLoginOK(int cID)
 {
@@ -1113,6 +1132,17 @@ void Server::SendInventory(int key)
 	packet.size = sizeof(packet);
 	packet.type = LC_REFRESH_INVENTORY;
 	packet.inventoryFlag = mClients[key].mInventory;
+	mClients[key].DoSend(&packet);
+}
+
+void Server::SendRankingToClient(int key, rankInfo* ranking)
+{
+	LC_REFRESH_DEP_RANK_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = LC_REFRESH_DEP_RANK;
+	for (int i = 0; i < 10; ++i) {
+		packet.ranking[i] = ranking[i];
+	}
 	mClients[key].DoSend(&packet);
 }
 
