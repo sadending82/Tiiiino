@@ -18,6 +18,7 @@ class CLIENT_API ULobbyUIWidget : public UUserWidget
 	GENERATED_BODY()
 public:
 	virtual void NativePreConstruct() override;
+	virtual void NativeConstruct() override;
 	virtual void NativeDestruct() override;
 public:
 	// 게임 준비
@@ -33,7 +34,8 @@ public:
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void TryGameReadyCancel();
 
-	
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void UpdatePoint();
 
 public:
 	// 로그인 화면으로 돌아가기

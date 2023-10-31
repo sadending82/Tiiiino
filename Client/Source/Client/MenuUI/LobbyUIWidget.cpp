@@ -7,6 +7,7 @@
 #include "MenuUI/InventoryUIWidget.h"
 #include "Components/TextBlock.h"
 #include "Actor/Controller/TinoController.h"
+#include "Actor/Character/TinoCharacter.h"
 #include "Network/Network.h"
 #include "Global.h"
 
@@ -14,6 +15,12 @@ void ULobbyUIWidget::NativePreConstruct()
 {
 	Super::NativePreConstruct();
 	//Grade = 0.f;
+}
+
+void ULobbyUIWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+	
 }
 
 void ULobbyUIWidget::NativeDestruct()
@@ -41,6 +48,19 @@ void ULobbyUIWidget::TryGameReadyCancel()
 	send_matchout_packet(Network::GetNetwork()->l_socket);
 	// GameStart Button Onclicked
 
+}
+
+void ULobbyUIWidget::UpdatePoint()
+{
+	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (!!TinoController)
+	{
+		auto TinoCharacter = TinoController->GetPawn<ATinoCharacter>();
+		if (!!TinoCharacter)
+		{
+			Point = TinoCharacter->GetPoint();
+		}
+	}
 }
 
 void ULobbyUIWidget::TryBack()

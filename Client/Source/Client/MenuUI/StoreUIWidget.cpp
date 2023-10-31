@@ -34,6 +34,8 @@ void UStoreUIWidget::TryBack()
 {
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 
+	TinoController->LobbyUIInstance->UpdatePoint();
+	
 	TinoController->ChangeMenuWidget(TinoController->LobbyUIInstance);
 }
 
