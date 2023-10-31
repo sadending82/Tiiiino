@@ -74,13 +74,16 @@ bool GameDataManager::LoadShopData()
 			item.price = stoi(pProduct->FirstChildElement("price")->GetText());
 			item.cutline = stoi(pProduct->FirstChildElement("cutline")->GetText());
 			item.assetName = pProduct->FirstChildElement("assetName")->GetText();
-			item.text = pProduct->FirstChildElement("text")->GetText();
 			const char* uft8Name = pProduct->FirstChildElement("name")->GetText();
+			const char* uft8text = pProduct->FirstChildElement("text")->GetText();
 			wchar_t unicodeName[256] = { 0, };
+			wchar_t unicodeText[256] = { 0, };
 			int nLen = MultiByteToWideChar(CP_UTF8, 0, uft8Name, strlen(uft8Name), NULL, NULL);
 			MultiByteToWideChar(CP_UTF8, 0, uft8Name, strlen(uft8Name), unicodeName, nLen);
-			item.name = wstring(unicodeName);
-
+			nLen = MultiByteToWideChar(CP_UTF8, 0, uft8text, strlen(uft8text), NULL, NULL);
+			MultiByteToWideChar(CP_UTF8, 0, uft8text, strlen(uft8text), unicodeText, nLen);
+			item.name = wstring(unicodeName).c_str();
+			item.text = wstring(unicodeText).c_str();
 			ShopProductsList[item.itemCode] = item;
 		}
 		UE_LOG(LogTemp, Log, TEXT("Shop Data Load Succeed"));
@@ -109,15 +112,18 @@ bool GameDataManager::LoadItemData()
 
 			Item item;
 			item.itemCode = stoi(pItem->FirstChildElement("code")->GetText());
-			item.name = pItem->FirstChildElement("name")->GetText();
 			item.price = stoi(pItem->FirstChildElement("price")->GetText());
 			item.assetName = pItem->FirstChildElement("assetName")->GetText(); 
-			item.text = pItem->FirstChildElement("text")->GetText();
 			const char* uft8Name = pItem->FirstChildElement("name")->GetText();
+			const char* uft8text = pItem->FirstChildElement("text")->GetText();
 			wchar_t unicodeName[256] = { 0, };
+			wchar_t unicodeText[256] = { 0, };
 			int nLen = MultiByteToWideChar(CP_UTF8, 0, uft8Name, strlen(uft8Name), NULL, NULL);
 			MultiByteToWideChar(CP_UTF8, 0, uft8Name, strlen(uft8Name), unicodeName, nLen);
-			item.name = wstring(unicodeName);
+			nLen = MultiByteToWideChar(CP_UTF8, 0, uft8text, strlen(uft8text), NULL, NULL);
+			MultiByteToWideChar(CP_UTF8, 0, uft8text, strlen(uft8text), unicodeText, nLen);
+			item.name = wstring(unicodeName).c_str();
+			item.text = wstring(unicodeText).c_str();
 			ItemList[item.itemCode] = item;
 		}
 		UE_LOG(LogTemp, Log, TEXT("Item Data Load Succeed"));
