@@ -154,7 +154,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	FItemData GetItemDataFromItemCode(const int64& ItemCode);
-		void SetInventoryFromEquippedCode(const long long& EquippedItems);
+	void SetInventoryFromEquippedCode(const long long& EquippedItems);
+
+	UFUNCTION(BlueprintCallable, Category = "shop")
+	void GetShopData(UPARAM(REF) TArray<int>& iOut);
 
 
 	UFUNCTION(BlueprintCallable)

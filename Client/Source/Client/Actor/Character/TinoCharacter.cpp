@@ -434,6 +434,13 @@ void ATinoCharacter::SetInventoryFromEquippedCode(const long long& EquippedItems
 
 }
 
+void ATinoCharacter::GetShopData(UPARAM(REF) TArray<int>& iOut)
+{
+
+	auto GameMode = Cast<AClientGameMode>(GetWorld()->GetAuthGameMode());
+	GameMode->GetShopProductTable(iOut);
+}
+
 void ATinoCharacter::SetDepartmentClothes(int department)
 {
 	EDepartment EnumValue = static_cast<EDepartment>(department);

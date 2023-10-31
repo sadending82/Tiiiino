@@ -1129,11 +1129,6 @@ void Server::LoadGameData()
 		DEBUGMSGNOPARAM("Load Shop Data Failed\n");
 		return;
 	}
-	result = pGameDataManager->LoadCouponData();
-	if (result == false) {
-		DEBUGMSGNOPARAM("Load Coupon Data Failed\n");
-		return;
-	}
 
 	if (result == true) {
 		DEBUGMSGNOPARAM("Load Game Data Succeed\n");

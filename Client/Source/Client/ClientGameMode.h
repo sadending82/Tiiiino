@@ -21,18 +21,25 @@ public:
 public:
 
 	FItemData* GetItemData(const int64& ItemCode) const;
+	FItemData* GetShopProductData(const int64& ItemCode) const;
 
 	void SetItemDataTable();
+	void SetShopDataTable();
+
+	void GetShopProductTable(TArray<int>& f_out);
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Data");
-		 UDataTable* ItemData;
+	UPROPERTY(EditDefaultsOnly, Category = "Data")
+	UDataTable* ItemData;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Data")
+	UDataTable* ShopData;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Class")
-		TSubclassOf<class ASoundManager> SoundMangerClass;
+	TSubclassOf<class ASoundManager> SoundMangerClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "LevelName")
 	TMap<FString, EBGMType> ConvertBGMTypeMap;
