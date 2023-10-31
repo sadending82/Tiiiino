@@ -5,171 +5,205 @@
       <code>0</code>
       <name>[등] 천사날개</name>
       <price>150</price>
+      <assetName>AngelWing_white</assetName>
     </item>
     <item>
       <code>1</code>
       <name>[등] 태엽</name>
       <price>150</price>
+      <assetName>ClockWork_black</assetName>
     </item>
     <item>
       <code>2</code>
       <name>[등] 금빛 태엽</name>
       <price>300</price>
+      <assetName>ClockWork_gold</assetName>
     </item>
     <item>
       <code>3</code>
       <name>[등] 은빛 태엽</name>
       <price>300</price>
+      <assetName>ClockWork_silver</assetName>
     </item>
     <item>
       <code>4</code>
       <name>[등] 삽</name>
       <price>900</price>
+      <assetName>Shovel</assetName>
     </item>
     <item>
       <code>5</code>
       <name>[등] 딥 퍼플 윙</name>
       <price>3600</price>
+      <assetName>BigWing_purple</assetName>
     </item>
     <item>
       <code>6</code>
       <name>[등] 퓨어 화이트 윙</name>
       <price>18000</price>
+      <assetName>BigWing_white</assetName>
     </item>    
      <item>
       <code>16</code>
       <name>[손] 다크 브래슬릿</name>
       <price>150</price>
+      <assetName>Bracelet_black</assetName>
     </item>
     <item>
       <code>17</code>
       <name>[손] 레드 브래슬릿</name>
       <price>150</price>
+      <assetName>Bracelet_red</assetName>
     </item>
     <item>
       <code>18</code>
       <name>[손] 그린 브래슬릿</name>
       <price>150</price>
+      <assetName>Bracelet_green</assetName>
     </item>
     <item>
       <code>19</code>
       <name>[손] 내 손에 메론바</name>
       <price>900</price>
+      <assetName>MeronBar_forHand</assetName>
     </item>
     <item>
       <code>20</code>
       <name>[손] 야구방망이</name>
       <price>900</price>
+      <assetName>Bat_origin</assetName>
     </item>
     <item>
       <code>32</code>
       <name>[얼굴] 블랙 선글라스</name>
       <price>150</price>
+      <assetName>Sunglass</assetName>
     </item>
     <item>
       <code>33</code>
       <name>[얼굴] 블루 선글라스</name>
       <price>150</price>
+      <assetName>Sunglass_blue</assetName>
     </item>
     <item>
       <code>34</code>
       <name>[얼굴] 핑크 선글라스</name>
       <price>150</price>
+      <assetName>Sunglass_pink</assetName>
     </item>
     <item>
       <code>35</code>
       <name>[얼굴] 동글이 안경</name>
       <price>150</price>
+      <assetName>Glasses_black</assetName>
     </item>
     <item>
       <code>36</code>
       <name>[얼굴] 오리주둥이</name>
       <price>300</price>
+      <assetName>DuckMouse</assetName>
     </item>
     <item>
       <code>37</code>
       <name>[얼굴] 그림자 반가면</name>
       <price>300</price>
+      <assetName>HalfMask_black</assetName>
     </item>
     <item>
       <code>38</code>
       <name>[얼굴] 백색 반가면</name>
       <price>300</price>
+      <assetName>HalfMask_white</assetName>
     </item>
     <item>
       <code>39</code>
       <name>[얼굴] 내 입에 메론바</name>
       <price>900</price>
+      <assetName>MeronBar_forFace</assetName>
     </item>
     <item>
       <code>40</code>
       <name>[얼굴] 파이프</name>
       <price>900</price>
+      <assetName>Pipe</assetName>
     </item>
     <item>
       <code>48</code>
       <name>[머리] 1st VIP 크라운</name>
       <price>0</price>
+      <assetName>CrownForVIP</assetName>
     </item>
     <item>
       <code>49</code>
       <name>[머리] 새싹</name>
       <price>10</price>
+      <assetName>Sprout_green</assetName>
     </item>
     <item>
       <code>50</code>
       <name>[머리] 천사고리</name>
       <price>150</price>
+      <assetName>AngelRing_yellow</assetName>
     </item>
     <item>
       <code>51</code>
       <name>[머리] 악마뿔</name>
       <price>150</price>
+      <assetName>DevilHorn_red</assetName>
     </item>
     <item>
       <code>52</code>
       <name>[머리] 계란초밥</name>
       <price>150</price>
+      <assetName>EggSushi</assetName>
     </item>
     <item>
       <code>53</code>
       <name>[머리] 군함초밥</name>
       <price>150</price>
+      <assetName>WarshipSushi</assetName>
     </item>
     <item>
       <code>54</code>
       <name>[머리] 새우초밥</name>
       <price>150</price>
+      <assetName>ShrimpSushi</assetName>
     </item>
     <item>
       <code>55</code>
       <name>[머리] 브라운 고양이 귀</name>
       <price>300</price>
+      <assetName>CatEar_brown</assetName>
     </item>
     <item>
       <code>56</code>
       <name>[머리] 핑크 고양이 귀</name>
       <price>300</price>
+      <assetName>CatEar_pink</assetName>
     </item>
     <item>
       <code>57</code>
       <name>[머리] 방울 고양이 귀</name>
       <price>3600</price>
+      <assetName>CatEarWithBell</assetName>
     </item>
     <item>
       <code>58</code>
       <name>[머리] 토끼 귀</name>
       <price>9000</price>
+      <assetName>RabbitEar_white</assetName>
     </item>
     <item>
       <code>59</code>
       <name>[머리] 블랙 토끼 귀</name>
       <price>1200</price>
+      <assetName>RabbitEar_black</assetName>
     </item>
     <item>
       <code>60</code>
       <name>[머리] 왕관</name>
       <price>900</price>
+      <assetName>SimpleCrown</assetName>
     </item>
   </itemlist>
 </root>
