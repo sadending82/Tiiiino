@@ -224,6 +224,10 @@ private:
 		float Grade;
 	UPROPERTY(VisibleDefaultsOnly, Category = "Stat")
 		float Point;
+	//UPROPERTY(VisibleDefaultsOnly, Category = "Stat")
+		//long long ItemInInventory = 0b0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000;
+
+
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation | Dive")
 		float MaxDiveTime;
@@ -299,5 +303,6 @@ private:
 	FTimerHandle DiveTimer;
 	FTimerHandle GrabTimer;
 	FTimerHandle GrabCoolTimer;
+		
 
 };

@@ -86,6 +86,41 @@ void UStoreUIWidget::LimitGrade()
 	ShowPurchaseWarning(false);
 }
 
+void UStoreUIWidget::ShowPurchaseWarning(int64 itemcode)
+{
+	auto itemdata = Network::GetNetwork()->mGameDataManager->GetShopProductsList();
+	int price = 0;
+	int grade = 0;
+	for (auto& data : itemdata)
+	{
+		if (itemcode == data.second.itemCode)
+		{
+			price = data.second.price;
+			grade = data.second.cutline;
+			break;
+		}
+	}
+	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (!!TinoController)
+	{
+		auto TinoCharacter = TinoController->GetPawn<ATinoCharacter>();
+		if (!!TinoCharacter)
+		{
+			if (TinoCharacter->GetPoint() < price)
+			{
+				warning = EPurchaseState::EPS_AlreadyPurchase;
+				return;
+			}
+			if (TinoCharacter->GetGrade() < grade)
+			{
+				warning = EPurchaseState::EPS_LimitGrade;
+				return;
+			}
+		}
+	}
+	warning = EPurchaseState::EPS_Purchase;
+}
+
 void UStoreUIWidget::MoveLeft()
 {
 	// 좌측 이동버튼 클릭

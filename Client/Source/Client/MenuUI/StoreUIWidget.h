@@ -10,6 +10,15 @@
  * 
  */
 
+UENUM(BlueprintType)
+enum class EPurchaseState : uint8
+{
+	EPS_Purchase UMETA(DisplayName = "Purchase"),
+	EPS_AlreadyPurchase UMETA(DisplayName = "Already"),
+	EPS_LimitGrade UMETA(DisplayName = "LimitGrade"),
+	
+};
+
 UCLASS()
 class CLIENT_API UStoreUIWidget : public UUserWidget
 {
@@ -42,8 +51,8 @@ public:
 	void LimitGrade();
 
 	// 아이템 구매 불가 사유 Dialog
-	UFUNCTION(BluePrintImplementableEvent, Category = "UMG_Game")
-	void ShowPurchaseWarning(bool check);
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void ShowPurchaseWarning(int64 itemcode);
 
 	UFUNCTION(BluePrintImplementableEvent, Category = "UMG_Game")
 	void ChangePoint();
@@ -74,5 +83,8 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
 	int64 ClickItemCode;
+
+	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
+	EPurchaseState warning;
 
 };
