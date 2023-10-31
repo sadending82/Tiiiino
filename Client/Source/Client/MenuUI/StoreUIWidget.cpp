@@ -76,6 +76,11 @@ bool UStoreUIWidget::QualifyingPurchase(int64 itemcode)
 			{
 				return false;
 			}
+			for (auto& p : Network::GetNetwork()->mMyCharacter->GetInventoryContents())
+			{
+				if (p.ItemCode == itemcode)
+					return false;
+			}
 		}
 	}
 
