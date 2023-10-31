@@ -32,19 +32,19 @@ public:
 	void UIAlertMessage();
 
 
-	UFUNCTION()
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void TryNewAccounts();
 
 	UPROPERTY(meta = (BindWidget))
 	class UEditableTextBox* LoginIDTextBox;
 
-	UFUNCTION()
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void InputLoginID(const FText& Text);
 
 	UPROPERTY(meta = (BindWidget))
 	class UEditableTextBox* LoginPasswordTextBox;
 
-	UFUNCTION()
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void InputLoginPassword(const FText& Text);
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
