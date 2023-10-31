@@ -39,7 +39,7 @@ public:
 	void SendGameResult(int roomID, int key);
 	void SendUpdateEquipmentFlag(int cID, long long equipmentFlag);
 	void SendBuyItem(int cID, int itemCode);
-
+	void SendRefreshRankingRequest(int cID);
 
 	void SendLoginOK(int cID);
 
@@ -51,6 +51,7 @@ public:
 	void SendBuyOK(int key, int itemCode);
 	void SendBuyFail(int key);
 	void SendInventory(int key);
+	void SendRankingToClient(int key, rankInfo* ranking);
 
 	void LoadGameData();
 public:

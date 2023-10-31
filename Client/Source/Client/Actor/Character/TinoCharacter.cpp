@@ -362,14 +362,14 @@ void ATinoCharacter::MakeAndShowDialogInGame()
 	DialogWidget->RenderDisconnectNetworkWindow();
 }
 
-void ATinoCharacter::MakeAndShowLobbyRankSystem(char DepartmentName[], char DepartmentPoint[])
+void ATinoCharacter::MakeAndShowLobbyRankSystem(rankInfo rank[])
 {
 	auto TinoController = GetController<ATinoController>();
 	if (!!TinoController)
 	{
 		TinoController->ChangeMenuWidget(TinoController->LobbyUIInstance);
 		auto LobbyUI = TinoController->LobbyUIInstance;
-		LobbyUI->GetRankData(DepartmentName, DepartmentPoint);
+		LobbyUI->GetRankData(rank);
 	}
 }
 
