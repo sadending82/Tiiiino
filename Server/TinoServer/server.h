@@ -22,6 +22,7 @@ public:
 	void PlayerMatchIn(int cID);
 	void PlayerMatchOut(int cID);
 	void RoomReset(int roomID);
+	void BuyItem(int cID, int itemCode);
 
 	void EquipItem(int cID, int itemCode);
 	void UnequipItem(int cID, int itemCode);
@@ -36,8 +37,8 @@ public:
 	void SendLogin(int cID, char* id, char* pass, char* version);
 	void SendSignUp(int cID, char* id, char* pass, char depart);
 	void SendGameResult(int roomID, int key);
-	void SendUpdateEquipmentFlag(int cID, int uid, long long equipmentFlag);
-	void SendBuyItem(int cID, int uid, int itemCode);
+	void SendUpdateEquipmentFlag(int cID, long long equipmentFlag);
+	void SendBuyItem(int cID, int itemCode);
 
 
 	void SendLoginOK(int cID);
@@ -47,7 +48,7 @@ public:
 	void SendSignUpOK(int key);
 	void SendSignUpFail(int key);
 	void SendMatchResponse(int roomID);
-	void SendBuyOK(int key);
+	void SendBuyOK(int key, int itemCode);
 	void SendBuyFail(int key);
 	void SendInventory(int key);
 

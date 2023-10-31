@@ -190,6 +190,7 @@ struct DL_INVENTORY_PACKET :public SPACKET {
 
 struct DL_BUYITEM_OK_PACKET :public SPACKET {
 	int		itemCode;
+	int		pointAfterPurchase;
 	int		userKey;
 };
 

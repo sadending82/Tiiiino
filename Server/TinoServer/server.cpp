@@ -110,7 +110,7 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 		CL_EQUIP_ITEM_PACKET* p = reinterpret_cast<CL_EQUIP_ITEM_PACKET*>(cpacket);
 
 		EquipItem(cID, p->itemCode);
-		SendUpdateEquipmentFlag(cID, mClients[cID].mUID, mClients[cID].mEquippedItems);
+		SendUpdateEquipmentFlag(cID, mClients[cID].mEquippedItems);
 		break;
 	}
 	case CL_UNEQUIP_ITEM:
@@ -118,13 +118,13 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 		CL_UNEQUIP_ITEM_PACKET* p = reinterpret_cast<CL_UNEQUIP_ITEM_PACKET*>(cpacket);
 
 		UnequipItem(cID, p->itemCode);
-		SendUpdateEquipmentFlag(cID, mClients[cID].mUID, mClients[cID].mEquippedItems);
+		SendUpdateEquipmentFlag(cID, mClients[cID].mEquippedItems);
 		break;
 	}
 	case CL_BUY_ITEM:
 	{
 		CL_BUY_ITEM_PACKET* p = reinterpret_cast<CL_BUY_ITEM_PACKET*>(cpacket);
-		SendBuyItem(cID, mClients[cID].mUID, p->itemCode);
+		BuyItem(cID, p->itemCode);
 		break;
 	}
 	case CL_REFRESH_INVENTORY:
@@ -226,8 +226,9 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 	case DL_BUYITEM_OK:
 	{
 		DL_BUYITEM_OK_PACKET* p = reinterpret_cast<DL_BUYITEM_OK_PACKET*>(spacket);
+		mClients[p->userKey].mPoint = p->pointAfterPurchase;
 		AddItemToInventory(p->userKey, p->itemCode);
-		SendBuyOK(p->userKey);
+		SendBuyOK(p->userKey, p->itemCode);
 		break;
 	}
 	case DL_BUYITEM_FAIL:
@@ -747,6 +748,17 @@ void Server::RoomReset(int roomID)
 	mRooms[roomID].mStateLock.unlock();
 }
 
+void Server::BuyItem(int cID, int itemCode)
+{
+	if (mClients[cID].mPoint - pGameDataManager->GetShopProductInfo(itemCode).price < 0) {
+		SendBuyFail(cID);
+		return;
+	}
+	else {
+		SendBuyItem(cID, itemCode);
+	}
+}
+
 void Server::EquipItem(int cID, int itemCode)
 {
 	long long initBit;
@@ -944,26 +956,26 @@ void Server::SendGameResult(int roomID, int key)
 	mServers[0].DoSend(&packet);
 }
 
-void Server::SendUpdateEquipmentFlag(int cID, int uid, long long equipmentFlag)
+void Server::SendUpdateEquipmentFlag(int cID, long long equipmentFlag)
 {
 	LD_EQUIP_ITEM_PACKET packet;
 
 	packet.size = sizeof(LD_EQUIP_ITEM_PACKET);
 	packet.type = LD_EQUIP_ITEM;
-	packet.uid = uid;
+	packet.uid = mClients[cID].mUID;
 	packet.equipmentFlag = equipmentFlag;
 	packet.userKey = cID;
 
 	mServers[0].DoSend(&packet);
 }
 
-void Server::SendBuyItem(int cID, int uid, int itemCode)
+void Server::SendBuyItem(int cID, int itemCode)
 {
 	LD_BUY_ITEM_PACKET packet;
 
 	packet.size = sizeof(LD_EQUIP_ITEM_PACKET);
 	packet.type = LD_EQUIP_ITEM;
-	packet.uid = uid;
+	packet.uid = mClients[cID].mUID;
 	packet.itemCode = itemCode;
 	packet.price = pGameDataManager->GetShopProductInfo(itemCode).price;
 	packet.userKey = cID;
@@ -1076,11 +1088,13 @@ void Server::SendMatchResponse(int roomID)
 	}
 }
 
-void Server::SendBuyOK(int key)
+void Server::SendBuyOK(int key, int itemCode)
 {
 	LC_BUYITEM_OK_PACKET packet;
 	packet.size = sizeof(packet);
 	packet.type = LC_BUYITEM_OK;
+	packet.pointAfterPurchase = mClients[key].mPoint;
+	packet.itemCode = itemCode;
 	mClients[key].DoSend(&packet);
 }
 
