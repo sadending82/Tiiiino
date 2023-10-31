@@ -82,6 +82,7 @@ enum PacketType {
 	CL_UNEQUIP_ITEM,
 	CL_BUY_ITEM,
 	CL_REFRESH_INVENTORY,
+	CL_REFRESH_DEP_RANK,
 
 	// GameServer To Client
 	SC_LOGIN_OK,
@@ -112,7 +113,8 @@ enum PacketType {
 	LC_CONTROL,
 	LC_BUYITEM_OK,
 	LC_BUYITEM_FAIL,
-	LC_REFRESH_INVENTORY
+	LC_REFRESH_INVENTORY,
+	LC_REFRESH_DEP_RANK,
 };
 
 #pragma pack (push, 1)
@@ -214,6 +216,10 @@ struct CL_BUY_ITEM_PACKET : public PACKET {
 struct CL_REFRESH_INVENTORY_PACKET : public PACKET {
 
 };
+
+struct CL_REFRESH_DEP_RANK_PACKET : public PACKET {
+
+};
 //-----------------------------------
 
 struct SC_LOGIN_OK_PACKET : public PACKET {
@@ -305,6 +311,8 @@ struct LC_LOGIN_OK_PACKET : public PACKET {
 	int point;
 	int RoomID;
 	long long equippedItems;
+	char departmentcode[10];
+	char departmentpoint[10];
 };
 
 struct 	LC_LOGIN_FAIL_PACKET :public PACKET {
@@ -349,6 +357,10 @@ struct LC_REFRESH_INVENTORY_PACKET : public PACKET {
 	long long inventoryFlag;
 };
 
+struct LC_REFRESH_DEP_RANK_PACKET : public PACKET {
+	char departmentcode[10];
+	char departmentpoint[10];
+};
 //--------------------------
 struct EVENT {
 	unsigned char size;

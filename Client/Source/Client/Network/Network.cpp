@@ -89,6 +89,7 @@ bool Network::init()
 		{
 			mGameDataManager = new GameDataManager;
 			mGameDataManager->CheckDataFile();
+			LoadItemData();
 		}
 
 		WSAStartup(MAKEWORD(2, 2), &WSAData);
@@ -233,6 +234,45 @@ void send_control_packet(SOCKET& sock)
 			}
 		}
 	}
+}
+
+void send_buyitem_packet(SOCKET& sock, const int itemCode)
+{
+	CL_BUY_ITEM_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = CL_BUY_ITEM;
+	packet.itemCode = itemCode;
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+}
+
+void send_equip_packet(SOCKET& sock, const int itemCode)
+{
+	CL_EQUIP_ITEM_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = CL_EQUIP_ITEM;
+	packet.itemCode = itemCode;
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+}
+
+void send_unequip_packet(SOCKET& sock, const int itemCode)
+{
+	CL_UNEQUIP_ITEM_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = CL_UNEQUIP_ITEM;
+	packet.itemCode = itemCode;
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+}
+
+void send_refresh_dep_rank_packet(SOCKET& sock)
+{
+	CL_REFRESH_DEP_RANK_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = CL_REFRESH_DEP_RANK;
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
 }
 
 void send_movetogame_packet(SOCKET& sock, const int uID, const char* id, const int& roomID)
@@ -601,7 +641,8 @@ void Network::l_process_packet(unsigned char* p)
 		bIsConnectedLobby = true;
 		CLog::Print("LC_LOGIN_OK IS CALLING");
 		//아이템 장착 사용법 
-		long long TestItemFlag = 0b0000'0000'0000'0000'0000'0000'0000'0100'0000'0000'0000'0000'0000'0000'0000'0000;
+		long long TestItemFlag = 0b0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'1001;
+		mMyCharacter->SetInventoryFromEquippedCode(packet->equippedItems);
 		if ((packet->equippedItems & TestItemFlag))
 		{
 			//장착중 (장착이 아니라면 and 연산에서 다 false가 나와 0이라 if문 안들어옴)
@@ -662,6 +703,26 @@ void Network::l_process_packet(unsigned char* p)
 	}
 	case LC_CONTROL: {
 		//send_control_packet(l_socket);
+		break;
+	}
+	case LC_BUYITEM_OK: {
+		LC_BUYITEM_OK_PACKET* packet = reinterpret_cast<LC_BUYITEM_OK_PACKET*>(p);
+
+		break;
+	}
+	case LC_BUYITEM_FAIL: {
+		LC_BUYITEM_FAIL_PACKET* packet = reinterpret_cast<LC_BUYITEM_FAIL_PACKET*>(p);
+
+		break;
+	}
+	case LC_REFRESH_INVENTORY: {
+		LC_REFRESH_INVENTORY_PACKET* packet = reinterpret_cast<LC_REFRESH_INVENTORY_PACKET*>(p);
+
+		break;
+	}
+	case LC_REFRESH_DEP_RANK: {
+		LC_REFRESH_DEP_RANK_PACKET* packet = reinterpret_cast<LC_REFRESH_DEP_RANK_PACKET*>(p);
+
 		break;
 	}
 	default:

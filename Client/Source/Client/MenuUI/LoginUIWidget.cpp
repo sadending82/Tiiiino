@@ -13,6 +13,7 @@
 
 void ULoginUIWidget::NativePreConstruct()
 {
+	Super::NativePreConstruct();
 	LoginButton->OnClicked.AddDynamic(this, &ULoginUIWidget::TryLogin);
 	NewAccountsButton->OnClicked.AddDynamic(this, &ULoginUIWidget::TryNewAccounts);
 
@@ -22,6 +23,7 @@ void ULoginUIWidget::NativePreConstruct()
 
 void ULoginUIWidget::NativeDestruct()
 {
+	Super::NativeDestruct();
 }
 
 void ULoginUIWidget::TryLogin()
