@@ -314,6 +314,7 @@ struct LC_LOGIN_OK_PACKET : public PACKET {
 	int point;
 	int RoomID;
 	long long equippedItems;
+	long long inventoryFlag;
 	char departmentcode[RANK_COUNT];
 	char departmentpoint[RANK_COUNT];
 

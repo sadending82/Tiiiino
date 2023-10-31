@@ -713,6 +713,7 @@ void Network::l_process_packet(unsigned char* p)
 		
 		mMyCharacter->AddItemToInventory(mMyCharacter->GetItemDataFromItemCode(3));
 		mMyCharacter->GetController<ATinoController>()->StoreUIInstance->StoreDialogInstance->RemoveFromParent();
+		mMyCharacter->MakeAndShowChangePoint();
 		break;
 	}
 	case LC_BUYITEM_FAIL: {

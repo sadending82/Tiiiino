@@ -48,8 +48,6 @@ public:
 	UFUNCTION(BluePrintImplementableEvent, Category = "UMG_Game")
 	void ChangePoint();
 
-
-
 	// StoreDialog
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
 	TSubclassOf<class UStoreUIWidget> StoreDialogWidgetClass;

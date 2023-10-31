@@ -36,13 +36,9 @@ void UStoreUIWidget::TryBack()
 void UStoreUIWidget::PurchaseItem()
 {
 	// Buy버튼 클릭
-	int32 price = 100;
-	Point -= price;
-	ChangePoint();
 	send_buyitem_packet(Network::GetNetwork()->l_socket, ClickItemCode);
+	// 포인트 변화 적용
 
-	// Store BuyResult 창 띄움
-	// StoreBuyResultInstance->AddToViewport();
 }
 
 bool UStoreUIWidget::QualifyingPurchase()
@@ -82,6 +78,8 @@ void UStoreUIWidget::LimitGrade()
 void UStoreUIWidget::MoveLeft()
 {
 	// 좌측 이동버튼 클릭
+	
+	
 }
 
 void UStoreUIWidget::MoveRight()

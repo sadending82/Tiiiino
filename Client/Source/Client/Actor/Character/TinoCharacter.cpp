@@ -373,6 +373,17 @@ void ATinoCharacter::MakeAndShowLobbyRankSystem(char DepartmentName[], char Depa
 	}
 }
 
+void ATinoCharacter::MakeAndShowChangePoint()
+{
+	auto TinoController = GetController<ATinoController>();
+
+	if (!!TinoController)
+	{
+		auto StoreUI = TinoController->StoreUIInstance;
+		StoreUI->ChangePoint();
+	}
+}
+
 void ATinoCharacter::SetNetworkLocation(const FVector& Location)
 {
 	PreviousLocation = Location;
