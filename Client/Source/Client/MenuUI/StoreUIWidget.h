@@ -60,13 +60,13 @@ public:
 	// StoreDialog
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
 	TSubclassOf<class UStoreUIWidget> StoreDialogWidgetClass;
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
 	class UStoreUIWidget* StoreDialogInstance = nullptr;
 
 	// StoreBuyResult
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
 	TSubclassOf<class UStoreUIWidget> StoreBuyResultWidgetClass;
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
 	class UStoreUIWidget* StoreBuyResultInstance = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
