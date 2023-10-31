@@ -24,6 +24,7 @@ struct Item
 	int		price;
 	double  cutline = 0.0;
 	FString assetName;
+	FString text;
 };
 
 class GameDataManager
