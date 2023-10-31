@@ -43,6 +43,7 @@ enum SPacketType {
 	LD_EQUIP_ITEM,
 	LD_UNEQUIP_ITEM,
 	LD_BUY_ITEM,
+	LD_USE_COUPON,
 
 	// DBServer To LobbyServer
 	DL_LOGIN_OK,
@@ -53,6 +54,8 @@ enum SPacketType {
 	DL_INVENTORY,
 	DL_BUYITEM_OK,
 	DL_BUYITEM_FAIL,
+	DL_USE_COUPON_OK,
+	DL_USE_COUPON_FAIL,
 };
 
 
@@ -157,6 +160,12 @@ struct LD_BUY_ITEM_PACKET :public SPACKET {
 	int			userKey;
 };
 
+struct LD_USE_COUPON_PACKET :public SPACKET {
+	int		uid;
+	string	couponCode;
+	int		userKey;
+};
+
 struct DL_LOGIN_OK_PACKET :public SPACKET {
 	int		uid;
 	char	id[MAX_NAME_SIZE];
@@ -190,6 +199,7 @@ struct DL_INVENTORY_PACKET :public SPACKET {
 
 struct DL_BUYITEM_OK_PACKET :public SPACKET {
 	int		itemCode;
+	int		pointAfterPurchase;
 	int		userKey;
 };
 
@@ -197,5 +207,14 @@ struct DL_BUYITEM_FAIL_PACKET :public SPACKET {
 	int		userKey;
 };
 
+struct DL_USE_COUPON_OK_PACKET :public SPACKET {
+	int		  itemcode;
+	long long inventoryFlag;
+	int		  userKey;
+};
+
+struct DL_USE_COUPON_FAIL_PACKET :public SPACKET {
+	int		userKey;
+};
 
 #pragma pack (pop)

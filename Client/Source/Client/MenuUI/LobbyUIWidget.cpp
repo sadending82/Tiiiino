@@ -3,6 +3,8 @@
 
 #include "MenuUI/LobbyUIWidget.h"
 #include "MenuUI/LoginUIWidget.h"
+#include "MenuUI/StoreUIWidget.h"
+#include "MenuUI/InventoryUIWidget.h"
 #include "Actor/Controller/TinoController.h"
 #include "Network/Network.h"
 #include "Global.h"
@@ -45,3 +47,16 @@ void ULobbyUIWidget::TryBack()
 	send_logout_packet(Network::GetNetwork()->l_socket);
 	TinoController->ChangeMenuWidget(TinoController->LoginUIInstance);
 }
+
+void ULobbyUIWidget::TryEnterStore()
+{
+	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	TinoController->ChangeMenuWidget(TinoController->StoreUIInstance);
+}
+
+void ULobbyUIWidget::TryEnterInventory()
+{
+	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	TinoController->ChangeMenuWidget(TinoController->InventoryUIInstance);
+}
+

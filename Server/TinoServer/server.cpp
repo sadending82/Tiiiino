@@ -110,7 +110,7 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 		CL_EQUIP_ITEM_PACKET* p = reinterpret_cast<CL_EQUIP_ITEM_PACKET*>(cpacket);
 
 		EquipItem(cID, p->itemCode);
-		SendUpdateEquipmentFlag(cID, mClients[cID].mUID, mClients[cID].mEquippedItems);
+		SendUpdateEquipmentFlag(cID, mClients[cID].mEquippedItems);
 		break;
 	}
 	case CL_UNEQUIP_ITEM:
@@ -118,13 +118,13 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 		CL_UNEQUIP_ITEM_PACKET* p = reinterpret_cast<CL_UNEQUIP_ITEM_PACKET*>(cpacket);
 
 		UnequipItem(cID, p->itemCode);
-		SendUpdateEquipmentFlag(cID, mClients[cID].mUID, mClients[cID].mEquippedItems);
+		SendUpdateEquipmentFlag(cID, mClients[cID].mEquippedItems);
 		break;
 	}
 	case CL_BUY_ITEM:
 	{
 		CL_BUY_ITEM_PACKET* p = reinterpret_cast<CL_BUY_ITEM_PACKET*>(cpacket);
-		SendBuyItem(cID, mClients[cID].mUID, p->itemCode);
+		BuyItem(cID, p->itemCode);
 		break;
 	}
 	case CL_REFRESH_INVENTORY:
@@ -184,6 +184,7 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		mClients[p->userKey].mUID = p->uid;
 		mClients[p->userKey].mState = eSessionState::ST_LOBBY;
 		mClients[p->userKey].mEquippedItems = p->equipmentflag;
+		mClients[p->userKey].mInventory = p->inventoryflag;
 		mClients[p->userKey].mStateLock.unlock();
 
 		SendLoginOK(p->userKey);
@@ -226,8 +227,9 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 	case DL_BUYITEM_OK:
 	{
 		DL_BUYITEM_OK_PACKET* p = reinterpret_cast<DL_BUYITEM_OK_PACKET*>(spacket);
+		mClients[p->userKey].mPoint = p->pointAfterPurchase;
 		AddItemToInventory(p->userKey, p->itemCode);
-		SendBuyOK(p->userKey);
+		SendBuyOK(p->userKey, p->itemCode);
 		break;
 	}
 	case DL_BUYITEM_FAIL:
@@ -747,6 +749,17 @@ void Server::RoomReset(int roomID)
 	mRooms[roomID].mStateLock.unlock();
 }
 
+void Server::BuyItem(int cID, int itemCode)
+{
+	if (mClients[cID].mPoint - pGameDataManager->GetShopProductInfo(itemCode).price < 0) {
+		SendBuyFail(cID);
+		return;
+	}
+	else {
+		SendBuyItem(cID, itemCode);
+	}
+}
+
 void Server::EquipItem(int cID, int itemCode)
 {
 	long long initBit;
@@ -846,15 +859,16 @@ void Server::SendPlayerResult(int uID, int roomID, bool retire, int rank)
 				mClients[mRooms[roomID].mSockID[i]].mStateLock.lock();
 				mClients[mRooms[roomID].mSockID[i]].mGrade += temp;
 				mRooms[roomID].mGrade[i] = mClients[mRooms[roomID].mSockID[i]].mGrade;
-				mClients[mRooms[roomID].mSockID[i]].mPoint += point;
+				mClients[mRooms[roomID].mSockID[i]].mPoint = point;
 				mRooms[roomID].mPoint[i] = mClients[mRooms[roomID].mSockID[i]].mPoint;
 				mClients[mRooms[roomID].mSockID[i]].mState = eSessionState::ST_LOBBY;
 				mClients[mRooms[roomID].mSockID[i]].mStateLock.unlock();
 				// to db server update
 				SendGameResult(roomID, i);
-				SendMatchResult(mRooms[roomID].mSockID[i], rank, 0);
-				DEBUGMSGONEPARAM("[%d]플레이어의 점수 ", mClients[mRooms[roomID].mSockID[i]].mUID);
-				DEBUGMSGONEPARAM("[%f] 로비안끊김\n", mClients[mRooms[roomID].mSockID[i]].mGrade);
+				SendMatchResult(mRooms[roomID].mSockID[i], rank, mRooms[roomID].mPoint[i]);
+				DEBUGMSGONEPARAM("[%d]플레이어의 점수 : ", mClients[mRooms[roomID].mSockID[i]].mUID);
+				DEBUGMSGONEPARAM("[%f] 로비안끊김    플레이어의 포인트 : ", mClients[mRooms[roomID].mSockID[i]].mGrade);
+				DEBUGMSGONEPARAM("[%d] 로비안끊김\n", mClients[mRooms[roomID].mSockID[i]].mPoint);
 				break;
 			}
 			else // player disconnected lobby server
@@ -896,11 +910,12 @@ void Server::SendPlayerResult(int uID, int roomID, bool retire, int rank)
 
 
 				mRooms[roomID].mGrade[i] += temp;
-				mRooms[roomID].mPoint[i] += point;
+				mRooms[roomID].mPoint[i] = point;
 				// to db server update
 				SendGameResult(roomID, i);
-				DEBUGMSGONEPARAM("[%d]플레이어의 점수 ", mRooms[roomID].mUID[i]);
-				DEBUGMSGONEPARAM("[%f] 로비 끊김\n", mRooms[roomID].mGrade[i]);
+				DEBUGMSGONEPARAM("[%d]플레이어의 점수 : ", mRooms[roomID].mUID[i]);
+				DEBUGMSGONEPARAM("[%f] 로비 끊김  플레이어의 포인트 : ", mRooms[roomID].mGrade[i]);
+				DEBUGMSGONEPARAM("[%d] 로비 끊김\n", mRooms[roomID].mPoint[i]);
 				break;
 			}
 		}
@@ -942,26 +957,26 @@ void Server::SendGameResult(int roomID, int key)
 	mServers[0].DoSend(&packet);
 }
 
-void Server::SendUpdateEquipmentFlag(int cID, int uid, long long equipmentFlag)
+void Server::SendUpdateEquipmentFlag(int cID, long long equipmentFlag)
 {
 	LD_EQUIP_ITEM_PACKET packet;
 
 	packet.size = sizeof(LD_EQUIP_ITEM_PACKET);
 	packet.type = LD_EQUIP_ITEM;
-	packet.uid = uid;
+	packet.uid = mClients[cID].mUID;
 	packet.equipmentFlag = equipmentFlag;
 	packet.userKey = cID;
 
 	mServers[0].DoSend(&packet);
 }
 
-void Server::SendBuyItem(int cID, int uid, int itemCode)
+void Server::SendBuyItem(int cID, int itemCode)
 {
 	LD_BUY_ITEM_PACKET packet;
 
 	packet.size = sizeof(LD_EQUIP_ITEM_PACKET);
 	packet.type = LD_EQUIP_ITEM;
-	packet.uid = uid;
+	packet.uid = mClients[cID].mUID;
 	packet.itemCode = itemCode;
 	packet.price = pGameDataManager->GetShopProductInfo(itemCode).price;
 	packet.userKey = cID;
@@ -981,8 +996,7 @@ void Server::SendLoginOK(int cID)
 	pac.RoomID = 0;
 	pac.UID = mClients[cID].mUID;
 	pac.equippedItems = mClients[cID].mEquippedItems;
-
-	cout << pac.equippedItems << endl;
+	pac.inventoryFlag = mClients[cID].mInventory;
 
 	mClients[cID].DoSend(&pac);
 }
@@ -1074,11 +1088,14 @@ void Server::SendMatchResponse(int roomID)
 	}
 }
 
-void Server::SendBuyOK(int key)
+void Server::SendBuyOK(int key, int itemCode)
 {
 	LC_BUYITEM_OK_PACKET packet;
 	packet.size = sizeof(packet);
 	packet.type = LC_BUYITEM_OK;
+	packet.pointAfterPurchase = mClients[key].mPoint;
+	packet.itemCode = itemCode;
+	packet.inventoryFlag = mClients[key].mInventory;
 	mClients[key].DoSend(&packet);
 }
 
@@ -1104,17 +1121,12 @@ void Server::LoadGameData()
 	pGameDataManager = new GameDataManager;
 	bool result = pGameDataManager->LoadItemData();
 	if (result == false) {
-		DEBUGMSGNOPARAM("Load Game Data Failed\n");
+		DEBUGMSGNOPARAM("Load Item Data Failed\n");
 		return;
 	}
 	result = pGameDataManager->LoadShopData();
 	if (result == false) {
-		DEBUGMSGNOPARAM("Load Game Data Failed\n");
-		return;
-	}
-	result = pGameDataManager->LoadCouponData();
-	if (result == false) {
-		DEBUGMSGNOPARAM("Load Game Data Failed\n");
+		DEBUGMSGNOPARAM("Load Shop Data Failed\n");
 		return;
 	}
 

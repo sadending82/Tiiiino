@@ -30,6 +30,9 @@ public:
 	vector<string> SelectHash(const string& id); // Index 0: hash / Index 1: salt
 	tuple<GRADE, DEPARTMENT> SelectUserGradeAndDepartment(const int uid);
 	long long SelectInventory(const int uid);
+	int	SelectPoint(const int uid);
+	vector<rankInfo> SelectRanking();
+	tuple<ITEM_CODE, COUPON_CAN_DUPLICATED, COUPON_USED> SelectCouponInfo(const string& code);
 
 	bool InsertNewUser(const string& id, const char department);
 	bool InsertNewAccount(const string& id, const string& password);
@@ -41,9 +44,11 @@ public:
 	bool UpdateRanking(const char department, const int incrementPoint);
 	bool UpdateUserDepartment(const int uid, const char department);
 	bool UpdateInventory(const int uid, const int itemCode);
+	bool UpdateInventoryDeleteItem(const int uid, const int itemCode);
 	bool UpdateEquipItemFlag(const int uid, long long bitFlag);
 	bool UpdateEquipItem(const int uid, const int itemCode);
 	bool UpdateUnequipItem(const int uid, const int itemCode);
+	bool UpdateCouponUsed(const string& code, const bool isUsed);
 
 	bool DeleteAccount(const string& id);
 	bool DeleteItemInInventory(const int uid, const int itemCode);

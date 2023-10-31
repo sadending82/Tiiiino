@@ -7,6 +7,8 @@
 #include "ClientGameMode.generated.h"
 
 enum class EBGMType : uint8;
+class UDataTable;
+struct FItemData;
 
 UCLASS(minimalapi)
 class AClientGameMode : public AGameModeBase
@@ -15,16 +17,27 @@ class AClientGameMode : public AGameModeBase
 
 public:
 	AClientGameMode();
+	
+public:
+
+	FItemData* GetItemData(const int64& ItemCode) const;
+
+	void SetItemDataTable();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Data");
+		 UDataTable* ItemData;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Class")
 		TSubclassOf<class ASoundManager> SoundMangerClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "LevelName")
 	TMap<FString, EBGMType> ConvertBGMTypeMap;
+
+	
 };
 
 

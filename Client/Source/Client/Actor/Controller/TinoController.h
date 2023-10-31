@@ -113,6 +113,18 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "UMG_Game")
 	class UFinishGameUIWidget* FinishGameUIInstance = nullptr;
 	
+	// StoreUI
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
+	TSubclassOf<class UStoreUIWidget> StoreUIWidgetClass;
+	UPROPERTY(BlueprintReadOnly, Category = "UMG_Game")
+	class UStoreUIWidget* StoreUIInstance = nullptr;
+
+	// InventoryUI
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
+	TSubclassOf<class UInventoryUIWidget> InventoryUIWidgetClass;
+	UPROPERTY(BlueprintReadOnly, Category = "UMG_Game")
+	class UInventoryUIWidget* InventoryUIInstance = nullptr;
+
 	UPROPERTY()
 	UUserWidget* CurrentWidget;
 

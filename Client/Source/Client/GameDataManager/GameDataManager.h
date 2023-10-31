@@ -1,24 +1,37 @@
 #pragma once
-#include "stdafx.h"
 #include "tinyxml2.h"
 #include <map>
+#include <string>
+#include <Windows.h>
+
+#include "../Global.h"
+
+using namespace std;
 
 constexpr int MAXITEM = 64;
 
-#define SHOPDATAFILE "../../GameData/ShopData.xml"
-#define ITEMDATAFILE "../../GameData/ItemData.xml"
+#define EXTERNAL_SHOPDATAFILE "../../GameData/ShopData.xml"
+#define EXTERNAL_ITEMDATAFILE "../../GameData/ItemData.xml"
+
+#define INTERNAL_DATADIR "/Data"
+#define INTERNAL_SHOPDATAFILE "/Data/ShopData.xml"
+#define INTERNAL_ITEMDATAFILE "/Data/ItemData.xml"
 
 struct Item
 {
 	int		itemCode;
-	wstring	name;
+	FString	name;
 	int		price;
 	double  cutline = 0.0;
+	FString assetName;
+	FString text;
 };
 
 class GameDataManager
 {
 public:
+	bool			CheckDataFile();
+
 	bool			LoadShopData();
 	bool			LoadItemData();
 
@@ -32,6 +45,6 @@ private:
 	map<int, Item> ShopProductsList;
 	map<int, Item> ItemList;
 
-	// key = coupon number / value = itemcode
-	map<string, int> CouponList;
+	string		SHOPDATAFILE;
+	string		ITEMDATAFILE;
 };

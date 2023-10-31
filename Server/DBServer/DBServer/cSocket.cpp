@@ -184,6 +184,10 @@ void Socket::processPacket(int key, unsigned char* buf)
         ProcessPacket_BuyItem(key, buf);
         break;
     }
+    case LD_USE_COUPON: {
+        ProcessPacket_UseCoupon(key, buf);
+        break;
+    }
     default:
     {
         break;
@@ -312,12 +316,13 @@ void Socket::SendInventory(int key, long long inventoryFlag, int userKey)
     mSessions[key].DoSend((void*)(&p));
 }
 
-void Socket::SendBuyItemOK(int key, int itemCode, int userKey)
+void Socket::SendBuyItemOK(int key, int itemCode, int userKey, int pointAfterPurchase)
 {
     DL_BUYITEM_OK_PACKET p;
     p.size = sizeof(DL_BUYITEM_OK_PACKET);
     p.type = SPacketType::DL_BUYITEM_OK;
     p.itemCode = itemCode;
+    p.pointAfterPurchase = pointAfterPurchase;
     p.userKey = userKey;
 
     mSessions[key].DoSend((void*)(&p));
@@ -328,6 +333,28 @@ void Socket::SendBuyItemFail(int key, int userKey)
     DL_BUYITEM_FAIL_PACKET p;
     p.size = sizeof(DL_BUYITEM_FAIL_PACKET);
     p.type = SPacketType::DL_BUYITEM_FAIL;
+    p.userKey = userKey;
+
+    mSessions[key].DoSend((void*)(&p));
+}
+
+void Socket::SendUseCouponOK(int key, int itemCode, int userKey, long long inventoryFlag)
+{
+    DL_USE_COUPON_OK_PACKET p;
+    p.size = sizeof(DL_USE_COUPON_OK_PACKET);
+    p.type = SPacketType::DL_USE_COUPON_OK;
+    p.inventoryFlag = inventoryFlag;
+    p.itemcode = itemCode;
+    p.userKey = userKey;
+
+    mSessions[key].DoSend((void*)(&p));
+}
+
+void Socket::SendUseCouponFail(int key, int userKey)
+{
+    DL_USE_COUPON_FAIL_PACKET p;
+    p.size = sizeof(DL_USE_COUPON_FAIL_PACKET);
+    p.type = SPacketType::DL_USE_COUPON_FAIL;
     p.userKey = userKey;
 
     mSessions[key].DoSend((void*)(&p));
@@ -465,6 +492,7 @@ void Socket::ProcessPacket_UnequipItem(int key, unsigned char* buf)
 void Socket::ProcessPacket_BuyItem(int key, unsigned char* buf)
 {
     LD_BUY_ITEM_PACKET* p = reinterpret_cast<LD_BUY_ITEM_PACKET*>(buf);
+    int pointAfterPurchase = 0;
 #ifdef RUN_DB
 
     bool bResult = Getm_pDB()->UpdateUserPoint(p->uid, -p->price);
@@ -479,9 +507,60 @@ void Socket::ProcessPacket_BuyItem(int key, unsigned char* buf)
         SendBuyItemFail(key, p->userKey);
         return;
     }
+    
+    pointAfterPurchase = Getm_pDB()->SelectPoint(p->uid);
+
 #endif
 
-    SendBuyItemOK(key, p->itemCode, p->userKey);
+    SendBuyItemOK(key, p->itemCode, p->userKey, pointAfterPurchase);
+}
+
+void Socket::ProcessPacket_UseCoupon(int key, unsigned char* buf)
+{
+    LD_USE_COUPON_PACKET* p = reinterpret_cast<LD_USE_COUPON_PACKET*>(buf);
+    int itemCode = 0;
+
+#ifdef RUN_DB
+    auto info = m_pDB->SelectCouponInfo(p->couponCode);
+
+    itemCode = get<0>(info);
+    bool canDuplicated = get<1>(info);
+    bool isUsed = get<2>(info);
+
+    if (canDuplicated == false && isUsed == true) {
+        SendUseCouponFail(key, p->userKey);
+        return;
+    }
+    bool bResult = false;
+    if (canDuplicated == false) {
+        bResult = m_pDB->UpdateCouponUsed(p->couponCode, true);
+        if (bResult == false) {
+            SendUseCouponFail(key, p->userKey);
+            return;
+        }
+    }
+
+    bResult = m_pDB->UpdateInventory(p->uid, itemCode);
+    if (bResult == false) {
+        if (canDuplicated == false) {
+            m_pDB->UpdateCouponUsed(p->couponCode, false);
+        }
+        SendUseCouponFail(key, p->userKey);
+        return;
+    }
+
+    long long newInventory = m_pDB->SelectInventory(p->uid);
+    if (newInventory == -1) {
+        if (canDuplicated == false) {
+            m_pDB->UpdateCouponUsed(p->couponCode, false);
+        }
+        m_pDB->UpdateInventoryDeleteItem(p->uid, itemCode);
+        SendUseCouponFail(key, p->userKey);
+        return;
+    }
+#endif
+
+    SendUseCouponOK(key, itemCode, p->userKey, newInventory);
 }
 
 int Socket::SetUIDForTest()

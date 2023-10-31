@@ -30,8 +30,10 @@ public:
 	void SendSignUpOK(int key, int userKey);
 	void SendSignUpFail(int key, int userKey);
 	void SendInventory(int key, long long inventoryFlag, int userKey);
-	void SendBuyItemOK(int key, int itemCode, int userKey);
+	void SendBuyItemOK(int key, int itemCode, int userKey, int pointAfterPurchase);
 	void SendBuyItemFail(int key, int userKey);
+	void SendUseCouponOK(int key, int itemCode, int userKey, long long inventoryFlag);
+	void SendUseCouponFail(int key, int userKey);
 
 	void ProcessPacket_Login(int key, unsigned char* buf);
 	void ProcessPacket_Logout(unsigned char* buf);
@@ -42,6 +44,7 @@ public:
 	void ProcessPacket_EquipItem(int key, unsigned char* buf);
 	void ProcessPacket_UnequipItem(int key, unsigned char* buf);
 	void ProcessPacket_BuyItem(int key, unsigned char* buf);
+	void ProcessPacket_UseCoupon(int key, unsigned char* buf);
 
 	int SetUIDForTest();
 

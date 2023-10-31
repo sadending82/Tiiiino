@@ -26,6 +26,10 @@
 #define DEPARTMENT char
 #define EQUIPMENT_BITFLAG long long
 
+#define ITEM_CODE int
+#define COUPON_CAN_DUPLICATED bool
+#define COUPON_USED	bool
+
 
 constexpr int MAXLOBBY = 10;
 constexpr int INVALIDKEY = -1;

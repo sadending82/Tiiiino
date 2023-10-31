@@ -9,7 +9,6 @@
 
 #include "Global.h"
 
-
 void CALLBACK send_callback(DWORD err, DWORD num_byte, LPWSAOVERLAPPED send_over, DWORD flag);
 void CALLBACK recv_Gamecallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv_over, DWORD flag);
 void CALLBACK recv_Lobbycallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv_over, DWORD flag);
@@ -24,6 +23,7 @@ Network::Network()
 	, bIsConnected(false)
 	, l_socket(INVALID_SOCKET)
 	, s_socket(INVALID_SOCKET)
+	, mGameDataManager(nullptr)
 {
 	for (int i = 0; i < MAX_USER; ++i)
 	{
@@ -69,6 +69,12 @@ void Network::RegisterObjectNetwork(ABaseObstacle* object, int& ObjectID)
 	//}
 }
 
+void Network::LoadItemData()
+{
+	mGameDataManager->LoadShopData();
+	mGameDataManager->LoadItemData();
+}
+
 void Network::SetObjectNetID(ABaseObstacle* object, const int netID)
 {
 	mObjects[netID] = object;
@@ -79,8 +85,13 @@ bool Network::init()
 {
 	if (!isInit)
 	{
+		if (nullptr == mGameDataManager)
+		{
+			mGameDataManager = new GameDataManager;
+			mGameDataManager->CheckDataFile();
+			LoadItemData();
+		}
 
-		isInit = true;
 		WSAStartup(MAKEWORD(2, 2), &WSAData);
 		return true;
 	}
@@ -105,14 +116,19 @@ void Network::release()
 		closesocket(s_socket);
 		_prev_size = 0;
 		WSACleanup();
-		if (!bLevelOpenTriggerEnabled)
+		if (!bLevelOpenTriggerEnabled)	//If Editor Stop, Call This
 		{
-			//openlevel로 인한 release가 아니라,
-						//editor중지때문에 생기는 release라면 false시켜줌.
+			// Called when the editor is stopped, not when changing levels.
+			
+			//If OpenLevel (Change Level), -> Character Destroy -> Network::Release Called
+			// Do not here
+			// But Editor Simulate Stop -> Character Destory -> Network::Release Called
+			// In Here
+			if(mGameDataManager)
+				delete mGameDataManager;
+			mGameDataManager = nullptr;
 			bLoginFlag = false;
-			//editor중지때문이니까 여기도 그냥 false로 다시 초기화.
 			bLevelOpenTriggerEnabled = false;
-			//editor 중지가 아니라 level 변경시 불리는 release에서 변경되지 말아야 할 값은 이 if문 안에 넣기.
 			bIsConnectedLobby = 0;
 			bIsConnected = 0;
 			closesocket(l_socket);
@@ -218,6 +234,45 @@ void send_control_packet(SOCKET& sock)
 			}
 		}
 	}
+}
+
+void send_buyitem_packet(SOCKET& sock, const int itemCode)
+{
+	CL_BUY_ITEM_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = CL_BUY_ITEM;
+	packet.itemCode = itemCode;
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+}
+
+void send_equip_packet(SOCKET& sock, const int itemCode)
+{
+	CL_EQUIP_ITEM_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = CL_EQUIP_ITEM;
+	packet.itemCode = itemCode;
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+}
+
+void send_unequip_packet(SOCKET& sock, const int itemCode)
+{
+	CL_UNEQUIP_ITEM_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = CL_UNEQUIP_ITEM;
+	packet.itemCode = itemCode;
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+}
+
+void send_refresh_dep_rank_packet(SOCKET& sock)
+{
+	CL_REFRESH_DEP_RANK_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = CL_REFRESH_DEP_RANK;
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
 }
 
 void send_movetogame_packet(SOCKET& sock, const int uID, const char* id, const int& roomID)
@@ -586,7 +641,8 @@ void Network::l_process_packet(unsigned char* p)
 		bIsConnectedLobby = true;
 		CLog::Print("LC_LOGIN_OK IS CALLING");
 		//아이템 장착 사용법 
-		long long TestItemFlag = 0b0000'0000'0000'0000'0000'0000'0000'0100'0000'0000'0000'0000'0000'0000'0000'0000;
+		long long TestItemFlag = 0b0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'1001;
+		mMyCharacter->SetInventoryFromEquippedCode(packet->equippedItems);
 		if ((packet->equippedItems & TestItemFlag))
 		{
 			//장착중 (장착이 아니라면 and 연산에서 다 false가 나와 0이라 if문 안들어옴)
@@ -647,6 +703,26 @@ void Network::l_process_packet(unsigned char* p)
 	}
 	case LC_CONTROL: {
 		//send_control_packet(l_socket);
+		break;
+	}
+	case LC_BUYITEM_OK: {
+		LC_BUYITEM_OK_PACKET* packet = reinterpret_cast<LC_BUYITEM_OK_PACKET*>(p);
+
+		break;
+	}
+	case LC_BUYITEM_FAIL: {
+		LC_BUYITEM_FAIL_PACKET* packet = reinterpret_cast<LC_BUYITEM_FAIL_PACKET*>(p);
+
+		break;
+	}
+	case LC_REFRESH_INVENTORY: {
+		LC_REFRESH_INVENTORY_PACKET* packet = reinterpret_cast<LC_REFRESH_INVENTORY_PACKET*>(p);
+
+		break;
+	}
+	case LC_REFRESH_DEP_RANK: {
+		LC_REFRESH_DEP_RANK_PACKET* packet = reinterpret_cast<LC_REFRESH_DEP_RANK_PACKET*>(p);
+
 		break;
 	}
 	default:
@@ -812,6 +888,8 @@ bool Network::ConnectServerGame()
 
 bool Network::ConnectServerLobby()
 {
+	isInit = true;
+
 	if (bIsConnectedLobby) return false;
 	l_socket = WSASocketW(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);
 
