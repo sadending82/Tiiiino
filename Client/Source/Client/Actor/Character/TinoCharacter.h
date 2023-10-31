@@ -118,7 +118,7 @@ public:
 
 	void MakeAndShowDialogInLobby();
 	void MakeAndShowDialogInGame();
-	void MakeAndShowLobbyRankSystem(char DepartmentName[], char DepartmentPoint[]);
+	void MakeAndShowLobbyRankSystem(struct rankInfo rank[]);
 	void MakeAndShowChangePoint();
 	//Accessory
 

@@ -65,7 +65,7 @@ public:
 	// 랭크 시스템
 
 	// 서버에서 보내주는 랭크데이터 받음
-	void GetRankData(char DepartmentName[], char DepartmentPoint[]);
+	void GetRankData(struct rankInfo rank[]);
 
 	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
 	TArray<int> DepartmentNameArray = { 0,1,2,3,4,5,6,7,8,9 };
