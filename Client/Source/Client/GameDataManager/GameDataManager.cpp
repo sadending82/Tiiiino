@@ -1,9 +1,10 @@
 #pragma once
+#include "GameDataManager.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <filesystem>
-#include "GameDataManager.h"
+
 
 bool GameDataManager::CheckDataFile()
 {
@@ -105,7 +106,7 @@ bool GameDataManager::LoadItemData()
 			item.itemCode = stoi(pItem->FirstChildElement("code")->GetText());
 			item.name = pItem->FirstChildElement("name")->GetText();
 			item.price = stoi(pItem->FirstChildElement("price")->GetText());
-			item.assetName = pItem->FirstChildElement("assetName")->GetText());
+			item.assetName = pItem->FirstChildElement("assetName")->GetText();
 			item.text = pItem->FirstChildElement("text")->GetText();
 			ItemList[item.itemCode] = item;
 		}
