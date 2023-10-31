@@ -41,27 +41,38 @@ void UStoreUIWidget::PurchaseItem()
 
 }
 
-bool UStoreUIWidget::QualifyingPurchase()
+bool UStoreUIWidget::QualifyingPurchase(int64 itemcode)
 {
-	// 학점 제한여부 확인
-	if (true)
-	{
-		
-		//ShowPurchaseWarning(false);
-	}
-
-	// 보유 여부 확인
-	if (true)
-	{
-
-		//ShowPurchaseWarning(true);
-	}
-	// 임시 게임데이터매니저에서 아이템데이터 불러오기
+	// 게임데이터매니저에서 아이템데이터 불러오기
 	auto itemdata = Network::GetNetwork()->mGameDataManager->GetShopProductsList();
-	for (auto &data : itemdata)
+	int price = 0;
+	int grade = 0;
+	for (auto& data : itemdata)
 	{
-		int price = data.second.price;
+		if (itemcode == data.second.itemCode)
+		{
+			price = data.second.price;
+			grade = data.second.cutline;
+			break;
+		}
 	}
+	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (!!TinoController)
+	{
+		auto TinoCharacter = TinoController->GetPawn<ATinoCharacter>();
+		if (!!TinoCharacter)
+		{
+			if (TinoCharacter->GetPoint() < price)
+			{
+				return false;
+			}
+			if (TinoCharacter->GetGrade() < grade)
+			{
+				return false;
+			}
+		}
+	}
+
 	return true;
 }
 

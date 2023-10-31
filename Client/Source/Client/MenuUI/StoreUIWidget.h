@@ -33,7 +33,7 @@ public:
 
 	// 상점 아이템 구매 가능 확인
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	bool QualifyingPurchase();
+	bool QualifyingPurchase(int64 itemcode);
 	
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void AlreadyPurchase();
