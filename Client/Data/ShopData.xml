@@ -6,198 +6,264 @@
       <name>[등] 천사날개</name>
       <price>150</price>
       <cutline>0.0</cutline>
+      <assetName>AngelWing_white</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>1</code>
       <name>[등] 태엽</name>
       <price>150</price>
       <cutline>0.0</cutline>
+      <assetName>ClockWork_black</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>2</code>
       <name>[등] 금빛 태엽</name>
       <price>300</price>
       <cutline>0.0</cutline>
+      <assetName>ClockWork_gold</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>3</code>
       <name>[등] 은빛 태엽</name>
       <price>300</price>
       <cutline>0.0</cutline>
+      <assetName>ClockWork_silver</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>4</code>
       <name>[등] 삽</name>
       <price>900</price>
       <cutline>4.5</cutline>
+      <assetName>Shovel</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>5</code>
       <name>[등] 딥 퍼플 윙</name>
       <price>3600</price>
       <cutline>5.0</cutline>
+      <assetName>BigWing_purple</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>6</code>
       <name>[등] 퓨어 화이트 윙</name>
       <price>18000</price>
       <cutline>0.0</cutline>
+      <assetName>BigWing_white</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>16</code>
       <name>[손] 다크 브래슬릿</name>
       <price>150</price>
       <cutline>0.0</cutline>
+      <assetName>Bracelet_black</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>17</code>
       <name>[손] 레드 브래슬릿</name>
       <price>150</price>
       <cutline>0.0</cutline>
+      <assetName>Bracelet_red</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>18</code>
       <name>[손] 그린 브래슬릿</name>
       <price>150</price>
       <cutline>0.0</cutline>
+      <assetName>Bracelet_green</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>19</code>
       <name>[손] 내 손에 메론바</name>
       <price>900</price>
       <cutline>0.0</cutline>
+      <assetName>MeronBar_forHand</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>20</code>
       <name>[손] 야구방망이</name>
       <price>900</price>
       <cutline>4.5</cutline>
+      <assetName>Bat_origin</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>32</code>
       <name>[얼굴] 블랙 선글라스</name>
       <price>150</price>
       <cutline>0.0</cutline>
+      <assetName>Sunglass</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>33</code>
       <name>[얼굴] 블루 선글라스</name>
       <price>150</price>
       <cutline>3.0</cutline>
+      <assetName>Sunglass_blue</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>34</code>
       <name>[얼굴] 핑크 선글라스</name>
       <price>150</price>
       <cutline>3.0</cutline>
+      <assetName>Sunglass_pink</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>35</code>
       <name>[얼굴] 동글이 안경</name>
       <price>150</price>
       <cutline>0.0</cutline>
+      <assetName>Glasses_black</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>36</code>
       <name>[얼굴] 오리주둥이</name>
       <price>300</price>
       <cutline>0.0</cutline>
+      <assetName>DuckMouse</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>37</code>
       <name>[얼굴] 그림자 반가면</name>
       <price>300</price>
       <cutline>0.0</cutline>
+      <assetName>HalfMask_black</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>38</code>
       <name>[얼굴] 백색 반가면</name>
       <price>300</price>
       <cutline>0.0</cutline>
+      <assetName>HalfMask_white</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>39</code>
       <name>[얼굴] 내 입에 메론바</name>
       <price>900</price>
       <cutline>0.0</cutline>
+      <assetName>MeronBar_forFace</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>40</code>
       <name>[얼굴] 파이프</name>
       <price>900</price>
       <cutline>4.5</cutline>
+      <assetName>Pipe</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>49</code>
       <name>[머리] 새싹</name>
       <price>10</price>
       <cutline>0.0</cutline>
+      <assetName>Sprout_green</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>50</code>
       <name>[머리] 천사고리</name>
       <price>150</price>
       <cutline>0.0</cutline>
+      <assetName>AngelRing_yellow</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>51</code>
       <name>[머리] 악마뿔</name>
       <price>150</price>
       <cutline>0.0</cutline>
+      <assetName>DevilHorn_red</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>52</code>
       <name>[머리] 계란초밥</name>
       <price>150</price>
       <cutline>0.0</cutline>
+      <assetName>EggSushi</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>53</code>
       <name>[머리] 군함초밥</name>
       <price>150</price>
       <cutline>0.0</cutline>
+      <assetName>WarshipSushi</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>54</code>
       <name>[머리] 새우초밥</name>
       <price>150</price>
       <cutline>0.0</cutline>
+      <assetName>ShrimpSushi</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>55</code>
       <name>[머리] 브라운 고양이 귀</name>
       <price>300</price>
       <cutline>0.0</cutline>
+      <assetName>CatEar_brown</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>56</code>
       <name>[머리] 핑크 고양이 귀</name>
       <price>300</price>
       <cutline>0.0</cutline>
+      <assetName>CatEar_pink</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>57</code>
       <name>[머리] 방울 고양이 귀</name>
       <price>3600</price>
       <cutline>0.0</cutline>
+      <assetName>CatEarWithBell</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>58</code>
       <name>[머리] 토끼 귀</name>
       <price>9000</price>
       <cutline>0.0</cutline>
+      <assetName>RabbitEar_white</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>59</code>
       <name>[머리] 블랙 토끼 귀</name>
       <price>1200</price>
       <cutline>4.8</cutline>
+      <assetName>RabbitEar_black</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>60</code>
       <name>[머리] 왕관</name>
       <price>900</price>
       <cutline>4.0</cutline>
+      <assetName>SimpleCrown</assetName>
+      <text>test</text>
     </product>
   </productlist>
 </root>
