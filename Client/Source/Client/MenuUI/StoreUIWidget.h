@@ -56,7 +56,8 @@ public:
 	UPROPERTY()
 	class UStoreUIWidget* StoreDialogInstance = nullptr;
 
-
+	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
+	TArray<int> ShopItemCodeList;
 
 public:
 	// аб/©Л ╬фюлеш д╜ юл╣©

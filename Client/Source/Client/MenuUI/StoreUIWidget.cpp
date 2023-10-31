@@ -7,6 +7,7 @@
 #include "Actor/Controller/TinoController.h"
 #include "Actor/Character/TinoCharacter.h"
 #include "Components/TextBlock.h"
+#include "Data/ItemData.h"
 #include "Network/Network.h"
 #include "Global.h"
 
@@ -18,6 +19,8 @@ void UStoreUIWidget::NativePreConstruct()
 	//auto TinoCharacter = TinoController->GetPawn<ATinoCharacter>();
 	//Grade = TinoCharacter->GetGrade();
 	//Point = TinoCharacter->GetPoint();
+
+
 }
 
 void UStoreUIWidget::NativeDestruct()
