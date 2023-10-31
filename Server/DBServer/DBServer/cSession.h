@@ -28,7 +28,7 @@ public:
 	}
 	void DoSend(void* packet)
 	{
-		ExOver* sdata = new ExOver{ reinterpret_cast<char*>(packet) };
+		ExOver* sdata = new ExOver{ reinterpret_cast<unsigned char*>(packet) };
 		BOOL ret = WSASend(mSocket, &sdata->mWsaBuf, 1, 0, 0, &sdata->mOver, 0);
 	}
 
