@@ -268,6 +268,15 @@ void send_unequip_packet(SOCKET& sock, const int itemCode)
 	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
 }
 
+void send_refresh_dep_rank_packet(SOCKET& sock)
+{
+	CL_REFRESH_DEP_RANK_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = CL_REFRESH_DEP_RANK;
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+}
+
 void send_movetogame_packet(SOCKET& sock, const int uID, const char* id, const int& roomID)
 {
 	CS_LOGIN_PACKET packet;
@@ -713,6 +722,11 @@ void Network::l_process_packet(unsigned char* p)
 	}
 	case LC_REFRESH_INVENTORY: {
 		LC_REFRESH_INVENTORY_PACKET* packet = reinterpret_cast<LC_REFRESH_INVENTORY_PACKET*>(p);
+
+		break;
+	}
+	case LC_REFRESH_DEP_RANK: {
+		LC_REFRESH_DEP_RANK_PACKET* packet = reinterpret_cast<LC_REFRESH_DEP_RANK_PACKET*>(p);
 
 		break;
 	}

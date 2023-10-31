@@ -30,6 +30,8 @@ public:
 	vector<string> SelectHash(const string& id); // Index 0: hash / Index 1: salt
 	tuple<GRADE, DEPARTMENT> SelectUserGradeAndDepartment(const int uid);
 	long long SelectInventory(const int uid);
+	int	SelectPoint(const int uid);
+	vector<rankInfo> SelectRanking();
 
 	bool InsertNewUser(const string& id, const char department);
 	bool InsertNewAccount(const string& id, const string& password);
