@@ -11,7 +11,7 @@ constexpr int MAXITEM = 64;
 struct Item
 {
 	int		itemCode;
-	string	name;
+	wstring	name;
 	int		price;
 	double  cutline = 0.0;
 };
