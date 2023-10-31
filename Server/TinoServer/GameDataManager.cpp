@@ -20,11 +20,12 @@ bool GameDataManager::LoadShopData()
 			item.cutline = stoi(pProduct->FirstChildElement("cutline")->GetText());
 
 			const char* uft8Name = pProduct->FirstChildElement("name")->GetText();
-			wstring unicodeName;
+			wchar_t unicodeName[256] = { 0, };
 			int nLen = MultiByteToWideChar(CP_UTF8, 0, uft8Name, strlen(uft8Name), NULL, NULL);
-			MultiByteToWideChar(CP_UTF8, 0, uft8Name, strlen(uft8Name), &unicodeName[0], nLen);
-			wcout << unicodeName << endl;
-			//item.name = wstring(unicodeName);
+			MultiByteToWideChar(CP_UTF8, 0, uft8Name, strlen(uft8Name), unicodeName, nLen);
+			item.name = wstring(unicodeName);
+			wcout << item.name << endl;
+
 
 			ShopProductsList[item.itemCode] = item;
 		}
