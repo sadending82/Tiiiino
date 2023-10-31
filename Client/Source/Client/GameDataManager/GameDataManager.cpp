@@ -73,7 +73,7 @@ bool GameDataManager::LoadShopData()
 			item.name = pProduct->FirstChildElement("name")->GetText();
 			item.price = stoi(pProduct->FirstChildElement("price")->GetText());
 			item.cutline = stoi(pProduct->FirstChildElement("cutline")->GetText());
-			item.assetName = stoi(pProduct->FirstChildElement("assetName")->GetText());
+			item.assetName = pProduct->FirstChildElement("assetName")->GetText();
 			ShopProductsList[item.itemCode] = item;
 		}
 		UE_LOG(LogTemp, Log, TEXT("Shop Data Load Succeed"));
@@ -104,7 +104,7 @@ bool GameDataManager::LoadItemData()
 			item.itemCode = stoi(pItem->FirstChildElement("code")->GetText());
 			item.name = pItem->FirstChildElement("name")->GetText();
 			item.price = stoi(pItem->FirstChildElement("price")->GetText());
-			item.assetName = stoi(pProduct->FirstChildElement("assetName")->GetText());
+			item.assetName = pItem->FirstChildElement("assetName")->GetText();
 			ItemList[item.itemCode] = item;
 		}
 		UE_LOG(LogTemp, Log, TEXT("Item Data Load Succeed"));
