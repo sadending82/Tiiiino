@@ -154,7 +154,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	FItemData GetItemDataFromItemCode(const int64& ItemCode);
-	void SetInventoryFromEquippedCode(const long long& EquippedItems);
+	void SetInventoryFromInventoryFlag(const long long& EquippedItems);
 
 	UFUNCTION(BlueprintCallable, Category = "shop")
 	void GetShopData(UPARAM(REF) TArray<int>& iOut);
@@ -227,10 +227,6 @@ private:
 		float Grade;
 	UPROPERTY(VisibleDefaultsOnly, Category = "Stat")
 		float Point;
-	//UPROPERTY(VisibleDefaultsOnly, Category = "Stat")
-		//long long ItemInInventory = 0b0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000;
-
-
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation | Dive")
 		float MaxDiveTime;

@@ -417,7 +417,7 @@ FItemData ATinoCharacter::GetItemDataFromItemCode(const int64& ItemCode)
 	return ItemData;
 }
 
-void ATinoCharacter::SetInventoryFromEquippedCode(const long long& EquippedItems)
+void ATinoCharacter::SetInventoryFromInventoryFlag(const long long& EquippedItems)
 {
 	int64 IC = StaticCast<int64>(EquippedItems);
 

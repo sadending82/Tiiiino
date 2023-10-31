@@ -644,7 +644,8 @@ void Network::l_process_packet(unsigned char* p)
 		CLog::Print("LC_LOGIN_OK IS CALLING");
 		//아이템 장착 사용법 
 		long long TestItemFlag = 0b0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'1001;
-		mMyCharacter->SetInventoryFromEquippedCode(packet->equippedItems);
+		mMyCharacter->SetInventoryFromInventoryFlag(packet->inventoryFlag);
+
 		if ((packet->equippedItems & TestItemFlag))
 		{
 			//장착중 (장착이 아니라면 and 연산에서 다 false가 나와 0이라 if문 안들어옴)
