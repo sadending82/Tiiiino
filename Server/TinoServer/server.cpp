@@ -761,6 +761,11 @@ void Server::RoomReset(int roomID)
 
 void Server::BuyItem(int cID, int itemCode)
 {
+	if ((mClients[cID].mInventory & (1LL << itemCode)) != 0) {
+		SendBuyFail(cID);
+		return;
+	}
+
 	if (mClients[cID].mPoint - pGameDataManager->GetShopProductInfo(itemCode).price < 0) {
 		SendBuyFail(cID);
 		return;
