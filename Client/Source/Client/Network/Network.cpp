@@ -654,7 +654,7 @@ void Network::l_process_packet(unsigned char* p)
 
 		//학점과 포인트 표기
 		mMyCharacter->MakeAndShowLoginOK(packet->grade, packet->point);
-		mMyCharacter->MakeAndShowLobbyRankSystem();
+		mMyCharacter->MakeAndShowLobbyRankSystem(packet->departmentcode, packet->departmentpoint);
 		break;
 	}
 	case LC_LOGIN_FAIL:

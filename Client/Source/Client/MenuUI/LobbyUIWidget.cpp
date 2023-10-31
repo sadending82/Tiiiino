@@ -63,9 +63,13 @@ void ULobbyUIWidget::TryEnterInventory()
 	TinoController->ChangeMenuWidget(TinoController->InventoryUIInstance);
 }
 
-void ULobbyUIWidget::GetRankData()
+void ULobbyUIWidget::GetRankData(char DepartmentName[], char DepartmentPoint[])
 {
 	// 서버에서 보내준 랭크데이터 받는 함수
-	
+	for (int i = 0; i < RANK_COUNT; ++i)
+	{
+		DepartmentNameArray[i] = (DepartmentName[i]);
+		DepartmentPointArray[i] = DepartmentPoint[i];
+	}
 }
 

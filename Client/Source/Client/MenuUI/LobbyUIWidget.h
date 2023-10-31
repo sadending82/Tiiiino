@@ -9,6 +9,9 @@
 /**
  * 
  */
+
+
+
 UCLASS()
 class CLIENT_API ULobbyUIWidget : public UUserWidget
 {
@@ -62,9 +65,11 @@ public:
 	// 랭크 시스템
 
 	// 서버에서 보내주는 랭크데이터 받음
-	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	void GetRankData();
+	void GetRankData(char DepartmentName[], char DepartmentPoint[]);
 
 	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
-	TArray<FString> DepartmentArray;
+	TArray<int> DepartmentNameArray;
+
+	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
+	TArray<int> DepartmentPointArray;
 };

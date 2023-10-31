@@ -32,6 +32,9 @@ constexpr int STARTCODE_FACEEQUIP = 32;
 constexpr int STARTCODE_HANDEQUIP = 16;
 constexpr int STARTCODE_BACKEQUIP = 0;
 
+// rank
+constexpr int RANK_COUNT = 10;
+
 struct rankInfo
 {
 	char	department;
@@ -311,8 +314,8 @@ struct LC_LOGIN_OK_PACKET : public PACKET {
 	int point;
 	int RoomID;
 	long long equippedItems;
-	char departmentcode[10];
-	char departmentpoint[10];
+	char departmentcode[RANK_COUNT];
+	char departmentpoint[RANK_COUNT];
 };
 
 struct 	LC_LOGIN_FAIL_PACKET :public PACKET {
@@ -358,8 +361,8 @@ struct LC_REFRESH_INVENTORY_PACKET : public PACKET {
 };
 
 struct LC_REFRESH_DEP_RANK_PACKET : public PACKET {
-	char departmentcode[10];
-	char departmentpoint[10];
+	char departmentcode[RANK_COUNT];
+	char departmentpoint[RANK_COUNT];
 };
 //--------------------------
 struct EVENT {
