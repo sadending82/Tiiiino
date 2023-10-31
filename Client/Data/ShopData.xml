@@ -7,6 +7,7 @@
       <price>150</price>
       <cutline>0.0</cutline>
       <assetName>AngelWing_white</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>1</code>
@@ -14,6 +15,7 @@
       <price>150</price>
       <cutline>0.0</cutline>
       <assetName>ClockWork_black</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>2</code>
@@ -21,6 +23,7 @@
       <price>300</price>
       <cutline>0.0</cutline>
       <assetName>ClockWork_gold</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>3</code>
@@ -28,6 +31,7 @@
       <price>300</price>
       <cutline>0.0</cutline>
       <assetName>ClockWork_silver</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>4</code>
@@ -35,6 +39,7 @@
       <price>900</price>
       <cutline>4.5</cutline>
       <assetName>Shovel</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>5</code>
@@ -42,6 +47,7 @@
       <price>3600</price>
       <cutline>5.0</cutline>
       <assetName>BigWing_purple</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>6</code>
@@ -49,6 +55,7 @@
       <price>18000</price>
       <cutline>0.0</cutline>
       <assetName>BigWing_white</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>16</code>
@@ -56,6 +63,7 @@
       <price>150</price>
       <cutline>0.0</cutline>
       <assetName>Bracelet_black</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>17</code>
@@ -63,6 +71,7 @@
       <price>150</price>
       <cutline>0.0</cutline>
       <assetName>Bracelet_red</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>18</code>
@@ -70,6 +79,7 @@
       <price>150</price>
       <cutline>0.0</cutline>
       <assetName>Bracelet_green</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>19</code>
@@ -77,6 +87,7 @@
       <price>900</price>
       <cutline>0.0</cutline>
       <assetName>MeronBar_forHand</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>20</code>
@@ -84,6 +95,7 @@
       <price>900</price>
       <cutline>4.5</cutline>
       <assetName>Bat_origin</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>32</code>
@@ -91,6 +103,7 @@
       <price>150</price>
       <cutline>0.0</cutline>
       <assetName>Sunglass</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>33</code>
@@ -98,6 +111,7 @@
       <price>150</price>
       <cutline>3.0</cutline>
       <assetName>Sunglass_blue</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>34</code>
@@ -105,6 +119,7 @@
       <price>150</price>
       <cutline>3.0</cutline>
       <assetName>Sunglass_pink</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>35</code>
@@ -112,6 +127,7 @@
       <price>150</price>
       <cutline>0.0</cutline>
       <assetName>Glasses_black</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>36</code>
@@ -119,6 +135,7 @@
       <price>300</price>
       <cutline>0.0</cutline>
       <assetName>DuckMouse</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>37</code>
@@ -126,6 +143,7 @@
       <price>300</price>
       <cutline>0.0</cutline>
       <assetName>HalfMask_black</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>38</code>
@@ -133,6 +151,7 @@
       <price>300</price>
       <cutline>0.0</cutline>
       <assetName>HalfMask_white</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>39</code>
@@ -140,6 +159,7 @@
       <price>900</price>
       <cutline>0.0</cutline>
       <assetName>MeronBar_forFace</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>40</code>
@@ -147,6 +167,7 @@
       <price>900</price>
       <cutline>4.5</cutline>
       <assetName>Pipe</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>49</code>
@@ -154,6 +175,7 @@
       <price>10</price>
       <cutline>0.0</cutline>
       <assetName>Sprout_green</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>50</code>
@@ -161,6 +183,7 @@
       <price>150</price>
       <cutline>0.0</cutline>
       <assetName>AngelRing_yellow</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>51</code>
@@ -168,6 +191,7 @@
       <price>150</price>
       <cutline>0.0</cutline>
       <assetName>DevilHorn_red</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>52</code>
@@ -175,6 +199,7 @@
       <price>150</price>
       <cutline>0.0</cutline>
       <assetName>EggSushi</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>53</code>
@@ -182,6 +207,7 @@
       <price>150</price>
       <cutline>0.0</cutline>
       <assetName>WarshipSushi</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>54</code>
@@ -189,6 +215,7 @@
       <price>150</price>
       <cutline>0.0</cutline>
       <assetName>ShrimpSushi</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>55</code>
@@ -196,6 +223,7 @@
       <price>300</price>
       <cutline>0.0</cutline>
       <assetName>CatEar_brown</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>56</code>
@@ -203,6 +231,7 @@
       <price>300</price>
       <cutline>0.0</cutline>
       <assetName>CatEar_pink</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>57</code>
@@ -210,6 +239,7 @@
       <price>3600</price>
       <cutline>0.0</cutline>
       <assetName>CatEarWithBell</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>58</code>
@@ -217,6 +247,7 @@
       <price>9000</price>
       <cutline>0.0</cutline>
       <assetName>RabbitEar_white</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>59</code>
@@ -224,6 +255,7 @@
       <price>1200</price>
       <cutline>4.8</cutline>
       <assetName>RabbitEar_black</assetName>
+      <text>test</text>
     </product>
     <product>
       <code>60</code>
@@ -231,6 +263,7 @@
       <price>900</price>
       <cutline>4.0</cutline>
       <assetName>SimpleCrown</assetName>
+      <text>test</text>
     </product>
   </productlist>
 </root>

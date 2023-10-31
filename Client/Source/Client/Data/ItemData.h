@@ -68,6 +68,15 @@ public:
 
 	}
 
+	FItemData(int itemCode, EEquipType equipType, FText name, FText description, float numericData, int32 sellValue)
+		: ItemCode(itemCode), EquipType(equipType), SellValue(sellValue)
+	{
+		TextData.Name = name;
+		TextData.Description = description;
+
+		NumericData.PurchaseCondition = numericData;
+	}
+
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "ItemData")
 		int64 ItemCode;
 
