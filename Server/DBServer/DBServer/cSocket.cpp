@@ -168,10 +168,6 @@ void Socket::processPacket(int key, unsigned char* buf)
         ProcessPacket_ChangeDepartment(key, buf);
         break;
     }
-    case LD_INVENTORY: {
-        ProcessPacket_Inventory(key, buf);
-        break;
-    }
     case LD_EQUIP_ITEM: {
         ProcessPacket_EquipItem(key, buf);
         break;
@@ -186,6 +182,14 @@ void Socket::processPacket(int key, unsigned char* buf)
     }
     case LD_USE_COUPON: {
         ProcessPacket_UseCoupon(key, buf);
+        break;
+    }
+    case LD_REFRESH_INVENTORY: {
+        ProcessPacket_RefreshInventory(key, buf);
+        break;
+    }
+    case LD_REFRESH_DEP_RANK: {
+        ProcessPacket_RefreshDepRank(key, buf);
         break;
     }
     default:
@@ -232,7 +236,10 @@ bool Socket::CheckLogin(int key, const char* id, const char* password, int userK
     long long equippedItems = get<5>(userData);
     long long inventoryItems = Getm_pDB()->SelectInventory(uid);
 
-    SendLoginOK(key, uid, id, grade, point, state, department, equippedItems, inventoryItems, userKey);
+    vector<rankInfo> ranking = Getm_pDB()->SelectRanking();
+
+    SendLoginOK(key, uid, id, grade, point, state, department, equippedItems
+        , inventoryItems, ranking, userKey);
 
     if (state == FALSE)
         Getm_pDB()->UpdateUserConnectionState(uid, true);
@@ -258,7 +265,8 @@ bool Socket::CheckValidString(const char* input)
 // SendPacket
 void Socket::SendLoginOK(int key, int uid, const char* id
     , double grade, int point, int state, char department
-    , long long equippedItemFlag, long long inventoryFlag, int userKey)
+    , long long equippedItemFlag, long long inventoryFlag,
+    vector<rankInfo>& ranking, int userKey)
 {
     DL_LOGIN_OK_PACKET p;
     p.size = sizeof(DL_LOGIN_OK_PACKET);
@@ -272,6 +280,10 @@ void Socket::SendLoginOK(int key, int uid, const char* id
     p.userKey = userKey;
     p.equipmentflag = equippedItemFlag;
     p.inventoryflag = inventoryFlag;
+
+    for (int i = 0; i < ranking.size(); ++i) {
+        p.ranking[i] = ranking[i];
+    }
 
     mSessions[key].DoSend((void*)(&p));
 }
@@ -307,9 +319,9 @@ void Socket::SendSignUpFail(int key, int userKey)
 
 void Socket::SendInventory(int key, long long inventoryFlag, int userKey)
 {
-    DL_INVENTORY_PACKET p;
-    p.size = sizeof(DL_INVENTORY_PACKET);
-    p.type = SPacketType::DL_INVENTORY;
+    DL_REFRESH_INVENTORY_PACKET p;
+    p.size = sizeof(DL_REFRESH_INVENTORY_PACKET);
+    p.type = SPacketType::DL_REFRESH_INVENTORY;
     p.inventoryFlag = inventoryFlag;
     p.userKey = userKey;
 
@@ -360,6 +372,19 @@ void Socket::SendUseCouponFail(int key, int userKey)
     mSessions[key].DoSend((void*)(&p));
 }
 
+void Socket::SendRanking(int key, vector<rankInfo>& ranking, int userKey)
+{
+    DL_REFRESH_DEP_RANK_PACKET p;
+    p.size = sizeof(DL_REFRESH_DEP_RANK_PACKET);
+    p.type = SPacketType::DL_USE_COUPON_OK;
+    p.userKey = userKey;
+
+    for (int i = 0; i < ranking.size(); ++i) {
+        p.ranking[i] = ranking[i];
+    }
+    mSessions[key].DoSend((void*)(&p));
+}
+
 // ProcessPacket
 void Socket::ProcessPacket_Login(int key, unsigned char* buf)
 {
@@ -374,9 +399,9 @@ void Socket::ProcessPacket_Login(int key, unsigned char* buf)
 #endif
 
     int uid = SetUIDForTest();
-
+    vector<rankInfo> emptyRanking{};
     SendLoginOK(key, uid, p->id
-        , 3.0, 100000, 1, 0, 0, 0, p->userKey);
+        , 3.0, 100000, 1, 0, 0, 0, emptyRanking, p->userKey);
 }
 
 void Socket::ProcessPacket_Logout(unsigned char* buf)
@@ -446,9 +471,9 @@ void Socket::ProcessPacket_UpdateGrade(int key, unsigned char* buf)
 #endif
 }
 
-void Socket::ProcessPacket_Inventory(int key, unsigned char* buf)
+void Socket::ProcessPacket_RefreshInventory(int key, unsigned char* buf)
 {
-    LD_INVENTORY_PACKET* p = reinterpret_cast<LD_INVENTORY_PACKET*>(buf);
+    LD_REFRESH_INVENTORY_PACKET* p = reinterpret_cast<LD_REFRESH_INVENTORY_PACKET*>(buf);
     long long bitFlag = 0;
 #ifdef RUN_DB
     bitFlag = Getm_pDB()->SelectInventory(p->uid);
@@ -561,6 +586,18 @@ void Socket::ProcessPacket_UseCoupon(int key, unsigned char* buf)
 #endif
 
     SendUseCouponOK(key, itemCode, p->userKey, newInventory);
+}
+
+void Socket::ProcessPacket_RefreshDepRank(int key, unsigned char* buf)
+{
+    LD_REFRESH_DEP_RANK_PACKET* p = reinterpret_cast<LD_REFRESH_DEP_RANK_PACKET*>(buf);
+
+    vector<rankInfo> ranking;
+#ifdef RUN_DB
+    ranking = m_pDB->SelectRanking();
+#endif
+
+    SendRanking(key, ranking, p->userKey);
 }
 
 int Socket::SetUIDForTest()

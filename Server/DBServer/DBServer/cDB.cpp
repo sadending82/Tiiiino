@@ -386,14 +386,12 @@ vector<rankInfo> DB::SelectRanking()
 		return vector<rankInfo>();
 	}
 
-	int rankCnt = 1;
 	while (1) {
 		int status = mysql_stmt_fetch(GetmStmt());
 		if (status == 1 || status == MYSQL_NO_DATA) break;
 		rankInfo rInfo;
 		rInfo.department = static_cast<char>(bindDepartment);
 		rInfo.point = bindPoint;
-		rInfo.rank = rankCnt++;
 		rankList.push_back(rInfo);
 	}
 

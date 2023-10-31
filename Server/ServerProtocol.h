@@ -39,11 +39,12 @@ enum SPacketType {
 	LD_SIGNUP,
 	LD_UPDATE_GRADE,
 	LD_CHANGE_DEPARTMENT,
-	LD_INVENTORY,
 	LD_EQUIP_ITEM,
 	LD_UNEQUIP_ITEM,
 	LD_BUY_ITEM,
 	LD_USE_COUPON,
+	LD_REFRESH_INVENTORY,
+	LD_REFRESH_DEP_RANK,
 
 	// DBServer To LobbyServer
 	DL_LOGIN_OK,
@@ -51,11 +52,12 @@ enum SPacketType {
 	DL_CHANGE_DEPARTMENT_OK,
 	DL_SIGNUP_OK,
 	DL_SIGNUP_FAIL,
-	DL_INVENTORY,
+	DL_REFRESH_INVENTORY,
 	DL_BUYITEM_OK,
 	DL_BUYITEM_FAIL,
 	DL_USE_COUPON_OK,
 	DL_USE_COUPON_FAIL,
+	DL_REFRESH_DEP_RANK
 };
 
 
@@ -136,11 +138,6 @@ struct LD_CHANGE_DEPARTMENT_PACKET :public SPACKET {
 	int		uid;
 };
 
-struct LD_INVENTORY_PACKET :public SPACKET {
-	int		uid;
-	int		userKey;
-};
-
 struct LD_EQUIP_ITEM_PACKET :public SPACKET {
 	int			uid;
 	long long	equipmentFlag;
@@ -166,6 +163,15 @@ struct LD_USE_COUPON_PACKET :public SPACKET {
 	int		userKey;
 };
 
+struct LD_REFRESH_INVENTORY_PACKET :public SPACKET {
+	int		uid;
+	int		userKey;
+};
+
+struct LD_REFRESH_DEP_RANK_PACKET :public SPACKET {
+	int		userKey;
+};
+
 struct DL_LOGIN_OK_PACKET :public SPACKET {
 	int		uid;
 	char	id[MAX_NAME_SIZE];
@@ -176,6 +182,7 @@ struct DL_LOGIN_OK_PACKET :public SPACKET {
 	bool	connState;
 	long long	equipmentflag;
 	long long	inventoryflag;
+	rankInfo ranking[10];
 };
 
 struct DL_LOGIN_FAIL_PACKET :public SPACKET {
@@ -192,7 +199,7 @@ struct DL_SIGNUP_FAIL_PACKET :public SPACKET {
 	int		userKey;
 };
 
-struct DL_INVENTORY_PACKET :public SPACKET {
+struct DL_REFRESH_INVENTORY_PACKET :public SPACKET {
 	long long	inventoryFlag;
 	int			userKey;
 };
@@ -214,6 +221,11 @@ struct DL_USE_COUPON_OK_PACKET :public SPACKET {
 };
 
 struct DL_USE_COUPON_FAIL_PACKET :public SPACKET {
+	int		userKey;
+};
+
+struct DL_REFRESH_DEP_RANK_PACKET :public SPACKET {
+	rankInfo ranking[10];
 	int		userKey;
 };
 
