@@ -985,7 +985,7 @@ void Server::SendBuyItem(int cID, int itemCode)
 	LD_BUY_ITEM_PACKET packet;
 
 	packet.size = sizeof(LD_EQUIP_ITEM_PACKET);
-	packet.type = LD_EQUIP_ITEM;
+	packet.type = LD_BUY_ITEM;
 	packet.uid = mClients[cID].mUID;
 	packet.itemCode = itemCode;
 	packet.price = pGameDataManager->GetShopProductInfo(itemCode).price;
