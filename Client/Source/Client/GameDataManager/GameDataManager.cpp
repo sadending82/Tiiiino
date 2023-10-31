@@ -103,7 +103,7 @@ bool GameDataManager::LoadItemData()
 			Item item;
 			item.itemCode = stoi(pItem->FirstChildElement("code")->GetText());
 			item.name = pItem->FirstChildElement("name")->GetText();
-			item.price = stoi(pItem->FirstChildElement("price")->GetText());
+			item.price = stoi(pItem->FirstChildElement("price")->GetText();
 			item.assetName = pItem->FirstChildElement("assetName")->GetText();
 			ItemList[item.itemCode] = item;
 		}

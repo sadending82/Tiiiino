@@ -19,6 +19,8 @@ bool GameDataManager::LoadShopData()
 			item.price = stoi(pProduct->FirstChildElement("price")->GetText());
 			item.cutline = stoi(pProduct->FirstChildElement("cutline")->GetText());
 
+			//cout << pProduct->FirstChildElement("name")->GetText() << endl;
+
 			ShopProductsList[item.itemCode] = item;
 		}
 		return true;
@@ -53,32 +55,6 @@ bool GameDataManager::LoadItemData()
 	}
 	catch (exception ex) {
 		DEBUGMSGNOPARAM("Load Item Data Failed\n");
-		return false;
-	}
-}
-
-bool GameDataManager::LoadCouponData()
-{
-	try {
-		tinyxml2::XMLDocument doc;
-
-		doc.LoadFile(COUPONDATAFILE);
-
-		tinyxml2::XMLElement* pRoot = doc.RootElement();
-		tinyxml2::XMLElement* pCouponList = pRoot->FirstChildElement("couponlist");
-
-		for (tinyxml2::XMLElement* pCoupon = pCouponList->FirstChildElement("coupon")
-			; pCoupon != NULL; pCoupon = pCoupon->NextSiblingElement()) {
-
-			string couponCode = pCoupon->FirstChildElement("couponCode")->GetText();
-			int itemCode = stoi(pCoupon->FirstChildElement("itemCode")->GetText());
-
-			CouponList[couponCode] = itemCode;
-		}
-		return true;
-	}
-	catch (exception ex) {
-		DEBUGMSGNOPARAM("Load Coupon Data Failed\n");
 		return false;
 	}
 }
