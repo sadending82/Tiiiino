@@ -31,6 +31,7 @@ public:
 
 protected:
 
+	// 플레이어 인벤토리
 	UPROPERTY(EditDefaultsOnly,Category="Inventory")
 	TArray<FItemData> InventoryContents;
 		

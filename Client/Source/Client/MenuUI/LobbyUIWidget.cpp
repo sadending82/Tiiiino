@@ -5,17 +5,20 @@
 #include "MenuUI/LoginUIWidget.h"
 #include "MenuUI/StoreUIWidget.h"
 #include "MenuUI/InventoryUIWidget.h"
+#include "Components/TextBlock.h"
 #include "Actor/Controller/TinoController.h"
 #include "Network/Network.h"
 #include "Global.h"
 
 void ULobbyUIWidget::NativePreConstruct()
 {
+	Super::NativePreConstruct();
 	//Grade = 0.f;
 }
 
 void ULobbyUIWidget::NativeDestruct()
 {
+	Super::NativeDestruct();
 }
 
 void ULobbyUIWidget::TryGameStart()
@@ -58,5 +61,18 @@ void ULobbyUIWidget::TryEnterInventory()
 {
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	TinoController->ChangeMenuWidget(TinoController->InventoryUIInstance);
+}
+
+void ULobbyUIWidget::GetRankData(rankInfo rank[])
+{
+	// 서버에서 보내준 랭크데이터 받는 함수
+	for (int i = 0; i < RANK_COUNT; ++i)
+	{
+		if (rank != nullptr)
+		{
+			DepartmentNameArray[i] = int(rank[i].department);
+			DepartmentPointArray[i] = rank[i].point;
+		}
+	}
 }
 

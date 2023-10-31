@@ -52,7 +52,7 @@ public:
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void CheckPasswordTextLength();
-
+	
 protected:
 	UPROPERTY()
 	int32 MaxLength = 10;
