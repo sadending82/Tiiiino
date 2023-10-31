@@ -7,12 +7,11 @@ constexpr int MAXITEM = 64;
 
 #define SHOPDATAFILE "../../GameData/ShopData.xml"
 #define ITEMDATAFILE "../../GameData/ItemData.xml"
-#define COUPONDATAFILE "../../GameData/CouponData.xml"
 
 struct Item
 {
 	int		itemCode;
-	string	name;
+	wstring	name;
 	int		price;
 	double  cutline = 0.0;
 };
@@ -22,7 +21,6 @@ class GameDataManager
 public:
 	bool			LoadShopData();
 	bool			LoadItemData();
-	bool			LoadCouponData();
 
 	map<int, Item>	GetShopProductsList() { return ShopProductsList; }
 	map<int, Item>	GetItemList() { return ItemList; }
