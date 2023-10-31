@@ -67,7 +67,8 @@ void AClientGameMode::SetItemDataTable()
 		newItemData.AssetData.BPClass = GeneratedAccessoryBP->StaticClass();
 		newItemData.AssetData.Icon = IconTexture;
 
-		ItemData->AddRow(FName(*data.second.assetName), newItemData);
+		
+		ItemData->AddRow(FName(*FString::FromInt(data.second.itemCode)), newItemData);
 	}
 }
 
@@ -78,7 +79,7 @@ void AClientGameMode::BeginPlay()
 	auto Game = Network::GetNetwork();
 	Game->init();
 
-	ItemData = NewObject<UDataTable>();
+	//ItemData = NewObject<UDataTable>();
 	
 	SetItemDataTable();
 
