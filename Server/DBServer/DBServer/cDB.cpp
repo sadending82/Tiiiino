@@ -276,7 +276,7 @@ long long DB::SelectInventory(const int uid)
 
 	if (mysql_stmt_prepare(GetmStmt(), query.c_str(), query.length()) != 0) {
 		DEBUGMSGONEPARAM("Select Inventory stmt prepare error: %s\n", mysql_stmt_error(GetmStmt()));
-		return -1;
+		return 0;
 	}
 
 	MYSQL_BIND paramBind;
@@ -286,7 +286,7 @@ long long DB::SelectInventory(const int uid)
 
 	if (mysql_stmt_bind_param(GetmStmt(), &paramBind) != 0) {
 		DEBUGMSGONEPARAM("Select Inventory stmt param bind error: %s\n", mysql_stmt_error(GetmStmt()));
-		return -1;
+		return 0;
 	}
 
 	MYSQL_BIND resultBind;
@@ -297,16 +297,15 @@ long long DB::SelectInventory(const int uid)
 
 	if (mysql_stmt_bind_result(GetmStmt(), &resultBind) != 0) {
 		DEBUGMSGONEPARAM("Select Inventory stmt result bind error: %s\n", mysql_stmt_error(GetmStmt()));
-		return -1;
+		return 0;
 	}
 
 	if (ExecuteQuery() == false) {
-		return -1;
+		return 0;
 	}
 
 	if (mysql_stmt_fetch(GetmStmt()) != 0) {
-		DEBUGMSGONEPARAM("Select Inventory stmt result fetch error: %s\n", mysql_stmt_error(GetmStmt()));
-		return -1;
+		return 0;
 	}
 
 	return bindItems;
