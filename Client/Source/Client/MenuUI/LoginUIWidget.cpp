@@ -14,11 +14,6 @@
 void ULoginUIWidget::NativePreConstruct()
 {
 	Super::NativePreConstruct();
-	LoginButton->OnClicked.AddDynamic(this, &ULoginUIWidget::TryLogin);
-	NewAccountsButton->OnClicked.AddDynamic(this, &ULoginUIWidget::TryNewAccounts);
-
-	LoginIDTextBox->OnTextChanged.AddDynamic(this, &ULoginUIWidget::InputLoginID);
-	LoginPasswordTextBox->OnTextChanged.AddDynamic(this, &ULoginUIWidget::InputLoginPassword);
 }
 
 void ULoginUIWidget::NativeDestruct()
