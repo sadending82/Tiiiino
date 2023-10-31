@@ -70,10 +70,15 @@ bool GameDataManager::LoadShopData()
 
 			Item item;
 			item.itemCode = stoi(pProduct->FirstChildElement("code")->GetText());
-			item.name = pProduct->FirstChildElement("name")->GetText();
 			item.price = stoi(pProduct->FirstChildElement("price")->GetText());
 			item.cutline = stoi(pProduct->FirstChildElement("cutline")->GetText());
 			item.assetName = pProduct->FirstChildElement("assetName")->GetText();
+			const char* uft8Name = pProduct->FirstChildElement("name")->GetText();
+			wchar_t unicodeName[256] = { 0, };
+			int nLen = MultiByteToWideChar(CP_UTF8, 0, uft8Name, strlen(uft8Name), NULL, NULL);
+			MultiByteToWideChar(CP_UTF8, 0, uft8Name, strlen(uft8Name), unicodeName, nLen);
+			item.name = wstring(unicodeName);
+
 			ShopProductsList[item.itemCode] = item;
 		}
 		UE_LOG(LogTemp, Log, TEXT("Shop Data Load Succeed"));
@@ -105,6 +110,11 @@ bool GameDataManager::LoadItemData()
 			item.name = pItem->FirstChildElement("name")->GetText();
 			item.price = stoi(pItem->FirstChildElement("price")->GetText();
 			item.assetName = pItem->FirstChildElement("assetName")->GetText();
+			onst char* uft8Name = pProduct->FirstChildElement("name")->GetText();
+			wchar_t unicodeName[256] = { 0, };
+			int nLen = MultiByteToWideChar(CP_UTF8, 0, uft8Name, strlen(uft8Name), NULL, NULL);
+			MultiByteToWideChar(CP_UTF8, 0, uft8Name, strlen(uft8Name), unicodeName, nLen);
+			item.name = wstring(unicodeName);
 			ItemList[item.itemCode] = item;
 		}
 		UE_LOG(LogTemp, Log, TEXT("Item Data Load Succeed"));
