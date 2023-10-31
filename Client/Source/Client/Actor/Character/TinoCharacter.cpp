@@ -362,6 +362,28 @@ void ATinoCharacter::MakeAndShowDialogInGame()
 	DialogWidget->RenderDisconnectNetworkWindow();
 }
 
+void ATinoCharacter::MakeAndShowLobbyRankSystem(char DepartmentName[], char DepartmentPoint[])
+{
+	auto TinoController = GetController<ATinoController>();
+	if (!!TinoController)
+	{
+		TinoController->ChangeMenuWidget(TinoController->LobbyUIInstance);
+		auto LobbyUI = TinoController->LobbyUIInstance;
+		LobbyUI->GetRankData(DepartmentName, DepartmentPoint);
+	}
+}
+
+void ATinoCharacter::MakeAndShowChangePoint()
+{
+	auto TinoController = GetController<ATinoController>();
+
+	if (!!TinoController)
+	{
+		auto StoreUI = TinoController->StoreUIInstance;
+		StoreUI->ChangePoint();
+	}
+}
+
 void ATinoCharacter::SetNetworkLocation(const FVector& Location)
 {
 	PreviousLocation = Location;
@@ -395,7 +417,7 @@ FItemData ATinoCharacter::GetItemDataFromItemCode(const int64& ItemCode)
 	return ItemData;
 }
 
-void ATinoCharacter::SetInventoryFromEquippedCode(const long long& EquippedItems)
+void ATinoCharacter::SetInventoryFromInventoryFlag(const long long& EquippedItems)
 {
 	int64 IC = StaticCast<int64>(EquippedItems);
 
@@ -410,6 +432,13 @@ void ATinoCharacter::SetInventoryFromEquippedCode(const long long& EquippedItems
 		}
 	}
 
+}
+
+void ATinoCharacter::GetShopData(UPARAM(REF) TArray<int>& iOut)
+{
+
+	auto GameMode = Cast<AClientGameMode>(GetWorld()->GetAuthGameMode());
+	GameMode->GetShopProductTable(iOut);
 }
 
 void ATinoCharacter::SetDepartmentClothes(int department)

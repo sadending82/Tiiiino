@@ -10,10 +10,12 @@
 
 void UCreateAccountsWidget::NativePreConstruct()
 {
+	Super::NativePreConstruct();
 }
 
 void UCreateAccountsWidget::NativeDestruct()
 {
+	Super::NativeDestruct();
 }
 
 void UCreateAccountsWidget::TryBack()

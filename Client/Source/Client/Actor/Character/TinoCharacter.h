@@ -118,7 +118,8 @@ public:
 
 	void MakeAndShowDialogInLobby();
 	void MakeAndShowDialogInGame();
-
+	void MakeAndShowLobbyRankSystem(char DepartmentName[], char DepartmentPoint[]);
+	void MakeAndShowChangePoint();
 	//Accessory
 
 	//소켓 이름과 메시를 정해줘야함
@@ -153,7 +154,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	FItemData GetItemDataFromItemCode(const int64& ItemCode);
-		void SetInventoryFromEquippedCode(const long long& EquippedItems);
+	void SetInventoryFromInventoryFlag(const long long& EquippedItems);
+
+	UFUNCTION(BlueprintCallable, Category = "shop")
+	void GetShopData(UPARAM(REF) TArray<int>& iOut);
 
 
 	UFUNCTION(BlueprintCallable)
@@ -298,5 +302,6 @@ private:
 	FTimerHandle DiveTimer;
 	FTimerHandle GrabTimer;
 	FTimerHandle GrabCoolTimer;
+		
 
 };

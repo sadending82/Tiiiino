@@ -32,6 +32,9 @@ constexpr int STARTCODE_FACEEQUIP = 32;
 constexpr int STARTCODE_HANDEQUIP = 16;
 constexpr int STARTCODE_BACKEQUIP = 0;
 
+// rank
+constexpr int RANK_COUNT = 10;
+
 struct rankInfo
 {
 	char	department	= 0;

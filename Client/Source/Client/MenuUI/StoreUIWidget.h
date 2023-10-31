@@ -10,6 +10,15 @@
  * 
  */
 
+UENUM(BlueprintType)
+enum class EPurchaseState : uint8
+{
+	EPS_Purchase UMETA(DisplayName = "Purchase"),
+	EPS_AlreadyPurchase UMETA(DisplayName = "Already"),
+	EPS_LimitGrade UMETA(DisplayName = "LimitGrade"),
+	
+};
+
 UCLASS()
 class CLIENT_API UStoreUIWidget : public UUserWidget
 {
@@ -33,7 +42,7 @@ public:
 
 	// 상점 아이템 구매 가능 확인
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	bool QualifyingPurchase();
+	bool QualifyingPurchase(int64 itemcode);
 	
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void AlreadyPurchase();
@@ -42,13 +51,11 @@ public:
 	void LimitGrade();
 
 	// 아이템 구매 불가 사유 Dialog
-	UFUNCTION(BluePrintImplementableEvent, Category = "UMG_Game")
-	void ShowPurchaseWarning(bool check);
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void ShowPurchaseWarning(int64 itemcode);
 
 	UFUNCTION(BluePrintImplementableEvent, Category = "UMG_Game")
 	void ChangePoint();
-
-
 
 	// StoreDialog
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
@@ -56,7 +63,14 @@ public:
 	UPROPERTY()
 	class UStoreUIWidget* StoreDialogInstance = nullptr;
 
+	// StoreBuyResult
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
+	TSubclassOf<class UStoreUIWidget> StoreBuyResultWidgetClass;
+	UPROPERTY()
+	class UStoreUIWidget* StoreBuyResultInstance = nullptr;
 
+	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
+	TArray<int> ShopItemCodeList;
 
 public:
 	// 좌/우 아이템 칸 이동
@@ -69,5 +83,11 @@ public:
 	float Grade;
 	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
 	float Point;
+
+	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
+	int64 ClickItemCode;
+
+	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
+	EPurchaseState warning;
 
 };
