@@ -9,6 +9,7 @@
 #include "Components/TextBlock.h"
 #include "Data/ItemData.h"
 #include "Network/Network.h"
+#include "Component/InventoryComponent.h"
 #include "Global.h"
 
 
@@ -59,10 +60,12 @@ bool UStoreUIWidget::QualifyingPurchase(int64 itemcode)
 			break;
 		}
 	}
+	
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	if (!!TinoController)
 	{
 		auto TinoCharacter = TinoController->GetPawn<ATinoCharacter>();
+		
 		if (!!TinoCharacter)
 		{
 			if (TinoCharacter->GetPoint() < price)
@@ -107,6 +110,7 @@ void UStoreUIWidget::ShowPurchaseWarning(int64 itemcode)
 	if (!!TinoController)
 	{
 		auto TinoCharacter = TinoController->GetPawn<ATinoCharacter>();
+		auto inventory = TinoCharacter->GetInventoryContents();
 		if (!!TinoCharacter)
 		{
 			if (TinoCharacter->GetPoint() < price)

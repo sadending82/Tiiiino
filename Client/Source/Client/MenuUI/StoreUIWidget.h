@@ -55,7 +55,7 @@ public:
 	void ShowPurchaseWarning(int64 itemcode);
 
 	UFUNCTION(BluePrintImplementableEvent, Category = "UMG_Game")
-	void ChangePoint();
+	void ChangePoint(int AfterPoint);
 
 	// StoreDialog
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")

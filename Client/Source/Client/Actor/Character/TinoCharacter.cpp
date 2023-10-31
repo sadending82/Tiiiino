@@ -373,14 +373,14 @@ void ATinoCharacter::MakeAndShowLobbyRankSystem(rankInfo rank[])
 	}
 }
 
-void ATinoCharacter::MakeAndShowChangePoint()
+void ATinoCharacter::MakeAndShowChangePoint(int AfterPoint)
 {
 	auto TinoController = GetController<ATinoController>();
 
 	if (!!TinoController)
 	{
 		auto StoreUI = TinoController->StoreUIInstance;
-		StoreUI->ChangePoint();
+		StoreUI->ChangePoint(AfterPoint);
 	}
 }
 
