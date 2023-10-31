@@ -184,6 +184,7 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		mClients[p->userKey].mUID = p->uid;
 		mClients[p->userKey].mState = eSessionState::ST_LOBBY;
 		mClients[p->userKey].mEquippedItems = p->equipmentflag;
+		mClients[p->userKey].mInventory = p->inventoryflag;
 		mClients[p->userKey].mStateLock.unlock();
 
 		SendLoginOK(p->userKey);
@@ -995,8 +996,7 @@ void Server::SendLoginOK(int cID)
 	pac.RoomID = 0;
 	pac.UID = mClients[cID].mUID;
 	pac.equippedItems = mClients[cID].mEquippedItems;
-
-	cout << pac.equippedItems << endl;
+	pac.inventoryFlag = mClients[cID].mInventory;
 
 	mClients[cID].DoSend(&pac);
 }
@@ -1095,6 +1095,7 @@ void Server::SendBuyOK(int key, int itemCode)
 	packet.type = LC_BUYITEM_OK;
 	packet.pointAfterPurchase = mClients[key].mPoint;
 	packet.itemCode = itemCode;
+	packet.inventoryFlag = mClients[key].mInventory;
 	mClients[key].DoSend(&packet);
 }
 

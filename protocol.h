@@ -311,8 +311,9 @@ struct LC_LOGIN_OK_PACKET : public PACKET {
 	int point;
 	int RoomID;
 	long long equippedItems;
+	long long inventoryFlag;
 	char departmentcode[10];
-	char departmentpoint[10];
+	int departmentpoint[10];
 };
 
 struct 	LC_LOGIN_FAIL_PACKET :public PACKET {
@@ -347,6 +348,7 @@ struct LC_CONTROL_PACKET :public PACKET {
 struct LC_BUYITEM_OK_PACKET :public PACKET {
 	int itemCode;
 	int	pointAfterPurchase;
+	long long inventoryFlag;
 };
 
 struct LC_BUYITEM_FAIL_PACKET :public PACKET {
