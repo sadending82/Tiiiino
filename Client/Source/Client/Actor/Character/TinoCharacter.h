@@ -161,6 +161,9 @@ public:
 	void SetInventoryFromInventoryFlag(const long long& EquippedItems);
 
 	UFUNCTION(BlueprintCallable, Category = "shop")
+	FItemData GetShopItemDataFromItemCode(const int64& ItemCode);
+
+	UFUNCTION(BlueprintCallable, Category = "shop")
 	void GetShopData(UPARAM(REF) TArray<int>& iOut);
 
 
