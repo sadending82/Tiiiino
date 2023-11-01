@@ -47,7 +47,7 @@ public:
 		UTexture2D* Icon;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ToolTip = "사용할 블루프린트 클래스"))
-		TSubclassOf<class AAccessoryItem> BPClass;
+	TSubclassOf<class AAccessoryItem> BPClass;
 };
 
 

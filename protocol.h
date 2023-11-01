@@ -229,6 +229,7 @@ struct CL_REFRESH_DEP_RANK_PACKET : public PACKET {
 struct SC_LOGIN_OK_PACKET : public PACKET {
 	int		id;
 	char	department;
+	long long equipmentFlag;
 };
 
 struct SC_DISCONN_PACKET : public PACKET {
@@ -251,6 +252,7 @@ struct SC_ADD_PLAYER_PACKET : public PACKET {
 	float rx, ry, rz, rw;
 	char	name[MAX_NAME_SIZE];
 	char	department;
+	long long equipmentFlag;
 
 };
 

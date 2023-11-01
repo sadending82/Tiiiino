@@ -155,9 +155,11 @@ SC_LOGIN_OK_PACKET MainServer::make_login_ok_packet(const int playerSocketID, co
 	packet.type = SC_LOGIN_OK;
 
 	packet.id = playerID;
-	if(player)
+	if (player)
+	{
 		packet.department = static_cast<char>(player->GetDepartment());
-	//wcscpy(packet.name, playername);
+		packet.equipmentFlag = player->GetEquipmentFlag();
+	}
 	return packet;
 }
 
@@ -188,6 +190,7 @@ SC_ADD_PLAYER_PACKET MainServer::make_player_add_packet(const int playerSocketID
 	sendpacket.ry = player->GetRotate().y;
 	sendpacket.rz = player->GetRotate().z;
 	sendpacket.rw = player->GetRotate().w;
+	sendpacket.equipmentFlag = player->GetEquipmentFlag();
 	return sendpacket;
 }
 
@@ -769,7 +772,7 @@ void MainServer::ProcessPacketLobby(const int serverID, unsigned char* p)
 		LG_USER_INTO_GAME_PACKET* packet = reinterpret_cast<LG_USER_INTO_GAME_PACKET*>(p);
 		Room* activeRoom = mRooms[packet->roomID];
 		mRooms[packet->roomID]->ActiveRoom();
-		sPlayerInfo playerinfo{ packet->id,packet->name,static_cast<eDepartment>(packet->department),static_cast<eEquipmentFlags>(packet->equipmentflag),packet->roomID };
+		sPlayerInfo playerinfo{ packet->id,packet->name,static_cast<eDepartment>(packet->department),packet->equipmentflag,packet->roomID };
 		playerinfo.UID = packet->uID;
 		strcpy_s(playerinfo.hashs, packet->hashs);
 		if (true == activeRoom->SettingRoomPlayer(playerinfo, packet->roomMax))

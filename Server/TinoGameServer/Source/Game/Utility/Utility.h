@@ -106,7 +106,7 @@ struct sPlayerInfo {
 	std::string ID;
 	std::string NickName;
 	eDepartment Department;
-	eEquipmentFlags Equipment;
+	long long EquipmentFlag;
 	int RoomID;
 	int UID = -1;
 	char	hashs[MAX_NAME_SIZE];
