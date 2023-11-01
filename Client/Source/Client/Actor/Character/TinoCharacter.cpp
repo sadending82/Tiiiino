@@ -586,17 +586,9 @@ void ATinoCharacter::WearAccessory(const int ItemCode)
 
 	auto Accessory = AAccessoryItem::Spawn< AAccessoryItem>(GetWorld(), Item.AssetData.BPClass, this);
 	Accessory->SetSocketNameWithItemCode(ItemCode);
+	Accessory->SetItemCode(ItemCode);
 	int idx = AccessoryInventory.Add(Accessory);
-	AccessoryInventory[idx]->Equip();
-}
-
-void ATinoCharacter::UnWearAccessory(const int ItemCode)
-{
-	//auto Accessory = AccessoryInventory.FindByPredicate([&ItemCode](const AAccessoryItem& i) { return i.GetItemCode() == ItemCode; });
-
-	//Accessory->UnEquip();
-	//AccessoryInventory.Remove(*Accessory);
-	//Accessory->Destroy();
+	//AccessoryInventory[idx]->Equip();
 }
 
 void ATinoCharacter::OnMoveForward(float Axis)

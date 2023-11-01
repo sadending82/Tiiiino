@@ -75,17 +75,7 @@ bool UInventoryUIWidget::CheckItemEquiped(const int64 itemcode)
 
 	for (auto& p : Network::GetNetwork()->mMyCharacter->AccessoryInventory)
 	{
-		if (p->GetItemCode() == itemcode)
-		{
-			if (p->GetbEquipped())
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
+		
 	}
 	return false;
 }
