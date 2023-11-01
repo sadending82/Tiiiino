@@ -427,7 +427,7 @@ void ATinoCharacter::SetInventoryFromInventoryFlag(const long long& EquippedItem
 
 		if (Value != 0)
 		{
-			int64 ItemCode = i + 1;
+			int64 ItemCode = i;
 			InventoryComponent->AddItem(GetItemDataFromItemCode(ItemCode));
 		}
 	}

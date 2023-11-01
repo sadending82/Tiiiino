@@ -34,6 +34,8 @@ void UStoreUIWidget::TryBack()
 {
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 
+	TinoController->LobbyUIInstance->UpdatePoint();
+	
 	TinoController->ChangeMenuWidget(TinoController->LobbyUIInstance);
 }
 
@@ -75,6 +77,11 @@ bool UStoreUIWidget::QualifyingPurchase(int64 itemcode)
 			if (TinoCharacter->GetGrade() < grade)
 			{
 				return false;
+			}
+			for (auto& p : Network::GetNetwork()->mMyCharacter->GetInventoryContents())
+			{
+				if (p.ItemCode == itemcode)
+					return false;
 			}
 		}
 	}
