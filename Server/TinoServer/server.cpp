@@ -138,6 +138,13 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 		SendRefreshRankingRequest(cID);
 		break;
 	}
+	case CL_REFRESH_POINT: {
+
+		LC_REFRESH_POINT_PACKET p;
+		p.point = mClients[cID].mPoint;
+		mClients[cID].DoSend(&p);
+		break;
+	}
 	default:
 	{
 		break;

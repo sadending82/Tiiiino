@@ -42,6 +42,7 @@ void send_buyitem_packet(SOCKET& sock, const int itemCode);
 void send_equip_packet(SOCKET& sock, const int itemCode);
 void send_unequip_packet(SOCKET& sock, const int itemCode);
 void send_refresh_dep_rank_packet(SOCKET& sock);
+void send_refresh_point_packet(SOCKET& sock);
 //game packet
 void send_movetogame_packet(SOCKET& sock,const int uID, const char* id, const int& roomID);
 void send_move_packet(SOCKET& sock, const bool& inair, const float& x, const float& y, const float& z, FQuat& rotate, const float& value, const FVector& speedVec);
