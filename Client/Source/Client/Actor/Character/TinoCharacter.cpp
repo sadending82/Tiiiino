@@ -562,6 +562,10 @@ UCharacterAnimInstance* ATinoCharacter::GetTinoAnimInstance()
 void ATinoCharacter::SetAccessoryFromEquippedFlag(const long long& EquippedItems)
 {
 	int64 IC = StaticCast<int64>(EquippedItems);
+	for (auto p : AccessoryInventory)
+	{
+		p->Destroy();
+	}
 	AccessoryInventory.Empty();
 	for (int64 i = 0; i < 64; ++i)
 	{
@@ -581,8 +585,8 @@ void ATinoCharacter::WearAccessory(const int ItemCode)
 
 	auto Accessory = AAccessoryItem::Spawn< AAccessoryItem>(GetWorld(), Item.AssetData.BPClass, this);
 	Accessory->SetSocketNameWithItemCode(ItemCode);
-	AccessoryInventory.Add(Accessory->GetClass());
-	Accessory->Equip();
+	int idx = AccessoryInventory.Add(Accessory);
+	AccessoryInventory[idx]->Equip();
 }
 
 void ATinoCharacter::UnWearAccessory(const int ItemCode)

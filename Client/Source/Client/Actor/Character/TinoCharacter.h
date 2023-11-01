@@ -130,8 +130,7 @@ public:
 	UFUNCTION(Blueprintcallable, Category = "Accessory")
 		void UnWearAccessory(const int ItemCode);
 	//임시 나중에 상점 생기면 수정할것
-	UPROPERTY(EditDefaultsOnly, Category = "Accessory")
-	TArray<TSubclassOf<class AAccessoryItem>> AccessoryInventory;
+	TArray<class AAccessoryItem*> AccessoryInventory;
 
 
 	//Getter & Setter

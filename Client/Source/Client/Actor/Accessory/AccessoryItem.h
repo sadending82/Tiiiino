@@ -17,7 +17,7 @@ public:
 
 public:
 	template<typename T>
-	static AAccessoryItem* Spawn(class UWorld* InWorld,class UClass* BPClass,class ACharacter* InOwner)
+	static AAccessoryItem* Spawn(class UWorld* InWorld, TSubclassOf<T> BPClass,class ACharacter* InOwner)
 	{
 		FActorSpawnParameters params;
 		params.Owner = InOwner;
