@@ -277,25 +277,21 @@ void ATinoCharacter::MakeAndShowHUD()
 
 }
 
-void ATinoCharacter::MakeAndShowLoginOK(const double GradeValue, const int PointValue)
+void ATinoCharacter::MakeAndShowLoginOK(const double GradeValue)
 {
 	float GValue = StaticCast<float>(GradeValue);
-	int32 PValue = StaticCast<int32>(PointValue);
 	auto TinoController = GetController<ATinoController>();
 
 	if (!!TinoController)
 	{
 		SetGrade(GValue);
-		SetPoint(PValue);
 
 		TinoController->ChangeMenuWidget(TinoController->LobbyUIInstance);
 		auto LobbyUI = TinoController->LobbyUIInstance;
 		LobbyUI->Grade = GValue;
-		LobbyUI->Point = PValue;
 
 		auto StoreUI = TinoController->StoreUIInstance;
 		StoreUI->Grade = GValue;
-		StoreUI->Point = PValue;
 	}
 }
 
@@ -367,9 +363,9 @@ void ATinoCharacter::MakeAndShowLobbyRankSystem(rankInfo rank[])
 	auto TinoController = GetController<ATinoController>();
 	if (!!TinoController)
 	{
-		TinoController->ChangeMenuWidget(TinoController->LobbyUIInstance);
 		auto LobbyUI = TinoController->LobbyUIInstance;
 		LobbyUI->GetRankData(rank);
+		LobbyUI->UpdataRankData();
 	}
 }
 
@@ -388,6 +384,22 @@ void ATinoCharacter::SetNetworkLocation(const FVector& Location)
 {
 	PreviousLocation = Location;
 	SetActorLocation(Location);
+}
+
+void ATinoCharacter::UpdataPointInLobby(int point)
+{
+	auto TinoController = GetController<ATinoController>();
+
+	SetPoint(point);
+
+	if (!!TinoController)
+	{
+		auto LobbyUI = TinoController->LobbyUIInstance;
+		LobbyUI->Point = point;
+
+		auto StoreUI = TinoController->StoreUIInstance;
+		StoreUI->Point = point;
+	}
 }
 
 TArray<FItemData> ATinoCharacter::GetInventoryContents()

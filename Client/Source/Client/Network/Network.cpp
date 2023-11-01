@@ -659,8 +659,9 @@ void Network::l_process_packet(unsigned char* p)
 		mMyCharacter->SetAccessoryFromEquippedFlag(packet->equippedItems);
 
 		//학점과 포인트 표기
-		mMyCharacter->MakeAndShowLoginOK(packet->grade, packet->point);
 		mMyCharacter->MakeAndShowLobbyRankSystem(packet->ranking);
+		mMyCharacter->MakeAndShowLoginOK(packet->grade);
+		mMyCharacter->UpdataPointInLobby(packet->point);
 		break;
 	}
 	case LC_LOGIN_FAIL:
@@ -716,7 +717,7 @@ void Network::l_process_packet(unsigned char* p)
 	}
 	case LC_BUYITEM_OK: {
 		LC_BUYITEM_OK_PACKET* packet = reinterpret_cast<LC_BUYITEM_OK_PACKET*>(p);
-		
+
 		mMyCharacter->AddItemToInventory(mMyCharacter->GetItemDataFromItemCode(packet->itemCode));
 		mMyCharacter->GetController<ATinoController>()->StoreUIInstance->StoreDialogInstance->RemoveFromParent();
 		mMyCharacter->MakeAndShowChangePoint(packet->pointAfterPurchase);
@@ -737,11 +738,13 @@ void Network::l_process_packet(unsigned char* p)
 	case LC_REFRESH_DEP_RANK: {
 		LC_REFRESH_DEP_RANK_PACKET* packet = reinterpret_cast<LC_REFRESH_DEP_RANK_PACKET*>(p);
 
+		mMyCharacter->MakeAndShowLobbyRankSystem(packet->ranking);
+		
 		break;
 	}
 	case LC_REFRESH_POINT: {
 		LC_REFRESH_POINT_PACKET* packet = reinterpret_cast<LC_REFRESH_POINT_PACKET*>(p);
-		
+		mMyCharacter->UpdataPointInLobby(packet->point);
 		break;
 	}
 	case LC_EQUIP_OK: {

@@ -105,7 +105,7 @@ public:
 	//UI 함수
 	void MakeAndShowHUD();	
 
-	void MakeAndShowLoginOK(const double GradeValue, const int PointValue);
+	void MakeAndShowLoginOK(const double GradeValue);
 	void MakeAndShowLoginFail();
 	void MakeAndShowCreateAccountsSignUpOK();
 	void MakeAndShowCreateAccountsSignUpFail();
@@ -148,7 +148,7 @@ public:
 	FORCEINLINE void SetPoint(const float PointValue) { Point = PointValue; };
 	FORCEINLINE FVector GetNetworkLocation() { return PreviousLocation; }
 
-
+	void UpdataPointInLobby(int point);
 
 	//인벤토리에 저장된 데이터에 접근할 수 있음
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
