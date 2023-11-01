@@ -41,6 +41,7 @@ public:
 	void SendRanking(int key, vector<rankInfo>& ranking, int userKey);
 	void SendEquipOK(int key, long long equipmentFlag, int userkey);
 	void SendUnequipOK(int key, long long equipmentFlag, int userkey);
+	void SendPoint(int key, int point, int userKey);
 
 	void ProcessPacket_Login(int key, unsigned char* buf);
 	void ProcessPacket_Logout(unsigned char* buf);
@@ -53,6 +54,7 @@ public:
 	void ProcessPacket_BuyItem(int key, unsigned char* buf);
 	void ProcessPacket_UseCoupon(int key, unsigned char* buf);
 	void ProcessPacket_RefreshDepRank(int key, unsigned char* buf);
+	void ProcessPacket_GetPoint(int key, unsigned char* buf);
 
 	int SetUIDForTest();
 

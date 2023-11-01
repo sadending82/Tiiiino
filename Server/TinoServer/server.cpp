@@ -139,10 +139,12 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 		break;
 	}
 	case CL_REFRESH_POINT: {
+		LD_GET_POINT_PACKET p;
+		p.size = sizeof(p);
+		p.type = LD_GET_POINT;
+		p.userKey = cID;
 
-		LC_REFRESH_POINT_PACKET p;
-		p.point = mClients[cID].mPoint;
-		mClients[cID].DoSend(&p);
+		mServers[0].DoSend(&p);
 		break;
 	}
 	default:
@@ -266,6 +268,17 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		DL_UNEQUIP_OK_PACKET* p = reinterpret_cast<DL_UNEQUIP_OK_PACKET*>(spacket);
 		mClients[p->userKey].mEquippedItems = p->equipmentFlag;
 		SendUnequipItemOK(p->userKey, p->itemCode, p->equipmentFlag);
+		break;
+	}
+	case DL_GET_POINT: {
+		DL_GET_POINT_PACKET* p = reinterpret_cast<DL_GET_POINT_PACKET*>(spacket);
+	
+		LC_REFRESH_POINT_PACKET pac;
+		pac.point = p->point;
+		pac.size = sizeof(pac);
+		pac.type = LC_REFRESH_POINT;
+
+		mClients[p->userKey].DoSend(&pac);
 		break;
 	}
 	default:
@@ -1043,6 +1056,7 @@ void Server::SendRefreshRankingRequest(int cID)
 	mServers[0].DoSend(&packet);
 }
 
+
 void Server::SendLoginOK(int cID,const rankInfo* rank)
 {
 	LC_LOGIN_OK_PACKET pac;
@@ -1204,6 +1218,7 @@ void Server::SendUnequipItemOK(int key, int itemCode, long long equipmentFlag)
 	packet.equipmentFlag = mClients[key].mInventory;
 	mClients[key].DoSend(&packet);
 }
+
 
 void Server::LoadGameData()
 {
