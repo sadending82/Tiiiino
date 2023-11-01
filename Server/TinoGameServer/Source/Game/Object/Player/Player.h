@@ -47,6 +47,8 @@ public:
     void SetGrade(const float grade) { mGrade = grade; }
     eDepartment GetDepartment() const { return mDepartment; }
     void SetDepartment(const eDepartment department) { mDepartment = department; }
+    long long GetEquipmentFlag() const { return mEquipmentFlag; }
+    void SetEquipmentFlag(const long long equipmentflag) { mEquipmentFlag = equipmentflag; }
 protected:
     //Be sure to use it below the function that calls the lock. ex)CanPlayerArrive()
     //반드시 락을 불러주는 함수 하위에서 쓸 것
@@ -57,7 +59,7 @@ protected:
     std::string mNickName;
     float   mGrade;   //학점
     eDepartment    mDepartment; //학과.
-    eEquipmentFlags mEquipment;
+    long long      mEquipmentFlag;
     std::mutex      mPlayerStateLock;
     ePlayerState    mPlayerState;
     int mRoomID;    // room number, check own mRooms[mRoomID]

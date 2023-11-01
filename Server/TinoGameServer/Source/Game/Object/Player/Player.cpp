@@ -6,7 +6,7 @@ Player::Player()
 	:mNickName("")
 	, mGrade(0.0f)
 	, mDepartment(eDepartment::None)
-	, mEquipment(eEquipmentFlags::None)
+	, mEquipmentFlag(0)
 	, mRoomID(INVALID_ROOM_ID)
 	, mRoomSyncID(-1)
 	, mRank(-1)
@@ -81,7 +81,7 @@ void Player::Reset()
 
 	mNickName.clear();
 	mDepartment = eDepartment::None;
-	mEquipment = eEquipmentFlags::None;
+	mEquipmentFlag = 0;
 	mGrade = 0.0f;
 	mRoomID = INVALID_ROOM_ID;
 	mRoomSyncID = -1;

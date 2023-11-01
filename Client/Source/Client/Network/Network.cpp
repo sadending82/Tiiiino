@@ -403,6 +403,7 @@ void Network::process_packet(unsigned char* p)
 		mMyCharacter->SetDepartmentClothes(packet->department);
 		FVector location(240.f - ((packet->id % 4) * 160), 0 - (packet->id / 4 * 160), 0);
 		mMyCharacter->SetActorLocation(location);
+		mMyCharacter->SetAccessoryFromEquippedFlag(packet->equipmentFlag);
 		//연결성공
 		bIsConnected = true;
 		break;
@@ -465,6 +466,7 @@ void Network::process_packet(unsigned char* p)
 			break;
 		if (nullptr != mOtherCharacter[id])
 		{
+			mOtherCharacter[id]->SetAccessoryFromEquippedFlag(packet->equipmentFlag);
 			mOtherCharacter[id]->GetMesh()->SetVisibility(true);
 			mOtherCharacter[id]->SetClientID(packet->id);
 			//mOtherCharacter[id]->CharacterName = FString(ANSI_TO_TCHAR(packet->name));
@@ -487,6 +489,7 @@ void Network::process_packet(unsigned char* p)
 				mc->FinishSpawning(trans);
 				mc->SetDepartmentClothes(packet->department);
 				mOtherCharacter[id] = mc;
+				mOtherCharacter[id]->SetAccessoryFromEquippedFlag(packet->equipmentFlag);
 				mOtherCharacter[id]->GetMesh()->SetVisibility(true);
 				mOtherCharacter[id]->SetClientID(packet->id);
 				mOtherCharacter[id]->SetCollisionProfileName(TEXT("Empty"));
