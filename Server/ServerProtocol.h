@@ -178,6 +178,7 @@ struct LD_REFRESH_DEP_RANK_PACKET :public SPACKET {
 };
 
 struct LD_GET_POINT_PACKET : public SPACKET {
+	int uid;
 	int userKey;
 };
 

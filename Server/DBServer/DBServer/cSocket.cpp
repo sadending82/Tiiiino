@@ -670,7 +670,7 @@ void Socket::ProcessPacket_GetPoint(int key, unsigned char* buf)
 
     int point = 0;
 #ifdef RUN_DB
-    point = m_pDB->SelectPoint(p->userKey);
+    point = m_pDB->SelectPoint(p->uid);
 #endif
     SendPoint(key, point, p->userKey);
 }

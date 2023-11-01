@@ -142,7 +142,8 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 		LD_GET_POINT_PACKET p;
 		p.size = sizeof(p);
 		p.type = LD_GET_POINT;
-		p.userKey = mClients[cID].mUID;
+		p.userKey = cID;
+		p.uid = mClients[cID].mUID;
 
 		mServers[0].DoSend(&p);
 		break;
