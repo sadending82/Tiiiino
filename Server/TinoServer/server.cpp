@@ -193,7 +193,7 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		mClients[p->userKey].mInventory = p->inventoryflag;
 		mClients[p->userKey].mStateLock.unlock();
 
-		SendLoginOK(p->userKey);
+		SendLoginOK(p->userKey, p->ranking);
 
 		break;
 	}
@@ -1036,7 +1036,7 @@ void Server::SendRefreshRankingRequest(int cID)
 	mServers[0].DoSend(&packet);
 }
 
-void Server::SendLoginOK(int cID)
+void Server::SendLoginOK(int cID,const rankInfo* rank)
 {
 	LC_LOGIN_OK_PACKET pac;
 	pac.type = LC_LOGIN_OK;
@@ -1048,7 +1048,7 @@ void Server::SendLoginOK(int cID)
 	pac.UID = mClients[cID].mUID;
 	pac.equippedItems = mClients[cID].mEquippedItems;
 	pac.inventoryFlag = mClients[cID].mInventory;
-
+	memcpy(pac.ranking, rank, sizeof(pac.ranking));
 	mClients[cID].DoSend(&pac);
 }
 

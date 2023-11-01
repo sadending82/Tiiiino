@@ -41,7 +41,7 @@ public:
 	void SendBuyItem(int cID, int itemCode);
 	void SendRefreshRankingRequest(int cID);
 
-	void SendLoginOK(int cID);
+	void SendLoginOK(int cID, const rankInfo* rank);
 
 	void SendDiconnectPacketToGameServer(int key, int uid, int roomID);
 	void SendMatchResult(int key, int rank, int point);
