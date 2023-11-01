@@ -109,16 +109,18 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 	{
 		CL_EQUIP_ITEM_PACKET* p = reinterpret_cast<CL_EQUIP_ITEM_PACKET*>(cpacket);
 
-		EquipItem(cID, p->itemCode);
-		SendUpdateEquipmentFlag(cID, mClients[cID].mEquippedItems);
+		if (CheckAbleEquipItem(cID, p->itemCode) == true) {
+			SendEquipItem(cID, p->itemCode);
+		}
 		break;
 	}
 	case CL_UNEQUIP_ITEM:
 	{
 		CL_UNEQUIP_ITEM_PACKET* p = reinterpret_cast<CL_UNEQUIP_ITEM_PACKET*>(cpacket);
 
-		UnequipItem(cID, p->itemCode);
-		SendUpdateEquipmentFlag(cID, mClients[cID].mEquippedItems);
+		if (CheckAbleUnequipItem(cID, p->itemCode) == true) {
+			SendUnequipItem(cID, p->itemCode);
+		}
 		break;
 	}
 	case CL_BUY_ITEM:
@@ -247,7 +249,18 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		SendRankingToClient(p->userKey, p->ranking);
 		break;
 	}
-	
+	case DL_EQUIP_OK: {
+		DL_EQUIP_OK_PACKET* p = reinterpret_cast<DL_EQUIP_OK_PACKET*>(spacket);
+		mClients[p->userKey].mEquippedItems = p->equipmentFlag;
+		SendEquipItemOK(p->userKey, p->itemCode, p->equipmentFlag);
+		break;
+	}
+	case DL_UNEQUIP_OK: {
+		DL_UNEQUIP_OK_PACKET* p = reinterpret_cast<DL_UNEQUIP_OK_PACKET*>(spacket);
+		mClients[p->userKey].mEquippedItems = p->equipmentFlag;
+		SendUnequipItemOK(p->userKey, p->itemCode, p->equipmentFlag);
+		break;
+	}
 	default:
 	{
 		break;
@@ -775,27 +788,6 @@ void Server::BuyItem(int cID, int itemCode)
 	}
 }
 
-void Server::EquipItem(int cID, int itemCode)
-{
-	long long initBit;
-
-	if (itemCode <= STARTCODE_HANDEQUIP)
-		initBit = BACKEQUIP;
-	else if (STARTCODE_HANDEQUIP <= itemCode && itemCode < STARTCODE_FACEEQUIP)
-		initBit = HANDEQUIP;
-	else if (STARTCODE_FACEEQUIP <= itemCode && itemCode < STARTCODE_HEADEQUIP)
-		initBit = FACEEQUIP;
-	else
-		initBit = HEADEQUIP;
-
-	mClients[cID].mEquippedItems = (mClients[cID].mEquippedItems & initBit) | (1ULL << itemCode);
-}
-
-void Server::UnequipItem(int cID, int itemCode)
-{
-	mClients[cID].mEquippedItems = mClients[cID].mEquippedItems & ~(1ULL << itemCode);
-}
-
 void Server::AddItemToInventory(int cID, int itemCode)
 {
 	mClients[cID].mInventory = mClients[cID].mInventory | (1ULL << itemCode);
@@ -821,6 +813,27 @@ void Server::CheckDuplicateLogin(int uid)
 			Disconnect(target);
 		}
 	}
+}
+
+bool Server::CheckAbleEquipItem(int cID, int itemCode)
+{
+	long long result = mClients[cID].mInventory & (1LL << itemCode);
+	if (result == 0) return false;
+
+	result = mClients[cID].mEquippedItems & (1LL << itemCode);
+	if (result == 0) return true;
+	return false;
+}
+
+bool Server::CheckAbleUnequipItem(int cID, int itemCode)
+{
+	long long result = mClients[cID].mInventory & (1LL << itemCode);
+	if (result == 0) return false;
+
+	result = mClients[cID].mEquippedItems & (1LL << itemCode);
+	if (result == 0) return false;
+
+	return true;
 }
 
 void Server::SendPlayerResult(int uID, int roomID, bool retire, int rank)
@@ -972,14 +985,27 @@ void Server::SendGameResult(int roomID, int key)
 	mServers[0].DoSend(&packet);
 }
 
-void Server::SendUpdateEquipmentFlag(int cID, long long equipmentFlag)
+void Server::SendEquipItem(int cID, int itemCode)
 {
 	LD_EQUIP_ITEM_PACKET packet;
 
 	packet.size = sizeof(LD_EQUIP_ITEM_PACKET);
 	packet.type = LD_EQUIP_ITEM;
 	packet.uid = mClients[cID].mUID;
-	packet.equipmentFlag = equipmentFlag;
+	packet.itemCode = itemCode;
+	packet.userKey = cID;
+
+	mServers[0].DoSend(&packet);
+}
+
+void Server::SendUnequipItem(int cID, int itemCode)
+{
+	LD_UNEQUIP_ITEM_PACKET packet;
+
+	packet.size = sizeof(LD_UNEQUIP_ITEM_PACKET);
+	packet.type = LD_UNEQUIP_ITEM;
+	packet.uid = mClients[cID].mUID;
+	packet.itemCode = itemCode;
 	packet.userKey = cID;
 
 	mServers[0].DoSend(&packet);
@@ -1148,6 +1174,26 @@ void Server::SendRankingToClient(int key, rankInfo* ranking)
 	for (int i = 0; i < 10; ++i) {
 		packet.ranking[i] = ranking[i];
 	}
+	mClients[key].DoSend(&packet);
+}
+
+void Server::SendEquipItemOK(int key, int itemCode, long long equipmentFlag)
+{
+	LC_EQUIP_OK_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = LC_EQUIP_OK;
+	packet.itemCode = itemCode;
+	packet.equipmentFlag = mClients[key].mInventory;
+	mClients[key].DoSend(&packet);
+}
+
+void Server::SendUnequipItemOK(int key, int itemCode, long long equipmentFlag)
+{
+	LC_UNEQUIP_OK_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = LC_UNEQUIP_OK;
+	packet.itemCode = itemCode;
+	packet.equipmentFlag = mClients[key].mInventory;
 	mClients[key].DoSend(&packet);
 }
 

@@ -24,12 +24,11 @@ public:
 	void RoomReset(int roomID);
 	void BuyItem(int cID, int itemCode);
 
-	void EquipItem(int cID, int itemCode);
-	void UnequipItem(int cID, int itemCode);
 	void AddItemToInventory(int cID, int itemCode);
 
 	void CheckDuplicateLogin(int uid);
-
+	bool CheckAbleEquipItem(int cID, int itemCode);
+	bool CheckAbleUnequipItem(int cID, int itemCode);
 
 	void SendPlayerResult(int uID, int roomID, bool retire, int rank);
 
@@ -37,7 +36,8 @@ public:
 	void SendLogin(int cID, char* id, char* pass, char* version);
 	void SendSignUp(int cID, char* id, char* pass, char depart);
 	void SendGameResult(int roomID, int key);
-	void SendUpdateEquipmentFlag(int cID, long long equipmentFlag);
+	void SendEquipItem(int cID, int itemCode);
+	void SendUnequipItem(int cID, int itemCode);
 	void SendBuyItem(int cID, int itemCode);
 	void SendRefreshRankingRequest(int cID);
 
@@ -52,6 +52,8 @@ public:
 	void SendBuyFail(int key);
 	void SendInventory(int key);
 	void SendRankingToClient(int key, rankInfo* ranking);
+	void SendEquipItemOK(int key, int itemCode, long long equipmentFlag);
+	void SendUnequipItemOK(int key, int itemCode, long long equipmentFlag);
 
 	void LoadGameData();
 public:

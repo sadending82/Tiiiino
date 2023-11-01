@@ -117,6 +117,8 @@ enum PacketType {
 	LC_BUYITEM_FAIL,
 	LC_REFRESH_INVENTORY,
 	LC_REFRESH_DEP_RANK,
+	LC_EQUIP_OK,
+	LC_UNEQUIP_OK,
 };
 
 #pragma pack (push, 1)
@@ -362,6 +364,16 @@ struct LC_REFRESH_INVENTORY_PACKET : public PACKET {
 
 struct LC_REFRESH_DEP_RANK_PACKET : public PACKET {
 	rankInfo ranking[10];
+};
+
+struct LC_EQUIP_OK_PACKET : public PACKET {
+	int itemCode;
+	long long equipmentFlag;
+};
+
+struct LC_UNEQUIP_OK_PACKET : public PACKET {
+	int itemCode;
+	long long equipmentFlag;
 };
 //--------------------------
 struct EVENT {

@@ -23,6 +23,9 @@ public:
 	bool CheckLogin(int key, const char* id, const char* password, int userid, const char* version);
 	bool CheckValidString(const char* str);
 
+	long long EquipItem(int itemCode, long long equipmentFlag);
+	long long UnequipItem(int itemCode, long long equipmentFlag);
+
 	void SendLoginOK(int key, int uid, const char* id, double grade
 		, int point, int state, char department
 		, long long equippedItemFlag, long long inventoryFlag,
@@ -36,6 +39,8 @@ public:
 	void SendUseCouponOK(int key, int itemCode, int userKey, long long inventoryFlag);
 	void SendUseCouponFail(int key, int userKey);
 	void SendRanking(int key, vector<rankInfo>& ranking, int userKey);
+	void SendEquipOK(int key, long long equipmentFlag, int userkey);
+	void SendUnequipOK(int key, long long equipmentFlag, int userkey);
 
 	void ProcessPacket_Login(int key, unsigned char* buf);
 	void ProcessPacket_Logout(unsigned char* buf);

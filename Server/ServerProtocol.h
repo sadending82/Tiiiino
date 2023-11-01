@@ -58,7 +58,9 @@ enum SPacketType {
 	DL_BUYITEM_FAIL,
 	DL_USE_COUPON_OK,
 	DL_USE_COUPON_FAIL,
-	DL_REFRESH_DEP_RANK
+	DL_REFRESH_DEP_RANK,
+	DL_EQUIP_OK,
+	DL_UNEQUIP_OK,
 };
 
 
@@ -141,7 +143,7 @@ struct LD_CHANGE_DEPARTMENT_PACKET :public SPACKET {
 
 struct LD_EQUIP_ITEM_PACKET :public SPACKET {
 	int			uid;
-	long long	equipmentFlag;
+	long long	itemCode;
 	int			userKey;
 };
 
@@ -229,5 +231,18 @@ struct DL_REFRESH_DEP_RANK_PACKET :public SPACKET {
 	rankInfo ranking[10];
 	int		userKey;
 };
+
+struct DL_EQUIP_OK_PACKET : public SPACKET {
+	int itemCode;
+	long long equipmentFlag;
+	int userKey;
+};
+
+struct DL_UNEQUIP_OK_PACKET : public SPACKET{
+	int itemCode;
+	long long equipmentFlag;
+	int userKey;
+};
+
 
 #pragma pack (pop)

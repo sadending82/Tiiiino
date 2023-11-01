@@ -447,6 +447,47 @@ tuple<ITEM_CODE, COUPON_CAN_DUPLICATED, COUPON_USED> DB::SelectCouponInfo(const 
 	return make_tuple(bindItemCode, bindCanDuplicated, bindUsed);
 }
 
+long long DB::SelectEquipmentItems(const int uid)
+{
+	string query = "SELECT equippedItems FROM userinfo WHERE uid = ?";
+
+	if (mysql_stmt_prepare(GetmStmt(), query.c_str(), query.length()) != 0) {
+		DEBUGMSGONEPARAM("Select equippedItemsstmt prepare error: %s\n", mysql_stmt_error(GetmStmt()));
+		return 0;
+	}
+
+	MYSQL_BIND paramBind;
+	memset(&paramBind, 0, sizeof(paramBind));
+	paramBind.buffer_type = MYSQL_TYPE_LONG;
+	paramBind.buffer = (void*)&uid;
+
+	if (mysql_stmt_bind_param(GetmStmt(), &paramBind) != 0) {
+		DEBUGMSGONEPARAM("Select equippedItems stmt param bind error: %s\n", mysql_stmt_error(GetmStmt()));
+		return 0;
+	}
+
+	MYSQL_BIND resultBind;
+	memset(&resultBind, 0, sizeof(resultBind));
+	long long bindItems = 0;
+	resultBind.buffer_type = MYSQL_TYPE_LONGLONG;
+	resultBind.buffer = &bindItems;
+
+	if (mysql_stmt_bind_result(GetmStmt(), &resultBind) != 0) {
+		DEBUGMSGONEPARAM("Select equippedItems stmt result bind error: %s\n", mysql_stmt_error(GetmStmt()));
+		return 0;
+	}
+
+	if (ExecuteQuery() == false) {
+		return 0;
+	}
+
+	if (mysql_stmt_fetch(GetmStmt()) != 0) {
+		return 0;
+	}
+
+	return bindItems;
+}
+
 bool DB::InsertNewUser(const string& id, const char department)
 {
 	string query = "INSERT INTO userinfo (ID, department) VALUES (?, ?)";
@@ -749,76 +790,6 @@ bool DB::UpdateEquipItemFlag(const int uid, long long bitFlag)
 
 	if (mysql_stmt_bind_param(GetmStmt(), binds) != 0) {
 		DEBUGMSGONEPARAM("UpdateUnquipItem stmt bind error: %s\n", mysql_stmt_error(GetmStmt()));
-		return false;
-	}
-
-	if (ExecuteQuery() == false) {
-		return false;
-	}
-
-	return true;
-}
-
-bool DB::UpdateEquipItem(const int uid, const int itemCode)
-{
-	string query = "UPDATE userinfo SET equippedItems = equippedItems | ? WHERE UID = ?";
-
-	if (mysql_stmt_prepare(GetmStmt(), query.c_str(), query.length()) != 0) {
-		DEBUGMSGONEPARAM("UpdateUnquipItem stmt prepare error: %s\n", mysql_stmt_error(GetmStmt()));
-		return false;
-	}
-
-	const int num = 2;
-
-	uint64_t bit = 1ULL << itemCode;
-
-	MYSQL_BIND binds[num];
-	memset(binds, 0, sizeof(binds));
-
-
-	binds[0].buffer_type = MYSQL_TYPE_LONGLONG;
-	binds[0].buffer = (void*)&bit;
-
-	binds[1].buffer_type = MYSQL_TYPE_LONG;
-	binds[1].buffer = (void*)&uid;
-
-	if (mysql_stmt_bind_param(GetmStmt(), binds) != 0) {
-		DEBUGMSGONEPARAM("UpdateUnquipItem stmt bind error: %s\n", mysql_stmt_error(GetmStmt()));
-		return false;
-	}
-
-	if (ExecuteQuery() == false) {
-		return false;
-	}
-
-	return true;
-}
-
-bool DB::UpdateUnequipItem(const int uid, const int itemCode)
-{
-	string query = "UPDATE userinfo SET equippedItems = equippedItems & ~? WHERE UID = ?";
-
-	if (mysql_stmt_prepare(GetmStmt(), query.c_str(), query.length()) != 0) {
-		DEBUGMSGONEPARAM("UpdateUnequipItem stmt prepare error: %s\n", mysql_stmt_error(GetmStmt()));
-		return false;
-	}
-
-	const int num = 2;
-
-	uint64_t bit = 1ULL << itemCode;
-
-	MYSQL_BIND binds[num];
-	memset(binds, 0, sizeof(binds));
-
-
-	binds[0].buffer_type = MYSQL_TYPE_LONGLONG;
-	binds[0].buffer = (void*)&bit;
-
-	binds[1].buffer_type = MYSQL_TYPE_LONG;
-	binds[1].buffer = (void*)&uid;
-
-	if (mysql_stmt_bind_param(GetmStmt(), binds) != 0) {
-		DEBUGMSGONEPARAM("UpdateUnequipItem stmt bind error: %s\n", mysql_stmt_error(GetmStmt()));
 		return false;
 	}
 

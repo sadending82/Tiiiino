@@ -262,6 +262,27 @@ bool Socket::CheckValidString(const char* input)
     return true;
 }
 
+long long Socket::EquipItem(int itemCode, long long equipmentFlag)
+{
+    long long initBit;
+
+    if (itemCode <= STARTCODE_HANDEQUIP)
+        initBit = BACKEQUIP;
+    else if (STARTCODE_HANDEQUIP <= itemCode && itemCode < STARTCODE_FACEEQUIP)
+        initBit = HANDEQUIP;
+    else if (STARTCODE_FACEEQUIP <= itemCode && itemCode < STARTCODE_HEADEQUIP)
+        initBit = FACEEQUIP;
+    else
+        initBit = HEADEQUIP;
+
+    return (equipmentFlag & initBit) | (1ULL << itemCode);
+}
+
+long long Socket::UnequipItem(int itemCode, long long equipmentFlag)
+{
+    return equipmentFlag & ~(1ULL << itemCode);
+}
+
 // SendPacket
 void Socket::SendLoginOK(int key, int uid, const char* id
     , double grade, int point, int state, char department
@@ -376,12 +397,34 @@ void Socket::SendRanking(int key, vector<rankInfo>& ranking, int userKey)
 {
     DL_REFRESH_DEP_RANK_PACKET p;
     p.size = sizeof(DL_REFRESH_DEP_RANK_PACKET);
-    p.type = SPacketType::DL_USE_COUPON_OK;
+    p.type = SPacketType::DL_REFRESH_DEP_RANK;
     p.userKey = userKey;
 
     for (int i = 0; i < ranking.size(); ++i) {
         p.ranking[i] = ranking[i];
     }
+    mSessions[key].DoSend((void*)(&p));
+}
+
+void Socket::SendEquipOK(int key, long long equipmentFlag, int userKey)
+{
+    DL_EQUIP_OK_PACKET p;
+    p.size = sizeof(DL_EQUIP_OK);
+    p.type = SPacketType::DL_EQUIP_OK;
+    p.equipmentFlag = equipmentFlag;
+    p.userKey = userKey;
+
+    mSessions[key].DoSend((void*)(&p));
+}
+
+void Socket::SendUnequipOK(int key, long long equipmentFlag, int userKey)
+{
+    DL_UNEQUIP_OK_PACKET p;
+    p.size = sizeof(DL_UNEQUIP_OK);
+    p.type = SPacketType::DL_UNEQUIP_OK;
+    p.equipmentFlag = equipmentFlag;
+    p.userKey = userKey;
+
     mSessions[key].DoSend((void*)(&p));
 }
 
@@ -495,23 +538,29 @@ void Socket::ProcessPacket_ChangeDepartment(int key, unsigned char* buf)
 void Socket::ProcessPacket_EquipItem(int key, unsigned char* buf)
 {
     LD_EQUIP_ITEM_PACKET* p = reinterpret_cast<LD_EQUIP_ITEM_PACKET*>(buf);
-#ifdef RUN_DB
-    bool bResult = Getm_pDB()->UpdateEquipItemFlag(p->uid, p->equipmentFlag);
-    if (bResult != true) {
 
-    }
+    long long equipmentItem = 0;
+#ifdef RUN_DB
+    equipmentItem = Getm_pDB()->SelectEquipmentItems(p->uid);
+    equipmentItem = EquipItem(p->itemCode, equipmentItem);
+
+    bool bResult = Getm_pDB()->UpdateEquipItemFlag(p->uid, equipmentItem);
 #endif
+    SendEquipOK(key, equipmentItem, p->userKey);
 }
 
 void Socket::ProcessPacket_UnequipItem(int key, unsigned char* buf)
 {
     LD_UNEQUIP_ITEM_PACKET* p = reinterpret_cast<LD_UNEQUIP_ITEM_PACKET*>(buf);
-#ifdef RUN_DB
-    bool bResult = Getm_pDB()->UpdateUnequipItem(p->uid, p->itemCode);
-    if (bResult != true) {
 
-    }
+    long long equipmentItem = 0;
+#ifdef RUN_DB
+    equipmentItem = Getm_pDB()->SelectEquipmentItems(p->uid);
+    equipmentItem = UnequipItem(p->itemCode, equipmentItem);
+
+    bool bResult = Getm_pDB()->UpdateEquipItemFlag(p->uid, equipmentItem);
 #endif
+    SendUnequipOK(key, equipmentItem, p->userKey);
 }
 
 void Socket::ProcessPacket_BuyItem(int key, unsigned char* buf)
