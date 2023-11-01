@@ -122,13 +122,17 @@ public:
 	void MakeAndShowChangePoint(int AfterPoint);
 	//Accessory
 
+	void SetAccessoryFromEquippedFlag(const long long& EquippedItems);
+
 	//소켓 이름과 메시를 정해줘야함
 	UFUNCTION(Blueprintcallable, Category = "Accessory")
-		void WearAccessory();
-
+		void WearAccessory(const int ItemCode);
+	UFUNCTION(Blueprintcallable, Category = "Accessory")
+		void UnWearAccessory(const int ItemCode);
 	//임시 나중에 상점 생기면 수정할것
 	UPROPERTY(EditDefaultsOnly, Category = "Accessory")
-	TArray<TSubclassOf<class AAccessoryItem>> AccessoryInvetory;
+	TArray<TSubclassOf<class AAccessoryItem>> AccessoryInventory;
+
 
 	//Getter & Setter
 	UFUNCTION(BlueprintCallable)
@@ -144,6 +148,8 @@ public:
 	FORCEINLINE float GetPoint() const { return Point; }
 	FORCEINLINE void SetPoint(const float PointValue) { Point = PointValue; };
 	FORCEINLINE FVector GetNetworkLocation() { return PreviousLocation; }
+
+
 
 	//인벤토리에 저장된 데이터에 접근할 수 있음
 	UFUNCTION(BlueprintCallable, Category = "Inventory")

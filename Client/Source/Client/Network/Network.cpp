@@ -645,13 +645,7 @@ void Network::l_process_packet(unsigned char* p)
 		//아이템 장착 사용법 
 		long long TestItemFlag = 0b0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'1001;
 		mMyCharacter->SetInventoryFromInventoryFlag(packet->inventoryFlag);
-
-		if ((packet->equippedItems & TestItemFlag))
-		{
-			//장착중 (장착이 아니라면 and 연산에서 다 false가 나와 0이라 if문 안들어옴)
-			//Equip !
-			//TestItemFlag는 xml에 들어가 있을 예정.
-		}
+		mMyCharacter->SetAccessoryFromEquippedFlag(packet->equippedItems);
 
 		//학점과 포인트 표기
 		mMyCharacter->MakeAndShowLoginOK(packet->grade, packet->point);
@@ -732,6 +726,16 @@ void Network::l_process_packet(unsigned char* p)
 	case LC_REFRESH_DEP_RANK: {
 		LC_REFRESH_DEP_RANK_PACKET* packet = reinterpret_cast<LC_REFRESH_DEP_RANK_PACKET*>(p);
 
+		break;
+	}
+	case LC_EQUIP_OK: {
+		LC_EQUIP_OK_PACKET* packet = reinterpret_cast<LC_EQUIP_OK_PACKET*>(p);
+		mMyCharacter->SetAccessoryFromEquippedFlag(packet->equipmentFlag);
+		break;
+	}
+	case LC_UNEQUIP_OK: {
+		LC_UNEQUIP_OK_PACKET* packet = reinterpret_cast<LC_UNEQUIP_OK_PACKET*>(p);
+		mMyCharacter->SetAccessoryFromEquippedFlag(packet->equipmentFlag);
 		break;
 	}
 	default:

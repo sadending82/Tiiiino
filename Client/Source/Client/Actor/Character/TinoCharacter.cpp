@@ -24,6 +24,7 @@
 #include "Animation/AnimMontage.h"
 
 
+
 ATinoCharacter::ATinoCharacter()
 	:MaxDiveTime(3.f),
 	MaxTumbledTime(1.0f),
@@ -87,7 +88,6 @@ void ATinoCharacter::BeginPlay()
 			// UI 위젯 생성
 			//SetLoginUIInstance();
 			//SetCreateAccountsInstance();
-
 			//카메라 각도 제한(마우스 Y축 아래로 제한)
 			UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->ViewPitchMax = 0.f;
 		}
@@ -449,7 +449,7 @@ void ATinoCharacter::SetDepartmentClothes(int department)
 	{
 		//Staff 전용
 		if (EDepartment::EDepartment_Staff == EnumValue)
-			WearAccessory();
+			WearAccessory(1);
 
 		auto DynamicMaterialInstance = GetMesh()->CreateDynamicMaterialInstance(0);
 		auto DepartmentTexture = GetTinoDepartTexture(static_cast<EDepartment>(department));
@@ -559,10 +559,39 @@ UCharacterAnimInstance* ATinoCharacter::GetTinoAnimInstance()
 	return Cast<UCharacterAnimInstance>(GetMesh()->GetAnimInstance());
 }
 
-void ATinoCharacter::WearAccessory()
+void ATinoCharacter::SetAccessoryFromEquippedFlag(const long long& EquippedItems)
 {
-	auto Accessory = AAccessoryItem::Spawn(GetWorld(), AccessoryInvetory[0], this);
+	int64 IC = StaticCast<int64>(EquippedItems);
+	AccessoryInventory.Empty();
+	for (int64 i = 0; i < 64; ++i)
+	{
+		int Value = (EquippedItems >> i) & 1;
+
+		if (Value != 0)
+		{
+			int64 ItemCode = i;
+			WearAccessory(ItemCode);
+		}
+	}
+}
+
+void ATinoCharacter::WearAccessory(const int ItemCode)
+{
+	auto Item = GetItemDataFromItemCode(ItemCode); 
+
+	auto Accessory = AAccessoryItem::Spawn< AAccessoryItem>(GetWorld(), Item.AssetData.BPClass, this);
+	Accessory->SetSocketNameWithItemCode(ItemCode);
+	AccessoryInventory.Add(Accessory->GetClass());
 	Accessory->Equip();
+}
+
+void ATinoCharacter::UnWearAccessory(const int ItemCode)
+{
+	//auto Accessory = AccessoryInventory.FindByPredicate([&ItemCode](const AAccessoryItem& i) { return i.GetItemCode() == ItemCode; });
+
+	//Accessory->UnEquip();
+	//AccessoryInventory.Remove(*Accessory);
+	//Accessory->Destroy();
 }
 
 void ATinoCharacter::OnMoveForward(float Axis)
