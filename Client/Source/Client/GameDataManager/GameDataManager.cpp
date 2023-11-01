@@ -73,7 +73,7 @@ bool GameDataManager::LoadShopData()
 			Item item;
 			item.itemCode = stoi(pProduct->FirstChildElement("code")->GetText());
 			item.price = stoi(pProduct->FirstChildElement("price")->GetText());
-			item.cutline = stoi(pProduct->FirstChildElement("cutline")->GetText());
+			item.cutline = stof(pProduct->FirstChildElement("cutline")->GetText());
 			item.assetName = pProduct->FirstChildElement("assetName")->GetText();
 			const char* uft8Name = pProduct->FirstChildElement("name")->GetText();
 			const char* uft8text = pProduct->FirstChildElement("text")->GetText();
