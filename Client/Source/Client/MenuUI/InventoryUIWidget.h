@@ -34,6 +34,13 @@ public:
 public:
 	// 아이템 아이콘 클릭
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	void ClickItemIcon();
+	void ClickItemIcon(const int itemcode);
+	
+	// 클릭한 아이템 장작
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void EquipClickedItem();
 
+	// 아이템 장착여부 확인
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	bool CheckItemEquiped(const int64 itemcode);
 };

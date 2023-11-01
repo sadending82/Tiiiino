@@ -49,8 +49,25 @@ void UInventoryUIWidget::UpdatePointAndPoint()
 	}
 }
 
-void UInventoryUIWidget::ClickItemIcon()
+void UInventoryUIWidget::ClickItemIcon(const int itemcode)
 {
-	//연결된 버튼 외곽선 강조
-	//강조된 버튼 인덱스 저장
+	// 서버에 클릭한 아이템 코드 전달
+	send_equip_packet(Network::GetNetwork()->l_socket, itemcode);
+	
+}
+
+void UInventoryUIWidget::EquipClickedItem()
+{
+	// 아이템 장착
+}
+
+bool UInventoryUIWidget::CheckItemEquiped(const int64 itemcode)
+{
+	
+	for (auto& p : Network::GetNetwork()->mMyCharacter->GetInventoryContents())
+	{
+		if (p.ItemCode == itemcode)
+			return false;
+	}
+	return true;
 }

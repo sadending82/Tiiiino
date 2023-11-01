@@ -120,6 +120,8 @@ public:
 	void MakeAndShowDialogInGame();
 	void MakeAndShowLobbyRankSystem(struct rankInfo rank[]);
 	void MakeAndShowChangePoint(int AfterPoint);
+
+	void MakeAndShowEquipItem();
 	//Accessory
 
 	//소켓 이름과 메시를 정해줘야함

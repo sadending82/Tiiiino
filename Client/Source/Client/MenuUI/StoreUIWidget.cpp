@@ -120,10 +120,13 @@ void UStoreUIWidget::ShowPurchaseWarning(int64 itemcode)
 		auto inventory = TinoCharacter->GetInventoryContents();
 		if (!!TinoCharacter)
 		{
-			if (TinoCharacter->GetPoint() < price)
+			for (auto& p : Network::GetNetwork()->mMyCharacter->GetInventoryContents())
 			{
-				warning = EPurchaseState::EPS_AlreadyPurchase;
-				return;
+				if (p.ItemCode == itemcode)
+				{
+					warning = EPurchaseState::EPS_AlreadyPurchase;
+					return;
+				}
 			}
 			if (TinoCharacter->GetGrade() < grade)
 			{

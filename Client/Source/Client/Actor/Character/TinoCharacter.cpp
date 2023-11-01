@@ -10,6 +10,7 @@
 #include "MenuUI/CreateAccountsWidget.h"
 #include "MenuUI/LobbyUIWidget.h"
 #include "MenuUI/StoreUIWidget.h"
+#include "MenuUI/InventoryUIWidget.h"
 
 #include "Component/InventoryComponent.h"
 #include "ClientGameMode.h"
@@ -381,6 +382,16 @@ void ATinoCharacter::MakeAndShowChangePoint(int AfterPoint)
 	{
 		auto StoreUI = TinoController->StoreUIInstance;
 		StoreUI->ChangePoint(AfterPoint);
+	}
+}
+
+void ATinoCharacter::MakeAndShowEquipItem()
+{
+	auto TinoController = GetController<ATinoController>();
+	if (!!TinoController)
+	{
+		auto InventoryUI = TinoController->InventoryUIInstance;
+		InventoryUI->EquipClickedItem();
 	}
 }
 
