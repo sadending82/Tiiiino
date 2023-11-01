@@ -38,7 +38,6 @@ void ATinoController::BeginPlay()
 				DisconnectNetwork();
 		}
 		else {
-			ChangeMenuWidget(LobbyUIInstance);
 			SetInputUIMode();
 		}
 	}
