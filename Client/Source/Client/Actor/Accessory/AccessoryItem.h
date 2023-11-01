@@ -43,6 +43,8 @@ public:
 	void SetSocketNameWithItemCode(const int itemCode);
 	void SetSocketName(const FName name) { SocketName = name; }
 
+	bool GetbEquipped() const { return bEquipped; }
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

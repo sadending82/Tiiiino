@@ -385,16 +385,6 @@ void ATinoCharacter::MakeAndShowChangePoint(int AfterPoint)
 	}
 }
 
-void ATinoCharacter::MakeAndShowEquipItem()
-{
-	auto TinoController = GetController<ATinoController>();
-	if (!!TinoController)
-	{
-		auto InventoryUI = TinoController->InventoryUIInstance;
-		InventoryUI->EquipClickedItem();
-	}
-}
-
 void ATinoCharacter::SetNetworkLocation(const FVector& Location)
 {
 	PreviousLocation = Location;

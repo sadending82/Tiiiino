@@ -5,7 +5,9 @@
 #include "MenuUI/LobbyUIWidget.h"
 #include "Actor/Controller/TinoController.h"
 #include "Actor/Character/TinoCharacter.h"
+#include "Actor/Accessory/AccessoryItem.h"
 #include "Data/ItemData.h"
+
 #include "Network/Network.h"
 #include "Global.h"
 
@@ -52,22 +54,38 @@ void UInventoryUIWidget::UpdatePointAndPoint()
 void UInventoryUIWidget::ClickItemIcon(const int itemcode)
 {
 	// 서버에 클릭한 아이템 코드 전달
-	send_equip_packet(Network::GetNetwork()->l_socket, itemcode);
+	
 	
 }
 
-void UInventoryUIWidget::EquipClickedItem()
+void UInventoryUIWidget::EquipClickedItem(const int itemcode)
 {
 	// 아이템 장착
+	send_equip_packet(Network::GetNetwork()->l_socket, itemcode);
+}
+
+void UInventoryUIWidget::UnEquipClickedItem(const int itemcode)
+{
+	// 아이템 해제
+	send_unequip_packet(Network::GetNetwork()->l_socket, itemcode);
 }
 
 bool UInventoryUIWidget::CheckItemEquiped(const int64 itemcode)
 {
-	
-	for (auto& p : Network::GetNetwork()->mMyCharacter->GetInventoryContents())
+
+	for (auto& p : Network::GetNetwork()->mMyCharacter->AccessoryInventory)
 	{
-		if (p.ItemCode == itemcode)
-			return false;
+		if (p->GetItemCode() == itemcode)
+		{
+			if (p->GetbEquipped())
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
 	}
-	return true;
+	return false;
 }

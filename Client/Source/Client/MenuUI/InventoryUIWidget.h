@@ -38,7 +38,12 @@ public:
 	
 	// 클릭한 아이템 장작
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	void EquipClickedItem();
+	void EquipClickedItem(const int itemcode);
+	
+	// 클릭한 아이템 해제
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void UnEquipClickedItem(const int itemcode);
+
 
 	// 아이템 장착여부 확인
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")

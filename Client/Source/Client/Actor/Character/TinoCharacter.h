@@ -121,7 +121,6 @@ public:
 	void MakeAndShowLobbyRankSystem(struct rankInfo rank[]);
 	void MakeAndShowChangePoint(int AfterPoint);
 
-	void MakeAndShowEquipItem();
 	//Accessory
 
 	void SetAccessoryFromEquippedFlag(const long long& EquippedItems);
