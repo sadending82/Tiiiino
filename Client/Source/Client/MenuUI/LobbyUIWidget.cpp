@@ -50,7 +50,7 @@ void ULobbyUIWidget::TryGameReadyCancel()
 
 }
 
-void ULobbyUIWidget::UpdatePoint()
+void ULobbyUIWidget::UpdatePointAndGrade()
 {
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	if (!!TinoController)
@@ -59,6 +59,7 @@ void ULobbyUIWidget::UpdatePoint()
 		if (!!TinoCharacter)
 		{
 			Point = TinoCharacter->GetPoint();
+			Grade = TinoCharacter->GetGrade();
 		}
 	}
 }
@@ -80,6 +81,7 @@ void ULobbyUIWidget::TryEnterStore()
 void ULobbyUIWidget::TryEnterInventory()
 {
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	TinoController->InventoryUIInstance->UpdatePointAndPoint();
 	TinoController->ChangeMenuWidget(TinoController->InventoryUIInstance);
 }
 

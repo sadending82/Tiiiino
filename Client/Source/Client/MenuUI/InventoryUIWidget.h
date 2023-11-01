@@ -22,6 +22,15 @@ public:
 	// 로비로 돌아가기
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void TryBack();
+
+	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
+	float Grade;
+	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
+	float Point;
+
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void UpdatePointAndPoint();
+
 public:
 	// 아이템 아이콘 클릭
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
