@@ -87,13 +87,13 @@ bool Network::init()
 {
 	if (!isInit)
 	{
+		isInit = true;
 		if (nullptr == mGameDataManager)
 		{
 			mGameDataManager = new GameDataManager;
 			mGameDataManager->CheckDataFile();
 			LoadItemData();
 		}
-
 		WSAStartup(MAKEWORD(2, 2), &WSAData);
 		return true;
 	}
@@ -920,7 +920,6 @@ bool Network::ConnectServerGame()
 
 bool Network::ConnectServerLobby()
 {
-	isInit = true;
 
 	if (bIsConnectedLobby) return false;
 	l_socket = WSASocketW(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);

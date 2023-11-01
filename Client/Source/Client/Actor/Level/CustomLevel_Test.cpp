@@ -102,7 +102,7 @@ bool ACustomLevel_Test::ConnLobbyServer()
 			CLog::Log("TinoController is nullptr, Connect Lobby Against Is Fail");
 		}
 		else {
-			//TinoController->InitializeUIInstance();
+			TinoController->InitializeUIInstance();
 			send_refresh_dep_rank_packet(Network::GetNetwork()->l_socket);
 			send_refresh_point_packet(Network::GetNetwork()->l_socket);
 			// 여기서 결과 UI를 띄워줌
