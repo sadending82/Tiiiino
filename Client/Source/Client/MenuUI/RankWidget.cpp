@@ -154,14 +154,20 @@ void URankWidget::ChangePositionByDistanceData()
 
 	TArray<float> distanceData = GetCharacterDistanceData();
 
+	int cnt{0};
 	for (int i = 0; i < distanceData.Num(); ++i)
 	{
-		if (i == sCurrentRank - 1 ) continue;
-		UCanvasPanelSlot* canvasPanel = UWidgetLayoutLibrary::SlotAsCanvasSlot(images[i]);
+		if (i == sCurrentRank - 1)
+		{
+			UCanvasPanelSlot* canvasPanel = UWidgetLayoutLibrary::SlotAsCanvasSlot(MyCharacterImage);
+			canvasPanel->SetPosition(FVector2D(1280.f * distanceData[sCurrentRank - 1], 0.0f));
+			continue;
+		}
+		UCanvasPanelSlot* canvasPanel = UWidgetLayoutLibrary::SlotAsCanvasSlot(images[cnt]);
 		canvasPanel->SetPosition(FVector2D(1280.f * distanceData[i], 0.0f));
+		cnt++;
 	}
-	UCanvasPanelSlot* canvasPanel = UWidgetLayoutLibrary::SlotAsCanvasSlot(MyCharacterImage);
-	canvasPanel->SetPosition(FVector2D(1280.f * distanceData[sCurrentRank - 1], 0.0f));
+
 	
 
 

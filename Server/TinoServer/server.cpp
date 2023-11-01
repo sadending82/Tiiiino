@@ -606,6 +606,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 				packet.size = sizeof(packet);
 				packet.type = LG_USER_INTO_GAME;
 				packet.roomID = roomID;// need update
+				packet.equipmentflag = mClients[player_id].mEquippedItems;
 				packet.department = mClients[player_id].mDepartment;
 				_itoa_s(rand() % 2'000'000'000, mClients[player_id].mHashs, 10);
 				strcpy_s(packet.hashs, mClients[player_id].mHashs);
@@ -641,6 +642,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 						packet.size = sizeof(packet);
 						packet.type = LG_USER_INTO_GAME;
 						packet.roomID = roomID;//need update
+						packet.equipmentflag = mClients[player_id].mEquippedItems;
 						packet.department = mClients[player_id].mDepartment;
 						_itoa_s(rand() % 2'000'000'000, mClients[player_id].mHashs, 10);
 						strcpy_s(packet.hashs, mClients[player_id].mHashs);
@@ -679,6 +681,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 					packet.type = LG_USER_INTO_GAME;
 					packet.roomID = roomID;//need update
 					packet.department = mClients[player_id].mDepartment;
+					packet.equipmentflag = mClients[player_id].mEquippedItems;
 					strcpy_s(packet.name,  mClients[player_id].mNickName);
 					strcpy_s(packet.id,  mClients[player_id].mID);
 					packet.uID = mClients[player_id].mUID;
@@ -1125,7 +1128,7 @@ void Server::SendMatchResponse(int roomID)
 	uniform_int_distribution<int> rLevel(MIN_LEVEL, MAX_LEVEL);
 	int randomlevel = rLevel(rng);
 
-	packet.mapLevel = randomlevel;
+	packet.mapLevel = 3;
 
 
 	int uidCount = 0;
