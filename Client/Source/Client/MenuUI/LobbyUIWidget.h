@@ -37,6 +37,9 @@ public:
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void UpdatePointAndGrade();
 
+	UFUNCTION(BluePrintImplementableEvent, Category = "UMG_Game")
+	void UpdataRankData();
+
 public:
 	// 로그인 화면으로 돌아가기
 	UPROPERTY(meta = (BindWidget))

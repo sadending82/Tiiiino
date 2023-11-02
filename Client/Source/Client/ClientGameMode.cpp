@@ -27,10 +27,10 @@ FItemData* AClientGameMode::GetItemData(const int64& ItemCode) const
 	return ItemData->FindRow<FItemData>(*FString::FromInt(ItemCode), TEXT(""));
 }
 
-FItemData* AClientGameMode::GetShopProductData(const int64& ItemCode) const
-{
-	return ShopData->FindRow<FItemData>(*FString::FromInt(ItemCode), TEXT(""));
-}
+//FItemData* AClientGameMode::GetShopProductData(const int64& ItemCode) const
+//{
+//	return ShopData->FindRow<FItemData>(*FString::FromInt(ItemCode), TEXT(""));
+//}
 
 void AClientGameMode::SetItemDataTable()
 {
@@ -126,7 +126,7 @@ void AClientGameMode::SetShopDataTable()
 void AClientGameMode::GetShopProductTable(TArray<int>& f_out)
 {
 	TArray<FItemData*> TempData;
-	ShopData->GetAllRows(TEXT(""), TempData);
+	ItemData->GetAllRows(TEXT(""), TempData);
 
 	for (auto data : TempData) {
 		f_out.Add(data->ItemCode);
@@ -143,7 +143,7 @@ void AClientGameMode::BeginPlay()
 	//ItemData = NewObject<UDataTable>();
 	
 	SetItemDataTable();
-	SetShopDataTable();
+	//SetShopDataTable();
 
 	GetWorld()->SpawnActor<ASoundManager>(SoundMangerClass);
 	EBGMType LevelType;

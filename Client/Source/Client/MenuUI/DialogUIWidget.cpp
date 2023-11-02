@@ -66,7 +66,6 @@ void UDialogUIWidget::DisconnectGame()
 	Network::GetNetwork()->bIsConnected = false;
 	Network::GetNetwork()->bLevelOpenTriggerEnabled = true;
 	UGameplayStatics::OpenLevel(GetWorld(), FName("Lobby"));
-
 	// 임시로 게임종료하도록 설정
 	//UKismetSystemLibrary::QuitGame(GetWorld(), nullptr, EQuitPreference::Quit, false);
 

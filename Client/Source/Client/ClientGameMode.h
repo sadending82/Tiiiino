@@ -32,9 +32,11 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	//모든 아이템 데이터 집합(= 상점 데이터) -> 김혁동 : 이 아니랍니다 ㅠㅠ
 	UPROPERTY(EditDefaultsOnly, Category = "Data")
 	UDataTable* ItemData;
 
+	//상점에서 팔 아이템 데이터들의 집합 -> CBT 쿠폰 보상 아이템 같은건 상점에서 팔면 안됨.
 	UPROPERTY(EditDefaultsOnly, Category = "Data")
 	UDataTable* ShopData;
 
