@@ -1,7 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "ClientGameMode.h"
-#include "ClientCharacter.h"
 #include "Data/ItemData.h"
 #include "Network/Network.h"
 #include "GameDataManager/GameDataManager.h"
@@ -12,14 +11,6 @@
 
 AClientGameMode::AClientGameMode()
 {
-	// set default pawn class to our Blueprinted character
-	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/ThirdPerson/Blueprints/BP_ThirdPersonCharacter"));
-	if (PlayerPawnBPClass.Class != NULL)
-	{
-		DefaultPawnClass = PlayerPawnBPClass.Class;
-	}
-
-	//ASoundManager::GetSoundManager()->PlayBGM();
 }
 
 FItemData* AClientGameMode::GetItemData(const int64& ItemCode) const
@@ -27,10 +18,10 @@ FItemData* AClientGameMode::GetItemData(const int64& ItemCode) const
 	return ItemData->FindRow<FItemData>(*FString::FromInt(ItemCode), TEXT(""));
 }
 
-//FItemData* AClientGameMode::GetShopProductData(const int64& ItemCode) const
-//{
-//	return ShopData->FindRow<FItemData>(*FString::FromInt(ItemCode), TEXT(""));
-//}
+FItemData* AClientGameMode::GetShopProductData(const int64& ItemCode) const
+{
+	return ShopData->FindRow<FItemData>(*FString::FromInt(ItemCode), TEXT(""));
+}
 
 void AClientGameMode::SetItemDataTable()
 {
@@ -126,7 +117,7 @@ void AClientGameMode::SetShopDataTable()
 void AClientGameMode::GetShopProductTable(TArray<int>& f_out)
 {
 	TArray<FItemData*> TempData;
-	ItemData->GetAllRows(TEXT(""), TempData);
+	ShopData->GetAllRows(TEXT(""), TempData);
 
 	for (auto data : TempData) {
 		f_out.Add(data->ItemCode);
@@ -143,7 +134,7 @@ void AClientGameMode::BeginPlay()
 	//ItemData = NewObject<UDataTable>();
 	
 	SetItemDataTable();
-	//SetShopDataTable();
+	SetShopDataTable();
 
 	GetWorld()->SpawnActor<ASoundManager>(SoundMangerClass);
 	EBGMType LevelType;

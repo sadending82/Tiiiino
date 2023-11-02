@@ -32,7 +32,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	//모든 아이템 데이터 집합(= 상점 데이터) -> 김혁동 : 이 아니랍니다 ㅠㅠ
+	//모든 아이템 데이터 집합 -> 김혁동 : 이 아니랍니다 ㅠㅠ
 	UPROPERTY(EditDefaultsOnly, Category = "Data")
 	UDataTable* ItemData;
 

@@ -449,7 +449,7 @@ void ATinoCharacter::SetInventoryFromInventoryFlag(const long long& EquippedItem
 FItemData ATinoCharacter::GetShopItemDataFromItemCode(const int64& ItemCode)
 {
 	auto GameMode = Cast<AClientGameMode>(GetWorld()->GetAuthGameMode());
-	auto Data = GameMode->GetItemData(ItemCode);
+	auto Data = GameMode->GetShopProductData(ItemCode);
 	if (Data == nullptr) return FItemData();
 
 	FItemData ItemData;
