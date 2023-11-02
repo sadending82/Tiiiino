@@ -29,6 +29,8 @@ public:
 
 	void AddItem(const FItemData& ItemData);
 
+	void ClearInventory();
+
 protected:
 
 	// 플레이어 인벤토리

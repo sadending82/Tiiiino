@@ -477,8 +477,7 @@ void ATinoCharacter::SetDepartmentClothes(int department)
 	if (EDepartment::EDepartment_None < EnumValue && EDepartment::EDepartment_MAX > EnumValue)
 	{
 		//Staff 전용
-		if (EDepartment::EDepartment_Staff == EnumValue)
-			WearAccessory(1);
+		if (EDepartment::EDepartment_Staff == EnumValue) WearAccessory(1);
 
 		auto DynamicMaterialInstance = GetMesh()->CreateDynamicMaterialInstance(0);
 		auto DepartmentTexture = GetTinoDepartTexture(static_cast<EDepartment>(department));
@@ -591,11 +590,10 @@ UCharacterAnimInstance* ATinoCharacter::GetTinoAnimInstance()
 void ATinoCharacter::SetAccessoryFromEquippedFlag(const long long& EquippedItems)
 {
 	int64 IC = StaticCast<int64>(EquippedItems);
-	for (auto p : AccessoryInventory)
-	{
-		p->Destroy();
-	}
-	AccessoryInventory.Empty();
+
+	//인벤토리 컴포넌트를 이용해 기존 보유 장비 정보를 업데이트한다.
+	InventoryComponent->ClearInventory();
+
 	for (int64 i = 0; i < 64; ++i)
 	{
 		int Value = (EquippedItems >> i) & 1;
@@ -603,19 +601,30 @@ void ATinoCharacter::SetAccessoryFromEquippedFlag(const long long& EquippedItems
 		if (Value != 0)
 		{
 			int64 ItemCode = i;
-			WearAccessory(ItemCode);
+			InventoryComponent->AddItem(GetItemDataFromItemCode(ItemCode));
 		}
+	}
+}
+
+void ATinoCharacter::WearAllAccessory()
+{
+	//인벤토리 컴포넌트에서 아이템 정보를 가져와서 스폰한다. 
+	for (auto item : GetInventoryContents())
+	{
+		auto Accessory = AAccessoryItem::Spawn< AAccessoryItem>(GetWorld(), item.AssetData.BPClass, this);
+		Accessory->SetSocketNameWithItemCode(item.ItemCode);
+		Accessory->Equip();
 	}
 }
 
 void ATinoCharacter::WearAccessory(const int ItemCode)
 {
-	auto Item = GetItemDataFromItemCode(ItemCode); 
-
+	//로비에서 한개씩 장착할때 사용하는 함수입니다.
+	//또는 테스트용으로 사용가능합니다.
+	FItemData Item = GetItemDataFromItemCode(ItemCode);
 	auto Accessory = AAccessoryItem::Spawn< AAccessoryItem>(GetWorld(), Item.AssetData.BPClass, this);
-	Accessory->SetSocketNameWithItemCode(ItemCode);
-	int idx = AccessoryInventory.Add(Accessory);
-	AccessoryInventory[idx]->Equip();
+	Accessory->SetSocketNameWithItemCode(Item.ItemCode);
+	Accessory->Equip();
 }
 
 void ATinoCharacter::UnWearAccessory(const int ItemCode)

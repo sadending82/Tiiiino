@@ -126,12 +126,9 @@ public:
 
 	//소켓 이름과 메시를 정해줘야함
 	UFUNCTION(Blueprintcallable, Category = "Accessory")
-		void WearAccessory(const int ItemCode);
+		void WearAccessory();
 	UFUNCTION(Blueprintcallable, Category = "Accessory")
 		void UnWearAccessory(const int ItemCode);
-	//임시 나중에 상점 생기면 수정할것
-	TArray<class AAccessoryItem*> AccessoryInventory;
-
 
 	//Getter & Setter
 	UFUNCTION(BlueprintCallable)

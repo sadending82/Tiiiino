@@ -25,3 +25,9 @@ void UInventoryComponent::AddItem(const FItemData& ItemData)
 
 	OnInventoryUpdated.Broadcast();
 }
+
+void UInventoryComponent::ClearInventory()
+{
+	InventoryContents.Empty();
+	OnInventoryUpdated.Broadcast();
+}
