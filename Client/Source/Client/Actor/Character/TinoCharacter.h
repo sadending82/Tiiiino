@@ -126,7 +126,9 @@ public:
 
 	//소켓 이름과 메시를 정해줘야함
 	UFUNCTION(Blueprintcallable, Category = "Accessory")
-		void WearAccessory();
+		void WearAllAccessory();
+	UFUNCTION(Blueprintcallable, Category = "Accessory")
+		void WearAccessory(const int ItemCode);
 	UFUNCTION(Blueprintcallable, Category = "Accessory")
 		void UnWearAccessory(const int ItemCode);
 
@@ -158,8 +160,8 @@ public:
 	FItemData GetItemDataFromItemCode(const int64& ItemCode);
 	void SetInventoryFromInventoryFlag(const long long& EquippedItems);
 
-	UFUNCTION(BlueprintCallable, Category = "shop")
-	FItemData GetShopItemDataFromItemCode(const int64& ItemCode);
+	//UFUNCTION(BlueprintCallable, Category = "shop")
+	//FItemData GetShopItemDataFromItemCode(const int64& ItemCode);
 
 	UFUNCTION(BlueprintCallable, Category = "shop")
 	void GetShopData(UPARAM(REF) TArray<int>& iOut);

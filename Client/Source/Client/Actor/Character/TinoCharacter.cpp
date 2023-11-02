@@ -446,22 +446,22 @@ void ATinoCharacter::SetInventoryFromInventoryFlag(const long long& EquippedItem
 
 }
 
-FItemData ATinoCharacter::GetShopItemDataFromItemCode(const int64& ItemCode)
-{
-	auto GameMode = Cast<AClientGameMode>(GetWorld()->GetAuthGameMode());
-	auto Data = GameMode->GetShopProductData(ItemCode);
-	if (Data == nullptr) return FItemData();
-
-	FItemData ItemData;
-	ItemData.ItemCode = ItemCode;
-	ItemData.EquipType = Data->EquipType;
-	ItemData.TextData = Data->TextData;
-	ItemData.NumericData = Data->NumericData;
-	ItemData.AssetData = Data->AssetData;
-	ItemData.SellValue = Data->SellValue;
-
-	return ItemData;
-}
+//FItemData ATinoCharacter::GetShopItemDataFromItemCode(const int64& ItemCode)
+//{
+//	auto GameMode = Cast<AClientGameMode>(GetWorld()->GetAuthGameMode());
+//	auto Data = GameMode->GetItemData(ItemCode);
+//	if (Data == nullptr) return FItemData();
+//
+//	FItemData ItemData;
+//	ItemData.ItemCode = ItemCode;
+//	ItemData.EquipType = Data->EquipType;
+//	ItemData.TextData = Data->TextData;
+//	ItemData.NumericData = Data->NumericData;
+//	ItemData.AssetData = Data->AssetData;
+//	ItemData.SellValue = Data->SellValue;
+//
+//	return ItemData;
+//}
 
 void ATinoCharacter::GetShopData(UPARAM(REF) TArray<int>& iOut)
 {
