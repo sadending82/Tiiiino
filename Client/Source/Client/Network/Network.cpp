@@ -7,7 +7,6 @@
 #include "Actor/Character/CharacterAnimInstance.h"
 #include "Actor/Obstacles/BaseObstacle.h"
 #include "Data/ItemData.h"
-#include "MenuUI/StoreUIWidget.h"
 
 #include "Global.h"
 
@@ -721,7 +720,7 @@ void Network::l_process_packet(unsigned char* p)
 		LC_BUYITEM_OK_PACKET* packet = reinterpret_cast<LC_BUYITEM_OK_PACKET*>(p);
 
 		mMyCharacter->AddItemToInventory(mMyCharacter->GetItemDataFromItemCode(packet->itemCode));
-		mMyCharacter->GetController<ATinoController>()->StoreUIInstance->StoreDialogInstance->RemoveFromParent();
+		mMyCharacter->RemoveStoreDialog();
 		mMyCharacter->MakeAndShowChangePoint(packet->pointAfterPurchase);
 		mMyCharacter->SetInventoryFromInventoryFlag(packet->inventoryFlag);
 		mMyCharacter->SetPoint(packet->pointAfterPurchase);

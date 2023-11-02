@@ -120,6 +120,8 @@ public:
 	void MakeAndShowDialogInGame();
 	void MakeAndShowLobbyRankSystem(struct rankInfo rank[]);
 	void MakeAndShowChangePoint(int AfterPoint);
+
+	void RemoveStoreDialog();
 	//Accessory
 
 	void SetAccessoryFromEquippedFlag(const long long& EquippedItems);
