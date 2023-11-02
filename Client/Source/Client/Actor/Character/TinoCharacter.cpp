@@ -186,7 +186,7 @@ void ATinoCharacter::Tick(float DeltaTime)
 				GetCharacterMovement()->MovementMode = EMovementMode::MOVE_Flying;
 			}
 		}
-
+		//이전 프레임 속도를 업데이트해줌(다음프레임기준 이전프레임 속도)
 		PreviousVelocity = GetVelocity();
 	}
 }
@@ -249,8 +249,9 @@ void ATinoCharacter::PlayerInterpolation(float DeltaTime)
 		PreviousVelocity = FVector::ZeroVector;
 	}
 
-	//네트워크 한 프레임 차이에서 발생하는 위치 차이를 기준으로 이동방향을 재설정한다.
-	AddMovementInput(GetVelocity());
+	//네트워크 한프레임 차이에서 발생하는 위치 차이를 기준으로
+	//이동방향을 재설정해준다.
+	AddMovementInput(NetworkDirection);
 
 	//InterTime마다 보간속도를구함(이전 프레임 위치 - 현재 위치) 
 	if (CurrentInterTime >= InterTime)
@@ -262,16 +263,16 @@ void ATinoCharacter::PlayerInterpolation(float DeltaTime)
 	// 보간 주기만 큼 나눠주면 속도가된다
 	if (InterVelocity.IsNearlyZero() == false && InterVelocity.Length() <= GetCharacterMovement()->MaxWalkSpeed)
 	{
-		if (MovementState == EMovementState::EMS_Grabbing)
-			InterVelocity *= InterTime*InterTime;
-		CLog::Log(StaticCast<float>(InterVelocity.Length()));
 		SetActorLocation(GetActorLocation() + InterVelocity * DeltaTime);
 	}
 }
 
 void ATinoCharacter::SetNetworkLocation(const FVector& Location)
 {
-	PreviousLocation = Location;
+	PreviousLocation = NextLocation;
+	NetworkDirection = Location - PreviousLocation;
+	NextLocation = Location;
+	NetworkDirection.Normalize();
 	SetActorLocation(Location);
 }
 
@@ -336,6 +337,7 @@ void ATinoCharacter::MakeAndShowInGameLevelStart()
 {
 	auto InGameWidget = GetController<ATinoController>()->InGameUIInstance;
 	InGameWidget->LevelStart();
+	bDebugInterVelocity = true;
 }
 
 void ATinoCharacter::MakeAndShowInGameLevelClear()
