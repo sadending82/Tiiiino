@@ -233,6 +233,8 @@ void ATinoCharacter::Align()
 
 void ATinoCharacter::PlayerInterpolation(float DeltaTime)
 {
+	if (MovementState == EMovementState::EMS_Grabbing)
+		return;
 	CurrentInterTime += DeltaTime;
 
 	//플레이어 정지시간 측정
@@ -247,19 +249,30 @@ void ATinoCharacter::PlayerInterpolation(float DeltaTime)
 		PreviousVelocity = FVector::ZeroVector;
 	}
 
-	//네트워크에서 현재 프레임 받은 위치 - PreviousPosition(이전프레임에 서버에서 지정한 위치)
-	//아래에 넣기?
+	//네트워크 한 프레임 차이에서 발생하는 위치 차이를 기준으로 이동방향을 재설정한다.
 	AddMovementInput(GetVelocity());
 
-	//InterTime마다 보간속도를구함
+	//InterTime마다 보간속도를구함(이전 프레임 위치 - 현재 위치) 
 	if (CurrentInterTime >= InterTime)
 	{
 		CurrentInterTime -= InterTime;
-		InterVelocity = PreviousLocation - GetActorLocation();
+		InterVelocity = (PreviousLocation - GetActorLocation()) / InterTime;
 	}
 
-	if (InterVelocity.IsNearlyZero() == false)
+	// 보간 주기만 큼 나눠주면 속도가된다
+	if (InterVelocity.IsNearlyZero() == false && InterVelocity.Length() <= GetCharacterMovement()->MaxWalkSpeed)
+	{
+		if (MovementState == EMovementState::EMS_Grabbing)
+			InterVelocity *= InterTime*InterTime;
+		CLog::Log(StaticCast<float>(InterVelocity.Length()));
 		SetActorLocation(GetActorLocation() + InterVelocity * DeltaTime);
+	}
+}
+
+void ATinoCharacter::SetNetworkLocation(const FVector& Location)
+{
+	PreviousLocation = Location;
+	SetActorLocation(Location);
 }
 
 void ATinoCharacter::MakeAndShowHUD()
@@ -378,12 +391,6 @@ void ATinoCharacter::MakeAndShowChangePoint(int AfterPoint)
 		auto StoreUI = TinoController->StoreUIInstance;
 		StoreUI->ChangePoint(AfterPoint);
 	}
-}
-
-void ATinoCharacter::SetNetworkLocation(const FVector& Location)
-{
-	PreviousLocation = Location;
-	SetActorLocation(Location);
 }
 
 void ATinoCharacter::UpdataPointInLobby(int point)
