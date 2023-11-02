@@ -412,6 +412,7 @@ void Network::process_packet(unsigned char* p)
 		FVector location(240.f - ((packet->id % 4) * 160), 0 - (packet->id / 4 * 160), 0);
 		mMyCharacter->SetActorLocation(location);
 		mMyCharacter->SetAccessoryFromEquippedFlag(packet->equipmentFlag);
+		mMyCharacter->WearAllAccessory();
 		//연결성공
 		bIsConnected = true;
 		break;
@@ -498,6 +499,7 @@ void Network::process_packet(unsigned char* p)
 				mc->SetDepartmentClothes(packet->department);
 				mOtherCharacter[id] = mc;
 				mOtherCharacter[id]->SetAccessoryFromEquippedFlag(packet->equipmentFlag);
+				mOtherCharacter[id]->WearAllAccessory();
 				mOtherCharacter[id]->GetMesh()->SetVisibility(true);
 				mOtherCharacter[id]->SetClientID(packet->id);
 				mOtherCharacter[id]->SetCollisionProfileName(TEXT("Empty"));
