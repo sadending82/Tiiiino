@@ -380,6 +380,13 @@ void ATinoCharacter::MakeAndShowChangePoint(int AfterPoint)
 	}
 }
 
+void ATinoCharacter::RemoveStoreDialog()
+{
+	auto TinoController = GetController<ATinoController>();
+	if (!!TinoController)
+		TinoController->StoreUIInstance->StoreDialogInstance->RemoveFromParent();
+}
+
 void ATinoCharacter::SetNetworkLocation(const FVector& Location)
 {
 	PreviousLocation = Location;
