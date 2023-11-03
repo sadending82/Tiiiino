@@ -381,6 +381,13 @@ void ATinoCharacter::MakeAndShowChangePoint(int AfterPoint)
 	}
 }
 
+void ATinoCharacter::RemoveStoreDialog()
+{
+	auto TinoController = GetController<ATinoController>();
+	if (!!TinoController)
+		TinoController->StoreUIInstance->StoreDialogInstance->RemoveFromParent();
+}
+
 void ATinoCharacter::SetNetworkLocation(const FVector& Location)
 {
 	PreviousLocation = Location;
@@ -450,7 +457,7 @@ void ATinoCharacter::SetInventoryFromInventoryFlag(const long long& EquippedItem
 FItemData ATinoCharacter::GetShopItemDataFromItemCode(const int64& ItemCode)
 {
 	auto GameMode = Cast<AClientGameMode>(GetWorld()->GetAuthGameMode());
-	auto Data = GameMode->GetItemData(ItemCode);
+	auto Data = GameMode->GetShopProductData(ItemCode);
 	if (Data == nullptr) return FItemData();
 
 	FItemData ItemData;
