@@ -132,7 +132,9 @@ public:
 	UFUNCTION(Blueprintcallable, Category = "Accessory")
 		void WearAccessory(const int ItemCode);
 	UFUNCTION(Blueprintcallable, Category = "Accessory")
-		void UnWearAccessory(const int ItemCode);
+		void UnWearAccessory(const int ItemCode);	
+	
+	TArray<class AAccessoryItem*> EquipAccessoryContainer;
 
 	//Getter & Setter
 	UFUNCTION(BlueprintCallable)
