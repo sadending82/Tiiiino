@@ -751,11 +751,13 @@ void Network::l_process_packet(unsigned char* p)
 	case LC_EQUIP_OK: {
 		LC_EQUIP_OK_PACKET* packet = reinterpret_cast<LC_EQUIP_OK_PACKET*>(p);
 		mMyCharacter->SetAccessoryFromEquippedFlag(packet->equipmentFlag);
+		mMyCharacter->UpdateEquippedAccessoryUI();
 		break;
 	}
 	case LC_UNEQUIP_OK: {
 		LC_UNEQUIP_OK_PACKET* packet = reinterpret_cast<LC_UNEQUIP_OK_PACKET*>(p);
 		mMyCharacter->SetAccessoryFromEquippedFlag(packet->equipmentFlag);
+		mMyCharacter->UpdateEquippedAccessoryUI();
 		break;
 	}
 	default:

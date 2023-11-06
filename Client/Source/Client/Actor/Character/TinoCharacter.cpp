@@ -10,6 +10,7 @@
 #include "MenuUI/CreateAccountsWidget.h"
 #include "MenuUI/LobbyUIWidget.h"
 #include "MenuUI/StoreUIWidget.h"
+#include "MenuUI/InventoryUIWidget.h"
 
 #include "Component/InventoryComponent.h"
 #include "ClientGameMode.h"
@@ -380,6 +381,13 @@ void ATinoCharacter::MakeAndShowChangePoint(int AfterPoint)
 	}
 }
 
+void ATinoCharacter::UpdateEquippedAccessoryUI()
+{
+	auto TinoController = GetController<ATinoController>();
+	if (!!TinoController)
+		TinoController->InventoryUIInstance->UpdateEquippedAccessory();
+}
+
 void ATinoCharacter::RemoveStoreDialog()
 {
 	auto TinoController = GetController<ATinoController>();
@@ -637,6 +645,7 @@ void ATinoCharacter::WearAccessory(const int ItemCode)
 	auto Accessory = AAccessoryItem::Spawn< AAccessoryItem>(GetWorld(), Item.AssetData.BPClass, this);
 	Accessory->SetSocketNameWithItemCode(Item.ItemCode);
 	int idx = EquipAccessoryContainer.Add(Accessory);
+	EquipAccessoryContainer[idx]->SetItemCode(Item.ItemCode);
 	EquipAccessoryContainer[idx]->Equip();
 }
 
