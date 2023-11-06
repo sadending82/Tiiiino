@@ -51,10 +51,21 @@ void UInventoryUIWidget::UpdatePointAndPoint()
 	}
 }
 
+FString UInventoryUIWidget::GetAccessoryItemCode()
+{
+	FString fstr;
+	for (auto p : Network::GetNetwork()->mMyCharacter->EquipAccessoryContainer)
+	{
+		FString temp = FString::FromInt(p->GetItemCode());
+		fstr += temp;
+		fstr += ' ';
+	}
+	return fstr;
+}
+
 void UInventoryUIWidget::ClickItemIcon(const int itemcode)
 {
 	// 서버에 클릭한 아이템 코드 전달
-	
 	
 }
 
@@ -72,10 +83,45 @@ void UInventoryUIWidget::UnEquipClickedItem(const int itemcode)
 
 bool UInventoryUIWidget::CheckItemEquiped(const int64 itemcode)
 {
-
-	for (auto& p : Network::GetNetwork()->mMyCharacter->AccessoryInventory)
+	
+	for (auto p : Network::GetNetwork()->mMyCharacter->EquipAccessoryContainer)
 	{
-		
+		//int AccessoryItemCode = p->GetItemCode();
+		//if (AccessoryItemCode <= 15)
+		//{
+		//	if (equiptype != EEquipType::EEquipType_Back)
+		//	{
+		//		return true;
+		//	}
+		//}
+		//else if (AccessoryItemCode <= 31)
+		//{
+		//	if (equiptype == EEquipType::EEquipType_Hand)
+		//	{
+		//		return true;
+		//	}
+		//}
+		//else if (AccessoryItemCode <= 47)
+		//{
+		//	if (equiptype == EEquipType::EEquipType_Face)
+		//	{
+		//		return true;
+		//	}
+		//}
+		//else if (AccessoryItemCode <= 63)
+		//{
+		//	if (equiptype == EEquipType::EEquipType_Head)
+		//	{
+		//		return true;
+		//	}
+		//}
+		//else
+		//{
+		//	// error
+		//}
+		//
+		if (itemcode == p->GetItemCode())
+			return true;
 	}
 	return false;
 }

@@ -24,6 +24,20 @@ void AAccessoryItem::BeginPlay()
 	Super::BeginPlay();
 }
 
+void AAccessoryItem::Equip()
+{
+	if (bEquipped == true) return;
+	bEquipped = true;
+	//SetInstigator(OwnerCharacter->GetController());
+	AttachToComponent(Cast<ACharacter>(GetOwner())->GetMesh(), FAttachmentTransformRules(EAttachmentRule::KeepRelative, true), SocketName);
+}
+
+void AAccessoryItem::UnEquip()
+{
+	if (bEquipped == false) return;
+	bEquipped = false;
+}
+
 void AAccessoryItem::SetSocketNameWithItemCode(const int itemCode)
 {
 	if (itemCode < 0) return;

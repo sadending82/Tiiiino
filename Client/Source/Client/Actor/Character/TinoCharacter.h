@@ -120,6 +120,7 @@ public:
 	void MakeAndShowDialogInGame();
 	void MakeAndShowLobbyRankSystem(struct rankInfo rank[]);
 	void MakeAndShowChangePoint(int AfterPoint);
+	void UpdateEquippedAccessoryUI();
 
 	void RemoveStoreDialog();
 	//Accessory
@@ -134,6 +135,8 @@ public:
 	UFUNCTION(Blueprintcallable, Category = "Accessory")
 		void UnWearAccessory(const int ItemCode);	
 	
+	UFUNCTION(Blueprintcallable, Category = "Accessory")
+	TArray<class AAccessoryItem*> GetAccessory() const { return EquipAccessoryContainer; }
 	TArray<class AAccessoryItem*> EquipAccessoryContainer;
 
 	//Getter & Setter

@@ -31,6 +31,12 @@ public:
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void UpdatePointAndPoint();
 
+	UFUNCTION(BluePrintImplementableEvent, Category = "UMG_Game")
+	void UpdateEquippedAccessory();
+
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	FString GetAccessoryItemCode();
+
 public:
 	// 아이템 아이콘 클릭
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
