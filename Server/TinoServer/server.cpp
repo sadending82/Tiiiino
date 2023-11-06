@@ -1209,7 +1209,7 @@ void Server::SendEquipItemOK(int key, int itemCode, long long equipmentFlag)
 	packet.size = sizeof(packet);
 	packet.type = LC_EQUIP_OK;
 	packet.itemCode = itemCode;
-	packet.equipmentFlag = mClients[key].mInventory;
+	packet.equipmentFlag = equipmentFlag;
 	mClients[key].DoSend(&packet);
 }
 
@@ -1219,7 +1219,7 @@ void Server::SendUnequipItemOK(int key, int itemCode, long long equipmentFlag)
 	packet.size = sizeof(packet);
 	packet.type = LC_UNEQUIP_OK;
 	packet.itemCode = itemCode;
-	packet.equipmentFlag = mClients[key].mInventory;
+	packet.equipmentFlag = equipmentFlag;
 	mClients[key].DoSend(&packet);
 }
 
