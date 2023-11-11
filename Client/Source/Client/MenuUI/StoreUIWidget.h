@@ -10,6 +10,9 @@
  * 
  */
 
+class ATinoCharacter;
+class AClientGameMode;
+
 UENUM(BlueprintType)
 enum class EPurchaseState : uint8
 {
@@ -90,4 +93,10 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
 	EPurchaseState warning;
 
+private:
+
+	void InitInstance();
+
+	ATinoCharacter* PlayerInstance;
+	AClientGameMode* GameModeInstance;
 };

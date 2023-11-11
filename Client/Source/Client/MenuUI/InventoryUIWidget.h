@@ -8,7 +8,10 @@
 
 /**
  * 
+
  */
+class ATinoCharacter;
+
 UCLASS()
 class CLIENT_API UInventoryUIWidget : public UUserWidget
 {
@@ -54,4 +57,9 @@ public:
 	// 아이템 장착여부 확인
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	bool CheckItemEquiped(const int64 itemcode);
+
+private:
+	void InitInstance();
+
+	ATinoCharacter* PlayerInstance;
 };

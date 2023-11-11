@@ -1,6 +1,5 @@
 #include "Component/InventoryComponent.h"
 #include "Actor/Accessory/AccessoryItem.h"
-#include "Data/ItemData.h"
 
 #include "Global.h"
 
@@ -17,11 +16,31 @@ void UInventoryComponent::BeginPlay()
 
 }
 
-void UInventoryComponent::AddItem(const FItemData& ItemData)
+TArray<FInventoryItem> UInventoryComponent::GetInventoryContents() const
 {
-	/*if (InventoryContents.Contains(ItemData))
-		CLog::Log("Already have Item!");*/
-	InventoryContents.AddUnique(ItemData);
+	TArray<FInventoryItem> OutArray;
+	InventoryContents.GenerateValueArray(OutArray);
+	return OutArray;
+}
+
+FInventoryItem UInventoryComponent::GetItemFromItemCode(const int64& ItemCode) const
+{
+	if (InventoryContents.Contains(ItemCode) == false)
+	{
+		CLog::Log("Invalid ItemCode!");
+		return FInventoryItem();
+	}
+	return InventoryContents[ItemCode];
+}
+
+void UInventoryComponent::AddItem(const FItemData& ItemData,bool bEquipped)
+{
+	if (InventoryContents.Contains(ItemData.ItemCode))
+	{
+		CLog::Log("Already have Item!");
+		return;
+	}
+	InventoryContents.Add({ ItemData.ItemCode ,FInventoryItem(ItemData, bEquipped) });
 
 	OnInventoryUpdated.Broadcast();
 }
@@ -30,4 +49,26 @@ void UInventoryComponent::ClearInventory()
 {
 	InventoryContents.Empty();
 	OnInventoryUpdated.Broadcast();
+}
+
+void UInventoryComponent::SetEquipped(const int64& ItemCode, bool bEquipped)
+{
+	if (InventoryContents.Contains(ItemCode) == false)
+	{
+		CLog::Log("Invalid ItemCode!");
+		return;
+	}
+
+	InventoryContents[ItemCode].bEquipped = bEquipped;
+}
+
+bool UInventoryComponent::GetEquipped(const int64& ItemCode) const
+{
+	if (InventoryContents.Contains(ItemCode) == false)
+	{
+		CLog::Log("Invalid ItemCode!");
+		return false;
+	}
+	
+	return InventoryContents[ItemCode].bEquipped;
 }

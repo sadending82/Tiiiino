@@ -45,6 +45,7 @@ enum class EDepartment : uint8
 };
 
 struct FItemData;
+struct FInventoryItem;
 
 UCLASS()
 class CLIENT_API ATinoCharacter : public ABaseCharacter
@@ -135,9 +136,9 @@ public:
 	UFUNCTION(Blueprintcallable, Category = "Accessory")
 		void UnWearAccessory(const int ItemCode);	
 	
-	UFUNCTION(Blueprintcallable, Category = "Accessory")
-	TArray<class AAccessoryItem*> GetAccessory() const { return EquipAccessoryContainer; }
-	TArray<class AAccessoryItem*> EquipAccessoryContainer;
+	//UFUNCTION(Blueprintcallable, Category = "Accessory")
+	//TArray<class AAccessoryItem*> GetAccessory() const { return EquipAccessoryContainer; }
+	//TArray<class AAccessoryItem*> EquipAccessoryContainer;
 
 	//Getter & Setter
 	UFUNCTION(BlueprintCallable)
@@ -158,7 +159,7 @@ public:
 
 	//인벤토리에 저장된 데이터에 접근할 수 있음
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	TArray<FItemData> GetInventoryContents();
+	TArray<FInventoryItem> GetInventoryContents();
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 		void AddItemToInventory(const FItemData& Data);
