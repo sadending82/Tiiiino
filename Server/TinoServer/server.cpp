@@ -1128,7 +1128,7 @@ void Server::SendMatchResponse(int roomID)
 	uniform_int_distribution<int> rLevel(MIN_LEVEL, MAX_LEVEL);
 	int randomlevel = rLevel(rng);
 
-	packet.mapLevel = 3;
+	packet.mapLevel = randomlevel;
 
 
 	int uidCount = 0;
