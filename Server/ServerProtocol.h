@@ -6,7 +6,7 @@ constexpr int DBSERVERPORT = 3700;
 
 constexpr int MAXGAMESERVER = 2;
 constexpr int MAX_ROOM = 100;
-constexpr int MAX_COUPONLEN = 10;
+//constexpr int MAX_COUPONLEN = 10;
 
 #define CHECK_VERSION
 constexpr const char* GAMEVERSION = "1.2.0";

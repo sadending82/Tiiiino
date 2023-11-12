@@ -4,8 +4,10 @@
 #include "Actor/GoalArea.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Component/InventoryComponent.h"
 #include "Actor/Controller/TinoController.h"
 #include "Actor/Character/TinoCharacter.h"
+#include "Actor/Accessory/AccessoryItem.h"
 #include "MenuUI/InGameUIWidget.h"
 #include "Global.h"
 #include "Network/Network.h"
@@ -77,5 +79,17 @@ void AGoalArea::PlayerDisable(ACharacter* Character)
 	Character->GetCharacterMovement()->StopMovementImmediately();
 	Character->GetCharacterMovement()->GravityScale = 0.f;
 	
+    TArray<AActor*> children;
+
+    Character->GetAttachedActors(children);
+
+    for (auto actor : children) {
+        actor->SetActorHiddenInGame(true);
+        actor->SetActorEnableCollision(false);
+    }
+    //ATinoCharacter* plCharacter = Cast<ATinoCharacter>(Character);
+
+    
+
 }
 
