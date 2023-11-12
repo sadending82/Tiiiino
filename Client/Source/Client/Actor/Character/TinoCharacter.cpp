@@ -411,12 +411,6 @@ void ATinoCharacter::RemoveStoreDialog()
 		TinoController->RemoveDialogUI();
 }
 
-void ATinoCharacter::SetNetworkLocation(const FVector& Location)
-{
-	PreviousLocation = Location;
-	SetActorLocation(Location);
-}
-
 void ATinoCharacter::UpdataPointInLobby(int point)
 {
 	auto TinoController = GetController<ATinoController>();
