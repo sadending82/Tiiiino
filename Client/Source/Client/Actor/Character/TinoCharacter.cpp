@@ -448,6 +448,7 @@ FItemData ATinoCharacter::GetItemDataFromItemCode(const int64& ItemCode)
 void ATinoCharacter::SetInventoryFromInventoryFlag(const long long& EquippedItems)
 {
 	int64 IC = StaticCast<int64>(EquippedItems);
+	InventoryComponent->ClearInventory();
 
 	for (int64 i = 0; i < 64; ++i)
 	{
@@ -606,10 +607,7 @@ UCharacterAnimInstance* ATinoCharacter::GetTinoAnimInstance()
 void ATinoCharacter::SetAccessoryFromEquippedFlag(const long long& EquippedItems)
 {
 	int64 IC = StaticCast<int64>(EquippedItems);
-
-	//인벤토리 컴포넌트를 이용해 기존 보유 장비 정보를 업데이트한다.
-	InventoryComponent->ClearInventory();
-
+	InventoryComponent->ClearEquippedInfo();
 
 	for (int64 i = 0; i < 64; ++i)
 	{
@@ -618,7 +616,7 @@ void ATinoCharacter::SetAccessoryFromEquippedFlag(const long long& EquippedItems
 		if (Value != 0)
 		{
 			int64 ItemCode = i;
-			InventoryComponent->AddItem(GetItemDataFromItemCode(ItemCode),true);
+			//InventoryComponent->AddItem(GetItemDataFromItemCode(ItemCode),true);
 			InventoryComponent->SetEquipped(ItemCode,true);
 			WearAccessory(ItemCode);
 		}
@@ -647,10 +645,9 @@ void ATinoCharacter::WearAccessory(const int ItemCode)
 	//또는 테스트용으로 사용가능합니다.
 	FItemData Item = GetItemDataFromItemCode(ItemCode);
 	auto Accessory = InventoryComponent->GetInstnace(ItemCode);
-	Accessory->SetSocketNameWithItemCode(Item.ItemCode);
 	if (Accessory == nullptr)
 	{
-		AAccessoryItem::Spawn< AAccessoryItem>(GetWorld(), Item.AssetData.BPClass, this);
+		Accessory = AAccessoryItem::Spawn< AAccessoryItem>(GetWorld(), Item.AssetData.BPClass, this);
 		Accessory->SetSocketNameWithItemCode(ItemCode);
 		InventoryComponent->SetInstnace(ItemCode, Accessory);
 	}

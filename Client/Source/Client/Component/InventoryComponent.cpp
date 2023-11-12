@@ -61,6 +61,14 @@ void UInventoryComponent::ClearInventory()
 	OnInventoryUpdated.Broadcast();
 }
 
+void UInventoryComponent::ClearEquippedInfo()
+{
+	for (auto& [code, Item] : InventoryContents)
+	{
+		Item.bEquipped = false;
+	}
+}
+
 void UInventoryComponent::SetEquipped(const int64& ItemCode, bool bEquipped)
 {
 	if (InventoryContents.Contains(ItemCode) == false)

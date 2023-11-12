@@ -62,6 +62,7 @@ public:
 
 	void AddItem(const FItemData& ItemData, bool bEquipped = false);
 	void ClearInventory();
+	void ClearEquippedInfo();
 
 	UFUNCTION(BlueprintCallable)
 	void SetEquipped(const int64& ItemCode, bool bEquipped);
