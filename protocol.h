@@ -87,6 +87,9 @@ enum PacketType {
 	CL_REFRESH_DEP_RANK,
 	CL_REFRESH_POINT,
 
+	// ManageMent To LobbyServer
+	ML_ALERT,
+
 	// GameServer To Client
 	SC_LOGIN_OK,
 	SC_LOGIN_FAIL,
@@ -121,6 +124,7 @@ enum PacketType {
 	LC_REFRESH_POINT,
 	LC_EQUIP_OK,
 	LC_UNEQUIP_OK,
+	LC_ALERT,
 
 };
 
@@ -232,7 +236,11 @@ struct CL_REFRESH_POINT_PACKET : public PACKET {
 	
 };
 //-----------------------------------
+struct ML_ALERT_PACKET : public PACKET {
+	wchar_t alert[70]; //리눅스에서 돌리지 말길!
+};
 
+//-----------------------------------
 struct SC_LOGIN_OK_PACKET : public PACKET {
 	int		id;
 	char	department;
@@ -387,6 +395,10 @@ struct LC_EQUIP_OK_PACKET : public PACKET {
 struct LC_UNEQUIP_OK_PACKET : public PACKET {
 	int itemCode;
 	long long equipmentFlag;
+};
+
+struct LC_ALERT_PACKET : public PACKET {
+	wchar_t alert[70];
 };
 
 //--------------------------

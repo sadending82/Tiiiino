@@ -762,6 +762,13 @@ void Network::l_process_packet(unsigned char* p)
 		mMyCharacter->UpdateEquippedAccessoryUI();
 		break;
 	}
+	case LC_ALERT: {
+		LC_ALERT_PACKET* packet = reinterpret_cast<LC_ALERT_PACKET*>(p);
+		
+		UE_LOG(LogTemp, Error, TEXT("%s"),packet->alert);
+
+		break;
+	}
 	default:
 		break;
 	}

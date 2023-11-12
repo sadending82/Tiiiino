@@ -79,7 +79,7 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 		SendLogin(cID, p->id, p->password, p->gameVersion);
 		break;
 	}
-	case CL_LOGOUT: 
+	case CL_LOGOUT:
 	{
 		CL_LOGOUT_PACKET* p = reinterpret_cast<CL_LOGOUT_PACKET*>(cpacket);
 		LD_LOGOUT_PACKET pac;
@@ -146,6 +146,26 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 		p.uid = mClients[cID].mUID;
 
 		mServers[0].DoSend(&p);
+		break;
+	}
+	case ML_ALERT: {
+		ML_ALERT_PACKET* p = reinterpret_cast<ML_ALERT_PACKET*>(cpacket);
+		wcout << p->alert << endl;
+		LC_ALERT_PACKET packet;
+		packet.size = sizeof(packet);
+		packet.type = LC_ALERT;
+		memcpy(packet.alert, p->alert, sizeof(packet.alert));
+		for (int i = MAXGAMESERVER; i < MAX_USER; ++i)
+		{
+			mClients[i].mStateLock.lock();
+			if (mClients[i].mState == eSessionState::ST_FREE || mClients[i].mState == eSessionState::ST_ACCEPTED)
+			{
+				mClients[i].mStateLock.unlock();
+				continue;
+			}
+			mClients[i].DoSend(&packet);
+			mClients[i].mStateLock.unlock();
+		}
 		break;
 	}
 	default:
