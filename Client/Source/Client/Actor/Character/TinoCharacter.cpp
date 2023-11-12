@@ -10,6 +10,7 @@
 #include "MenuUI/CreateAccountsWidget.h"
 #include "MenuUI/LobbyUIWidget.h"
 #include "MenuUI/StoreUIWidget.h"
+#include "MenuUI/InventoryUIWidget.h"
 
 #include "Component/InventoryComponent.h"
 #include "ClientGameMode.h"
@@ -123,10 +124,11 @@ void ATinoCharacter::Tick(float DeltaTime)
 		float PitchClamp = FMath::ClampAngle(Rotation.Pitch, -45.f, 30.f);
 		FRotator RotationControl(PitchClamp, Rotation.Yaw, Rotation.Roll);
 		SleepEx(0, true);
-		FVector TargetLocation = GetNetworkLocation();
 
 		if (MovementState == EMovementState::EMS_Grabbing && Target != nullptr)
 		{
+			FVector TargetLocation = Target->GetActorLocation();
+
 			if (bIsControlledPlayer == true)
 			{
 				if (CurrentInterTime >= InterTime)
@@ -378,6 +380,13 @@ void ATinoCharacter::MakeAndShowChangePoint(int AfterPoint)
 		auto StoreUI = TinoController->StoreUIInstance;
 		StoreUI->ChangePoint(AfterPoint);
 	}
+}
+
+void ATinoCharacter::UpdateEquippedAccessoryUI()
+{
+	auto TinoController = GetController<ATinoController>();
+	if (!!TinoController)
+		TinoController->InventoryUIInstance->UpdateEquippedAccessory();
 }
 
 void ATinoCharacter::RemoveStoreDialog()
@@ -637,6 +646,7 @@ void ATinoCharacter::WearAccessory(const int ItemCode)
 	auto Accessory = AAccessoryItem::Spawn< AAccessoryItem>(GetWorld(), Item.AssetData.BPClass, this);
 	Accessory->SetSocketNameWithItemCode(Item.ItemCode);
 	int idx = EquipAccessoryContainer.Add(Accessory);
+	EquipAccessoryContainer[idx]->SetItemCode(Item.ItemCode);
 	EquipAccessoryContainer[idx]->Equip();
 }
 

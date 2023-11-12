@@ -5,7 +5,9 @@
 #include "MenuUI/LobbyUIWidget.h"
 #include "Actor/Controller/TinoController.h"
 #include "Actor/Character/TinoCharacter.h"
+#include "Actor/Accessory/AccessoryItem.h"
 #include "Data/ItemData.h"
+
 #include "Network/Network.h"
 #include "Global.h"
 
@@ -17,7 +19,7 @@ void UInventoryUIWidget::NativePreConstruct()
 	//FAssetData.Icon을 버튼 이미지로 설정
 	//블루프린트,C++ 둘다 가능
 	//인벤토리 UI에 띄워줄 아이템 목록 인덱스 시작, 마지막값을 저장
-	//0~8 표시 (1페이지), 9 ~ 17 (2페이지)
+	//0~8 표시 (1페이지), 9 ~ 17 (2페이지)float
 	//표시할 페이지 만큼 인벤토리가 안차있으면 기본 버튼 이미지를 보여주자
 }
 
@@ -35,8 +37,91 @@ void UInventoryUIWidget::TryBack()
 	//아이템 코드 패킷 전송(아직 해당 함수는 없는듯?)
 }
 
-void UInventoryUIWidget::ClickItemIcon()
+void UInventoryUIWidget::UpdatePointAndPoint()
 {
-	//연결된 버튼 외곽선 강조
-	//강조된 버튼 인덱스 저장
+	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (!!TinoController)
+	{
+		auto TinoCharacter = TinoController->GetPawn<ATinoCharacter>();
+		if (!!TinoCharacter)
+		{
+			Point = TinoCharacter->GetPoint();
+			Grade = TinoCharacter->GetGrade();
+		}
+	}
+}
+
+FString UInventoryUIWidget::GetAccessoryItemCode()
+{
+	FString fstr;
+	for (auto p : Network::GetNetwork()->mMyCharacter->EquipAccessoryContainer)
+	{
+		FString temp = FString::FromInt(p->GetItemCode());
+		fstr += temp;
+		fstr += ' ';
+	}
+	return fstr;
+}
+
+void UInventoryUIWidget::ClickItemIcon(const int itemcode)
+{
+	// 서버에 클릭한 아이템 코드 전달
+	
+}
+
+void UInventoryUIWidget::EquipClickedItem(const int itemcode)
+{
+	// 아이템 장착
+	send_equip_packet(Network::GetNetwork()->l_socket, itemcode);
+}
+
+void UInventoryUIWidget::UnEquipClickedItem(const int itemcode)
+{
+	// 아이템 해제
+	send_unequip_packet(Network::GetNetwork()->l_socket, itemcode);
+}
+
+bool UInventoryUIWidget::CheckItemEquiped(const int64 itemcode)
+{
+	
+	for (auto p : Network::GetNetwork()->mMyCharacter->EquipAccessoryContainer)
+	{
+		//int AccessoryItemCode = p->GetItemCode();
+		//if (AccessoryItemCode <= 15)
+		//{
+		//	if (equiptype != EEquipType::EEquipType_Back)
+		//	{
+		//		return true;
+		//	}
+		//}
+		//else if (AccessoryItemCode <= 31)
+		//{
+		//	if (equiptype == EEquipType::EEquipType_Hand)
+		//	{
+		//		return true;
+		//	}
+		//}
+		//else if (AccessoryItemCode <= 47)
+		//{
+		//	if (equiptype == EEquipType::EEquipType_Face)
+		//	{
+		//		return true;
+		//	}
+		//}
+		//else if (AccessoryItemCode <= 63)
+		//{
+		//	if (equiptype == EEquipType::EEquipType_Head)
+		//	{
+		//		return true;
+		//	}
+		//}
+		//else
+		//{
+		//	// error
+		//}
+		//
+		if (itemcode == p->GetItemCode())
+			return true;
+	}
+	return false;
 }

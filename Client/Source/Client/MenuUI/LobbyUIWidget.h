@@ -35,7 +35,7 @@ public:
 	void TryGameReadyCancel();
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	void UpdatePoint();
+	void UpdatePointAndGrade();
 
 	UFUNCTION(BluePrintImplementableEvent, Category = "UMG_Game")
 	void UpdataRankData();
@@ -65,7 +65,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
 		float Grade;
 	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
-		int32 Point;
+		float Point;
 public:
 	// ∑©≈© Ω√Ω∫≈€
 

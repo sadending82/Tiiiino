@@ -270,7 +270,7 @@ long long Socket::EquipItem(int itemCode, long long equipmentFlag)
 {
     long long initBit;
 
-    if (itemCode <= STARTCODE_HANDEQUIP)
+    if (itemCode < STARTCODE_HANDEQUIP)
         initBit = BACKEQUIP;
     else if (STARTCODE_HANDEQUIP <= itemCode && itemCode < STARTCODE_FACEEQUIP)
         initBit = HANDEQUIP;
