@@ -10,6 +10,7 @@
 #include "Data/ItemData.h"
 #include "Network/Network.h"
 #include "Component/InventoryComponent.h"
+#include "ClientGameMode.h"
 #include "Global.h"
 
 
@@ -21,8 +22,6 @@ void UStoreUIWidget::NativePreConstruct()
 	//auto TinoCharacter = TinoController->GetPawn<ATinoCharacter>();
 	//Grade = TinoCharacter->GetGrade();
 	//Point = TinoCharacter->GetPoint();
-
-
 }
 
 void UStoreUIWidget::NativeDestruct()
@@ -34,8 +33,8 @@ void UStoreUIWidget::TryBack()
 {
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 
-	TinoController->LobbyUIInstance->UpdatePoint();
-	
+	TinoController->LobbyUIInstance->UpdatePointAndGrade();
+
 	TinoController->ChangeMenuWidget(TinoController->LobbyUIInstance);
 }
 
@@ -49,42 +48,46 @@ void UStoreUIWidget::PurchaseItem()
 
 bool UStoreUIWidget::QualifyingPurchase(int64 itemcode)
 {
-	// 게임데이터매니저에서 아이템데이터 불러오기
-	auto itemdata = Network::GetNetwork()->mGameDataManager->GetShopProductsList();
+	// 게임데이터매니저에서 아이템데이터 불러오기, 게임모드 초기화시 게임데이터매니저 데이터로 초기화되어있음
+	if (GameModeInstance == nullptr)
+	{
+		CLog::Log("GameMode Instance is Nullptr");
+		InitInstance();
+	}
+
+	TArray<int> ShopProductTable;
+	GameModeInstance->GetShopProductTable(ShopProductTable);
 	int price = 0;
 	int grade = 0;
-	for (auto& data : itemdata)
+
+	for (auto& code : ShopProductTable)
 	{
-		if (itemcode == data.second.itemCode)
+		if (itemcode == code)
 		{
-			price = data.second.price;
-			grade = data.second.cutline;
+			auto data = GameModeInstance->GetShopProductData(code);
+			price = data->SellValue;
+			grade = data->NumericData.PurchaseCondition;
 			break;
 		}
 	}
-	
-	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	if (!!TinoController)
+
+	if (!!PlayerInstance)
 	{
-		auto TinoCharacter = TinoController->GetPawn<ATinoCharacter>();
-		
-		if (!!TinoCharacter)
+		if (PlayerInstance->GetPoint() < price)
 		{
-			if (TinoCharacter->GetPoint() < price)
-			{
+			return false;
+		}
+		if (PlayerInstance->GetGrade() < grade)
+		{
+			return false;
+		}
+		for (auto& p : PlayerInstance->GetInventoryContents())
+		{
+			if (p.ItemInfo.ItemCode == itemcode)
 				return false;
-			}
-			if (TinoCharacter->GetGrade() < grade)
-			{
-				return false;
-			}
-			for (auto& p : Network::GetNetwork()->mMyCharacter->GetInventoryContents())
-			{
-				if (p.ItemCode == itemcode)
-					return false;
-			}
 		}
 	}
+
 
 	return true;
 }
@@ -101,48 +104,66 @@ void UStoreUIWidget::LimitGrade()
 
 void UStoreUIWidget::ShowPurchaseWarning(int64 itemcode)
 {
-	auto itemdata = Network::GetNetwork()->mGameDataManager->GetShopProductsList();
+	if (GameModeInstance == nullptr)
+	{
+		CLog::Log("GameMode Instance is Nullptr");
+		InitInstance();
+	}
+
+	TArray<int> ShopProductTable;
+	GameModeInstance->GetShopProductTable(ShopProductTable);
+
 	int price = 0;
 	int grade = 0;
-	for (auto& data : itemdata)
+
+	for (auto& code : ShopProductTable)
 	{
-		if (itemcode == data.second.itemCode)
+		if (itemcode == code)
 		{
-			price = data.second.price;
-			grade = data.second.cutline;
+			auto data = GameModeInstance->GetShopProductData(code);
+			price = data->SellValue;
+			grade = data->NumericData.PurchaseCondition;
 			break;
 		}
 	}
-	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	if (!!TinoController)
+
+
+	auto inventory = PlayerInstance->GetInventoryContents();
+	if (!!PlayerInstance)
 	{
-		auto TinoCharacter = TinoController->GetPawn<ATinoCharacter>();
-		auto inventory = TinoCharacter->GetInventoryContents();
-		if (!!TinoCharacter)
+		for (auto& p : inventory)
 		{
-			if (TinoCharacter->GetPoint() < price)
+			if (p.ItemInfo.ItemCode == itemcode)
 			{
 				warning = EPurchaseState::EPS_AlreadyPurchase;
 				return;
 			}
-			if (TinoCharacter->GetGrade() < grade)
-			{
-				warning = EPurchaseState::EPS_LimitGrade;
-				return;
-			}
+		}
+		if (PlayerInstance->GetGrade() < grade)
+		{
+			warning = EPurchaseState::EPS_LimitGrade;
+			return;
 		}
 	}
+
 	warning = EPurchaseState::EPS_Purchase;
 }
 
 void UStoreUIWidget::MoveLeft()
 {
 	// 좌측 이동버튼 클릭
-	
-	
+
+
 }
 
 void UStoreUIWidget::MoveRight()
 {
 	// 우측 이동버튼 클릭
+}
+
+void UStoreUIWidget::InitInstance()
+{
+	PlayerInstance = Cast<ATinoCharacter>(GetOwningPlayerPawn());
+	GameModeInstance = Cast<AClientGameMode>(UGameplayStatics::GetGameMode(PlayerInstance->GetWorld()));
+
 }

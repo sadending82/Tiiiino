@@ -10,6 +10,7 @@
 #include "MenuUI/CreateAccountsWidget.h"
 #include "MenuUI/LobbyUIWidget.h"
 #include "MenuUI/StoreUIWidget.h"
+#include "MenuUI/InventoryUIWidget.h"
 
 #include "Component/InventoryComponent.h"
 #include "ClientGameMode.h"
@@ -123,10 +124,11 @@ void ATinoCharacter::Tick(float DeltaTime)
 		float PitchClamp = FMath::ClampAngle(Rotation.Pitch, -45.f, 30.f);
 		FRotator RotationControl(PitchClamp, Rotation.Yaw, Rotation.Roll);
 		SleepEx(0, true);
-		FVector TargetLocation = GetNetworkLocation();
 
 		if (MovementState == EMovementState::EMS_Grabbing && Target != nullptr)
 		{
+			FVector TargetLocation = Target->GetActorLocation();
+
 			if (bIsControlledPlayer == true)
 			{
 				if (CurrentInterTime >= InterTime)
@@ -395,6 +397,26 @@ void ATinoCharacter::MakeAndShowChangePoint(int AfterPoint)
 	}
 }
 
+void ATinoCharacter::UpdateEquippedAccessoryUI()
+{
+	auto TinoController = GetController<ATinoController>();
+	if (!!TinoController)
+		TinoController->InventoryUIInstance->UpdateEquippedAccessory();
+}
+
+void ATinoCharacter::RemoveStoreDialog()
+{
+	auto TinoController = GetController<ATinoController>();
+	if (!!TinoController)
+		TinoController->RemoveDialogUI();
+}
+
+void ATinoCharacter::SetNetworkLocation(const FVector& Location)
+{
+	PreviousLocation = Location;
+	SetActorLocation(Location);
+}
+
 void ATinoCharacter::UpdataPointInLobby(int point)
 {
 	auto TinoController = GetController<ATinoController>();
@@ -411,7 +433,7 @@ void ATinoCharacter::UpdataPointInLobby(int point)
 	}
 }
 
-TArray<FItemData> ATinoCharacter::GetInventoryContents()
+TArray<FInventoryItem> ATinoCharacter::GetInventoryContents()
 {
 	return InventoryComponent->GetInventoryContents();
 }
@@ -441,6 +463,7 @@ FItemData ATinoCharacter::GetItemDataFromItemCode(const int64& ItemCode)
 void ATinoCharacter::SetInventoryFromInventoryFlag(const long long& EquippedItems)
 {
 	int64 IC = StaticCast<int64>(EquippedItems);
+	InventoryComponent->ClearInventory();
 
 	for (int64 i = 0; i < 64; ++i)
 	{
@@ -458,7 +481,7 @@ void ATinoCharacter::SetInventoryFromInventoryFlag(const long long& EquippedItem
 FItemData ATinoCharacter::GetShopItemDataFromItemCode(const int64& ItemCode)
 {
 	auto GameMode = Cast<AClientGameMode>(GetWorld()->GetAuthGameMode());
-	auto Data = GameMode->GetItemData(ItemCode);
+	auto Data = GameMode->GetShopProductData(ItemCode);
 	if (Data == nullptr) return FItemData();
 
 	FItemData ItemData;
@@ -599,9 +622,7 @@ UCharacterAnimInstance* ATinoCharacter::GetTinoAnimInstance()
 void ATinoCharacter::SetAccessoryFromEquippedFlag(const long long& EquippedItems)
 {
 	int64 IC = StaticCast<int64>(EquippedItems);
-
-	//인벤토리 컴포넌트를 이용해 기존 보유 장비 정보를 업데이트한다.
-	InventoryComponent->ClearInventory();
+	InventoryComponent->ClearEquippedInfo();
 
 	for (int64 i = 0; i < 64; ++i)
 	{
@@ -610,7 +631,9 @@ void ATinoCharacter::SetAccessoryFromEquippedFlag(const long long& EquippedItems
 		if (Value != 0)
 		{
 			int64 ItemCode = i;
-			InventoryComponent->AddItem(GetItemDataFromItemCode(ItemCode));
+			//InventoryComponent->AddItem(GetItemDataFromItemCode(ItemCode),true);
+			
+			WearAccessory(ItemCode);
 		}
 	}
 }
@@ -620,8 +643,13 @@ void ATinoCharacter::WearAllAccessory()
 	//인벤토리 컴포넌트에서 아이템 정보를 가져와서 스폰한다. 
 	for (auto item : GetInventoryContents())
 	{
-		auto Accessory = AAccessoryItem::Spawn< AAccessoryItem>(GetWorld(), item.AssetData.BPClass, this);
-		Accessory->SetSocketNameWithItemCode(item.ItemCode);
+		auto Accessory = InventoryComponent->GetInstnace(item.ItemInfo.ItemCode);
+		if (Accessory == nullptr)
+		{
+			AAccessoryItem::Spawn< AAccessoryItem>(GetWorld(), item.ItemInfo.AssetData.BPClass, this);
+			Accessory->SetSocketNameWithItemCode(item.ItemInfo.ItemCode);
+			InventoryComponent->SetInstnace(item.ItemInfo.ItemCode, Accessory);
+		}
 		Accessory->Equip();
 	}
 }
@@ -631,17 +659,32 @@ void ATinoCharacter::WearAccessory(const int ItemCode)
 	//로비에서 한개씩 장착할때 사용하는 함수입니다.
 	//또는 테스트용으로 사용가능합니다.
 	FItemData Item = GetItemDataFromItemCode(ItemCode);
-	auto Accessory = AAccessoryItem::Spawn< AAccessoryItem>(GetWorld(), Item.AssetData.BPClass, this);
-	Accessory->SetSocketNameWithItemCode(Item.ItemCode);
-	Accessory->Equip();
+	auto Accessory = InventoryComponent->GetInstnace(ItemCode);
+	if (Accessory == nullptr)
+	{
+		Accessory = AAccessoryItem::Spawn< AAccessoryItem>(GetWorld(), Item.AssetData.BPClass, this);
+		Accessory->SetSocketNameWithItemCode(ItemCode);
+		InventoryComponent->SetInstnace(ItemCode, Accessory);
+	}
+	InventoryComponent->SetEquipped(ItemCode, true);
+	Accessory->Equip(); 
+	//int idx = EquipAccessoryContainer.Add(Accessory);
+	//EquipAccessoryContainer[idx]->SetItemCode(Item.ItemCode);
+	//EquipAccessoryContainer[idx]->Equip();
 }
 
 void ATinoCharacter::UnWearAccessory(const int ItemCode)
 {
-	//auto Accessory = AccessoryInventory.FindByPredicate([&ItemCode](const AAccessoryItem& i) { return i.GetItemCode() == ItemCode; });
+	for (auto item : GetInventoryContents())
+	{
+		auto Accessory = InventoryComponent->GetInstnace(item.ItemInfo.ItemCode);
+		if(Accessory)
+			Accessory->UnEquip();
+	}
+	//auto Accessory = EquipAccessoryContainer.FindByPredicate([&ItemCode](const AAccessoryItem& i) { return i.GetItemCode() == ItemCode; });
 
 	//Accessory->UnEquip();
-	//AccessoryInventory.Remove(*Accessory);
+	//EquipAccessoryContainer.Remove(*Accessory);
 	//Accessory->Destroy();
 }
 

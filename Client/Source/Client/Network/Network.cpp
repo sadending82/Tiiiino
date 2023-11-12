@@ -7,7 +7,6 @@
 #include "Actor/Character/CharacterAnimInstance.h"
 #include "Actor/Obstacles/BaseObstacle.h"
 #include "Data/ItemData.h"
-#include "MenuUI/StoreUIWidget.h"
 
 #include "Global.h"
 
@@ -412,7 +411,7 @@ void Network::process_packet(unsigned char* p)
 		FVector location(240.f - ((packet->id % 4) * 160), 0 - (packet->id / 4 * 160), 0);
 		mMyCharacter->SetActorLocation(location);
 		mMyCharacter->SetAccessoryFromEquippedFlag(packet->equipmentFlag);
-		mMyCharacter->WearAllAccessory();
+		//mMyCharacter->WearAllAccessory();
 		//연결성공
 		bIsConnected = true;
 		break;
@@ -476,6 +475,7 @@ void Network::process_packet(unsigned char* p)
 		if (nullptr != mOtherCharacter[id])
 		{
 			mOtherCharacter[id]->SetAccessoryFromEquippedFlag(packet->equipmentFlag);
+			//mOtherCharacter[id]->WearAllAccessory();
 			mOtherCharacter[id]->GetMesh()->SetVisibility(true);
 			mOtherCharacter[id]->SetClientID(packet->id);
 			//mOtherCharacter[id]->CharacterName = FString(ANSI_TO_TCHAR(packet->name));
@@ -499,7 +499,7 @@ void Network::process_packet(unsigned char* p)
 				mc->SetDepartmentClothes(packet->department);
 				mOtherCharacter[id] = mc;
 				mOtherCharacter[id]->SetAccessoryFromEquippedFlag(packet->equipmentFlag);
-				mOtherCharacter[id]->WearAllAccessory();
+				//mOtherCharacter[id]->WearAllAccessory();
 				mOtherCharacter[id]->GetMesh()->SetVisibility(true);
 				mOtherCharacter[id]->SetClientID(packet->id);
 				mOtherCharacter[id]->SetCollisionProfileName(TEXT("Empty"));
@@ -659,6 +659,7 @@ void Network::l_process_packet(unsigned char* p)
 		long long TestItemFlag = 0b0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'1001;
 		mMyCharacter->SetInventoryFromInventoryFlag(packet->inventoryFlag);
 		mMyCharacter->SetAccessoryFromEquippedFlag(packet->equippedItems);
+		//mMyCharacter->WearAllAccessory();
 
 		//학점과 포인트 표기
 		mMyCharacter->MakeAndShowLobbyRankSystem(packet->ranking);
@@ -721,7 +722,7 @@ void Network::l_process_packet(unsigned char* p)
 		LC_BUYITEM_OK_PACKET* packet = reinterpret_cast<LC_BUYITEM_OK_PACKET*>(p);
 
 		mMyCharacter->AddItemToInventory(mMyCharacter->GetItemDataFromItemCode(packet->itemCode));
-		mMyCharacter->GetController<ATinoController>()->StoreUIInstance->StoreDialogInstance->RemoveFromParent();
+		mMyCharacter->RemoveStoreDialog();
 		mMyCharacter->MakeAndShowChangePoint(packet->pointAfterPurchase);
 		mMyCharacter->SetInventoryFromInventoryFlag(packet->inventoryFlag);
 		mMyCharacter->SetPoint(packet->pointAfterPurchase);
@@ -752,11 +753,20 @@ void Network::l_process_packet(unsigned char* p)
 	case LC_EQUIP_OK: {
 		LC_EQUIP_OK_PACKET* packet = reinterpret_cast<LC_EQUIP_OK_PACKET*>(p);
 		mMyCharacter->SetAccessoryFromEquippedFlag(packet->equipmentFlag);
+		mMyCharacter->UpdateEquippedAccessoryUI();
 		break;
 	}
 	case LC_UNEQUIP_OK: {
 		LC_UNEQUIP_OK_PACKET* packet = reinterpret_cast<LC_UNEQUIP_OK_PACKET*>(p);
 		mMyCharacter->SetAccessoryFromEquippedFlag(packet->equipmentFlag);
+		mMyCharacter->UpdateEquippedAccessoryUI();
+		break;
+	}
+	case LC_ALERT: {
+		LC_ALERT_PACKET* packet = reinterpret_cast<LC_ALERT_PACKET*>(p);
+		
+		UE_LOG(LogTemp, Error, TEXT("%s"),packet->alert);
+
 		break;
 	}
 	default:
