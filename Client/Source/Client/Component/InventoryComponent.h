@@ -74,7 +74,7 @@ public:
 
 protected:
 	// 플레이어 인벤토리
-	UPROPERTY(EditDefaultsOnly,Category="Inventory")
+	UPROPERTY(VisibleAnywhere,Category="Inventory")
 	TMap<int64,FInventoryItem> InventoryContents;
 
 

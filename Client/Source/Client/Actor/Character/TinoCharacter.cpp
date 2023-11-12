@@ -393,7 +393,7 @@ void ATinoCharacter::RemoveStoreDialog()
 {
 	auto TinoController = GetController<ATinoController>();
 	if (!!TinoController)
-		TinoController->StoreUIInstance->StoreDialogInstance->RemoveFromParent();
+		TinoController->RemoveDialogUI();
 }
 
 void ATinoCharacter::SetNetworkLocation(const FVector& Location)
