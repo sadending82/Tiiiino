@@ -12,7 +12,7 @@ void Server::Disconnect(int cID)
 
 	DEBUGMSGONEPARAM("DISCONNECT [%s]\n", mClients[cID].mID);
 
-	mMatchListHighTier.remove(cID);
+	//mMatchListHighTier.remove(cID);
 	mMatchListLowTier.remove(cID);
 
 	closesocket(mClients[cID].mSocket);
@@ -581,38 +581,38 @@ void Server::ProcessEvent(unsigned char* cmessage)
 	switch (te->mEventType) {
 	case eEVENT_TYPE::EV_MATCH_UP:
 	{
-		DEBUGMSGONEPARAM("상위 티어 매칭 인원 [%d]\n", mMatchListHighTier.size());
+		//DEBUGMSGONEPARAM("상위 티어 매칭 인원 [%d]\n", mMatchListHighTier.size());
 		DEBUGMSGONEPARAM("하위 티어 매칭 인원 [%d]\n", mMatchListLowTier.size());
 		// match room max
-		mHighListLock.lock();
-		if (mMatchListHighTier.size() >= MAX_ROOM_USER)
-		{
-			int roomID = GetNewRoomID();
-			for (int i = 0; i < MAX_ROOM_USER; ++i)
-			{
-				int player_id = mMatchListHighTier.front();
-				DEBUGMSGONEPARAM("[%s]플레이어 게임서버로\n",mClients[player_id].mID);
-				LG_USER_INTO_GAME_PACKET packet;
-				packet.size = sizeof(packet);
-				packet.type = LG_USER_INTO_GAME;
-				packet.department = mClients[player_id].mDepartment;
-				packet.roomID = roomID;// need update	
-				packet.equipmentflag = mClients[player_id].mEquippedItems;
-				_itoa_s(rand() % 2'000'000'000, mClients[player_id].mHashs, 10); 
-				strcpy_s(packet.hashs, mClients[player_id].mHashs);
-				strcpy_s(packet.name,  mClients[player_id].mNickName);
-				strcpy_s(packet.id,  mClients[player_id].mID);
-				packet.uID = mClients[player_id].mUID;
-				packet.roomMax = MAX_ROOM_USER;
-				mClients[player_id].mRoomID = packet.roomID;
+		//mHighListLock.lock();
+		//if (mMatchListHighTier.size() >= MAX_ROOM_USER)
+		//{
+		//	int roomID = GetNewRoomID();
+		//	for (int i = 0; i < MAX_ROOM_USER; ++i)
+		//	{
+		//		int player_id = mMatchListHighTier.front();
+		//		DEBUGMSGONEPARAM("[%s]플레이어 게임서버로\n",mClients[player_id].mID);
+		//		LG_USER_INTO_GAME_PACKET packet;
+		//		packet.size = sizeof(packet);
+		//		packet.type = LG_USER_INTO_GAME;
+		//		packet.department = mClients[player_id].mDepartment;
+		//		packet.roomID = roomID;// need update	
+		//		packet.equipmentflag = mClients[player_id].mEquippedItems;
+		//		_itoa_s(rand() % 2'000'000'000, mClients[player_id].mHashs, 10); 
+		//		strcpy_s(packet.hashs, mClients[player_id].mHashs);
+		//		strcpy_s(packet.name,  mClients[player_id].mNickName);
+		//		strcpy_s(packet.id,  mClients[player_id].mID);
+		//		packet.uID = mClients[player_id].mUID;
+		//		packet.roomMax = MAX_ROOM_USER;
+		//		mClients[player_id].mRoomID = packet.roomID;
 
-				mServers[1].ServerDoSend(&packet);
+		//		mServers[1].ServerDoSend(&packet);
 
-				mMatchListHighTier.pop_front();
-				mReadytoGame.push_back(player_id);
-			}
-		}
-		mHighListLock.unlock();
+		//		mMatchListHighTier.pop_front();
+		//		mReadytoGame.push_back(player_id);
+		//	}
+		//}
+		//mHighListLock.unlock();
 		mLowListlock.lock();
 		if (mMatchListLowTier.size() >= MAX_ROOM_USER)
 		{
@@ -646,44 +646,44 @@ void Server::ProcessEvent(unsigned char* cmessage)
 
 		// half room max
 		system_clock::time_point tTime = system_clock::now();
-		mHighListLock.lock();
-		if (mMatchListHighTier.size() >= MAX_ROOM_USER / 2 && mMatchListHighTier.size() < MAX_ROOM_USER) // high list
-		{
-			if (tTime - mClients[mMatchListHighTier.front()].mMatchStartTime >= milliseconds(20000))
-				{
-					int tSize = mMatchListHighTier.size();
-					int roomID = GetNewRoomID();
-					for (int i = 0; i < tSize; ++i)
-					{
-						int player_id = mMatchListHighTier.front();
+		//mHighListLock.lock();
+		//if (mMatchListHighTier.size() >= MAX_ROOM_USER / 2 && mMatchListHighTier.size() < MAX_ROOM_USER) // high list
+		//{
+		//	if (tTime - mClients[mMatchListHighTier.front()].mMatchStartTime >= milliseconds(20000))
+		//		{
+		//			int tSize = mMatchListHighTier.size();
+		//			int roomID = GetNewRoomID();
+		//			for (int i = 0; i < tSize; ++i)
+		//			{
+		//				int player_id = mMatchListHighTier.front();
 
-						DEBUGMSGONEPARAM("[%s]플레이어 게임서버로\n", mClients[player_id].mID);
-						LG_USER_INTO_GAME_PACKET packet;
-						packet.size = sizeof(packet);
-						packet.type = LG_USER_INTO_GAME;
-						packet.roomID = roomID;//need update
-						packet.equipmentflag = mClients[player_id].mEquippedItems;
-						packet.department = mClients[player_id].mDepartment;
-						_itoa_s(rand() % 2'000'000'000, mClients[player_id].mHashs, 10);
-						strcpy_s(packet.hashs, mClients[player_id].mHashs);
-						strcpy_s(packet.name,  mClients[player_id].mNickName);
-						strcpy_s(packet.id,  mClients[player_id].mID);
-						packet.uID = mClients[player_id].mUID;
-						packet.roomMax = tSize;
-						mClients[player_id].mRoomID = packet.roomID;
+		//				DEBUGMSGONEPARAM("[%s]플레이어 게임서버로\n", mClients[player_id].mID);
+		//				LG_USER_INTO_GAME_PACKET packet;
+		//				packet.size = sizeof(packet);
+		//				packet.type = LG_USER_INTO_GAME;
+		//				packet.roomID = roomID;//need update
+		//				packet.equipmentflag = mClients[player_id].mEquippedItems;
+		//				packet.department = mClients[player_id].mDepartment;
+		//				_itoa_s(rand() % 2'000'000'000, mClients[player_id].mHashs, 10);
+		//				strcpy_s(packet.hashs, mClients[player_id].mHashs);
+		//				strcpy_s(packet.name,  mClients[player_id].mNickName);
+		//				strcpy_s(packet.id,  mClients[player_id].mID);
+		//				packet.uID = mClients[player_id].mUID;
+		//				packet.roomMax = tSize;
+		//				mClients[player_id].mRoomID = packet.roomID;
 
-						mServers[1].ServerDoSend(&packet);
+		//				mServers[1].ServerDoSend(&packet);
 
-						mMatchListHighTier.pop_front();
-						mReadytoGame.push_back(player_id);
-					}
-				}
-			else
-				{
-					// count down packet?
-				}
-		}
-		mHighListLock.unlock();
+		//				mMatchListHighTier.pop_front();
+		//				mReadytoGame.push_back(player_id);
+		//			}
+		//		}
+		//	else
+		//		{
+		//			// count down packet?
+		//		}
+		//}
+		//mHighListLock.unlock();
 		mLowListlock.lock();
 		if (mMatchListLowTier.size() >= MAX_ROOM_USER / 2 && mMatchListLowTier.size() < MAX_ROOM_USER)
 		{
@@ -763,7 +763,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 void Server::PlayerMatchIn(int cID)
 {
 	DEBUGMSGONEPARAM("[%s] 플레이어 매치 시작\n", mClients[cID].mID);
-	if (mClients[cID].mGrade > 3.5)
+	/*if (mClients[cID].mGrade > 3.5)
 	{
 		mMatchListHighTier.push_back(cID);
 		if (mMatchListHighTier.size() == MAX_ROOM_USER / 2)
@@ -772,30 +772,30 @@ void Server::PlayerMatchIn(int cID)
 		}
 	}
 	else
-	{
+	{*/
 		mMatchListLowTier.push_back(cID);
 		if (mMatchListLowTier.size() == MAX_ROOM_USER / 2)
 		{
 			mClients[mMatchListLowTier.front()].mMatchStartTime = system_clock::now();
 		}
-	}
+	//}
 	mClients[cID].mState = eSessionState::ST_MATCH;
 }
 
 void Server::PlayerMatchOut(int cID)
 {
 	DEBUGMSGONEPARAM("[%s] 플레이어 매치 아웃\n", mClients[cID].mID);
-	mHighListLock.lock();
+	/*mHighListLock.lock();
 	mMatchListHighTier.remove(cID);
-	mHighListLock.unlock();
+	mHighListLock.unlock();*/
 	mLowListlock.lock();
 	mMatchListLowTier.remove(cID);
 	mLowListlock.unlock();
 
-	if (mMatchListHighTier.size() >= MAX_ROOM_USER / 2 && mMatchListHighTier.size() < MAX_ROOM_USER)
+	/*if (mMatchListHighTier.size() >= MAX_ROOM_USER / 2 && mMatchListHighTier.size() < MAX_ROOM_USER)
 	{
 		mClients[mMatchListHighTier.front()].mMatchStartTime = system_clock::now();
-	}
+	}*/
 	if (mMatchListLowTier.size() >= MAX_ROOM_USER / 2 && mMatchListLowTier.size() < MAX_ROOM_USER)
 	{
 		mClients[mMatchListLowTier.front()].mMatchStartTime = system_clock::now();
