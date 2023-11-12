@@ -150,7 +150,6 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 	}
 	case ML_ALERT: {
 		ML_ALERT_PACKET* p = reinterpret_cast<ML_ALERT_PACKET*>(cpacket);
-		wcout << p->alert << endl;
 		LC_ALERT_PACKET packet;
 		packet.size = sizeof(packet);
 		packet.type = LC_ALERT;

@@ -226,7 +226,6 @@ INT_PTR CALLBACK AlertDlg(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 			GetDlgItemText(hDlg, IDC_ALERTBOX, word, 100);
 			wstring t{ word };
 			send_alert_packet(gNetwork->s_socket, t);
-			wcout << t << endl;
 			SetDlgItemText(hDlg, IDC_ALERTBOX, _T(""));
 			break;
 		}
