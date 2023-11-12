@@ -475,6 +475,7 @@ void Network::process_packet(unsigned char* p)
 		if (nullptr != mOtherCharacter[id])
 		{
 			mOtherCharacter[id]->SetAccessoryFromEquippedFlag(packet->equipmentFlag);
+			//mOtherCharacter[id]->WearAllAccessory();
 			mOtherCharacter[id]->GetMesh()->SetVisibility(true);
 			mOtherCharacter[id]->SetClientID(packet->id);
 			//mOtherCharacter[id]->CharacterName = FString(ANSI_TO_TCHAR(packet->name));
@@ -498,7 +499,7 @@ void Network::process_packet(unsigned char* p)
 				mc->SetDepartmentClothes(packet->department);
 				mOtherCharacter[id] = mc;
 				mOtherCharacter[id]->SetAccessoryFromEquippedFlag(packet->equipmentFlag);
-				mOtherCharacter[id]->WearAllAccessory();
+				//mOtherCharacter[id]->WearAllAccessory();
 				mOtherCharacter[id]->GetMesh()->SetVisibility(true);
 				mOtherCharacter[id]->SetClientID(packet->id);
 				mOtherCharacter[id]->SetCollisionProfileName(TEXT("Empty"));
@@ -658,6 +659,7 @@ void Network::l_process_packet(unsigned char* p)
 		long long TestItemFlag = 0b0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'1001;
 		mMyCharacter->SetInventoryFromInventoryFlag(packet->inventoryFlag);
 		mMyCharacter->SetAccessoryFromEquippedFlag(packet->equippedItems);
+		//mMyCharacter->WearAllAccessory();
 
 		//학점과 포인트 표기
 		mMyCharacter->MakeAndShowLobbyRankSystem(packet->ranking);

@@ -45,6 +45,7 @@ enum class EDepartment : uint8
 };
 
 struct FItemData;
+struct FInventoryItem;
 
 UCLASS()
 class CLIENT_API ATinoCharacter : public ABaseCharacter
@@ -135,9 +136,9 @@ public:
 	UFUNCTION(Blueprintcallable, Category = "Accessory")
 		void UnWearAccessory(const int ItemCode);	
 	
-	UFUNCTION(Blueprintcallable, Category = "Accessory")
-	TArray<class AAccessoryItem*> GetAccessory() const { return EquipAccessoryContainer; }
-	TArray<class AAccessoryItem*> EquipAccessoryContainer;
+	//UFUNCTION(Blueprintcallable, Category = "Accessory")
+	//TArray<class AAccessoryItem*> GetAccessory() const { return EquipAccessoryContainer; }
+	//TArray<class AAccessoryItem*> EquipAccessoryContainer;
 
 	//Getter & Setter
 	UFUNCTION(BlueprintCallable)
@@ -158,7 +159,7 @@ public:
 
 	//인벤토리에 저장된 데이터에 접근할 수 있음
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	TArray<FItemData> GetInventoryContents();
+	TArray<FInventoryItem> GetInventoryContents();
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 		void AddItemToInventory(const FItemData& Data);
@@ -282,11 +283,15 @@ private:
 		float StopTime;
 	UPROPERTY(VisibleAnywhere, Category = "Interpolation")
 		float CurrentStopTime;
-	UPROPERTY(VisibleAnywhere, Category = "Interpolation")
+	UPROPERTY(VisibleAnywhere, meta = (ToolTip = "이전 프레임(서버) 위치"), Category = "Interpolation")
 		FVector PreviousLocation;
-	UPROPERTY(VisibleAnywhere, Category = "Interpolation")
+	UPROPERTY(VisibleAnywhere, meta = (ToolTip = "현재 프레임(서버) 위치"), Category = "Interpolation")
+		FVector NextLocation;
+	UPROPERTY(VisibleAnywhere, meta = (ToolTip = "이전 프레임 속도"), Category = "Interpolation")
 		FVector PreviousVelocity;
-	UPROPERTY(VisibleAnywhere, Category = "Interpolation")
+	UPROPERTY(VisibleAnywhere, meta = (ToolTip = "한프레임사이의 이동 방향"), Category = "Interpolation")
+		FVector NetworkDirection;
+	UPROPERTY(VisibleAnywhere, meta = (ToolTip = "보간 속도"), Category = "Interpolation")
 		FVector InterVelocity;
 
 	UPROPERTY(VisibleAnywhere, Category = "Enums")
@@ -312,6 +317,8 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation | Grab")
 		bool bShowDebugTrace;
+
+	bool bDebugInterVelocity = false;
 
 	FTimerHandle DiveTimer;
 	FTimerHandle GrabTimer;

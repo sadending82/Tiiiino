@@ -32,9 +32,10 @@ CREATE TABLE `userinfo` (
   `state` int NOT NULL DEFAULT '0',
   `department` tinyint NOT NULL DEFAULT '0',
   `equippedItems` bigint unsigned NOT NULL DEFAULT '0',
+  `AccumulatePoint` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`UID`),
   UNIQUE KEY `ID_UNIQUE` (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=619 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 DROP TABLE IF EXISTS `coupons`;
 CREATE TABLE `coupons` (
