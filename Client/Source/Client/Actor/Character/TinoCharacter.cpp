@@ -253,7 +253,7 @@ void ATinoCharacter::PlayerInterpolation(float DeltaTime)
 
 	//네트워크 한프레임 차이에서 발생하는 위치 차이를 기준으로
 	//이동방향을 재설정해준다.
-	AddMovementInput(NetworkDirection);
+	AddMovementInput(GetVelocity());
 
 	//InterTime마다 보간속도를구함(이전 프레임 위치 - 현재 위치) 
 	if (CurrentInterTime >= InterTime)
@@ -265,16 +265,15 @@ void ATinoCharacter::PlayerInterpolation(float DeltaTime)
 	// 보간 주기만 큼 나눠주면 속도가된다
 	if (InterVelocity.IsNearlyZero() == false && InterVelocity.Length() <= GetCharacterMovement()->MaxWalkSpeed)
 	{
+		if (MovementState == EMovementState::EMS_Grabbing)
+			InterVelocity *= InterTime * InterTime;
 		SetActorLocation(GetActorLocation() + InterVelocity * DeltaTime);
 	}
 }
 
 void ATinoCharacter::SetNetworkLocation(const FVector& Location)
 {
-	PreviousLocation = NextLocation;
-	NetworkDirection = Location - PreviousLocation;
-	NextLocation = Location;
-	NetworkDirection.Normalize();
+	PreviousLocation = Location;
 	SetActorLocation(Location);
 }
 
