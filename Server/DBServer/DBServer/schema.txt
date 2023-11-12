@@ -32,6 +32,20 @@ CREATE TABLE `userinfo` (
   `state` int NOT NULL DEFAULT '0',
   `department` tinyint NOT NULL DEFAULT '0',
   `equippedItems` bigint unsigned NOT NULL DEFAULT '0',
+  `AccumulatePoint` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`UID`),
   UNIQUE KEY `ID_UNIQUE` (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=619 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+DROP TABLE IF EXISTS `coupons`;
+CREATE TABLE `coupons` (
+  `code` varchar(20) NOT NULL,
+  `itemCode` int NOT NULL DEFAULT '0',
+  `CanDuplicated` int NOT NULL DEFAULT '1',
+  `used` int NOT NULL DEFAULT '0',
+  PRIMARY KEY (`code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+LOCK TABLES `coupons` WRITE;
+INSERT INTO `coupons` VALUES ('4K2FL2XM',0,0,0),('6YL9AY62',0,0,0),('7VH7OZS1',0,0,0),('97TT2U1J',0,0,0),('ZQ1KXEM0',0,0,0);
+UNLOCK TABLES;

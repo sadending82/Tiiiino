@@ -29,18 +29,14 @@ void AAccessoryItem::Equip()
 	if (bEquipped == true) return;
 	bEquipped = true;
 	//SetInstigator(OwnerCharacter->GetController());
-
 	AttachToComponent(Cast<ACharacter>(GetOwner())->GetMesh(), FAttachmentTransformRules(EAttachmentRule::KeepRelative, true), SocketName);
-
-
 }
-
 
 void AAccessoryItem::UnEquip()
 {
 	if (bEquipped == false) return;
 	bEquipped = false;
-
+	Destroy();
 }
 
 void AAccessoryItem::SetSocketNameWithItemCode(const int itemCode)
@@ -48,7 +44,7 @@ void AAccessoryItem::SetSocketNameWithItemCode(const int itemCode)
 	if (itemCode < 0) return;
 	else if (itemCode >= STARTCODE_BACKEQUIP && itemCode < STARTCODE_HANDEQUIP) SocketName = "BackAccessory";
 	else if (itemCode >= STARTCODE_HANDEQUIP && itemCode < STARTCODE_FACEEQUIP) SocketName = "HandAccessory";
-	else if (itemCode >= STARTCODE_FACEEQUIP && itemCode < STARTCODE_HEADEQUIP) SocketName = "FaceAccessory";
+	else if (itemCode >= STARTCODE_FACEEQUIP && itemCode < STARTCODE_HEADEQUIP) SocketName = "EyeAccessory";
 	else if (itemCode >= STARTCODE_HEADEQUIP) SocketName = "HeadAccessory";
 	else return;
 

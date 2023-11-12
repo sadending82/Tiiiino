@@ -37,11 +37,14 @@ public:
 	virtual void Equip();
 	virtual void UnEquip();
 
+	
 	int GetItemCode() const { return mItemCode; }
 	void SetItemCode(const int itemcode) { mItemCode = itemcode; }
 
 	void SetSocketNameWithItemCode(const int itemCode);
 	void SetSocketName(const FName name) { SocketName = name; }
+
+	bool GetbEquipped() const { return bEquipped; }
 
 protected:
 	// Called when the game starts or when spawned
@@ -60,6 +63,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Attachment")
 		bool bEquipped;
 
-	UPROPERTY(VisibleAnywhere, Category = "Attachment")
+	UPROPERTY(VisibleAnywhere, Category = "Accessory")
 		int mItemCode;
 };

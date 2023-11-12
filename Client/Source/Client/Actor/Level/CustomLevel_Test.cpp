@@ -103,6 +103,8 @@ bool ACustomLevel_Test::ConnLobbyServer()
 		}
 		else {
 			TinoController->InitializeUIInstance();
+			send_refresh_dep_rank_packet(Network::GetNetwork()->l_socket);
+			send_refresh_point_packet(Network::GetNetwork()->l_socket);
 			// 여기서 결과 UI를 띄워줌
 			if (-1 != Network::GetNetwork()->GameResult.point)
 			{
@@ -113,7 +115,7 @@ bool ACustomLevel_Test::ConnLobbyServer()
 				Network::GetNetwork()->GameResult.rank;
 
 				//학점 재반영 (게임 종료 -> 로비)
-				player->MakeAndShowLoginOK(Network::GetNetwork()->GameResult.grade, Network::GetNetwork()->GameResult.point);
+				player->MakeAndShowLoginOK(Network::GetNetwork()->GameResult.grade);
 				// 결과창 출력
 				ShowGameResult();
 				Network::GetNetwork()->GameResult = sGameResult{}; // 결과 처리 했으니 비워주기.

@@ -192,6 +192,10 @@ void Socket::processPacket(int key, unsigned char* buf)
         ProcessPacket_RefreshDepRank(key, buf);
         break;
     }
+    case LD_GET_POINT: {
+        ProcessPacket_GetPoint(key, buf);
+        break;
+    }
     default:
     {
         break;
@@ -266,7 +270,7 @@ long long Socket::EquipItem(int itemCode, long long equipmentFlag)
 {
     long long initBit;
 
-    if (itemCode <= STARTCODE_HANDEQUIP)
+    if (itemCode < STARTCODE_HANDEQUIP)
         initBit = BACKEQUIP;
     else if (STARTCODE_HANDEQUIP <= itemCode && itemCode < STARTCODE_FACEEQUIP)
         initBit = HANDEQUIP;
@@ -409,7 +413,7 @@ void Socket::SendRanking(int key, vector<rankInfo>& ranking, int userKey)
 void Socket::SendEquipOK(int key, long long equipmentFlag, int userKey)
 {
     DL_EQUIP_OK_PACKET p;
-    p.size = sizeof(DL_EQUIP_OK);
+    p.size = sizeof(p);
     p.type = SPacketType::DL_EQUIP_OK;
     p.equipmentFlag = equipmentFlag;
     p.userKey = userKey;
@@ -420,9 +424,20 @@ void Socket::SendEquipOK(int key, long long equipmentFlag, int userKey)
 void Socket::SendUnequipOK(int key, long long equipmentFlag, int userKey)
 {
     DL_UNEQUIP_OK_PACKET p;
-    p.size = sizeof(DL_UNEQUIP_OK);
+    p.size = sizeof(p);
     p.type = SPacketType::DL_UNEQUIP_OK;
     p.equipmentFlag = equipmentFlag;
+    p.userKey = userKey;
+
+    mSessions[key].DoSend((void*)(&p));
+}
+
+void Socket::SendPoint(int key, int point, int userKey)
+{
+    DL_GET_POINT_PACKET p;
+    p.size = sizeof(p);
+    p.type = SPacketType::DL_GET_POINT;
+    p.point = point;
     p.userKey = userKey;
 
     mSessions[key].DoSend((void*)(&p));
@@ -647,6 +662,17 @@ void Socket::ProcessPacket_RefreshDepRank(int key, unsigned char* buf)
 #endif
 
     SendRanking(key, ranking, p->userKey);
+}
+
+void Socket::ProcessPacket_GetPoint(int key, unsigned char* buf)
+{
+    LD_GET_POINT_PACKET* p = reinterpret_cast<LD_GET_POINT_PACKET*>(buf);
+
+    int point = 0;
+#ifdef RUN_DB
+    point = m_pDB->SelectPoint(p->uid);
+#endif
+    SendPoint(key, point, p->userKey);
 }
 
 int Socket::SetUIDForTest()

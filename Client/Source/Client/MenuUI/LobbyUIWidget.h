@@ -35,7 +35,10 @@ public:
 	void TryGameReadyCancel();
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	void UpdatePoint();
+	void UpdatePointAndGrade();
+
+	UFUNCTION(BluePrintImplementableEvent, Category = "UMG_Game")
+	void UpdataRankData();
 
 public:
 	// 로그인 화면으로 돌아가기
@@ -62,7 +65,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
 		float Grade;
 	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
-		int32 Point;
+		float Point;
 public:
 	// 랭크 시스템
 

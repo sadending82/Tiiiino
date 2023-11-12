@@ -8,6 +8,7 @@
 
 enum class EBGMType : uint8;
 class UDataTable;
+struct Item;
 struct FItemData;
 
 UCLASS(minimalapi)
@@ -32,16 +33,20 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Data")
+	void GenerateItemDataFromServer(FItemData& OutData,const Item& data);
+
+	//모든 아이템 데이터 집합 -> 김혁동 : 이 아니랍니다 ㅠㅠ
+	UPROPERTY(EditDefaultsOnly, Category = "Accessory | Data")
 	UDataTable* ItemData;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Data")
+	//상점에서 팔 아이템 데이터들의 집합 -> CBT 쿠폰 보상 아이템 같은건 상점에서 팔면 안됨.
+	UPROPERTY(EditDefaultsOnly, Category = "Accessory | Data")
 	UDataTable* ShopData;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Class")
+	UPROPERTY(EditDefaultsOnly, Category = "Sound | Class")
 	TSubclassOf<class ASoundManager> SoundMangerClass;
 
-	UPROPERTY(EditDefaultsOnly, Category = "LevelName")
+	UPROPERTY(EditDefaultsOnly, Category = "Sound | LevelName")
 	TMap<FString, EBGMType> ConvertBGMTypeMap;
 
 	

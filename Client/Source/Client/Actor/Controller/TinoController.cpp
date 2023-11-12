@@ -110,6 +110,10 @@ void ATinoController::RemoveDialogUI()
 		DialogUIInstance->ResetWindow();
 		DialogUIInstance->RemoveFromParent();
 	}
+	if (!!StoreUIInstance->StoreDialogInstance)
+	{
+		StoreUIInstance->StoreDialogInstance->RemoveFromParent();
+	}
 }
 
 void ATinoController::UIAlertMessage(EDialogUICheck check)

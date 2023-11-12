@@ -144,7 +144,6 @@ void URankWidget::ChangePositionByDistanceData()
 {
 	std::vector<UImage*> images;
 	
-	
 	images.push_back(OtherCharacterImage0);
 	images.push_back(OtherCharacterImage1);
 	images.push_back(OtherCharacterImage2);
@@ -155,11 +154,23 @@ void URankWidget::ChangePositionByDistanceData()
 
 	TArray<float> distanceData = GetCharacterDistanceData();
 
-	for (int i = 0; i < images.size(); ++i)
+	int cnt{0};
+	for (int i = 0; i < distanceData.Num(); ++i)
 	{
-		UCanvasPanelSlot* canvasPanel = UWidgetLayoutLibrary::SlotAsCanvasSlot(images[i]);
+		if (i == sCurrentRank - 1)
+		{
+			UCanvasPanelSlot* canvasPanel = UWidgetLayoutLibrary::SlotAsCanvasSlot(MyCharacterImage);
+			canvasPanel->SetPosition(FVector2D(1280.f * distanceData[sCurrentRank - 1], 0.0f));
+			continue;
+		}
+		UCanvasPanelSlot* canvasPanel = UWidgetLayoutLibrary::SlotAsCanvasSlot(images[cnt]);
 		canvasPanel->SetPosition(FVector2D(1280.f * distanceData[i], 0.0f));
+		cnt++;
 	}
+
+	
+
+
 
 }
 

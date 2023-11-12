@@ -1,7 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "ClientGameMode.h"
-#include "ClientCharacter.h"
 #include "Data/ItemData.h"
 #include "Network/Network.h"
 #include "GameDataManager/GameDataManager.h"
@@ -12,14 +11,6 @@
 
 AClientGameMode::AClientGameMode()
 {
-	// set default pawn class to our Blueprinted character
-	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/ThirdPerson/Blueprints/BP_ThirdPersonCharacter"));
-	if (PlayerPawnBPClass.Class != NULL)
-	{
-		DefaultPawnClass = PlayerPawnBPClass.Class;
-	}
-
-	//ASoundManager::GetSoundManager()->PlayBGM();
 }
 
 FItemData* AClientGameMode::GetItemData(const int64& ItemCode) const
@@ -39,42 +30,10 @@ void AClientGameMode::SetItemDataTable()
 
 	for (auto& data : gdManager->GetItemList())
 	{
-		EEquipType equipType;
+		FItemData newItemData;
+		GenerateItemDataFromServer(newItemData, data.second);
 
-		if (data.second.itemCode < 0) continue;
-		else if (data.second.itemCode >= STARTCODE_BACKEQUIP && data.second.itemCode < STARTCODE_HANDEQUIP) equipType = EEquipType::EEquipType_Back;
-		else if (data.second.itemCode >= STARTCODE_HANDEQUIP && data.second.itemCode < STARTCODE_FACEEQUIP) equipType = EEquipType::EEquipType_Hand;
-		else if (data.second.itemCode >= STARTCODE_FACEEQUIP && data.second.itemCode < STARTCODE_HEADEQUIP) equipType = EEquipType::EEquipType_Face;
-		else if (data.second.itemCode >= STARTCODE_HEADEQUIP) equipType = EEquipType::EEquipType_Head;
-		else continue;
-
-
-		FItemData newItemData(data.second.itemCode, equipType, FText::FromString(data.second.name), FText::FromString(data.second.text), data.second.cutline, data.second.price);
-
-		FString BpPath = TEXT("Blueprint'/Game/Accessory/BP/BP_"); //_C를 꼭 붙여야 된다고 함.
-		BpPath += data.second.assetName;
-		BpPath += ".BP_";
-		BpPath += data.second.assetName;
-		BpPath += "_C'";
-		auto GeneratedAccessoryBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *BpPath));
-		//auto objac = Cast<AActor>(obj);
-		//AAccessoryItem* GeneratedAccessoryBP = Cast<AAccessoryItem>(obj);
-		
-		//FString IconPath = TEXT("Texture2D'/Game/Accessory/Icon/Icon_");
-		//IconPath += data.second.assetName;
-		//IconPath += ".Icon_";
-		//IconPath += data.second.assetName;
-		//IconPath += "'";
-
-		//UTexture2D* IconTexture = LoadObject<UTexture2D>(NULL, *IconPath, NULL, LOAD_None, NULL);
-
-		UTexture2D* IconTexture = LoadObject<UTexture2D>(NULL, TEXT("Texture2D'/Game/Characters/Tino/Cloth/Texture/DepartmentTestTexture/Tino_A.Tino_A'"), NULL, LOAD_None, NULL);
-
-		newItemData.AssetData.BPClass = GeneratedAccessoryBP;
-		newItemData.AssetData.Icon = IconTexture;
-
-		
-		ItemData->AddRow(FName(*FString::FromInt(data.second.itemCode)), newItemData);
+		ItemData->AddRow(FName(*FString::FromInt(newItemData.ItemCode)), newItemData);
 	}
 }
 
@@ -85,41 +44,10 @@ void AClientGameMode::SetShopDataTable()
 
 	for (auto& data : gdManager->GetShopProductsList())
 	{
-		EEquipType equipType;
+		FItemData newItemData;
+		GenerateItemDataFromServer(newItemData, data.second);
 
-		if (data.second.itemCode < 0) continue;
-		else if (data.second.itemCode >= STARTCODE_BACKEQUIP && data.second.itemCode < STARTCODE_HANDEQUIP) equipType = EEquipType::EEquipType_Back;
-		else if (data.second.itemCode >= STARTCODE_HANDEQUIP && data.second.itemCode < STARTCODE_FACEEQUIP) equipType = EEquipType::EEquipType_Hand;
-		else if (data.second.itemCode >= STARTCODE_FACEEQUIP && data.second.itemCode < STARTCODE_HEADEQUIP) equipType = EEquipType::EEquipType_Face;
-		else if (data.second.itemCode >= STARTCODE_HEADEQUIP) equipType = EEquipType::EEquipType_Head;
-		else continue;
-
-
-		FItemData newItemData(data.second.itemCode, equipType, FText::FromString(data.second.name), FText::FromString(data.second.text), data.second.cutline, data.second.price);
-
-		FString BpPath = TEXT("Blueprint'/Game/Accessory/BP/BP_"); //_C를 꼭 붙여야 된다고 함.
-		BpPath += data.second.assetName;
-		BpPath += ".BP_";
-		BpPath += data.second.assetName;
-		BpPath += "_C'";
-
-		auto GeneratedAccessoryBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *BpPath));
-
-		//FString IconPath = TEXT("Texture2D'/Game/Accessory/Icon/Icon_");
-		//IconPath += data.second.assetName;
-		//IconPath += ".Icon_";
-		//IconPath += data.second.assetName;
-		//IconPath += "'";
-
-		//UTexture2D* IconTexture = LoadObject<UTexture2D>(NULL, *IconPath, NULL, LOAD_None, NULL);
-
-		UTexture2D* IconTexture = LoadObject<UTexture2D>(NULL, TEXT("Texture2D'/Game/Characters/Tino/Cloth/Texture/DepartmentTestTexture/Tino_A.Tino_A'"), NULL, LOAD_None, NULL);
-
-		newItemData.AssetData.BPClass = GeneratedAccessoryBP;
-		newItemData.AssetData.Icon = IconTexture;
-
-
-		ShopData->AddRow(FName(*FString::FromInt(data.second.itemCode)), newItemData);
+		ShopData->AddRow(FName(*FString::FromInt(newItemData.ItemCode)), newItemData);
 	}
 }
 
@@ -141,7 +69,7 @@ void AClientGameMode::BeginPlay()
 	Game->init();
 
 	//ItemData = NewObject<UDataTable>();
-	
+
 	SetItemDataTable();
 	SetShopDataTable();
 
@@ -156,5 +84,52 @@ void AClientGameMode::BeginPlay()
 	ASoundManager::GetSoundManager()->SetBGM(LevelType);
 	ASoundManager::GetSoundManager()->PlayBGM();
 	
+}
+
+void AClientGameMode::GenerateItemDataFromServer(FItemData& OutData,const Item& data)
+{
+	EEquipType equipType;
+	int32 ItemCode = StaticCast<int32>(data.itemCode);
+
+
+	if (ItemCode < 0) return;
+	else if (ItemCode >= STARTCODE_BACKEQUIP && ItemCode < STARTCODE_HANDEQUIP) equipType = EEquipType::EEquipType_Back;
+	else if (ItemCode >= STARTCODE_HANDEQUIP && ItemCode < STARTCODE_FACEEQUIP) equipType = EEquipType::EEquipType_Hand;
+	else if (ItemCode >= STARTCODE_FACEEQUIP && ItemCode < STARTCODE_HEADEQUIP) equipType = EEquipType::EEquipType_Face;
+	else if (ItemCode >= STARTCODE_HEADEQUIP) equipType = EEquipType::EEquipType_Head;
+	else return;
+
+	//_C를 꼭 붙여야 된다고 함.
+	FString BpPath = "Blueprint'/Game/Accessory/BP/BP_"
+		+ data.assetName
+		+ ".BP_"
+		+ data.assetName
+		+ "_C'";
+
+	TSubclassOf<AActor> AccessoryBP;
+	UHelpers::GetClassDynamic<AActor>(&AccessoryBP, BpPath);
+
+	//auto GeneratedAccessoryBP = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *BpPath));
+	//auto objac = Cast<AActor>(obj);
+	//AAccessoryItem* GeneratedAccessoryBP = Cast<AAccessoryItem>(obj);
+
+	FString IconPath = TEXT("Texture2D'/Game/Accessory/Icon/Icon_");
+	IconPath += data.assetName;
+	IconPath += ".Icon_";
+	IconPath += data.assetName;
+	IconPath += "'";
+
+	UTexture2D* IconTexture = LoadObject<UTexture2D>(NULL, *IconPath, NULL, LOAD_None, NULL);
+
+	//UTexture2D* IconTexture = LoadObject<UTexture2D>(NULL, TEXT("Texture2D'/Game/Characters/Tino/Cloth/Texture/DepartmentTestTexture/Tino_A.Tino_A'"), NULL, LOAD_None, NULL);
+
+	OutData.ItemCode = ItemCode;
+	OutData.EquipType = equipType;
+	OutData.TextData.Name = FText::FromString(data.name);
+	OutData.TextData.Description = FText::FromString(data.text);
+	OutData.NumericData.PurchaseCondition = data.cutline;
+	OutData.SellValue = data.price;
 	
+	OutData.AssetData.BPClass = AccessoryBP;
+	OutData.AssetData.Icon = IconTexture;
 }

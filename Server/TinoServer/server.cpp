@@ -79,7 +79,7 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 		SendLogin(cID, p->id, p->password, p->gameVersion);
 		break;
 	}
-	case CL_LOGOUT: 
+	case CL_LOGOUT:
 	{
 		CL_LOGOUT_PACKET* p = reinterpret_cast<CL_LOGOUT_PACKET*>(cpacket);
 		LD_LOGOUT_PACKET pac;
@@ -138,6 +138,36 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 		SendRefreshRankingRequest(cID);
 		break;
 	}
+	case CL_REFRESH_POINT: {
+		LD_GET_POINT_PACKET p;
+		p.size = sizeof(p);
+		p.type = LD_GET_POINT;
+		p.userKey = cID;
+		p.uid = mClients[cID].mUID;
+
+		mServers[0].DoSend(&p);
+		break;
+	}
+	case ML_ALERT: {
+		ML_ALERT_PACKET* p = reinterpret_cast<ML_ALERT_PACKET*>(cpacket);
+		wcout << p->alert << endl;
+		LC_ALERT_PACKET packet;
+		packet.size = sizeof(packet);
+		packet.type = LC_ALERT;
+		memcpy(packet.alert, p->alert, sizeof(packet.alert));
+		for (int i = MAXGAMESERVER; i < MAX_USER; ++i)
+		{
+			mClients[i].mStateLock.lock();
+			if (mClients[i].mState == eSessionState::ST_FREE || mClients[i].mState == eSessionState::ST_ACCEPTED)
+			{
+				mClients[i].mStateLock.unlock();
+				continue;
+			}
+			mClients[i].DoSend(&packet);
+			mClients[i].mStateLock.unlock();
+		}
+		break;
+	}
 	default:
 	{
 		break;
@@ -193,7 +223,7 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		mClients[p->userKey].mInventory = p->inventoryflag;
 		mClients[p->userKey].mStateLock.unlock();
 
-		SendLoginOK(p->userKey);
+		SendLoginOK(p->userKey, p->ranking);
 
 		break;
 	}
@@ -259,6 +289,17 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		DL_UNEQUIP_OK_PACKET* p = reinterpret_cast<DL_UNEQUIP_OK_PACKET*>(spacket);
 		mClients[p->userKey].mEquippedItems = p->equipmentFlag;
 		SendUnequipItemOK(p->userKey, p->itemCode, p->equipmentFlag);
+		break;
+	}
+	case DL_GET_POINT: {
+		DL_GET_POINT_PACKET* p = reinterpret_cast<DL_GET_POINT_PACKET*>(spacket);
+	
+		LC_REFRESH_POINT_PACKET pac;
+		pac.point = p->point;
+		pac.size = sizeof(pac);
+		pac.type = LC_REFRESH_POINT;
+
+		mClients[p->userKey].DoSend(&pac);
 		break;
 	}
 	default:
@@ -585,6 +626,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 				packet.size = sizeof(packet);
 				packet.type = LG_USER_INTO_GAME;
 				packet.roomID = roomID;// need update
+				packet.equipmentflag = mClients[player_id].mEquippedItems;
 				packet.department = mClients[player_id].mDepartment;
 				_itoa_s(rand() % 2'000'000'000, mClients[player_id].mHashs, 10);
 				strcpy_s(packet.hashs, mClients[player_id].mHashs);
@@ -620,6 +662,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 		//				packet.size = sizeof(packet);
 		//				packet.type = LG_USER_INTO_GAME;
 		//				packet.roomID = roomID;//need update
+		//				packet.equipmentflag = mClients[player_id].mEquippedItems;
 		//				packet.department = mClients[player_id].mDepartment;
 		//				_itoa_s(rand() % 2'000'000'000, mClients[player_id].mHashs, 10);
 		//				strcpy_s(packet.hashs, mClients[player_id].mHashs);
@@ -658,6 +701,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 					packet.type = LG_USER_INTO_GAME;
 					packet.roomID = roomID;//need update
 					packet.department = mClients[player_id].mDepartment;
+					packet.equipmentflag = mClients[player_id].mEquippedItems;
 					strcpy_s(packet.name,  mClients[player_id].mNickName);
 					strcpy_s(packet.id,  mClients[player_id].mID);
 					packet.uID = mClients[player_id].mUID;
@@ -1036,7 +1080,8 @@ void Server::SendRefreshRankingRequest(int cID)
 	mServers[0].DoSend(&packet);
 }
 
-void Server::SendLoginOK(int cID)
+
+void Server::SendLoginOK(int cID,const rankInfo* rank)
 {
 	LC_LOGIN_OK_PACKET pac;
 	pac.type = LC_LOGIN_OK;
@@ -1048,7 +1093,7 @@ void Server::SendLoginOK(int cID)
 	pac.UID = mClients[cID].mUID;
 	pac.equippedItems = mClients[cID].mEquippedItems;
 	pac.inventoryFlag = mClients[cID].mInventory;
-
+	memcpy(pac.ranking, rank, sizeof(pac.ranking));
 	mClients[cID].DoSend(&pac);
 }
 
@@ -1184,7 +1229,7 @@ void Server::SendEquipItemOK(int key, int itemCode, long long equipmentFlag)
 	packet.size = sizeof(packet);
 	packet.type = LC_EQUIP_OK;
 	packet.itemCode = itemCode;
-	packet.equipmentFlag = mClients[key].mInventory;
+	packet.equipmentFlag = equipmentFlag;
 	mClients[key].DoSend(&packet);
 }
 
@@ -1194,9 +1239,10 @@ void Server::SendUnequipItemOK(int key, int itemCode, long long equipmentFlag)
 	packet.size = sizeof(packet);
 	packet.type = LC_UNEQUIP_OK;
 	packet.itemCode = itemCode;
-	packet.equipmentFlag = mClients[key].mInventory;
+	packet.equipmentFlag = equipmentFlag;
 	mClients[key].DoSend(&packet);
 }
+
 
 void Server::LoadGameData()
 {

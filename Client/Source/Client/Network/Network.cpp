@@ -7,7 +7,6 @@
 #include "Actor/Character/CharacterAnimInstance.h"
 #include "Actor/Obstacles/BaseObstacle.h"
 #include "Data/ItemData.h"
-#include "MenuUI/StoreUIWidget.h"
 
 #include "Global.h"
 
@@ -87,13 +86,13 @@ bool Network::init()
 {
 	if (!isInit)
 	{
+		isInit = true;
 		if (nullptr == mGameDataManager)
 		{
 			mGameDataManager = new GameDataManager;
 			mGameDataManager->CheckDataFile();
 			LoadItemData();
 		}
-
 		WSAStartup(MAKEWORD(2, 2), &WSAData);
 		return true;
 	}
@@ -277,6 +276,14 @@ void send_refresh_dep_rank_packet(SOCKET& sock)
 	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
 }
 
+void send_refresh_point_packet(SOCKET& sock)
+{
+	CL_REFRESH_POINT_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = CL_REFRESH_POINT;
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+}
 void send_movetogame_packet(SOCKET& sock, const int uID, const char* id, const int& roomID)
 {
 	CS_LOGIN_PACKET packet;
@@ -404,6 +411,7 @@ void Network::process_packet(unsigned char* p)
 		FVector location(240.f - ((packet->id % 4) * 160), 0 - (packet->id / 4 * 160), 0);
 		mMyCharacter->SetActorLocation(location);
 		mMyCharacter->SetAccessoryFromEquippedFlag(packet->equipmentFlag);
+		//mMyCharacter->WearAllAccessory();
 		//연결성공
 		bIsConnected = true;
 		break;
@@ -467,6 +475,7 @@ void Network::process_packet(unsigned char* p)
 		if (nullptr != mOtherCharacter[id])
 		{
 			mOtherCharacter[id]->SetAccessoryFromEquippedFlag(packet->equipmentFlag);
+			//mOtherCharacter[id]->WearAllAccessory();
 			mOtherCharacter[id]->GetMesh()->SetVisibility(true);
 			mOtherCharacter[id]->SetClientID(packet->id);
 			//mOtherCharacter[id]->CharacterName = FString(ANSI_TO_TCHAR(packet->name));
@@ -490,6 +499,7 @@ void Network::process_packet(unsigned char* p)
 				mc->SetDepartmentClothes(packet->department);
 				mOtherCharacter[id] = mc;
 				mOtherCharacter[id]->SetAccessoryFromEquippedFlag(packet->equipmentFlag);
+				//mOtherCharacter[id]->WearAllAccessory();
 				mOtherCharacter[id]->GetMesh()->SetVisibility(true);
 				mOtherCharacter[id]->SetClientID(packet->id);
 				mOtherCharacter[id]->SetCollisionProfileName(TEXT("Empty"));
@@ -649,10 +659,12 @@ void Network::l_process_packet(unsigned char* p)
 		long long TestItemFlag = 0b0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'1001;
 		mMyCharacter->SetInventoryFromInventoryFlag(packet->inventoryFlag);
 		mMyCharacter->SetAccessoryFromEquippedFlag(packet->equippedItems);
+		//mMyCharacter->WearAllAccessory();
 
 		//학점과 포인트 표기
-		mMyCharacter->MakeAndShowLoginOK(packet->grade, packet->point);
 		mMyCharacter->MakeAndShowLobbyRankSystem(packet->ranking);
+		mMyCharacter->MakeAndShowLoginOK(packet->grade);
+		mMyCharacter->UpdataPointInLobby(packet->point);
 		break;
 	}
 	case LC_LOGIN_FAIL:
@@ -708,9 +720,9 @@ void Network::l_process_packet(unsigned char* p)
 	}
 	case LC_BUYITEM_OK: {
 		LC_BUYITEM_OK_PACKET* packet = reinterpret_cast<LC_BUYITEM_OK_PACKET*>(p);
-		
+
 		mMyCharacter->AddItemToInventory(mMyCharacter->GetItemDataFromItemCode(packet->itemCode));
-		mMyCharacter->GetController<ATinoController>()->StoreUIInstance->StoreDialogInstance->RemoveFromParent();
+		mMyCharacter->RemoveStoreDialog();
 		mMyCharacter->MakeAndShowChangePoint(packet->pointAfterPurchase);
 		mMyCharacter->SetInventoryFromInventoryFlag(packet->inventoryFlag);
 		mMyCharacter->SetPoint(packet->pointAfterPurchase);
@@ -729,16 +741,32 @@ void Network::l_process_packet(unsigned char* p)
 	case LC_REFRESH_DEP_RANK: {
 		LC_REFRESH_DEP_RANK_PACKET* packet = reinterpret_cast<LC_REFRESH_DEP_RANK_PACKET*>(p);
 
+		mMyCharacter->MakeAndShowLobbyRankSystem(packet->ranking);
+		
+		break;
+	}
+	case LC_REFRESH_POINT: {
+		LC_REFRESH_POINT_PACKET* packet = reinterpret_cast<LC_REFRESH_POINT_PACKET*>(p);
+		mMyCharacter->UpdataPointInLobby(packet->point);
 		break;
 	}
 	case LC_EQUIP_OK: {
 		LC_EQUIP_OK_PACKET* packet = reinterpret_cast<LC_EQUIP_OK_PACKET*>(p);
 		mMyCharacter->SetAccessoryFromEquippedFlag(packet->equipmentFlag);
+		mMyCharacter->UpdateEquippedAccessoryUI();
 		break;
 	}
 	case LC_UNEQUIP_OK: {
 		LC_UNEQUIP_OK_PACKET* packet = reinterpret_cast<LC_UNEQUIP_OK_PACKET*>(p);
 		mMyCharacter->SetAccessoryFromEquippedFlag(packet->equipmentFlag);
+		mMyCharacter->UpdateEquippedAccessoryUI();
+		break;
+	}
+	case LC_ALERT: {
+		LC_ALERT_PACKET* packet = reinterpret_cast<LC_ALERT_PACKET*>(p);
+		
+		UE_LOG(LogTemp, Error, TEXT("%s"),packet->alert);
+
 		break;
 	}
 	default:
@@ -904,7 +932,6 @@ bool Network::ConnectServerGame()
 
 bool Network::ConnectServerLobby()
 {
-	isInit = true;
 
 	if (bIsConnectedLobby) return false;
 	l_socket = WSASocketW(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);

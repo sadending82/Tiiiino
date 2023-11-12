@@ -499,6 +499,7 @@ bool MainServer::setPlayerInRoom(Player* player, const char verification[MAX_NAM
 					player->SetDepartment(pInfo.Department);
 					player->SetID(pInfo.ID);
 					player->SetNickName(pInfo.NickName);
+					player->SetEquipmentFlag(pInfo.EquipmentFlag);
 					//한명이라도 들어오면 일단 타이머 세팅
 					room->setGameStartTimerStartOnce();
 					return true;

@@ -45,6 +45,7 @@ enum class EDepartment : uint8
 };
 
 struct FItemData;
+struct FInventoryItem;
 
 UCLASS()
 class CLIENT_API ATinoCharacter : public ABaseCharacter
@@ -105,7 +106,7 @@ public:
 	//UI 함수
 	void MakeAndShowHUD();	
 
-	void MakeAndShowLoginOK(const double GradeValue, const int PointValue);
+	void MakeAndShowLoginOK(const double GradeValue);
 	void MakeAndShowLoginFail();
 	void MakeAndShowCreateAccountsSignUpOK();
 	void MakeAndShowCreateAccountsSignUpFail();
@@ -120,18 +121,24 @@ public:
 	void MakeAndShowDialogInGame();
 	void MakeAndShowLobbyRankSystem(struct rankInfo rank[]);
 	void MakeAndShowChangePoint(int AfterPoint);
+	void UpdateEquippedAccessoryUI();
+
+	void RemoveStoreDialog();
 	//Accessory
 
 	void SetAccessoryFromEquippedFlag(const long long& EquippedItems);
 
 	//소켓 이름과 메시를 정해줘야함
 	UFUNCTION(Blueprintcallable, Category = "Accessory")
+		void WearAllAccessory();
+	UFUNCTION(Blueprintcallable, Category = "Accessory")
 		void WearAccessory(const int ItemCode);
 	UFUNCTION(Blueprintcallable, Category = "Accessory")
-		void UnWearAccessory(const int ItemCode);
-	//임시 나중에 상점 생기면 수정할것
-	TArray<class AAccessoryItem*> AccessoryInventory;
-
+		void UnWearAccessory(const int ItemCode);	
+	
+	//UFUNCTION(Blueprintcallable, Category = "Accessory")
+	//TArray<class AAccessoryItem*> GetAccessory() const { return EquipAccessoryContainer; }
+	//TArray<class AAccessoryItem*> EquipAccessoryContainer;
 
 	//Getter & Setter
 	UFUNCTION(BlueprintCallable)
@@ -148,11 +155,11 @@ public:
 	FORCEINLINE void SetPoint(const float PointValue) { Point = PointValue; };
 	FORCEINLINE FVector GetNetworkLocation() { return PreviousLocation; }
 
-
+	void UpdataPointInLobby(int point);
 
 	//인벤토리에 저장된 데이터에 접근할 수 있음
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	TArray<FItemData> GetInventoryContents();
+	TArray<FInventoryItem> GetInventoryContents();
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 		void AddItemToInventory(const FItemData& Data);
@@ -160,6 +167,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	FItemData GetItemDataFromItemCode(const int64& ItemCode);
 	void SetInventoryFromInventoryFlag(const long long& EquippedItems);
+
+	UFUNCTION(BlueprintCallable, Category = "shop")
+	FItemData GetShopItemDataFromItemCode(const int64& ItemCode);
 
 	UFUNCTION(BlueprintCallable, Category = "shop")
 	void GetShopData(UPARAM(REF) TArray<int>& iOut);
@@ -273,11 +283,15 @@ private:
 		float StopTime;
 	UPROPERTY(VisibleAnywhere, Category = "Interpolation")
 		float CurrentStopTime;
-	UPROPERTY(VisibleAnywhere, Category = "Interpolation")
+	UPROPERTY(VisibleAnywhere, meta = (ToolTip = "이전 프레임(서버) 위치"), Category = "Interpolation")
 		FVector PreviousLocation;
-	UPROPERTY(VisibleAnywhere, Category = "Interpolation")
+	UPROPERTY(VisibleAnywhere, meta = (ToolTip = "현재 프레임(서버) 위치"), Category = "Interpolation")
+		FVector NextLocation;
+	UPROPERTY(VisibleAnywhere, meta = (ToolTip = "이전 프레임 속도"), Category = "Interpolation")
 		FVector PreviousVelocity;
-	UPROPERTY(VisibleAnywhere, Category = "Interpolation")
+	UPROPERTY(VisibleAnywhere, meta = (ToolTip = "한프레임사이의 이동 방향"), Category = "Interpolation")
+		FVector NetworkDirection;
+	UPROPERTY(VisibleAnywhere, meta = (ToolTip = "보간 속도"), Category = "Interpolation")
 		FVector InterVelocity;
 
 	UPROPERTY(VisibleAnywhere, Category = "Enums")
@@ -303,6 +317,8 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation | Grab")
 		bool bShowDebugTrace;
+
+	bool bDebugInterVelocity = false;
 
 	FTimerHandle DiveTimer;
 	FTimerHandle GrabTimer;

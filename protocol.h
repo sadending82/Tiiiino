@@ -85,6 +85,10 @@ enum PacketType {
 	CL_BUY_ITEM,
 	CL_REFRESH_INVENTORY,
 	CL_REFRESH_DEP_RANK,
+	CL_REFRESH_POINT,
+
+	// ManageMent To LobbyServer
+	ML_ALERT,
 
 	// GameServer To Client
 	SC_LOGIN_OK,
@@ -117,8 +121,11 @@ enum PacketType {
 	LC_BUYITEM_FAIL,
 	LC_REFRESH_INVENTORY,
 	LC_REFRESH_DEP_RANK,
+	LC_REFRESH_POINT,
 	LC_EQUIP_OK,
 	LC_UNEQUIP_OK,
+	LC_ALERT,
+
 };
 
 #pragma pack (push, 1)
@@ -224,8 +231,16 @@ struct CL_REFRESH_INVENTORY_PACKET : public PACKET {
 struct CL_REFRESH_DEP_RANK_PACKET : public PACKET {
 
 };
-//-----------------------------------
 
+struct CL_REFRESH_POINT_PACKET : public PACKET {
+	
+};
+//-----------------------------------
+struct ML_ALERT_PACKET : public PACKET {
+	wchar_t alert[70]; //리눅스에서 돌리지 말길!
+};
+
+//-----------------------------------
 struct SC_LOGIN_OK_PACKET : public PACKET {
 	int		id;
 	char	department;
@@ -368,6 +383,10 @@ struct LC_REFRESH_DEP_RANK_PACKET : public PACKET {
 	rankInfo ranking[10];
 };
 
+struct LC_REFRESH_POINT_PACKET : public PACKET {
+	int point;
+};
+
 struct LC_EQUIP_OK_PACKET : public PACKET {
 	int itemCode;
 	long long equipmentFlag;
@@ -377,6 +396,11 @@ struct LC_UNEQUIP_OK_PACKET : public PACKET {
 	int itemCode;
 	long long equipmentFlag;
 };
+
+struct LC_ALERT_PACKET : public PACKET {
+	wchar_t alert[70];
+};
+
 //--------------------------
 struct EVENT {
 	unsigned char size;

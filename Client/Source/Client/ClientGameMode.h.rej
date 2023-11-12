@@ -1,0 +1,16 @@
+diff a/Client/Source/Client/ClientGameMode.h b/Client/Source/Client/ClientGameMode.h	(rejected hunks)
+@@ -32,11 +32,12 @@
+ 	// Called when the game starts or when spawned
+ 	virtual void BeginPlay() override;
+ 
++	//��� ������ ������ ����(= ���� ������)
+ 	UPROPERTY(EditDefaultsOnly, Category = "Data")
+ 	UDataTable* ItemData;
+ 
+-	UPROPERTY(EditDefaultsOnly, Category = "Data")
+-	UDataTable* ShopData;
++	//UPROPERTY(EditDefaultsOnly, Category = "Data")
++	//UDataTable* ShopData;
+ 
+ 	UPROPERTY(EditDefaultsOnly, Category = "Class")
+ 	TSubclassOf<class ASoundManager> SoundMangerClass;
