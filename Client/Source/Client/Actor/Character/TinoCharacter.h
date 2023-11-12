@@ -283,11 +283,15 @@ private:
 		float StopTime;
 	UPROPERTY(VisibleAnywhere, Category = "Interpolation")
 		float CurrentStopTime;
-	UPROPERTY(VisibleAnywhere, Category = "Interpolation")
+	UPROPERTY(VisibleAnywhere, meta = (ToolTip = "이전 프레임(서버) 위치"), Category = "Interpolation")
 		FVector PreviousLocation;
-	UPROPERTY(VisibleAnywhere, Category = "Interpolation")
+	UPROPERTY(VisibleAnywhere, meta = (ToolTip = "현재 프레임(서버) 위치"), Category = "Interpolation")
+		FVector NextLocation;
+	UPROPERTY(VisibleAnywhere, meta = (ToolTip = "이전 프레임 속도"), Category = "Interpolation")
 		FVector PreviousVelocity;
-	UPROPERTY(VisibleAnywhere, Category = "Interpolation")
+	UPROPERTY(VisibleAnywhere, meta = (ToolTip = "한프레임사이의 이동 방향"), Category = "Interpolation")
+		FVector NetworkDirection;
+	UPROPERTY(VisibleAnywhere, meta = (ToolTip = "보간 속도"), Category = "Interpolation")
 		FVector InterVelocity;
 
 	UPROPERTY(VisibleAnywhere, Category = "Enums")
@@ -313,6 +317,8 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation | Grab")
 		bool bShowDebugTrace;
+
+	bool bDebugInterVelocity = false;
 
 	FTimerHandle DiveTimer;
 	FTimerHandle GrabTimer;
