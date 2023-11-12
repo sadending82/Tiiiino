@@ -36,6 +36,7 @@ void AAccessoryItem::UnEquip()
 {
 	if (bEquipped == false) return;
 	bEquipped = false;
+	Destroy();
 }
 
 void AAccessoryItem::SetSocketNameWithItemCode(const int itemCode)

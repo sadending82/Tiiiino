@@ -22,9 +22,11 @@ public:
 
 	FInventoryItem() = default;
 	FInventoryItem(const FItemData& ItemData, bool bEquipped) 
-		: ItemInfo(ItemData), bEquipped(bEquipped) 
+		: ItemInstance(nullptr),ItemInfo(ItemData), bEquipped(bEquipped) 
 	{};
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "InventoryData")
+		AAccessoryItem* ItemInstance;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "InventoryData")
 		FItemData ItemInfo; //아이템정보만 저장되있다
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "InventoryData")
@@ -65,6 +67,10 @@ public:
 	void SetEquipped(const int64& ItemCode, bool bEquipped);
 	UFUNCTION(BlueprintCallable)
 	bool GetEquipped(const int64& ItemCode) const;
+	UFUNCTION(BlueprintCallable)
+	AAccessoryItem* GetInstnace(const int64& ItemCode) const;
+	UFUNCTION(BlueprintCallable)
+	void SetInstnace(const int64& ItemCode, AAccessoryItem* Item);
 
 protected:
 	// 플레이어 인벤토리

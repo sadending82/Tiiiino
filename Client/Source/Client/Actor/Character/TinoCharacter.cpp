@@ -618,8 +618,9 @@ void ATinoCharacter::SetAccessoryFromEquippedFlag(const long long& EquippedItems
 		if (Value != 0)
 		{
 			int64 ItemCode = i;
-			InventoryComponent->AddItem(GetItemDataFromItemCode(ItemCode));
-			//WearAccessory(ItemCode);
+			InventoryComponent->AddItem(GetItemDataFromItemCode(ItemCode),true);
+			InventoryComponent->SetEquipped(ItemCode,true);
+			WearAccessory(ItemCode);
 		}
 	}
 }
@@ -629,8 +630,13 @@ void ATinoCharacter::WearAllAccessory()
 	//인벤토리 컴포넌트에서 아이템 정보를 가져와서 스폰한다. 
 	for (auto item : GetInventoryContents())
 	{
-		auto Accessory = AAccessoryItem::Spawn< AAccessoryItem>(GetWorld(), item.ItemInfo.AssetData.BPClass, this);
-		Accessory->SetSocketNameWithItemCode(item.ItemInfo.ItemCode);
+		auto Accessory = InventoryComponent->GetInstnace(item.ItemInfo.ItemCode);
+		if (Accessory == nullptr)
+		{
+			AAccessoryItem::Spawn< AAccessoryItem>(GetWorld(), item.ItemInfo.AssetData.BPClass, this);
+			Accessory->SetSocketNameWithItemCode(item.ItemInfo.ItemCode);
+			InventoryComponent->SetInstnace(item.ItemInfo.ItemCode, Accessory);
+		}
 		Accessory->Equip();
 	}
 }
@@ -640,8 +646,15 @@ void ATinoCharacter::WearAccessory(const int ItemCode)
 	//로비에서 한개씩 장착할때 사용하는 함수입니다.
 	//또는 테스트용으로 사용가능합니다.
 	FItemData Item = GetItemDataFromItemCode(ItemCode);
-	auto Accessory = AAccessoryItem::Spawn< AAccessoryItem>(GetWorld(), Item.AssetData.BPClass, this);
+	auto Accessory = InventoryComponent->GetInstnace(ItemCode);
 	Accessory->SetSocketNameWithItemCode(Item.ItemCode);
+	if (Accessory == nullptr)
+	{
+		AAccessoryItem::Spawn< AAccessoryItem>(GetWorld(), Item.AssetData.BPClass, this);
+		Accessory->SetSocketNameWithItemCode(ItemCode);
+		InventoryComponent->SetInstnace(ItemCode, Accessory);
+	}
+	Accessory->Equip(); 
 	//int idx = EquipAccessoryContainer.Add(Accessory);
 	//EquipAccessoryContainer[idx]->SetItemCode(Item.ItemCode);
 	//EquipAccessoryContainer[idx]->Equip();
@@ -649,6 +662,12 @@ void ATinoCharacter::WearAccessory(const int ItemCode)
 
 void ATinoCharacter::UnWearAccessory(const int ItemCode)
 {
+	for (auto item : GetInventoryContents())
+	{
+		auto Accessory = InventoryComponent->GetInstnace(item.ItemInfo.ItemCode);
+		if(Accessory)
+			Accessory->UnEquip();
+	}
 	//auto Accessory = EquipAccessoryContainer.FindByPredicate([&ItemCode](const AAccessoryItem& i) { return i.GetItemCode() == ItemCode; });
 
 	//Accessory->UnEquip();

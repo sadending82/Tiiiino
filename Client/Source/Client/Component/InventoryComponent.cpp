@@ -33,6 +33,16 @@ FInventoryItem UInventoryComponent::GetItemFromItemCode(const int64& ItemCode) c
 	return InventoryContents[ItemCode];
 }
 
+void UInventoryComponent::SetInstnace(const int64& ItemCode, AAccessoryItem* Item)
+{
+	if (InventoryContents.Contains(ItemCode) == false)
+	{
+		CLog::Log("Don't Exist Item!");
+		return;
+	}
+	InventoryContents[ItemCode].ItemInstance = Item;
+}
+
 void UInventoryComponent::AddItem(const FItemData& ItemData,bool bEquipped)
 {
 	if (InventoryContents.Contains(ItemData.ItemCode))
@@ -71,4 +81,15 @@ bool UInventoryComponent::GetEquipped(const int64& ItemCode) const
 	}
 	
 	return InventoryContents[ItemCode].bEquipped;
+}
+
+AAccessoryItem* UInventoryComponent::GetInstnace(const int64& ItemCode) const
+{
+	if (InventoryContents.Contains(ItemCode) == false)
+	{
+		CLog::Log("Invalid ItemCode!");
+		return nullptr;
+	}
+
+	return InventoryContents[ItemCode].ItemInstance;
 }
