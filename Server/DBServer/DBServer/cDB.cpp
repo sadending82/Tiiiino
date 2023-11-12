@@ -633,14 +633,14 @@ bool DB::UpdateUserGrade(const int uid, double grade)
 
 bool DB::UpdateUserPoint(const int uid, unsigned int point)
 {
-	string query = "UPDATE userinfo SET point = point + ? WHERE UID = ?";
+	string query = "UPDATE userinfo SET point = point + ?, AccumulatePoint = AccumulatePoint + ? WHERE UID = ?";
 
 	if (mysql_stmt_prepare(GetmStmt(), query.c_str(), query.length()) != 0) {
 		DEBUGMSGONEPARAM("UpdateUserPoint stmt prepare error: %s\n", mysql_stmt_error(GetmStmt()));
 		return false;
 	}
 
-	const int colNum = 2;
+	const int colNum = 3;
 
 	MYSQL_BIND binds[colNum];
 	memset(binds, 0, sizeof(binds));
@@ -649,7 +649,10 @@ bool DB::UpdateUserPoint(const int uid, unsigned int point)
 	binds[0].buffer = &point;
 
 	binds[1].buffer_type = MYSQL_TYPE_LONG;
-	binds[1].buffer = (void*)&uid;
+	binds[1].buffer = &point;
+
+	binds[2].buffer_type = MYSQL_TYPE_LONG;
+	binds[2].buffer = (void*)&uid;
 
 	if (mysql_stmt_bind_param(GetmStmt(), binds) != 0) {
 		DEBUGMSGONEPARAM("UpdateUserPoint stmt bind error: %s\n", mysql_stmt_error(GetmStmt()));
