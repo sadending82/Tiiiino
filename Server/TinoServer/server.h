@@ -40,6 +40,7 @@ public:
 	void SendUnequipItem(int cID, int itemCode);
 	void SendBuyItem(int cID, int itemCode);
 	void SendRefreshRankingRequest(int cID);
+	void SendUseCoupon(int cID, char* couponCode);
 
 	void SendLoginOK(int cID, const rankInfo* rank);
 
@@ -54,6 +55,8 @@ public:
 	void SendRankingToClient(int key, rankInfo* ranking);
 	void SendEquipItemOK(int key, int itemCode, long long equipmentFlag);
 	void SendUnequipItemOK(int key, int itemCode, long long equipmentFlag);
+	void SendUseCouponOK(int key, int itemcode, long long inventoryFlag);
+	void SendUseCouponFail(int key);
 
 	void LoadGameData();
 public:

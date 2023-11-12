@@ -83,6 +83,7 @@ enum PacketType {
 	CL_EQUIP_ITEM,
 	CL_UNEQUIP_ITEM,
 	CL_BUY_ITEM,
+	CL_USE_COUPON,
 	CL_REFRESH_INVENTORY,
 	CL_REFRESH_DEP_RANK,
 	CL_REFRESH_POINT,
@@ -124,6 +125,8 @@ enum PacketType {
 	LC_REFRESH_POINT,
 	LC_EQUIP_OK,
 	LC_UNEQUIP_OK,
+	LC_USE_COUPON_OK,
+	LC_USE_COUPON_FAIL,
 	LC_ALERT,
 
 };
@@ -222,6 +225,10 @@ struct CL_UNEQUIP_ITEM_PACKET : public PACKET {
 
 struct CL_BUY_ITEM_PACKET : public PACKET {
 	int itemCode;
+};
+
+struct CL_USE_COUPON_PACKET :public PACKET {
+	char couponCode[MAX_COUPONLEN];
 };
 
 struct CL_REFRESH_INVENTORY_PACKET : public PACKET {
@@ -395,6 +402,15 @@ struct LC_EQUIP_OK_PACKET : public PACKET {
 struct LC_UNEQUIP_OK_PACKET : public PACKET {
 	int itemCode;
 	long long equipmentFlag;
+};
+
+struct LC_USE_COUPON_OK_PACKET :public PACKET {
+	int		  itemcode;
+	long long inventoryFlag;
+};
+
+struct LC_USE_COUPON_FAIL_PACKET :public PACKET {
+
 };
 
 struct LC_ALERT_PACKET : public PACKET {
