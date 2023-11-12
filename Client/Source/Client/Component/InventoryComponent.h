@@ -78,6 +78,8 @@ protected:
 	UPROPERTY(VisibleAnywhere,Category="Inventory")
 	TMap<int64,FInventoryItem> InventoryContents;
 
+	UPROPERTY(VisibleAnywhere, Category = "Inventory")
+		TMap<EEquipType, AAccessoryItem*> EquipInfo;
 
 		
 };

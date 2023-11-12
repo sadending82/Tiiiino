@@ -617,7 +617,7 @@ void ATinoCharacter::SetAccessoryFromEquippedFlag(const long long& EquippedItems
 		{
 			int64 ItemCode = i;
 			//InventoryComponent->AddItem(GetItemDataFromItemCode(ItemCode),true);
-			InventoryComponent->SetEquipped(ItemCode,true);
+			
 			WearAccessory(ItemCode);
 		}
 	}
@@ -651,6 +651,7 @@ void ATinoCharacter::WearAccessory(const int ItemCode)
 		Accessory->SetSocketNameWithItemCode(ItemCode);
 		InventoryComponent->SetInstnace(ItemCode, Accessory);
 	}
+	InventoryComponent->SetEquipped(ItemCode, true);
 	Accessory->Equip(); 
 	//int idx = EquipAccessoryContainer.Add(Accessory);
 	//EquipAccessoryContainer[idx]->SetItemCode(Item.ItemCode);
