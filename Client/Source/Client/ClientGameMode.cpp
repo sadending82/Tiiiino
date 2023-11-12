@@ -113,15 +113,15 @@ void AClientGameMode::GenerateItemDataFromServer(FItemData& OutData,const Item& 
 	//auto objac = Cast<AActor>(obj);
 	//AAccessoryItem* GeneratedAccessoryBP = Cast<AAccessoryItem>(obj);
 
-	//FString IconPath = TEXT("Texture2D'/Game/Accessory/Icon/Icon_");
-	//IconPath += data.second.assetName;
-	//IconPath += ".Icon_";
-	//IconPath += data.second.assetName;
-	//IconPath += "'";
+	FString IconPath = TEXT("Texture2D'/Game/Accessory/Icon/Icon_");
+	IconPath += data.assetName;
+	IconPath += ".Icon_";
+	IconPath += data.assetName;
+	IconPath += "'";
 
-	//UTexture2D* IconTexture = LoadObject<UTexture2D>(NULL, *IconPath, NULL, LOAD_None, NULL);
+	UTexture2D* IconTexture = LoadObject<UTexture2D>(NULL, *IconPath, NULL, LOAD_None, NULL);
 
-	UTexture2D* IconTexture = LoadObject<UTexture2D>(NULL, TEXT("Texture2D'/Game/Characters/Tino/Cloth/Texture/DepartmentTestTexture/Tino_A.Tino_A'"), NULL, LOAD_None, NULL);
+	//UTexture2D* IconTexture = LoadObject<UTexture2D>(NULL, TEXT("Texture2D'/Game/Characters/Tino/Cloth/Texture/DepartmentTestTexture/Tino_A.Tino_A'"), NULL, LOAD_None, NULL);
 
 	OutData.ItemCode = ItemCode;
 	OutData.EquipType = equipType;
