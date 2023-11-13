@@ -83,15 +83,19 @@ public:
 	void MoveRight();
 
 	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
-	float Grade;
-	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
-	float Point;
-
-	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
 	int64 ClickItemCode;
 
 	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
 	EPurchaseState warning;
+public:
+	// 학점/포인트 데이터
+	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
+	float Grade;
+	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
+	float Point;
+
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void UpdatePointAndPoint();
 
 private:
 

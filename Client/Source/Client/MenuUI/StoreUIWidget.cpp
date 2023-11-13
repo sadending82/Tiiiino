@@ -161,6 +161,17 @@ void UStoreUIWidget::MoveRight()
 	// 우측 이동버튼 클릭
 }
 
+void UStoreUIWidget::UpdatePointAndPoint()
+{
+	if (PlayerInstance == nullptr)
+		InitInstance();
+	if (!!PlayerInstance)
+	{
+		Point = PlayerInstance->GetPoint();
+		Grade = PlayerInstance->GetGrade();
+	}
+}
+
 void UStoreUIWidget::InitInstance()
 {
 	PlayerInstance = Cast<ATinoCharacter>(GetOwningPlayerPawn());

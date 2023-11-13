@@ -309,6 +309,9 @@ void ATinoCharacter::MakeAndShowLoginOK(const double GradeValue)
 
 		auto StoreUI = TinoController->StoreUIInstance;
 		StoreUI->Grade = GValue;
+
+		auto InventoryUI = TinoController->InventoryUIInstance;
+		InventoryUI->Grade = GValue;
 	}
 }
 
@@ -455,6 +458,9 @@ void ATinoCharacter::UpdataPointInLobby(int point)
 
 		auto StoreUI = TinoController->StoreUIInstance;
 		StoreUI->Point = point;
+
+		auto InventoryUI = TinoController->InventoryUIInstance;
+		InventoryUI->Point = point;
 	}
 }
 

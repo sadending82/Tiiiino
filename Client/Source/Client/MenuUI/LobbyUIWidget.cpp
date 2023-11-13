@@ -76,6 +76,7 @@ void ULobbyUIWidget::TryBack()
 void ULobbyUIWidget::TryEnterStore()
 {
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	TinoController->StoreUIInstance->UpdatePointAndPoint();
 	TinoController->ChangeMenuWidget(TinoController->StoreUIInstance);
 }
 
