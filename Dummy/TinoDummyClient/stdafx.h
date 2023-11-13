@@ -35,7 +35,7 @@ const static int INVALID_ID = -1;
 const static int MAX_PACKET_SIZE = 255;
 const static int MAX_BUFF_SIZE = 255;
 constexpr const char* GAMEVERSION = "2.2.0";
-
+constexpr const char* SV_ADDR = "127.0.0.1";
 #pragma comment (lib, "ws2_32.lib")
 
 #include "../../protocol.h"

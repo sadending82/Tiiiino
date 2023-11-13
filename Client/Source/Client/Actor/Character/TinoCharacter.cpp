@@ -794,7 +794,7 @@ void ATinoCharacter::OnGrab()
 {
 	if (GrabMontage == nullptr || (CanGrab() == false)) return;
 
-	bIsGrabbing = true;
+	bIsGrabbing = !bIsGrabbing;
 
 	SendAnimPacket(4);
 	PlayAnimMontage(GrabMontage);
@@ -804,23 +804,22 @@ void ATinoCharacter::OnGrab()
 
 void ATinoCharacter::OffGrab()
 {
-	bIsGrabbing = false;
-
-	if (MovementState == EMovementState::EMS_Grabbing)
-	{
-		StopAnimMontage(GrabMontage);
-		ASoundManager::GetSoundManager()->PlaySFXAtLocation(this, ESFXType::ESFXType_OffGrab, GetActorLocation());
-		SetMovementState(EMovementState::EMS_Normal);
-	}
 
 	SendAnimPacket(5);
 
-	if (Target == nullptr) return;
+		StopAnimMontage(GrabMontage);
+		ASoundManager::GetSoundManager()->PlaySFXAtLocation(this, ESFXType::ESFXType_OffGrab, GetActorLocation());
+		SetMovementState(EMovementState::EMS_Normal);
+	
+	bIsGrabbing = false;
 
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+
+	//if (Target == nullptr) return;
+
+	//GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
 	
-	SetTargetGrabbedToNormal();
+	//SetTargetGrabbedToNormal();
 
 	bIsGrabCoolTime = true;
 
