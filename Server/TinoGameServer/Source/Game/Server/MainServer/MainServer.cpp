@@ -590,7 +590,7 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 		Room* pRoom = mRooms[player->GetRoomID()];
 		pRoom->AddObject(player);
 		{
-			DEBUGMSGONEPARAM("[%d]\n", player->GetRoomSyncID());
+			DEBUGMSGTWOPARAM("[%d]의 룸 싱크 [%d]\n", player->GetUID(), player->GetRoomSyncID());
 			SC_LOGIN_OK_PACKET sPacket = make_login_ok_packet(player->GetSocketID(),player->GetRoomSyncID(), "none");
 			SendMySelf(client_id, (void*)&sPacket, sizeof(sPacket));
 		}
@@ -778,6 +778,7 @@ void MainServer::ProcessPacketLobby(const int serverID, unsigned char* p)
 		strcpy_s(playerinfo.hashs, packet->hashs);
 		if (true == activeRoom->SettingRoomPlayer(playerinfo, packet->roomMax))
 		{
+			activeRoom->ShufflePlayerInfo();
 			DEBUGMSGONEPARAM("%d번째 방 활성화 완료.\n", packet->roomID);
 			DEBUGMSGONEPARAM("인원수 [%d]\n", packet->roomMax);
 			send_room_ready_packet(packet->roomID);
