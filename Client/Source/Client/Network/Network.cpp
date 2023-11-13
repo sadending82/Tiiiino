@@ -767,6 +767,7 @@ void Network::l_process_packet(unsigned char* p)
 		mMyCharacter->SetInventoryFromInventoryFlag(packet->inventoryFlag);
 		mMyCharacter->SetAccessoryFromEquippedFlag(packet->equipmentFlag);
 		mMyCharacter->SetPoint(packet->pointAfterPurchase);
+		mMyCharacter->UpdateInventoryPointAndGrade();
 		break;
 	}
 	case LC_BUYITEM_FAIL: {

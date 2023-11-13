@@ -30,7 +30,7 @@ void UInventoryUIWidget::TryBack()
 
 }
 
-void UInventoryUIWidget::UpdatePointAndPoint()
+void UInventoryUIWidget::UpdateGradeAndPoint()
 {
 	if (PlayerInstance == nullptr)
 		InitInstance();
@@ -123,5 +123,5 @@ bool UInventoryUIWidget::CheckItemEquiped(const int64 itemcode)
 
 void UInventoryUIWidget::InitInstance()
 {
-	PlayerInstance = Cast<ATinoCharacter>(GetOwningPlayer());
+	PlayerInstance = Cast<ATinoCharacter>(GetOwningPlayerPawn());
 }

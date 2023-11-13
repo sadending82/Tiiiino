@@ -438,6 +438,13 @@ void ATinoCharacter::UpdateEquippedAccessoryUI()
 		TinoController->InventoryUIInstance->UpdateEquippedAccessory();
 }
 
+void ATinoCharacter::UpdateInventoryPointAndGrade()
+{
+	auto TinoController = GetController<ATinoController>();
+	if (!!TinoController)
+		TinoController->InventoryUIInstance->UpdateGradeAndPoint();
+}
+
 void ATinoCharacter::RemoveStoreDialog()
 {
 	auto TinoController = GetController<ATinoController>();

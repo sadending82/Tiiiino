@@ -126,6 +126,7 @@ public:
 	void MakeAndShowCouponDialog(bool bCheckUsingCoupon);
 
 	void UpdateEquippedAccessoryUI();
+	void UpdateInventoryPointAndGrade();
 
 	void RemoveStoreDialog();
 	//Accessory

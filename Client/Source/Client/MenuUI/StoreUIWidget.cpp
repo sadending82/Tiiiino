@@ -58,7 +58,7 @@ bool UStoreUIWidget::QualifyingPurchase(int64 itemcode)
 	TArray<int> ShopProductTable;
 	GameModeInstance->GetShopProductTable(ShopProductTable);
 	int price = 0;
-	int grade = 0;
+	float grade = 0;
 
 	for (auto& code : ShopProductTable)
 	{
@@ -114,7 +114,7 @@ void UStoreUIWidget::ShowPurchaseWarning(int64 itemcode)
 	GameModeInstance->GetShopProductTable(ShopProductTable);
 
 	int price = 0;
-	int grade = 0;
+	float grade = 0;
 
 	for (auto& code : ShopProductTable)
 	{
@@ -161,7 +161,7 @@ void UStoreUIWidget::MoveRight()
 	// 우측 이동버튼 클릭
 }
 
-void UStoreUIWidget::UpdatePointAndPoint()
+void UStoreUIWidget::UpdatePointAndGrade()
 {
 	if (PlayerInstance == nullptr)
 		InitInstance();
