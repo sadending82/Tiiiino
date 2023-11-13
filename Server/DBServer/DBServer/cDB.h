@@ -41,7 +41,8 @@ public:
 
 	bool UpdateUserConnectionState(const int uid, const int state);
 	bool UpdateUserGrade(const int uid, double grade);
-	bool UpdateUserPoint(const int uid, unsigned int point);
+	bool UpdateUserPoint(const int uid, unsigned int IncreasePoint);
+	bool UpdateUserPointAfterBuyItem(const int uid, unsigned int DecreasePoint);
 	bool UpdateRanking(const char department, const int incrementPoint);
 	bool UpdateUserDepartment(const int uid, const char department);
 	bool UpdateInventory(const int uid, const int itemCode);

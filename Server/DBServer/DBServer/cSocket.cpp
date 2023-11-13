@@ -584,7 +584,7 @@ void Socket::ProcessPacket_BuyItem(int key, unsigned char* buf)
     int pointAfterPurchase = 0;
 #ifdef RUN_DB
 
-    bool bResult = Getm_pDB()->UpdateUserPoint(p->uid, -p->price);
+    bool bResult = Getm_pDB()->UpdateUserPointAfterBuyItem(p->uid, p->price);
     if (bResult != true) {
         SendBuyItemFail(key, p->userKey);
         return;
@@ -592,7 +592,7 @@ void Socket::ProcessPacket_BuyItem(int key, unsigned char* buf)
 
     bResult = Getm_pDB()->UpdateInventory(p->uid, p->itemCode);
     if (bResult != true) {
-        Getm_pDB()->UpdateUserPoint(p->uid, p->price);
+        Getm_pDB()->UpdateUserPointAfterBuyItem(p->uid, -p->price);
         SendBuyItemFail(key, p->userKey);
         return;
     }

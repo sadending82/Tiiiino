@@ -631,7 +631,7 @@ bool DB::UpdateUserGrade(const int uid, double grade)
 	return true;
 }
 
-bool DB::UpdateUserPoint(const int uid, unsigned int point)
+bool DB::UpdateUserPoint(const int uid, unsigned int IncreasePoint)
 {
 	string query = "UPDATE userinfo SET point = point + ?, AccumulatePoint = AccumulatePoint + ? WHERE UID = ?";
 
@@ -646,13 +646,45 @@ bool DB::UpdateUserPoint(const int uid, unsigned int point)
 	memset(binds, 0, sizeof(binds));
 
 	binds[0].buffer_type = MYSQL_TYPE_LONG;
-	binds[0].buffer = &point;
+	binds[0].buffer = &IncreasePoint;
 
 	binds[1].buffer_type = MYSQL_TYPE_LONG;
-	binds[1].buffer = &point;
+	binds[1].buffer = &IncreasePoint;
 
 	binds[2].buffer_type = MYSQL_TYPE_LONG;
 	binds[2].buffer = (void*)&uid;
+
+	if (mysql_stmt_bind_param(GetmStmt(), binds) != 0) {
+		DEBUGMSGONEPARAM("UpdateUserPoint stmt bind error: %s\n", mysql_stmt_error(GetmStmt()));
+		return false;
+	}
+
+	if (ExecuteQuery() == false) {
+		return false;
+	}
+
+	return true;
+}
+
+bool DB::UpdateUserPointAfterBuyItem(const int uid, unsigned int DecreasePoint)
+{
+	string query = "UPDATE userinfo SET point = point - ? WHERE UID = ?";
+
+	if (mysql_stmt_prepare(GetmStmt(), query.c_str(), query.length()) != 0) {
+		DEBUGMSGONEPARAM("UpdateUserPoint stmt prepare error: %s\n", mysql_stmt_error(GetmStmt()));
+		return false;
+	}
+
+	const int colNum = 2;
+
+	MYSQL_BIND binds[colNum];
+	memset(binds, 0, sizeof(binds));
+
+	binds[0].buffer_type = MYSQL_TYPE_LONG;
+	binds[0].buffer = &DecreasePoint;
+
+	binds[1].buffer_type = MYSQL_TYPE_LONG;
+	binds[1].buffer = (void*)&uid;
 
 	if (mysql_stmt_bind_param(GetmStmt(), binds) != 0) {
 		DEBUGMSGONEPARAM("UpdateUserPoint stmt bind error: %s\n", mysql_stmt_error(GetmStmt()));
