@@ -132,6 +132,12 @@ public:
 	class UNoticeUIWidget* NoticeUIInstance = nullptr;
 
 
+	// CouponUI
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
+	TSubclassOf<class UCouponUIWidget> CouponUIWidgetClass;
+	UPROPERTY(BlueprintReadOnly, Category = "UMG_Game")
+	class UCouponUIWidget* CouponUIInstance = nullptr;
+
 	UPROPERTY()
 	UUserWidget* CurrentWidget;
 

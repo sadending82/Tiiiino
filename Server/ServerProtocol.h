@@ -4,7 +4,7 @@ namespace svproto {
 	constexpr int MAX_COUPONLEN = 20;
 }
 
-constexpr const char* DBSERVERIP = "127.0.0.1";
+constexpr const char* DBSERVERIP = "58.125.39.92";
 constexpr int DBSERVERPORT = 3700;
 
 constexpr int MAXGAMESERVER = 2;

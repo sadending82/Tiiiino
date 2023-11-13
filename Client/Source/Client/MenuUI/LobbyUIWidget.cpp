@@ -5,6 +5,7 @@
 #include "MenuUI/LoginUIWidget.h"
 #include "MenuUI/StoreUIWidget.h"
 #include "MenuUI/InventoryUIWidget.h"
+#include "CouponUIWidget.h"
 #include "Components/TextBlock.h"
 #include "Actor/Controller/TinoController.h"
 #include "Actor/Character/TinoCharacter.h"
@@ -83,6 +84,12 @@ void ULobbyUIWidget::TryEnterInventory()
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	TinoController->InventoryUIInstance->UpdatePointAndPoint();
 	TinoController->ChangeMenuWidget(TinoController->InventoryUIInstance);
+}
+
+void ULobbyUIWidget::TryOpenCouponUI()
+{
+	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	TinoController->CouponUIInstance->AddToViewport();
 }
 
 void ULobbyUIWidget::GetRankData(rankInfo rank[])
