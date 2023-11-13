@@ -1,5 +1,8 @@
 //test ip
 #pragma once
+namespace proto {
+	constexpr int MAX_COUPONLEN = 20;
+}
 constexpr const char* SERVERIP = "127.0.0.1";
 constexpr const char* LOOBYSERVER_ADDR = "127.0.0.1";
 
@@ -7,12 +10,12 @@ constexpr int GAMESERVERPORT = 3600;
 constexpr int LOBBYSERVERPORT = 3500;
 constexpr int BUF_SIZE = 200;
 
+
 constexpr int MAX_USER = 300;
 constexpr int MAX_OBJECT = 3000;
 constexpr int MAX_NAME_SIZE = 20;	//닉네임, 중복검사 X
 constexpr int MAX_ROOM_USER = 8;
 constexpr int MAX_VERSION_SIZE = 10;
-constexpr int MAX_COUPONLEN = 20;
 
 // Object Event Time
 constexpr int DELAY_TIME_EXEC_BREAKDOOR = 1000;
@@ -229,7 +232,7 @@ struct CL_BUY_ITEM_PACKET : public PACKET {
 };
 
 struct CL_USE_COUPON_PACKET :public PACKET {
-	char couponCode[MAX_COUPONLEN];
+	char couponCode[proto::MAX_COUPONLEN];
 };
 
 struct CL_REFRESH_INVENTORY_PACKET : public PACKET {
