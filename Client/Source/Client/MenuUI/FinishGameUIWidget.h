@@ -45,7 +45,7 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* PointNameText;
 
-	std::array<FString, 7 + 1> MapNameArray;
+	std::array<FString, 8 + 1> MapNameArray;
 
 private:
 	UPROPERTY(EditAnywhere, Category = "UMG_Game")
