@@ -19,8 +19,9 @@ class CLIENT_API UInventoryUIWidget : public UUserWidget
 	
 public:
 	virtual void NativePreConstruct() override;
+	virtual void NativeConstruct() override;
 	virtual void NativeDestruct() override;
-
+	virtual void NativeTick(const FGeometry& Geometry, float InDeltaTime) override;
 
 	// 로비로 돌아가기
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
