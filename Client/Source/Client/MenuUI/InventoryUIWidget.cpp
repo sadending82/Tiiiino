@@ -32,8 +32,9 @@ void UInventoryUIWidget::NativeDestruct()
 void UInventoryUIWidget::NativeTick(const FGeometry& Geometry, float InDeltaTime)
 {
 	Super::NativeTick(Geometry, InDeltaTime);
-
-	Network::GetNetwork()->mMyCharacter->AddActorLocalRotation(FRotator(0.0f, InDeltaTime * 20.0f, 0.0f));
+	auto Mycharacter = Network::GetNetwork()->mMyCharacter;
+	if(Mycharacter)
+		Mycharacter->AddActorLocalRotation(FRotator(0.0f, InDeltaTime * 20.0f, 0.0f));
 }
 
 void UInventoryUIWidget::TryBack()
