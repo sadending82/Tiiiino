@@ -17,4 +17,7 @@ public:
 	// ÄíÆù »ç¿ë
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void TryUsingCoupon();
+
+	UPROPERTY(meta = (BindWidget))
+	class UEditableTextBox* CouponTextbox;
 };

@@ -2,6 +2,7 @@
 
 
 #include "MenuUI/CouponUIWidget.h"
+#include "Components/EditableTextBox.h"
 
 #include "Network/Network.h"
 #include "Global.h"
