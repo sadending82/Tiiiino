@@ -92,6 +92,19 @@ bool Network::init()
 			mGameDataManager = new GameDataManager;
 			mGameDataManager->CheckDataFile();
 			LoadItemData();
+			if (bMultiClientBan)
+			{
+				hMutex = ::CreateMutex(nullptr, TRUE, _T("Tiino_Mutex"));
+				if (ERROR_ALREADY_EXISTS == GetLastError())
+				{
+					//다중클라 접속. 접속해제,
+					::CloseHandle(hMutex);
+					closesocket(s_socket);
+					closesocket(l_socket);
+					WSACleanup();
+					FGenericPlatformMisc::RequestExit(false);
+				}
+			}
 		}
 		WSAStartup(MAKEWORD(2, 2), &WSAData);
 		return true;
@@ -135,6 +148,7 @@ void Network::release()
 			closesocket(l_socket);
 			l_socket = INVALID_SOCKET;
 			l_prev_size = 0;
+			::CloseHandle(hMutex);
 		}
 		isInit = false;
 	}
