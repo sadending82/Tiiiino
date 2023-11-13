@@ -148,9 +148,13 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 		mServers[0].DoSend(&p);
 		break;
 	}
+	case CL_USE_COUPON: {
+		CL_USE_COUPON_PACKET* p = reinterpret_cast<CL_USE_COUPON_PACKET*>(cpacket);
+		SendUseCoupon(cID, p->couponCode);
+		break;
+	}
 	case ML_ALERT: {
 		ML_ALERT_PACKET* p = reinterpret_cast<ML_ALERT_PACKET*>(cpacket);
-		wcout << p->alert << endl;
 		LC_ALERT_PACKET packet;
 		packet.size = sizeof(packet);
 		packet.type = LC_ALERT;
@@ -289,6 +293,17 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		DL_UNEQUIP_OK_PACKET* p = reinterpret_cast<DL_UNEQUIP_OK_PACKET*>(spacket);
 		mClients[p->userKey].mEquippedItems = p->equipmentFlag;
 		SendUnequipItemOK(p->userKey, p->itemCode, p->equipmentFlag);
+		break;
+	}
+	case DL_USE_COUPON_OK: {
+		DL_USE_COUPON_OK_PACKET* p = reinterpret_cast<DL_USE_COUPON_OK_PACKET*>(spacket);
+		SendUseCouponOK(p->userKey, p->itemcode, p->inventoryFlag);
+		break;
+	}
+
+	case DL_USE_COUPON_FAIL: {
+		DL_USE_COUPON_FAIL_PACKET* p = reinterpret_cast<DL_USE_COUPON_FAIL_PACKET*>(spacket);
+		SendUseCouponFail(p->userKey);
 		break;
 	}
 	case DL_GET_POINT: {
@@ -1080,6 +1095,18 @@ void Server::SendRefreshRankingRequest(int cID)
 	mServers[0].DoSend(&packet);
 }
 
+void Server::SendUseCoupon(int cID, char* couponCode)
+{
+	LD_USE_COUPON_PACKET packet;
+	packet.size = sizeof(LD_USE_COUPON_PACKET);
+	packet.type = LD_USE_COUPON;
+	packet.uid = mClients[cID].mUID;
+	memcpy(packet.couponCode, couponCode, sizeof(packet.couponCode));
+	packet.userKey = cID;
+
+	mServers[0].DoSend(&packet);
+}
+
 
 void Server::SendLoginOK(int cID,const rankInfo* rank)
 {
@@ -1243,6 +1270,21 @@ void Server::SendUnequipItemOK(int key, int itemCode, long long equipmentFlag)
 	mClients[key].DoSend(&packet);
 }
 
+void Server::SendUseCouponOK(int key, int itemcode, long long inventoryFlag) {
+	LC_USE_COUPON_OK_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = LC_USE_COUPON_OK;
+	packet.itemcode = itemcode;
+	packet.inventoryFlag = inventoryFlag;
+	mClients[key].DoSend(&packet);
+}
+
+void Server::SendUseCouponFail(int key) {
+	LC_USE_COUPON_FAIL_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = LC_USE_COUPON_FAIL;
+	mClients[key].DoSend(&packet);
+}
 
 void Server::LoadGameData()
 {

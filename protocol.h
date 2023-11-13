@@ -12,6 +12,7 @@ constexpr int MAX_OBJECT = 3000;
 constexpr int MAX_NAME_SIZE = 20;	//닉네임, 중복검사 X
 constexpr int MAX_ROOM_USER = 8;
 constexpr int MAX_VERSION_SIZE = 10;
+constexpr int MAX_COUPONLEN = 20;
 
 // Object Event Time
 constexpr int DELAY_TIME_EXEC_BREAKDOOR = 1000;
@@ -83,6 +84,7 @@ enum PacketType {
 	CL_EQUIP_ITEM,
 	CL_UNEQUIP_ITEM,
 	CL_BUY_ITEM,
+	CL_USE_COUPON,
 	CL_REFRESH_INVENTORY,
 	CL_REFRESH_DEP_RANK,
 	CL_REFRESH_POINT,
@@ -124,6 +126,8 @@ enum PacketType {
 	LC_REFRESH_POINT,
 	LC_EQUIP_OK,
 	LC_UNEQUIP_OK,
+	LC_USE_COUPON_OK,
+	LC_USE_COUPON_FAIL,
 	LC_ALERT,
 
 };
@@ -222,6 +226,10 @@ struct CL_UNEQUIP_ITEM_PACKET : public PACKET {
 
 struct CL_BUY_ITEM_PACKET : public PACKET {
 	int itemCode;
+};
+
+struct CL_USE_COUPON_PACKET :public PACKET {
+	char couponCode[MAX_COUPONLEN];
 };
 
 struct CL_REFRESH_INVENTORY_PACKET : public PACKET {
@@ -395,6 +403,15 @@ struct LC_EQUIP_OK_PACKET : public PACKET {
 struct LC_UNEQUIP_OK_PACKET : public PACKET {
 	int itemCode;
 	long long equipmentFlag;
+};
+
+struct LC_USE_COUPON_OK_PACKET :public PACKET {
+	int		  itemcode;
+	long long inventoryFlag;
+};
+
+struct LC_USE_COUPON_FAIL_PACKET :public PACKET {
+
 };
 
 struct LC_ALERT_PACKET : public PACKET {

@@ -105,6 +105,8 @@ bool ACustomLevel_Test::ConnLobbyServer()
 			TinoController->InitializeUIInstance();
 			send_refresh_dep_rank_packet(Network::GetNetwork()->l_socket);
 			send_refresh_point_packet(Network::GetNetwork()->l_socket);
+			send_refresh_inventory_packet(Network::GetNetwork()->l_socket);
+
 			// 여기서 결과 UI를 띄워줌
 			if (-1 != Network::GetNetwork()->GameResult.point)
 			{

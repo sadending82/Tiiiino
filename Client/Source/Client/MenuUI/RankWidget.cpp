@@ -21,6 +21,13 @@ TArray<float>& URankWidget::GetCharacterDistanceData()
 	return CharacterDistanceData;
 }
 
+bool URankWidget::IsSpectatorModeOn()
+{
+	auto network = Network::GetNetwork();
+	return network->mMyCharacter->bIsSpactateModeEnabled;
+	 
+}
+
 void URankWidget::CalculateNewRank()
 {
 	auto network = Network::GetNetwork();
@@ -160,7 +167,13 @@ void URankWidget::ChangePositionByDistanceData()
 		if (i == sCurrentRank - 1)
 		{
 			UCanvasPanelSlot* canvasPanel = UWidgetLayoutLibrary::SlotAsCanvasSlot(MyCharacterImage);
-			canvasPanel->SetPosition(FVector2D(1280.f * distanceData[sCurrentRank - 1], 0.0f));
+			if (!IsSpectatorModeOn())
+			{
+				canvasPanel->SetPosition(FVector2D(1280.f * distanceData[sCurrentRank - 1], 0.0f));
+			}
+			else {
+				canvasPanel->SetPosition(FVector2D(1280.f, 0.0f));
+			}
 			continue;
 		}
 		UCanvasPanelSlot* canvasPanel = UWidgetLayoutLibrary::SlotAsCanvasSlot(images[cnt]);

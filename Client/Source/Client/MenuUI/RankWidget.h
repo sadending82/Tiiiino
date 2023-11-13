@@ -34,6 +34,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	TArray<float>& GetCharacterDistanceData();
 
+	UFUNCTION(BlueprintCallable)
+	bool IsSpectatorModeOn();
+
+
 	void CalculateNewRank();
 
 	void GetDataOfCharacters();
