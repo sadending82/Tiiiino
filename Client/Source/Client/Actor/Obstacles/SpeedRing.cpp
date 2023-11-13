@@ -28,6 +28,12 @@ void ASpeedRing::BeginPlay()
 	OverlapBox->OnComponentBeginOverlap.AddDynamic(this, &ASpeedRing::BoxBeginOverlap);
 }
 
+void ASpeedRing::EndPlay(EEndPlayReason::Type Reason)
+{
+	Super::EndPlay(Reason);
+	GetWorldTimerManager().ClearTimer(SpeedRingTImer);
+}
+
 // Called every frame
 void ASpeedRing::Tick(float DeltaTime)
 {

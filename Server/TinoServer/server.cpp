@@ -959,15 +959,15 @@ void Server::SendPlayerResult(int uID, int roomID, bool retire, int rank)
 				mClients[mRooms[roomID].mSockID[i]].mStateLock.lock();
 				mClients[mRooms[roomID].mSockID[i]].mGrade += temp;
 				mRooms[roomID].mGrade[i] = mClients[mRooms[roomID].mSockID[i]].mGrade;
-				mClients[mRooms[roomID].mSockID[i]].mPoint = point;
-				mRooms[roomID].mPoint[i] = mClients[mRooms[roomID].mSockID[i]].mPoint;
+				mClients[mRooms[roomID].mSockID[i]].mPoint += point;
+				mRooms[roomID].mPoint[i] = point;
 				mClients[mRooms[roomID].mSockID[i]].mState = eSessionState::ST_LOBBY;
 				mClients[mRooms[roomID].mSockID[i]].mStateLock.unlock();
 				// to db server update
 				SendGameResult(roomID, i);
 				SendMatchResult(mRooms[roomID].mSockID[i], rank, mRooms[roomID].mPoint[i]);
 				DEBUGMSGONEPARAM("[%d]플레이어의 점수 : ", mClients[mRooms[roomID].mSockID[i]].mUID);
-				DEBUGMSGONEPARAM("[%f] 로비안끊김    플레이어의 포인트 : ", mClients[mRooms[roomID].mSockID[i]].mGrade);
+				DEBUGMSGONEPARAM("[%f] 로비안끊김    플레이어의 누적 포인트 : ", mClients[mRooms[roomID].mSockID[i]].mGrade);
 				DEBUGMSGONEPARAM("[%d] 로비안끊김\n", mClients[mRooms[roomID].mSockID[i]].mPoint);
 				break;
 			}
