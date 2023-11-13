@@ -1247,6 +1247,7 @@ void Server::SendInventory(int key)
 	packet.size = sizeof(packet);
 	packet.type = LC_REFRESH_INVENTORY;
 	packet.inventoryFlag = mClients[key].mInventory;
+	packet.equipmentFlag = mClients[key].mEquippedItems;
 	mClients[key].DoSend(&packet);
 }
 
