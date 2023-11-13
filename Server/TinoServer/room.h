@@ -24,7 +24,7 @@ constexpr int POINT_FOR_SCORE[5][8]	=
 	{330,	290,	250,	210,	170,	130,	90,		50}
 };
 
-constexpr double GRADE_CON_NUM = 0.005;
+constexpr double GRADE_CON_NUM = 0.01;
 
 constexpr int MIN_USER = 4;
 

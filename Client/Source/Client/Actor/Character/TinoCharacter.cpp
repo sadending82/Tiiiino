@@ -547,7 +547,7 @@ void ATinoCharacter::SetDepartmentClothes(int department)
 	if (EDepartment::EDepartment_None < EnumValue && EDepartment::EDepartment_MAX > EnumValue)
 	{
 		//Staff 전용
-		if (EDepartment::EDepartment_Staff == EnumValue) WearAccessory(1);
+		//if (EDepartment::EDepartment_Staff == EnumValue) WearAccessory(1);
 
 		auto DynamicMaterialInstance = GetMesh()->CreateDynamicMaterialInstance(0);
 		auto DepartmentTexture = GetTinoDepartTexture(static_cast<EDepartment>(department));
