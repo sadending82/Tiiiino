@@ -32,7 +32,7 @@ public:
 	float Point;
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	void UpdatePointAndPoint();
+	void UpdateGradeAndPoint();
 
 	UFUNCTION(BluePrintImplementableEvent, Category = "UMG_Game")
 	void UpdateEquippedAccessory();

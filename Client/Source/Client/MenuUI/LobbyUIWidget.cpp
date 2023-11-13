@@ -76,14 +76,14 @@ void ULobbyUIWidget::TryBack()
 void ULobbyUIWidget::TryEnterStore()
 {
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	TinoController->StoreUIInstance->UpdatePointAndPoint();
+	//TinoController->StoreUIInstance->UpdatePointAndPoint();
 	TinoController->ChangeMenuWidget(TinoController->StoreUIInstance);
 }
 
 void ULobbyUIWidget::TryEnterInventory()
 {
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	TinoController->InventoryUIInstance->UpdatePointAndPoint();
+	//TinoController->InventoryUIInstance->UpdatePointAndPoint();
 	TinoController->ChangeMenuWidget(TinoController->InventoryUIInstance);
 }
 

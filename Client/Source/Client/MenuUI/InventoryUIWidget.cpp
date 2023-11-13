@@ -30,7 +30,7 @@ void UInventoryUIWidget::TryBack()
 
 }
 
-void UInventoryUIWidget::UpdatePointAndPoint()
+void UInventoryUIWidget::UpdateGradeAndPoint()
 {
 	if (PlayerInstance == nullptr)
 		InitInstance();
