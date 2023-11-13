@@ -66,6 +66,11 @@ public:
 		float Grade;
 	UPROPERTY(BlueprintReadWrite, Category = "UMG_Game")
 		float Point;
+
+	// 쿠폰 입력
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void TryOpenCouponUI();
+
 public:
 	// 랭크 시스템
 
