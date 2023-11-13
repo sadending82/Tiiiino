@@ -639,9 +639,10 @@ void Network::process_packet(unsigned char* p)
 		SC_PLAYER_ARRIVE_PACKET* packet = reinterpret_cast<SC_PLAYER_ARRIVE_PACKET*>(p);
 		if (nullptr != mOtherCharacter[packet->id])
 		{
+			mOtherCharacter[packet->id]->SetActorLocation(FVector(0, 1'000'000, 0));
 			mOtherCharacter[packet->id]->SetActorEnableCollision(false);
 			mOtherCharacter[packet->id]->SetActorHiddenInGame(true);
-
+			
 			TArray<AActor*> children;
 
 			mOtherCharacter[packet->id]->GetAttachedActors(children);
