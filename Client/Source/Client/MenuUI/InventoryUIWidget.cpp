@@ -123,5 +123,5 @@ bool UInventoryUIWidget::CheckItemEquiped(const int64 itemcode)
 
 void UInventoryUIWidget::InitInstance()
 {
-	PlayerInstance = Cast<ATinoCharacter>(GetOwningPlayer());
+	PlayerInstance = Cast<ATinoCharacter>(GetOwningPlayerPawn());
 }

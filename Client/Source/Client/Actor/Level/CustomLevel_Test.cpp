@@ -31,7 +31,7 @@ void ACustomLevel_Test::BeginPlay() {
 	srand(time(NULL));
 	;
 	trans.SetRotation(FRotator(0, 90, 0).Quaternion());
-	mMyCharacterSpawnPosition.Y += (rand() % 10) * 10;
+	//mMyCharacterSpawnPosition.Y += (rand() % 10) * 10;
 	trans.SetLocation(trans.GetLocation() + mMyCharacterSpawnPosition);
 	auto mc1 = GetWorld()->SpawnActorDeferred<ATinoCharacter>(GeneratedCharacterBP, trans);
 	mc1->SpawnDefaultController();
