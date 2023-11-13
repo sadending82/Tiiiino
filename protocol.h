@@ -380,6 +380,7 @@ struct LC_BUYITEM_OK_PACKET :public PACKET {
 	int itemCode;
 	int	pointAfterPurchase;
 	long long inventoryFlag;
+	long long equipmentFlag;
 };
 
 struct LC_BUYITEM_FAIL_PACKET :public PACKET {
@@ -412,6 +413,7 @@ struct LC_UNEQUIP_OK_PACKET : public PACKET {
 struct LC_USE_COUPON_OK_PACKET :public PACKET {
 	int		  itemcode;
 	long long inventoryFlag;
+	long long equipmentFlag;
 };
 
 struct LC_USE_COUPON_FAIL_PACKET :public PACKET {

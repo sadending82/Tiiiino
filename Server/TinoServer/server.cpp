@@ -1230,6 +1230,8 @@ void Server::SendBuyOK(int key, int itemCode)
 	packet.pointAfterPurchase = mClients[key].mPoint;
 	packet.itemCode = itemCode;
 	packet.inventoryFlag = mClients[key].mInventory;
+	packet.equipmentFlag = mClients[key].mInventory;
+
 	mClients[key].DoSend(&packet);
 }
 
@@ -1288,6 +1290,8 @@ void Server::SendUseCouponOK(int key, int itemcode, long long inventoryFlag) {
 	packet.type = LC_USE_COUPON_OK;
 	packet.itemcode = itemcode;
 	packet.inventoryFlag = inventoryFlag;
+	packet.equipmentFlag = mClients[key].mEquippedItems;
+
 	mClients[key].DoSend(&packet);
 }
 

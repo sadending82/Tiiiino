@@ -765,6 +765,7 @@ void Network::l_process_packet(unsigned char* p)
 		mMyCharacter->RemoveStoreDialog();
 		mMyCharacter->MakeAndShowChangePoint(packet->pointAfterPurchase);
 		mMyCharacter->SetInventoryFromInventoryFlag(packet->inventoryFlag);
+		mMyCharacter->SetAccessoryFromEquippedFlag(packet->equipmentFlag);
 		mMyCharacter->SetPoint(packet->pointAfterPurchase);
 		break;
 	}
