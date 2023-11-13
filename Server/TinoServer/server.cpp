@@ -850,6 +850,7 @@ void Server::BuyItem(int cID, int itemCode)
 		SendBuyFail(cID);
 		return;
 	}
+	cout << mClients[cID].mPoint << "," << pGameDataManager->GetShopProductInfo(itemCode).price << endl;
 	if (mClients[cID].mPoint - pGameDataManager->GetShopProductInfo(itemCode).price < 0) {
 		SendBuyFail(cID);
 		return;
