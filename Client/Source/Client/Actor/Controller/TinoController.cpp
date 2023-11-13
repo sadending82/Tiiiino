@@ -13,6 +13,7 @@
 #include "MenuUI/InventoryUIWidget.h"
 #include "MenuUI/NoticeUIWidget.h"
 #include "MenuUI/CouponUIWidget.h"
+#include "MenuUI/CouponDialogWidget.h"
 
 #include "Global.h"
 
@@ -218,6 +219,11 @@ void ATinoController::InitializeUIInstance()
 	{
 		if(CouponUIInstance == nullptr)
 			CouponUIInstance = CreateWidget<UCouponUIWidget>(GetWorld(), CouponUIWidgetClass);
+	}
+	if (!!CouponDialogUIWidgetClass)
+	{
+		if (CouponDialogUIInstance == nullptr)
+			CouponDialogUIInstance = CreateWidget<UCouponDialogWidget>(GetWorld(), CouponDialogUIWidgetClass);
 	}
 }
 

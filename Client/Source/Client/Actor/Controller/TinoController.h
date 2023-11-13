@@ -138,6 +138,12 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "UMG_Game")
 	class UCouponUIWidget* CouponUIInstance = nullptr;
 
+	// CouponDialogUI
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
+	TSubclassOf<class UCouponDialogWidget> CouponDialogUIWidgetClass;
+	UPROPERTY(BlueprintReadOnly, Category = "UMG_Game")
+	class UCouponDialogWidget* CouponDialogUIInstance = nullptr;
+
 	UPROPERTY()
 	UUserWidget* CurrentWidget;
 
