@@ -12,6 +12,7 @@
 #include "MenuUI/StoreUIWidget.h"
 #include "MenuUI/InventoryUIWidget.h"
 #include "MenuUI/NoticeUIWidget.h"
+#include "MenuUI/CouponDialogWidget.h"
 
 #include "Component/InventoryComponent.h"
 #include "ClientGameMode.h"
@@ -405,6 +406,25 @@ void ATinoCharacter::MakeAndShowNotice(FString notice)
 		auto NoticeUI = TinoController->NoticeUIInstance;
 		NoticeUI->Notice = notice;
 		NoticeUI->SetVisibleNotice();
+	}
+}
+
+void ATinoCharacter::MakeAndShowCouponDialog(bool bCheckUsingCoupon)
+{
+	auto TinoController = GetController<ATinoController>();
+	if (!!TinoController)
+	{
+		auto CouponDialog = TinoController->CouponDialogUIInstance;
+		CouponDialog->AddToViewport();
+		if (bCheckUsingCoupon == true)
+		{
+
+			CouponDialog->SuccessUsingCoupon();
+		}
+		else
+		{
+			CouponDialog->FailedUsingCoupon();
+		}
 	}
 }
 

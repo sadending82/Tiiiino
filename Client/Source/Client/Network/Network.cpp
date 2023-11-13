@@ -806,12 +806,12 @@ void Network::l_process_packet(unsigned char* p)
 	case LC_USE_COUPON_OK: {
 		LC_USE_COUPON_OK_PACKET* packet = reinterpret_cast<LC_USE_COUPON_OK_PACKET*>(p);
 		mMyCharacter->SetInventoryFromInventoryFlag(packet->inventoryFlag);
-
+		mMyCharacter->MakeAndShowCouponDialog(true);
 		break;
 	}
 	case LC_USE_COUPON_FAIL: {
 		LC_USE_COUPON_FAIL_PACKET* packet = reinterpret_cast<LC_USE_COUPON_FAIL_PACKET*>(p);
-
+		mMyCharacter->MakeAndShowCouponDialog(false);
 		break;
 	}
 	case LC_ALERT: {

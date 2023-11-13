@@ -123,6 +123,7 @@ public:
 	void MakeAndShowChangePoint(int AfterPoint);
 
 	void MakeAndShowNotice(FString notice);
+	void MakeAndShowCouponDialog(bool bCheckUsingCoupon);
 
 	void UpdateEquippedAccessoryUI();
 
