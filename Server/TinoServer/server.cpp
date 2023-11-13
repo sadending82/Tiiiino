@@ -841,7 +841,11 @@ void Server::BuyItem(int cID, int itemCode)
 		SendBuyFail(cID);
 		return;
 	}
-
+	if (mClients[cID].mGrade - pGameDataManager->GetShopProductInfo(itemCode).cutline <= 0.0f)
+	{
+		SendBuyFail(cID);
+		return;
+	}
 	if (mClients[cID].mPoint - pGameDataManager->GetShopProductInfo(itemCode).price < 0) {
 		SendBuyFail(cID);
 		return;
