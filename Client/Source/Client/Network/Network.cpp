@@ -99,7 +99,10 @@ bool Network::init()
 				{
 					//다중클라 접속. 접속해제,
 					::CloseHandle(hMutex);
-					exit(0);
+					closesocket(s_socket);
+					closesocket(l_socket);
+					WSACleanup();
+					FGenericPlatformMisc::RequestExit(false);
 				}
 			}
 		}

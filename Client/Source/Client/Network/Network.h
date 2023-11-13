@@ -134,7 +134,7 @@ public:
 private:
 	bool isInit;
 	int mObjectCnt = 0;
-	HANDLE hMutex;
+	HANDLE hMutex{};
 public:
 	WSADATA WSAData;
 	bool bIsConnected = false;	//게임서버랑 연결이 되었는지,
