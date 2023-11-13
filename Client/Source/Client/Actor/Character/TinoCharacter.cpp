@@ -11,6 +11,7 @@
 #include "MenuUI/LobbyUIWidget.h"
 #include "MenuUI/StoreUIWidget.h"
 #include "MenuUI/InventoryUIWidget.h"
+#include "MenuUI/NoticeUIWidget.h"
 
 #include "Component/InventoryComponent.h"
 #include "ClientGameMode.h"
@@ -393,6 +394,17 @@ void ATinoCharacter::MakeAndShowChangePoint(int AfterPoint)
 	{
 		auto StoreUI = TinoController->StoreUIInstance;
 		StoreUI->ChangePoint(AfterPoint);
+	}
+}
+
+void ATinoCharacter::MakeAndShowNotice(FString notice)
+{
+	auto TinoController = GetController<ATinoController>();
+	if (!!TinoController)
+	{
+		auto NoticeUI = TinoController->NoticeUIInstance;
+		NoticeUI->Notice = notice;
+		NoticeUI->SetVisibleNotice();
 	}
 }
 

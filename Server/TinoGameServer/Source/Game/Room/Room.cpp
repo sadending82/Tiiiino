@@ -68,21 +68,6 @@ void Room::RemovePlayer(Player* player)
 	}
 }
 
-void Room::DisablePlayer(Player* player)
-{
-	for (int i = 0; i < MAX_ROOM_USER; ++i)
-	{
-		Player* p = dynamic_cast<Player*>(mObjects[i]);
-		if (!p) continue;
-		if (p->GetSocketID() == player->GetSocketID())
-		{
-			//player socket state는 disconnect을 먼저 하면서 free로 바뀜.
-			RemovePlayerInfo(p->GetUID());
-			return;
-		}
-	}
-}
-
 
 void Room::ResetGameRoom()
 {
@@ -143,6 +128,13 @@ void Room::ActiveRoom()
 		mRoomState = eRoomState::ST_READY;
 	}
 	mRoomStateLock.unlock();
+}
+
+void Room::ShufflePlayerInfo()
+{
+	mPlayerInfoLock.lock();
+	std::random_shuffle(mPlayerInfo.begin(), mPlayerInfo.end());
+	mPlayerInfoLock.unlock();
 }
 
 bool Room::IsRoomReadyComplete()
@@ -307,7 +299,8 @@ int Room::GetPlayerRoomSyncID(const int uID)
 	//	assert(0);
 	//	return -1;
 	//}
-	auto Iter = mPlayerInfo.find(uID);
+	
+	auto Iter = std::find_if(mPlayerInfo.begin(), mPlayerInfo.end(), [uID](const std::pair<int, sPlayerInfo>& val) {return val.first == uID; });
 	if (Iter != mPlayerInfo.end())
 	{
 		auto dist = std::distance(mPlayerInfo.begin(), Iter);
@@ -325,7 +318,7 @@ sPlayerInfo Room::GetPlayerInfo(const int uID)
 	//2023-10-06 기획을 생각해보니 재접속이 없음. 그럼 나가면 playerInfo에서 플레이어를 빼주어야함.
 	//넣고 끝인줄 알았더니 도중에 나가는것도 존재하기 때문에 무조건 락을 걸어양함.
 	mPlayerInfoLock.lock();
-	auto Iter = mPlayerInfo.find(uID);
+	auto Iter = std::find_if(mPlayerInfo.begin(), mPlayerInfo.end(), [uID](const std::pair<int, sPlayerInfo>& val) {return val.first == uID; });
 	if (Iter != mPlayerInfo.end())
 	{
 		sPlayerInfo tmp = (*Iter).second;
@@ -422,12 +415,6 @@ void Room::addMapObject(MapObject* mapObject)
 }
 
 
-void Room::RemovePlayerInfo(const int& UID)
-{
-	mPlayerInfoLock.lock();
-	mPlayerInfo.erase(UID);
-	mPlayerInfoLock.unlock();
-}
 
 void Room::setPlayerInfo(const sPlayerInfo& playerInfo, const int& playerMaxNum)
 {
@@ -439,7 +426,7 @@ void Room::setPlayerInfo(const sPlayerInfo& playerInfo, const int& playerMaxNum)
 		mPlayerInfoLock.unlock();
 		return;
 	}
-	mPlayerInfo.insert(std::make_pair(playerInfo.UID, playerInfo));
+	mPlayerInfo.push_back(std::make_pair(playerInfo.UID, playerInfo));
 	mPlayerSettingCnt++;
 	mPlayerInfoLock.unlock();
 
@@ -456,7 +443,7 @@ void Room::setPlayerInfoWithCnt(const sPlayerInfo& playerInfo, const int& player
 		DEBUGMSGONEPARAM("심각한 오류!!!! [%d]", mPlayerSettingCnt);
 		return;
 	}
-	mPlayerInfo.insert(std::make_pair(playerInfo.UID, playerInfo));
+	mPlayerInfo.push_back(std::make_pair(playerInfo.UID, playerInfo));
 	mPlayerSettingCnt++;
 	playerCnt = mPlayerSettingCnt;
 	mPlayerInfoLock.unlock();

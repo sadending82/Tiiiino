@@ -36,6 +36,7 @@ void UFinishGameUIWidget::ShowResult(int level, int rank, double grade, int poin
 	MapNameArray[5] = L"스페이스 티노 2023";
 	MapNameArray[6] = L"티노 풀 회전!";
 	MapNameArray[7] = L"티노의 습격";
+	MapNameArray[8] = L"티노와 초콜릿 공장";
 
 
 	// 맵 이름 입력

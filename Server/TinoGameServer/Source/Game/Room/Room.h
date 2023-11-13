@@ -2,6 +2,7 @@
 #include <array>
 #include <mutex>
 #include <map>
+#include <vector>
 
 #include "../Utility/Utility.h"
 #include "../Network/Network.h"
@@ -20,12 +21,13 @@ public:
 	void AddObject(Object* object);
 	// Remove Player - If Room want Reset
 	void RemovePlayer(Player* player);
-	// Disable Player - if Player Connection is Gone, player just disabled not remove
-	void DisablePlayer(Player* player);
+		
 	//The Game Is End, Reset Room ex)clear mObjects
 	void ResetGameRoom();
 	std::mutex& GetRoomStateLockRef();
 	void ActiveRoom();
+	void ShufflePlayerInfo();
+
 	bool IsRoomReady();
 	bool IsRoomReadyComplete();
 	bool IsAllPlayerReady();
@@ -54,7 +56,6 @@ protected:
 	void addMapObject(MapObject* mapObject);
 	//°ÔÀÓ ·ë »óÅÂ¸¦ Free¿¡¼­ ±ú¿öÁÜ.
 
-	void RemovePlayerInfo(const int& UID);
 	void setPlayerInfo(const sPlayerInfo& playerInfo, const int& playerMaxNum);
 	void setPlayerInfoWithCnt(const sPlayerInfo& playerInfo, const int& playerMaxNum, int& playerCnt);
 
@@ -64,7 +65,7 @@ protected:
 	std::array<Object*,MAX_OBJECT> mObjects;
 
 	std::mutex mPlayerInfoLock;
-	std::map<int, sPlayerInfo> mPlayerInfo;
+	std::vector<std::pair<int, sPlayerInfo>> mPlayerInfo;
 
 	std::mutex mPlayerArriveLock;
 	int	mPlayerArrivedCnt;	//°ñ¿¡ µµÂøÇÑ »ç¶÷ ¼ö

@@ -9,6 +9,7 @@ constexpr int ROOM_RESET_TIME = 100000;
 #ifdef _DEBUG
 #define DEBUGMSGNOPARAM(args) (printf("file: %s, line:%d ",__FILE__,__LINE__), printf(args))
 #define DEBUGMSGONEPARAM(args,k) (printf("file: %s, line:%d ",__FILE__,__LINE__), printf(args,k))
+#define DEBUGMSGTWOPARAM(args,k,l) (printf("file: %s, line:%d ",__FILE__,__LINE__), printf(args,k,l))
 #else
 #define DEBUGMSGNOPARAM(...)
 #define DEBUGMSGONEPARAM(...)
