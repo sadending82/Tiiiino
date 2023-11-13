@@ -125,6 +125,13 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "UMG_Game")
 	class UInventoryUIWidget* InventoryUIInstance = nullptr;
 
+	// NoticeUI
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
+	TSubclassOf<class UNoticeUIWidget> NoticeUIWidgetClass;
+	UPROPERTY(BlueprintReadOnly, Category = "UMG_Game")
+	class UNoticeUIWidget* NoticeUIInstance = nullptr;
+
+
 	UPROPERTY()
 	UUserWidget* CurrentWidget;
 

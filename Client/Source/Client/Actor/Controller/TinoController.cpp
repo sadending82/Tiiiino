@@ -11,6 +11,7 @@
 #include "MenuUI/InGameUIWidget.h"
 #include "MenuUI/StoreUIWidget.h"
 #include "MenuUI/InventoryUIWidget.h"
+#include "MenuUI/NoticeUIWidget.h"
 
 
 #include "Global.h"
@@ -207,6 +208,11 @@ void ATinoController::InitializeUIInstance()
 	{
 		if (InventoryUIInstance == nullptr)
 			InventoryUIInstance = CreateWidget<UInventoryUIWidget>(GetWorld(), InventoryUIWidgetClass);
+	}
+	if (!!NoticeUIWidgetClass)
+	{
+		if (NoticeUIInstance == nullptr)
+			NoticeUIInstance = CreateWidget<UNoticeUIWidget>(GetWorld(), NoticeUIWidgetClass);
 	}
 }
 

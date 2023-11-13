@@ -121,6 +121,9 @@ public:
 	void MakeAndShowDialogInGame();
 	void MakeAndShowLobbyRankSystem(struct rankInfo rank[]);
 	void MakeAndShowChangePoint(int AfterPoint);
+
+	void MakeAndShowNotice(FString notice);
+
 	void UpdateEquippedAccessoryUI();
 
 	void RemoveStoreDialog();

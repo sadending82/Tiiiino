@@ -631,9 +631,15 @@ void Network::process_packet(unsigned char* p)
 		{
 			mOtherCharacter[packet->id]->SetActorEnableCollision(false);
 			mOtherCharacter[packet->id]->SetActorHiddenInGame(true);
-			//
-			//UI에 도착한 인원 +1 Update
-			//
+
+			TArray<AActor*> children;
+
+			mOtherCharacter[packet->id]->GetAttachedActors(children);
+
+			for (auto actor : children) {
+				actor->SetActorHiddenInGame(true);
+				actor->SetActorEnableCollision(false);
+			}
 		}
 		break;
 	}
@@ -799,6 +805,7 @@ void Network::l_process_packet(unsigned char* p)
 		LC_ALERT_PACKET* packet = reinterpret_cast<LC_ALERT_PACKET*>(p);
 		
 		UE_LOG(LogTemp, Error, TEXT("%s"),packet->alert);
+		mMyCharacter->MakeAndShowNotice(packet->alert);
 
 		break;
 	}
