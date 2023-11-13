@@ -1230,7 +1230,7 @@ void Server::SendBuyOK(int key, int itemCode)
 	packet.pointAfterPurchase = mClients[key].mPoint;
 	packet.itemCode = itemCode;
 	packet.inventoryFlag = mClients[key].mInventory;
-	packet.equipmentFlag = mClients[key].mInventory;
+	packet.equipmentFlag = mClients[key].mEquippedItems;
 
 	mClients[key].DoSend(&packet);
 }

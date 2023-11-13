@@ -808,6 +808,7 @@ void Network::l_process_packet(unsigned char* p)
 	case LC_USE_COUPON_OK: {
 		LC_USE_COUPON_OK_PACKET* packet = reinterpret_cast<LC_USE_COUPON_OK_PACKET*>(p);
 		mMyCharacter->SetInventoryFromInventoryFlag(packet->inventoryFlag);
+		mMyCharacter->SetAccessoryFromEquippedFlag(packet->equipmentFlag);
 		mMyCharacter->MakeAndShowCouponDialog(true);
 		break;
 	}
