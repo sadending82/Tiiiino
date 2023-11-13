@@ -388,6 +388,7 @@ struct LC_BUYITEM_FAIL_PACKET :public PACKET {
 
 struct LC_REFRESH_INVENTORY_PACKET : public PACKET {
 	long long inventoryFlag;
+	long long equipmentFlag;
 };
 
 struct LC_REFRESH_DEP_RANK_PACKET : public PACKET {
