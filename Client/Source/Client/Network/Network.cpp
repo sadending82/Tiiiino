@@ -776,7 +776,7 @@ void Network::l_process_packet(unsigned char* p)
 	case LC_REFRESH_INVENTORY: {
 		LC_REFRESH_INVENTORY_PACKET* packet = reinterpret_cast<LC_REFRESH_INVENTORY_PACKET*>(p);
 		mMyCharacter->SetInventoryFromInventoryFlag(packet->inventoryFlag);
-
+		mMyCharacter->SetAccessoryFromEquippedFlag(packet->equipmentFlag);
 		break;
 	}
 	case LC_REFRESH_DEP_RANK: {
