@@ -63,6 +63,7 @@ void UInventoryComponent::AddItem(const FItemData& ItemData,bool bEquipped)
 
 void UInventoryComponent::ClearInventory()
 {
+	ClearEquippedInfo();
 	InventoryContents.Empty();
 	OnInventoryUpdated.Broadcast();
 }
