@@ -9,5 +9,6 @@
 
 void UCouponUIWidget::TryUsingCoupon()
 {
-	
+	const char* coupon = TCHAR_TO_ANSI(*CouponTextbox->GetText().ToString());
+	send_coupon_packet(Network::GetNetwork()->l_socket, coupon);
 }

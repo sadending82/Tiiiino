@@ -274,6 +274,8 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 	case DL_REFRESH_INVENTORY:
 	{
 		DL_REFRESH_INVENTORY_PACKET* p = reinterpret_cast<DL_REFRESH_INVENTORY_PACKET*>(spacket);
+		mClients[p->userKey].mInventory = p->inventoryFlag;
+		SendInventory(p->userKey);
 		// 일단 클라의 인벤토리 새로고침 요청을 로비에서 저장된 데이터로 보내게 해서 안씀
 		// 나중에 수정할지 말지 정해야함
 		break;
@@ -297,6 +299,7 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 	}
 	case DL_USE_COUPON_OK: {
 		DL_USE_COUPON_OK_PACKET* p = reinterpret_cast<DL_USE_COUPON_OK_PACKET*>(spacket);
+		mClients[p->userKey].mInventory = p->inventoryFlag;
 		SendUseCouponOK(p->userKey, p->itemcode, p->inventoryFlag);
 		break;
 	}

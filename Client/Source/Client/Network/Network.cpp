@@ -308,6 +308,16 @@ void send_refresh_inventory_packet(SOCKET& sock)
 	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
 }
 
+void send_coupon_packet(SOCKET& sock, const char* couponCode)
+{
+	CL_USE_COUPON_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = CL_USE_COUPON;
+	memcpy(packet.couponCode, couponCode, sizeof(packet.couponCode));
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+}
+
 void send_movetogame_packet(SOCKET& sock, const int uID, const char* id, const int& roomID)
 {
 	CS_LOGIN_PACKET packet;
@@ -794,10 +804,13 @@ void Network::l_process_packet(unsigned char* p)
 		break;
 	}
 	case LC_USE_COUPON_OK: {
+		LC_USE_COUPON_OK_PACKET* packet = reinterpret_cast<LC_USE_COUPON_OK_PACKET*>(p);
+		mMyCharacter->SetInventoryFromInventoryFlag(packet->inventoryFlag);
 
 		break;
 	}
 	case LC_USE_COUPON_FAIL: {
+		LC_USE_COUPON_FAIL_PACKET* packet = reinterpret_cast<LC_USE_COUPON_FAIL_PACKET*>(p);
 
 		break;
 	}
