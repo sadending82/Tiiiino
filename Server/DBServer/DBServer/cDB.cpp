@@ -813,10 +813,11 @@ bool DB::UpdateCouponUsed(const string& code, const bool isUsed)
 	}
 
 	MYSQL_BIND binds[2];
-	memset(bind, 0, sizeof(binds));
+	memset(binds, 0, sizeof(binds));
 
+	int userd = isUsed;
 	binds[0].buffer_type = MYSQL_TYPE_LONG;
-	binds[0].buffer = (void*)&isUsed;
+	binds[0].buffer = (void*)&userd;
 
 	binds[1].buffer_type = MYSQL_TYPE_STRING;
 	binds[1].buffer_length = sizeof(code.c_str());
