@@ -134,7 +134,7 @@ public:
 private:
 	bool isInit;
 	int mObjectCnt = 0;
-
+	HANDLE hMutex;
 public:
 	WSADATA WSAData;
 	bool bIsConnected = false;	//게임서버랑 연결이 되었는지,
@@ -155,6 +155,7 @@ public:
 	// 112.152.55.49  127.0.0.1  , 112.153.53.142
 	const char* GAMESERVER_ADDR = "127.0.0.1";
 	const char* LOBBYSERVER_ADDR = "127.0.0.1";
+	bool bMultiClientBan = true;
 };
 
 

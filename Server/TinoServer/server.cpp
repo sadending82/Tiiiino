@@ -664,7 +664,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 		//mHighListLock.lock();
 		//if (mMatchListHighTier.size() >= MAX_ROOM_USER / 2 && mMatchListHighTier.size() < MAX_ROOM_USER) // high list
 		//{
-		//	if (tTime - mClients[mMatchListHighTier.front()].mMatchStartTime >= milliseconds(20000))
+		//	if (tTime - mClients[mMatchListHighTier.front()].mMatchStartTime >= milliseconds(10000))
 		//		{
 		//			int tSize = mMatchListHighTier.size();
 		//			int roomID = GetNewRoomID();
@@ -702,7 +702,7 @@ void Server::ProcessEvent(unsigned char* cmessage)
 		mLowListlock.lock();
 		if (mMatchListLowTier.size() >= MAX_ROOM_USER / 2 && mMatchListLowTier.size() < MAX_ROOM_USER)
 		{
-			if (tTime - mClients[mMatchListLowTier.front()].mMatchStartTime >= milliseconds(20000))
+			if (tTime - mClients[mMatchListLowTier.front()].mMatchStartTime >= milliseconds(10000))
 			{
 				int tSize = mMatchListLowTier.size();
 				int roomID = GetNewRoomID();
