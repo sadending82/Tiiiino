@@ -24,9 +24,10 @@ void UANS_Grab::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* A
 	const FAnimNotifyEventReference& EventReference)
 {
 	Super::NotifyEnd(MeshComp, Animation, EventReference);
+	return;
 	auto TinoCharacter = Cast<ATinoCharacter>(MeshComp->GetOwner());
 	if (TinoCharacter)
 	{
-		TinoCharacter->DetectTarget();
+		TinoCharacter->SetMovementState(EMovementState::EMS_Grabbing);
 	}
 }
