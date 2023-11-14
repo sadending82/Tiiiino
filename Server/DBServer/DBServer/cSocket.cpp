@@ -261,6 +261,7 @@ bool Socket::CheckValidString(const char* input)
     if (str.length() == 0) return false;
 
     for (wchar_t c : str) {
+        if (c == ' ') return false;
         if (iswpunct(c)) return false;
         if (0xAC00 <= c && c <= 0xD7A3) return false;
     }
