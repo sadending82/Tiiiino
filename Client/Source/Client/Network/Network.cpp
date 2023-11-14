@@ -118,7 +118,7 @@ void Network::release()
 	{
 		bGameIsStart = false;
 		mGeneratedID = 0;
-		mMyCharacter->bIsConnected = 0;
+		//mMyCharacter->bIsConnected = 0;
 		mMyCharacter = nullptr;
 		for (auto& p : mOtherCharacter)
 			p = nullptr;
