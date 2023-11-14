@@ -33,13 +33,13 @@ public:
 	class UEditableTextBox* CreateIDTextBox;
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	void InputCreateID(const FText& Text);
+	void InputCreateID();
 
 	UPROPERTY(meta = (BindWidget))
 	class UEditableTextBox* CreatePasswordTextBox;
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	void InputCreatePassword(const FText& Text);
+	void InputCreatePassword();
 
 	UPROPERTY(EditAnywhere, BlueprintReadwrite ,Category = "UMG_Game")
 	int DepartmentNum;

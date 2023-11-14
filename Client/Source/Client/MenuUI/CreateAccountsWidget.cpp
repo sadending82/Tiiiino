@@ -26,6 +26,23 @@ void UCreateAccountsWidget::TryBack()
 
 void UCreateAccountsWidget::TryCreateAccounts()
 {
+	// IDText의 크기가 0일때 아이디 생성 방지
+	FText cur_text = CreateIDTextBox->GetText();
+	FString OriginalText = cur_text.ToString();
+	if (OriginalText.Len() == 0)
+	{
+		CheckCreateAccount(false);
+		return;
+	}
+	// PasswordText의 크기가 0일때 아이디 생성 방지
+	cur_text = CreatePasswordTextBox->GetText();
+	OriginalText = cur_text.ToString();
+	if (OriginalText.Len() == 0)
+	{
+		CheckCreateAccount(false);
+		return;
+	}
+
 	const char* id = TCHAR_TO_ANSI(*CreateIDTextBox->GetText().ToString());
 	const char* pass = TCHAR_TO_ANSI(*CreatePasswordTextBox->GetText().ToString());
 	Network::GetNetwork()->MyCharacterName = id;
@@ -33,12 +50,61 @@ void UCreateAccountsWidget::TryCreateAccounts()
 	send_newaccount_packet(Network::GetNetwork()->l_socket, id, pass, DepartmentNum + 1);
 }
 
-void UCreateAccountsWidget::InputCreateID(const FText& Text)
+void UCreateAccountsWidget::InputCreateID()
 {
+	// 이름은 Input이지만 실제 기능은 스페이스바, 한글체크
+	FText cur_text = CreateIDTextBox->GetText();
+	FString OriginalText = cur_text.ToString();
+	int32 length = OriginalText.Len() - 1;
+	if (length >= 0)
+	{
+		if (OriginalText[length] >= 'a' && OriginalText[length] <= 'z')
+		{
+			return;
+		}
+		else if (OriginalText[length] >= 'A' && OriginalText[length] <= 'Z')
+		{
+			return;
+		}
+		else if (OriginalText[length] >= '0' && OriginalText[length] <= '9')
+		{
+			return;
+		}
+		else
+		{
+			cur_text = FText::FromString(OriginalText.Left(length));
+			
+			CreateIDTextBox->SetText(cur_text);
+		}
+	}
 }
 
-void UCreateAccountsWidget::InputCreatePassword(const FText& Text)
+void UCreateAccountsWidget::InputCreatePassword()
 {
+	// 이름은 Input이지만 실제 기능은 스페이스바, 한글체크
+	FText cur_text = CreatePasswordTextBox->GetText();
+	FString OriginalText = cur_text.ToString();
+	int32 length = OriginalText.Len() - 1;
+	if (length >= 0)
+	{
+		if (OriginalText[length] >= 'a' && OriginalText[length] <= 'z')
+		{
+			return;
+		}
+		else if (OriginalText[length] >= 'A' && OriginalText[length] <= 'Z')
+		{
+			return;
+		}
+		else if (OriginalText[length] >= '0' && OriginalText[length] <= '9')
+		{
+			return;
+		}
+		else
+		{
+			cur_text = FText::FromString(OriginalText.Left(length));
+			CreatePasswordTextBox->SetText(cur_text);
+		}
+	}
 }
 
 void UCreateAccountsWidget::CheckCreateAccount(bool check)
