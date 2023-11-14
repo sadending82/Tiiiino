@@ -39,6 +39,8 @@ void UDialogUIWidget::ResetWindow()
 
 void UDialogUIWidget::DisconnectNetwork()
 {
+	Network::GetNetwork()->bLevelOpenTriggerEnabled = false;
+	Network::GetNetwork()->release();
 	UKismetSystemLibrary::QuitGame(GetWorld(), nullptr, EQuitPreference::Quit, false);
 }
 
