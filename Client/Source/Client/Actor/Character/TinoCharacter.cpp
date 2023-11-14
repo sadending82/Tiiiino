@@ -72,8 +72,8 @@ void ATinoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction("CreateDummy", EInputEvent::IE_Pressed, this, &ATinoCharacter::CreateDummy);
 	PlayerInputComponent->BindAction("Align", EInputEvent::IE_Pressed, this, &ATinoCharacter::Align);
 	PlayerInputComponent->BindAction("Jump", EInputEvent::IE_Pressed, this, &ATinoCharacter::Jump);
-	//PlayerInputComponent->BindAction("Grab", EInputEvent::IE_Pressed, this, &ATinoCharacter::OnGrab);
-	//PlayerInputComponent->BindAction("Grab", EInputEvent::IE_Released, this, &ATinoCharacter::OffGrab);
+	PlayerInputComponent->BindAction("Grab", EInputEvent::IE_Pressed, this, &ATinoCharacter::OnGrab);
+	PlayerInputComponent->BindAction("Grab", EInputEvent::IE_Released, this, &ATinoCharacter::OffGrab);
 	//PlayerInputComponent->BindAction("Jump", EInputEvent::IE_Released, this, &ATinoCharacter::StopJumping);
 	PlayerInputComponent->BindAction("Dive", EInputEvent::IE_Pressed, this, &ATinoCharacter::Dive);
 }
@@ -165,7 +165,7 @@ void ATinoCharacter::Tick(float DeltaTime)
 						ServerSyncElapsedTime += DeltaTime;
 						if (ServerSyncDeltaTime < ServerSyncElapsedTime)
 						{
-							if(!bIsSpactateModeEnabled)
+							if (!bIsSpactateModeEnabled)
 								send_move_packet(Network::GetNetwork()->s_socket, Cast<UCharacterAnimInstance>(GetMesh()->GetAnimInstance())->bIsAir, pos.X, pos.Y, pos.Z, rot, GetVelocity().Size2D(), GetCharacterMovement()->Velocity);
 							ServerSyncElapsedTime = 0.0f;
 						}
@@ -177,7 +177,6 @@ void ATinoCharacter::Tick(float DeltaTime)
 		}
 
 		PlayTumbleMontage(DeltaTime);
-		
 
 		// 10/04 가만히 있을 때 충돌하지 안흔 부분을 해결하기 위한 코드 추가
 		FHitResult OutHit;
@@ -221,6 +220,7 @@ void ATinoCharacter::PlayTumbleMontage(float DeltaTime)
 			bCanTumbled = false;
 			SendAnimPacket(3);
 			PlayAnimMontage(TumbleMontage);
+			//SetMovementState(EMovementState::EMS_Tumbled);
 		}
 		else
 			CLog::Log("Asset TumbleMontage is Invalid");
@@ -487,7 +487,7 @@ FItemData ATinoCharacter::GetItemDataFromItemCode(const int64& ItemCode)
 	if (Data == nullptr) return FItemData();
 
 	FItemData ItemData;
-	ItemData.ItemCode = ItemCode; 
+	ItemData.ItemCode = ItemCode;
 	ItemData.EquipType = Data->EquipType;
 	ItemData.TextData = Data->TextData;
 	ItemData.NumericData = Data->NumericData;
@@ -607,7 +607,6 @@ void ATinoCharacter::OnAccelEffect()
 void ATinoCharacter::OffAccelEffect()
 {
 	Camera->PostProcessSettings.bOverride_VignetteIntensity = false;
-
 }
 
 void ATinoCharacter::SetOriginalSpeed()
@@ -669,7 +668,7 @@ void ATinoCharacter::SetAccessoryFromEquippedFlag(const long long& EquippedItems
 		{
 			int64 ItemCode = i;
 			//InventoryComponent->AddItem(GetItemDataFromItemCode(ItemCode),true);
-			
+
 			WearAccessory(ItemCode);
 		}
 	}
@@ -704,7 +703,7 @@ void ATinoCharacter::WearAccessory(const int ItemCode)
 		InventoryComponent->SetInstnace(ItemCode, Accessory);
 	}
 	InventoryComponent->SetEquipped(ItemCode, true);
-	Accessory->Equip(); 
+	Accessory->Equip();
 	//int idx = EquipAccessoryContainer.Add(Accessory);
 	//EquipAccessoryContainer[idx]->SetItemCode(Item.ItemCode);
 	//EquipAccessoryContainer[idx]->Equip();
@@ -715,7 +714,7 @@ void ATinoCharacter::UnWearAccessory(const int ItemCode)
 	for (auto item : GetInventoryContents())
 	{
 		auto Accessory = InventoryComponent->GetInstnace(item.ItemInfo.ItemCode);
-		if(Accessory)
+		if (Accessory)
 			Accessory->UnEquip();
 	}
 	//auto Accessory = EquipAccessoryContainer.FindByPredicate([&ItemCode](const AAccessoryItem& i) { return i.GetItemCode() == ItemCode; });
@@ -810,21 +809,17 @@ void ATinoCharacter::OnGrab()
 
 void ATinoCharacter::OffGrab()
 {
-
 	SendAnimPacket(5);
 
-		StopAnimMontage(GrabMontage);
-		ASoundManager::GetSoundManager()->PlaySFXAtLocation(this, ESFXType::ESFXType_OffGrab, GetActorLocation());
+	StopAnimMontage(GrabMontage);
+	ASoundManager::GetSoundManager()->PlaySFXAtLocation(this, ESFXType::ESFXType_OffGrab, GetActorLocation());
+	if (MovementState == EMovementState::EMS_Grabbing)
 		SetMovementState(EMovementState::EMS_Normal);
-	
+
 	bIsGrabbing = false;
 
-
 	//if (Target == nullptr) return;
-
 	//GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-
-	
 	//SetTargetGrabbedToNormal();
 
 	bIsGrabCoolTime = true;
