@@ -268,8 +268,6 @@ void ATinoCharacter::PlayerInterpolation(float DeltaTime)
 	// 보간 주기만 큼 나눠주면 속도가된다
 	if (InterVelocity.IsNearlyZero() == false && InterVelocity.Length() <= GetCharacterMovement()->MaxWalkSpeed)
 	{
-		if (MovementState == EMovementState::EMS_Grabbing)
-			InterVelocity *= InterTime * InterTime;
 		SetActorLocation(GetActorLocation() + InterVelocity * DeltaTime);
 	}
 }
