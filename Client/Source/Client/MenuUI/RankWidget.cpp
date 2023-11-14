@@ -24,7 +24,10 @@ TArray<float>& URankWidget::GetCharacterDistanceData()
 bool URankWidget::IsSpectatorModeOn()
 {
 	auto network = Network::GetNetwork();
-	return network->mMyCharacter->bIsSpactateModeEnabled;
+	bool tmpSpactateMode = 0;
+	if(network->mMyCharacter)
+		tmpSpactateMode = network->mMyCharacter->bIsSpactateModeEnabled;
+	return tmpSpactateMode;
 	 
 }
 

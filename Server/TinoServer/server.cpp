@@ -13,11 +13,15 @@ void Server::Disconnect(int cID)
 	DEBUGMSGONEPARAM("DISCONNECT [%s]\n", mClients[cID].mID);
 
 	//mMatchListHighTier.remove(cID);
-	mMatchListLowTier.remove(cID);
+
 
 	closesocket(mClients[cID].mSocket);
-	mClients[cID].mState = eSessionState::ST_FREE;
+	mClients[cID].Reset();
 	mClients[cID].mStateLock.unlock();
+
+	mLowListlock.lock();
+	mMatchListLowTier.remove(cID);
+	mLowListlock.unlock();
 
 	LD_LOGOUT_PACKET p;
 	p.size = sizeof(LD_LOGOUT_PACKET);
@@ -212,7 +216,8 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 
 		DEBUGMSGONEPARAM("[%s] player login ok\n", p->id);
 
-		if (p->connState == TRUE) {
+		//if (p->connState == TRUE) 
+		{
 			CheckDuplicateLogin(p->uid);
 		}
 
@@ -880,6 +885,7 @@ void Server::CheckDuplicateLogin(int uid)
 	if (target != -1) {
 		if (mClients[target].mState == eSessionState::ST_INGAME) {
 			SendDiconnectPacketToGameServer(target, uid, mClients[target].mRoomID);
+			Disconnect(target);
 		}
 		else {
 			Disconnect(target);

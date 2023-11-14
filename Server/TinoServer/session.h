@@ -25,6 +25,23 @@ public:
 		mMatchStartTime = system_clock::now();
 	}
 	~Session() {}
+
+	void Reset()
+	{
+		mSocketID = -1;
+		mSocket = 0;
+		mState = eSessionState::ST_FREE;
+		mPrevRemain = 0;
+		mRoomID = -1;
+		mUID = 0;
+		ZeroMemory(mNickName, sizeof(mNickName));
+		mGrade = 0;
+		mPoint = 0;
+		mEquippedItems = 0;
+		mInventory = 0;
+		mMatchStartTime = system_clock::now();
+	}
+
 	void DoRecv()
 	{
 		DWORD recvFlag = 0;
