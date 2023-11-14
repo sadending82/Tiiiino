@@ -72,8 +72,8 @@ void ATinoCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction("CreateDummy", EInputEvent::IE_Pressed, this, &ATinoCharacter::CreateDummy);
 	PlayerInputComponent->BindAction("Align", EInputEvent::IE_Pressed, this, &ATinoCharacter::Align);
 	PlayerInputComponent->BindAction("Jump", EInputEvent::IE_Pressed, this, &ATinoCharacter::Jump);
-	PlayerInputComponent->BindAction("Grab", EInputEvent::IE_Pressed, this, &ATinoCharacter::OnGrab);
-	PlayerInputComponent->BindAction("Grab", EInputEvent::IE_Released, this, &ATinoCharacter::OffGrab);
+	//PlayerInputComponent->BindAction("Grab", EInputEvent::IE_Pressed, this, &ATinoCharacter::OnGrab);
+	//PlayerInputComponent->BindAction("Grab", EInputEvent::IE_Released, this, &ATinoCharacter::OffGrab);
 	//PlayerInputComponent->BindAction("Jump", EInputEvent::IE_Released, this, &ATinoCharacter::StopJumping);
 	PlayerInputComponent->BindAction("Dive", EInputEvent::IE_Pressed, this, &ATinoCharacter::Dive);
 }
