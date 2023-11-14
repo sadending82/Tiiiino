@@ -90,6 +90,7 @@ void ULobbyUIWidget::TryEnterInventory()
 void ULobbyUIWidget::TryOpenCouponUI()
 {
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	
 	TinoController->CouponUIInstance->AddToViewport();
 }
 

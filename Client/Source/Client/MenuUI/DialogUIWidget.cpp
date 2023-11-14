@@ -44,6 +44,12 @@ void UDialogUIWidget::DisconnectNetwork()
 
 void UDialogUIWidget::RenderDisconnectNetworkWindow()
 {
+
+	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (!!TinoController)
+	{
+		TinoController->SetInputUIMode();
+	}
 	DisconnectNetworkButton->SetRenderOpacity(1.0);
 	DisconnectNetworkText->SetRenderOpacity(1.0);
 	DisconnectNetworkButtonText->SetRenderOpacity(1.0);
