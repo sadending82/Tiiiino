@@ -90,6 +90,9 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 		pac.type = LD_LOGOUT;
 		pac.size = sizeof(LD_LOGOUT_PACKET);
 		pac.uid = mClients[cID].mUID;
+		mClients[cID].mStateLock.lock();
+		mClients[cID].mUID = 0;
+		mClients[cID].mStateLock.unlock();
 		mServers[0].DoSend(&pac);
 		break;
 	}
