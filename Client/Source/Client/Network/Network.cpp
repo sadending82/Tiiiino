@@ -564,6 +564,7 @@ void Network::process_packet(unsigned char* p)
 				mc->bIsControlledPlayer = false;
 				mc->FinishSpawning(trans);
 				mc->SetDepartmentClothes(packet->department);
+				mc->SetNetworkLocation(FVector(888, 1566, -10000 + (id * 150)));
 				mOtherCharacter[id] = mc;
 				mOtherCharacter[id]->SetAccessoryFromEquippedFlag(packet->equipmentFlag);
 				//mOtherCharacter[id]->WearAllAccessory();
