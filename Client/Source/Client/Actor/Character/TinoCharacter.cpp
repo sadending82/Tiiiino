@@ -247,6 +247,7 @@ void ATinoCharacter::PlayerInterpolation(float DeltaTime)
 		CurrentStopTime += DeltaTime;
 
 	//기준 시간 초과시 플레이어는 안움직이는 상태이다
+	//11.15 지금 보간을 velocity로 해주는게 아니고 SetLocation으로 하는거라 무조건 StopTime에 들어옴.
 	if (CurrentStopTime >= StopTime)
 	{
 		CurrentStopTime -= StopTime;
@@ -274,7 +275,7 @@ void ATinoCharacter::PlayerInterpolation(float DeltaTime)
 
 void ATinoCharacter::SetNetworkLocation(const FVector& Location)
 {
-	PreviousLocation = Location;
+	PreviousLocation = GetActorLocation();
 	SetActorLocation(Location);
 }
 
