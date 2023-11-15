@@ -275,7 +275,7 @@ void ATinoCharacter::PlayerInterpolation(float DeltaTime)
 
 void ATinoCharacter::SetNetworkLocation(const FVector& Location)
 {
-	PreviousLocation = GetActorLocation();
+	PreviousLocation = Location;
 	SetActorLocation(Location);
 }
 
