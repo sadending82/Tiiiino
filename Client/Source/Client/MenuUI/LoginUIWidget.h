@@ -53,6 +53,16 @@ public:
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void CheckPasswordTextLength();
 
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void CheckIDTextBox();
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void CheckIDTextBoxLastword();
+
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void CheckPasswordTextBox();
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void CheckPasswordTextBoxLastword();
+
 public:
 	// CreditUI
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UMG_Game")
