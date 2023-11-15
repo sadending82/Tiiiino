@@ -263,11 +263,11 @@ void ATinoCharacter::PlayerInterpolation(float DeltaTime)
 	if (CurrentInterTime >= InterTime)
 	{
 		CurrentInterTime -= InterTime;
-		InterVelocity = (PreviousLocation - GetActorLocation()) / InterTime;
+		InterVelocity = (PreviousLocation - GetActorLocation()) ;
 	}
 
 	// 보간 주기만 큼 나눠주면 속도가된다
-	if (InterVelocity.IsNearlyZero() == false && InterVelocity.Length() <= GetCharacterMovement()->MaxWalkSpeed)
+	if (InterVelocity.IsNearlyZero() == false)
 	{
 		SetActorLocation(GetActorLocation() + InterVelocity * DeltaTime);
 	}
