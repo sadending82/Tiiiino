@@ -18,6 +18,7 @@ public:
 		mRoomID = -1;
 		mUID = 0;
 		ZeroMemory(mNickName, sizeof(mNickName));
+		ZeroMemory(mID, sizeof(mID));
 		mGrade = 0;
 		mPoint = 0;
 		mEquippedItems = 0;
@@ -35,6 +36,7 @@ public:
 		mRoomID = -1;
 		mUID = 0;
 		ZeroMemory(mNickName, sizeof(mNickName));
+		ZeroMemory(mID, sizeof(mID));
 		mGrade = 0;
 		mPoint = 0;
 		mEquippedItems = 0;
