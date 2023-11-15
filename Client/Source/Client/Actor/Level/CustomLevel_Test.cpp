@@ -105,7 +105,7 @@ bool ACustomLevel_Test::ConnLobbyServer()
 		else {
 			TinoController->InitializeUIInstance();
 			send_refresh_dep_rank_packet(Game->l_socket);
-			send_refresh_point_packet(Game->l_socket);
+			send_refresh_userstatus_packet(Game->l_socket);
 			send_refresh_inventory_packet(Game->l_socket);
 
 			// 여기서 결과 UI를 띄워줌
@@ -164,6 +164,9 @@ void ACustomLevel_Test::ShowGameResult()
 		TinoController->ShowGameResult(level, rank, grade, point);
 	}
 }
+
+
+
 
 
 

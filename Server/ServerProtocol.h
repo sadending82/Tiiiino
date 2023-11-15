@@ -49,7 +49,7 @@ enum SPacketType {
 	LD_USE_COUPON,
 	LD_REFRESH_INVENTORY,
 	LD_REFRESH_DEP_RANK,
-	LD_GET_POINT,
+	LD_GET_USERSTATUS,
 
 	// DBServer To LobbyServer
 	DL_LOGIN_OK,
@@ -65,7 +65,7 @@ enum SPacketType {
 	DL_REFRESH_DEP_RANK,
 	DL_EQUIP_OK,
 	DL_UNEQUIP_OK,
-	DL_GET_POINT,
+	DL_GET_USERSTATUS,
 };
 
 
@@ -180,7 +180,7 @@ struct LD_REFRESH_DEP_RANK_PACKET :public SPACKET {
 	int		userKey;
 };
 
-struct LD_GET_POINT_PACKET : public SPACKET {
+struct LD_GET_USERSTATUS_PACKET : public SPACKET {
 	int uid;
 	int userKey;
 };
@@ -254,8 +254,9 @@ struct DL_UNEQUIP_OK_PACKET : public SPACKET{
 	int userKey;
 };
 
-struct DL_GET_POINT_PACKET : public SPACKET {
+struct DL_GET_USERSTATUS_PACKET : public SPACKET {
 	int point;
+	double grade;
 	int userKey;
 };
 

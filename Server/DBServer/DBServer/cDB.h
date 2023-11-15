@@ -31,6 +31,7 @@ public:
 	tuple<GRADE, DEPARTMENT> SelectUserGradeAndDepartment(const int uid);
 	long long SelectInventory(const int uid);
 	int	SelectPoint(const int uid);
+	GRADE SelectGrade(const int uid);
 	vector<rankInfo> SelectRanking();
 	tuple<ITEM_CODE, COUPON_CAN_DUPLICATED, COUPON_USED> SelectCouponInfo(const string& code);
 	long long SelectEquipmentItems(const int uid);

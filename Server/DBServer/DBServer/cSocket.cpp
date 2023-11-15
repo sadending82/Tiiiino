@@ -192,8 +192,8 @@ void Socket::processPacket(int key, unsigned char* buf)
         ProcessPacket_RefreshDepRank(key, buf);
         break;
     }
-    case LD_GET_POINT: {
-        ProcessPacket_GetPoint(key, buf);
+    case LD_GET_USERSTATUS: {
+        ProcessPacket_GetUserStatus(key, buf);
         break;
     }
     default:
@@ -435,14 +435,14 @@ void Socket::SendUnequipOK(int key, long long equipmentFlag, int userKey)
     mSessions[key].DoSend((void*)(&p));
 }
 
-void Socket::SendPoint(int key, int point, int userKey)
+void Socket::SendUserStatus(int key, int point, GRADE grade, int userKey)
 {
-    DL_GET_POINT_PACKET p;
+    DL_GET_USERSTATUS_PACKET p;
     p.size = sizeof(p);
-    p.type = SPacketType::DL_GET_POINT;
+    p.type = SPacketType::DL_GET_USERSTATUS;
     p.point = point;
     p.userKey = userKey;
-
+    p.grade = grade;
     mSessions[key].DoSend((void*)(&p));
 }
 
@@ -667,15 +667,17 @@ void Socket::ProcessPacket_RefreshDepRank(int key, unsigned char* buf)
     SendRanking(key, ranking, p->userKey);
 }
 
-void Socket::ProcessPacket_GetPoint(int key, unsigned char* buf)
+void Socket::ProcessPacket_GetUserStatus(int key, unsigned char* buf)
 {
-    LD_GET_POINT_PACKET* p = reinterpret_cast<LD_GET_POINT_PACKET*>(buf);
+    LD_GET_USERSTATUS_PACKET* p = reinterpret_cast<LD_GET_USERSTATUS_PACKET*>(buf);
 
     int point = 0;
+    GRADE grade = 0.0f;
 #ifdef RUN_DB
     point = m_pDB->SelectPoint(p->uid);
+    grade = m_pDB->SelectGrade(p->uid);
 #endif
-    SendPoint(key, point, p->userKey);
+    SendUserStatus(key, point, grade, p->userKey);
 }
 
 int Socket::SetUIDForTest()

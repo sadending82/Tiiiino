@@ -452,22 +452,24 @@ void ATinoCharacter::RemoveStoreDialog()
 		TinoController->RemoveDialogUI();
 }
 
-void ATinoCharacter::UpdataPointInLobby(int point)
+void ATinoCharacter::UpdateUserStatusInLobby(int point,double grade)
 {
 	auto TinoController = GetController<ATinoController>();
 
 	SetPoint(point);
+	SetGrade(grade);
 
 	if (!!TinoController)
 	{
 		auto LobbyUI = TinoController->LobbyUIInstance;
 		LobbyUI->Point = point;
-
+		LobbyUI->Grade = grade;
 		auto StoreUI = TinoController->StoreUIInstance;
 		StoreUI->Point = point;
-
+		StoreUI->Grade = grade;
 		auto InventoryUI = TinoController->InventoryUIInstance;
 		InventoryUI->Point = point;
+		InventoryUI->Grade = grade;
 	}
 }
 

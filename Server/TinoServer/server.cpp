@@ -169,10 +169,10 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 		SendRefreshRankingRequest(cID);
 		break;
 	}
-	case CL_REFRESH_POINT: {
-		LD_GET_POINT_PACKET p;
+	case CL_REFRESH_USERSTATUS: {
+		LD_GET_USERSTATUS_PACKET p;
 		p.size = sizeof(p);
-		p.type = LD_GET_POINT;
+		p.type = LD_GET_USERSTATUS;
 		p.userKey = cID;
 		p.uid = mClients[cID].mUID;
 
@@ -341,13 +341,14 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		SendUseCouponFail(p->userKey);
 		break;
 	}
-	case DL_GET_POINT: {
-		DL_GET_POINT_PACKET* p = reinterpret_cast<DL_GET_POINT_PACKET*>(spacket);
+	case DL_GET_USERSTATUS: {
+		DL_GET_USERSTATUS_PACKET* p = reinterpret_cast<DL_GET_USERSTATUS_PACKET*>(spacket);
 	
-		LC_REFRESH_POINT_PACKET pac;
+		LC_REFRESH_USERSTATUS_PACKET pac;
 		pac.point = p->point;
+		pac.grade = p->grade;
 		pac.size = sizeof(pac);
-		pac.type = LC_REFRESH_POINT;
+		pac.type = LC_REFRESH_USERSTATUS;
 
 		mClients[p->userKey].DoSend(&pac);
 		break;

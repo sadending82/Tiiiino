@@ -323,11 +323,11 @@ void send_refresh_dep_rank_packet(SOCKET& sock)
 	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
 }
 
-void send_refresh_point_packet(SOCKET& sock)
+void send_refresh_userstatus_packet(SOCKET& sock)
 {
-	CL_REFRESH_POINT_PACKET packet;
+	CL_REFRESH_USERSTATUS_PACKET packet;
 	packet.size = sizeof(packet);
-	packet.type = CL_REFRESH_POINT;
+	packet.type = CL_REFRESH_USERSTATUS;
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
 	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
 }
@@ -751,7 +751,7 @@ void Network::l_process_packet(unsigned char* p)
 		//학점과 포인트 표기
 		mMyCharacter->MakeAndShowLobbyRankSystem(packet->ranking);
 		mMyCharacter->MakeAndShowLoginOK(packet->grade);
-		mMyCharacter->UpdataPointInLobby(packet->point);
+		mMyCharacter->UpdateUserStatusInLobby(packet->point);
 		break;
 	}
 	case LC_LOGIN_FAIL:
@@ -835,9 +835,9 @@ void Network::l_process_packet(unsigned char* p)
 		
 		break;
 	}
-	case LC_REFRESH_POINT: {
-		LC_REFRESH_POINT_PACKET* packet = reinterpret_cast<LC_REFRESH_POINT_PACKET*>(p);
-		mMyCharacter->UpdataPointInLobby(packet->point);
+	case LC_REFRESH_USERSTATUS: {
+		LC_REFRESH_USERSTATUS_PACKET* packet = reinterpret_cast<LC_REFRESH_USERSTATUS_PACKET*>(p);
+		mMyCharacter->UpdateUserStatusInLobby(packet->point);
 		break;
 	}
 	case LC_EQUIP_OK: {
@@ -894,6 +894,7 @@ void CALLBACK recv_Gamecallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv
 	if (err != 0)
 	{
 		UE_LOG(LogTemp, Error, TEXT("[%d]"), err);
+
 		if (Game->mMyCharacter)
 			Game->mMyCharacter->MakeAndShowDialogInGame();
 		Game->release();

@@ -43,7 +43,7 @@ void send_buyitem_packet(SOCKET& sock, const int itemCode);
 void send_equip_packet(SOCKET& sock, const int itemCode);
 void send_unequip_packet(SOCKET& sock, const int itemCode);
 void send_refresh_dep_rank_packet(SOCKET& sock);
-void send_refresh_point_packet(SOCKET& sock);
+void send_refresh_userstatus_packet(SOCKET& sock);
 void send_refresh_inventory_packet(SOCKET& sock);
 void send_coupon_packet(SOCKET& sock, const char* couponCode);
 //game packet
