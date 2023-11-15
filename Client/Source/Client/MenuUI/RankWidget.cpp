@@ -80,6 +80,7 @@ void URankWidget::GetDataOfCharacters()
 	auto network = Network::GetNetwork();
 
 	// 이 녀석은 순위를 매기기 위한 녀석이기 때문에 매번 클리어 해준다.
+	PtrBasedRankData.clear();
 	RankData.clear();
 
 	for (int i = 0; i < 8; ++i)
@@ -88,6 +89,8 @@ void URankWidget::GetDataOfCharacters()
 			continue;
 		}
 		ATinoCharacter* curCharacter = network->mOtherCharacter[i];
+
+		CLog::Log(curCharacter->GetName());
 
 		// 현재 진행한 정도를 총 거리로 나누면 어느정도 진행했는지 나온다.
 		// 현재 진행한 정도는 현재 지점 - 스타트 지점 하면 된다.
@@ -101,18 +104,9 @@ void URankWidget::GetDataOfCharacters()
 			DistanceData = 1.f;
 		}
 
-		auto findIt = PtrBasedRankData.find(curCharacter);
+		PtrBasedRankData.insert(std::make_pair(curCharacter, DistanceData));
+		CLog::Log(DistanceData);
 
-		// Map 내부에 이미 들어가 있나?
-		if (findIt == PtrBasedRankData.end()) {
-			// Map 내부에 없으면 추가해 줘야 한다
-			PtrBasedRankData.insert(std::make_pair(curCharacter, DistanceData));
-		}
-		else {
-			// Map 내부에 있으면 값만 갱신해 주면 된다.
-			(*findIt).second = DistanceData;
-		}
-		
 		RankData.emplace_back(std::make_pair(DistanceData, curCharacter));
 		OtherCharacterDistanceData.Add(DistanceData);
 	}
@@ -130,17 +124,7 @@ void URankWidget::GetDataOfCharacters()
 			DistanceData = 1.f;
 		}
 
-		auto findIt = PtrBasedRankData.find(curCharacter);
-
-		// Map 내부에 이미 들어가 있나?
-		if (findIt == PtrBasedRankData.end()) {
-			// Map 내부에 없으면 추가해 줘야 한다
-			PtrBasedRankData.insert(std::make_pair(curCharacter, DistanceData));
-		}
-		else {
-			// Map 내부에 있으면 값만 갱신해 주면 된다.
-			(*findIt).second = DistanceData;
-		}
+		PtrBasedRankData.insert(std::make_pair(curCharacter, DistanceData));
 
 		RankData.emplace_back(std::make_pair(DistanceData, curCharacter));
 		myCharcaterDistanceData = DistanceData;
@@ -181,12 +165,18 @@ void URankWidget::ChangePositionByDistanceData()
 		}
 		UCanvasPanelSlot* canvasPanel = UWidgetLayoutLibrary::SlotAsCanvasSlot(images[cnt]);
 		canvasPanel->SetPosition(FVector2D(1280.f * distanceData[i], 0.0f));
+		CLog::Log("Set");
 		cnt++;
+		CLog::Log(cnt);
 	}
 
-	
-
-
+	for (; cnt < images.size(); ++cnt)
+	{	
+		UCanvasPanelSlot* canvasPanel = UWidgetLayoutLibrary::SlotAsCanvasSlot(images[cnt]);
+		canvasPanel->SetPosition(FVector2D(-1920.f, 0.0f));
+		CLog::Log("Remove");
+		CLog::Log(cnt);
+	}
 
 }
 
