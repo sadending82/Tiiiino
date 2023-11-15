@@ -9,7 +9,7 @@
 #include "CoreMinimal.h"
 #include "GameDataManager/GameDataManager.h"
 
-constexpr const char* GAMEVERSION = "2.2.0";
+constexpr const char* GAMEVERSION = "2.2.1";
 
 
 struct sGameResult {

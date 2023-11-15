@@ -34,7 +34,7 @@ const static int MAX_CLIENTS = 14;// MAX_TEST * 2;
 const static int INVALID_ID = -1;
 const static int MAX_PACKET_SIZE = 255;
 const static int MAX_BUFF_SIZE = 255;
-constexpr const char* GAMEVERSION = "2.2.0";
+constexpr const char* GAMEVERSION = "2.2.1";
 constexpr const char* SV_ADDR = "127.0.0.1";
 #pragma comment (lib, "ws2_32.lib")
 

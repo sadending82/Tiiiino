@@ -12,7 +12,7 @@ constexpr int MAX_ROOM = 100;
 
 
 #define CHECK_VERSION
-constexpr const char* GAMEVERSION = "2.2.0";
+constexpr const char* GAMEVERSION = "2.2.1";
 
 constexpr unsigned long long INCODE_SERVER_PACKET = 0xFFFF'5137'0808'6310;
 
