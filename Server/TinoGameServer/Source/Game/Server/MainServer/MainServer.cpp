@@ -587,7 +587,7 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 			break;
 
 		}
-		if (0 < player->GetUID())
+		if (player->GetUID() < 0)
 		{
 			DEBUGMSGONEPARAM("[%d]플레이어 UID에서 버그. 접속 해제", player->GetSocketID());
 			player->DisConnectAndReset();

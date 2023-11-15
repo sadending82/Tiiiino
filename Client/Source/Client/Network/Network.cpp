@@ -586,9 +586,21 @@ void Network::process_packet(unsigned char* p)
 		int id = packet->id;
 		if (nullptr != mOtherCharacter[id])
 		{
+			mOtherCharacter[packet->id]->SetActorEnableCollision(false);
+			mOtherCharacter[packet->id]->SetActorHiddenInGame(true);
+
+			TArray<AActor*> children;
+
+			mOtherCharacter[packet->id]->GetAttachedActors(children);
+
+			for (auto actor : children) {
+				actor->SetActorHiddenInGame(true);
+				actor->SetActorEnableCollision(false);
+			}
 			mOtherCharacter[id]->Destroy();
 			mOtherCharacter[id] = nullptr;
 		}
+
 		break;
 	}
 	case SC_PING: {
