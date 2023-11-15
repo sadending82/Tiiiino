@@ -751,7 +751,7 @@ void Network::l_process_packet(unsigned char* p)
 		//학점과 포인트 표기
 		mMyCharacter->MakeAndShowLobbyRankSystem(packet->ranking);
 		mMyCharacter->MakeAndShowLoginOK(packet->grade);
-		mMyCharacter->UpdateUserStatusInLobby(packet->point);
+		mMyCharacter->UpdateUserStatusInLobby(packet->point,packet->grade);
 		break;
 	}
 	case LC_LOGIN_FAIL:
@@ -837,7 +837,7 @@ void Network::l_process_packet(unsigned char* p)
 	}
 	case LC_REFRESH_USERSTATUS: {
 		LC_REFRESH_USERSTATUS_PACKET* packet = reinterpret_cast<LC_REFRESH_USERSTATUS_PACKET*>(p);
-		mMyCharacter->UpdateUserStatusInLobby(packet->point);
+		mMyCharacter->UpdateUserStatusInLobby(packet->point,packet->grade);
 		break;
 	}
 	case LC_EQUIP_OK: {
