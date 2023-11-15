@@ -185,6 +185,18 @@ void send_newaccount_packet(SOCKET& sock, const char* id, const char* passWord, 
 	//strcpy_s(packet.name, TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterName));
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
 	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+	if (SOCKET_ERROR == ret)
+	{
+		int err = WSAGetLastError();
+		if (err != WSA_IO_PENDING)
+		{
+			//error ! 
+			auto Game = Network::GetNetwork();
+			if (Game->mMyCharacter)
+				Game->mMyCharacter->MakeAndShowDialogInLobby();
+		}
+	}
+
 }
 
 void send_checkversion_packet(SOCKET& sock, const char* version)
@@ -208,6 +220,17 @@ void send_login_packet(SOCKET& sock, const char* id, const char* passWord)
 	//strcpy_s(packet.name, TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterName));
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
 	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+	if (SOCKET_ERROR == ret)
+	{
+		int err = WSAGetLastError();
+		if (err != WSA_IO_PENDING)
+		{
+			//error ! 
+			auto Game = Network::GetNetwork();
+			if (Game->mMyCharacter)
+				Game->mMyCharacter->MakeAndShowDialogInLobby();
+		}
+	}
 }
 
 void send_logout_packet(SOCKET& sock)
