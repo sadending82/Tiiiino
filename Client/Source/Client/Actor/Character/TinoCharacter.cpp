@@ -323,13 +323,13 @@ void ATinoCharacter::MakeAndShowLoginFail()
 void ATinoCharacter::MakeAndShowCreateAccountsSignUpOK()
 {
 	auto CreateAccountWidget = GetController<ATinoController>()->CreateAccountsUIInstance;
-	CreateAccountWidget->CheckCreateAccount(true);
+	CreateAccountWidget->ShowCreateAccountResult(true);
 }
 
 void ATinoCharacter::MakeAndShowCreateAccountsSignUpFail()
 {
 	auto CreateAccountWidget = GetController<ATinoController>()->CreateAccountsUIInstance;
-	CreateAccountWidget->CheckCreateAccount(false);
+	CreateAccountWidget->ShowCreateAccountResult(false);
 }
 
 void ATinoCharacter::MakeAndShowLevelStartCountdown()

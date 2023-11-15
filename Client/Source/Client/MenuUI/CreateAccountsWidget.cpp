@@ -27,35 +27,41 @@ void UCreateAccountsWidget::TryBack()
 void UCreateAccountsWidget::TryCreateAccounts()
 {
 	// IDText의 크기가 0일때 아이디 생성 방지
-	FText cur_text = CreateIDTextBox->GetText();
+	FText cur_text = NewIDTextBox->GetText();
 	FString OriginalText = cur_text.ToString();
 	if (OriginalText.Len() == 0)
 	{
-		CheckCreateAccount(false);
+		ShowCreateAccountResult(false);
 		return;
 	}
 	// PasswordText의 크기가 0일때 아이디 생성 방지
-	cur_text = CreatePasswordTextBox->GetText();
+	cur_text = NewPasswordTextBox->GetText();
 	OriginalText = cur_text.ToString();
 	if (OriginalText.Len() == 0)
 	{
-		CheckCreateAccount(false);
+		ShowCreateAccountResult(false);
 		return;
 	}
 
-	const char* id = TCHAR_TO_ANSI(*CreateIDTextBox->GetText().ToString());
-	const char* pass = TCHAR_TO_ANSI(*CreatePasswordTextBox->GetText().ToString());
+	const char* id = TCHAR_TO_ANSI(*NewIDTextBox->GetText().ToString());
+	const char* pass = TCHAR_TO_ANSI(*NewPasswordTextBox->GetText().ToString());
 	Network::GetNetwork()->MyCharacterName = id;
 	Network::GetNetwork()->MyCharacterPassWord = pass;
 	send_newaccount_packet(Network::GetNetwork()->l_socket, id, pass, DepartmentNum + 1);
 }
 
-void UCreateAccountsWidget::InputCreateID()
+void UCreateAccountsWidget::CheckNewID()
+{
+	CheckNewIDLastword();
+}
+
+void UCreateAccountsWidget::CheckNewIDLastword()
 {
 	// 이름은 Input이지만 실제 기능은 스페이스바, 한글체크
-	FText cur_text = CreateIDTextBox->GetText();
+	FText cur_text = NewIDTextBox->GetText();
 	FString OriginalText = cur_text.ToString();
 	int32 length = OriginalText.Len() - 1;
+
 	if (length >= 0)
 	{
 		if (OriginalText[length] >= 'a' && OriginalText[length] <= 'z')
@@ -74,15 +80,20 @@ void UCreateAccountsWidget::InputCreateID()
 		{
 			cur_text = FText::FromString(OriginalText.Left(length));
 			
-			CreateIDTextBox->SetText(cur_text);
+			NewIDTextBox->SetText(cur_text);
 		}
 	}
 }
 
-void UCreateAccountsWidget::InputCreatePassword()
+void UCreateAccountsWidget::CheckNewPassword()
+{
+	CheckNewPassowordLastword();
+}
+
+void UCreateAccountsWidget::CheckNewPassowordLastword()
 {
 	// 이름은 Input이지만 실제 기능은 스페이스바, 한글체크
-	FText cur_text = CreatePasswordTextBox->GetText();
+	FText cur_text = NewPasswordTextBox->GetText();
 	FString OriginalText = cur_text.ToString();
 	int32 length = OriginalText.Len() - 1;
 	if (length >= 0)
@@ -102,12 +113,12 @@ void UCreateAccountsWidget::InputCreatePassword()
 		else
 		{
 			cur_text = FText::FromString(OriginalText.Left(length));
-			CreatePasswordTextBox->SetText(cur_text);
+			NewPasswordTextBox->SetText(cur_text);
 		}
 	}
 }
 
-void UCreateAccountsWidget::CheckCreateAccount(bool check)
+void UCreateAccountsWidget::ShowCreateAccountResult(bool check)
 {
 	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	if (!!TinoController)
@@ -123,21 +134,21 @@ void UCreateAccountsWidget::CheckCreateAccount(bool check)
 void UCreateAccountsWidget::CheckIDTextLength()
 {
 	// ID 글자수 제한
-	FText cur_text = CreateIDTextBox->GetText();
+	FText cur_text = NewIDTextBox->GetText();
 	FString OriginalText = cur_text.ToString();
 	FString ClippedText = OriginalText.Left(MaxLength);
 	//LimitedText = FText::FromString(ClippedText);
 	cur_text = FText::FromString(ClippedText);
-	CreateIDTextBox->SetText(cur_text);
+	NewIDTextBox->SetText(cur_text);
 }
 
 void UCreateAccountsWidget::CheckPasswordTextLength()
 {
-	FText cur_text = CreatePasswordTextBox->GetText();
+	FText cur_text = NewPasswordTextBox->GetText();
 	FString OriginalText = cur_text.ToString();
 	FString ClippedText = OriginalText.Left(MaxLength);
 	//LimitedText = FText::FromString(ClippedText);
 	cur_text = FText::FromString(ClippedText);
-	CreatePasswordTextBox->SetText(cur_text);
+	NewPasswordTextBox->SetText(cur_text);
 }
 
