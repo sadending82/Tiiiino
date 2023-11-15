@@ -32,6 +32,7 @@ class ATinoCharacter;
 class ABaseObstacle;
 
 //lobby packet
+void send_checkversion_packet(SOCKET& sock, const char* version);
 void send_login_packet(SOCKET& sock,const char* id, const char* passWord); 
 void send_logout_packet(SOCKET& sock);
 void send_newaccount_packet(SOCKET& sock, const char* id, const char* passWord, const int department);

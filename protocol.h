@@ -91,7 +91,6 @@ enum PacketType {
 	CL_REFRESH_INVENTORY,
 	CL_REFRESH_DEP_RANK,
 	CL_REFRESH_POINT,
-
 	// ManageMent To LobbyServer
 	ML_ALERT,
 
@@ -133,6 +132,7 @@ enum PacketType {
 	LC_USE_COUPON_FAIL,
 	LC_ALERT,
 
+	CL_CHECK_VERSION,
 };
 
 #pragma pack (push, 1)
@@ -245,6 +245,11 @@ struct CL_REFRESH_DEP_RANK_PACKET : public PACKET {
 
 struct CL_REFRESH_POINT_PACKET : public PACKET {
 	
+};
+
+struct CL_CHECK_VERSION_PACKET : public PACKET {
+
+	char gameVersion[MAX_VERSION_SIZE];
 };
 //-----------------------------------
 struct ML_ALERT_PACKET : public PACKET {

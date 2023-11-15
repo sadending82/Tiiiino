@@ -11,6 +11,7 @@ constexpr int INVALID_KEY = -1;
 class Server {
 public:
 	void Disconnect(int cID);
+	void DisconnectForVersionCheck(int cID);
 	int GetNewClientID();
 	int GetNewServerID();
 	int GetNewRoomID();

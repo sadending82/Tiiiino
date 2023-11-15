@@ -31,6 +31,20 @@ void Server::Disconnect(int cID)
 	mServers[0].ServerDoSend(&p);
 }
 
+void Server::DisconnectForVersionCheck(int cID)
+{
+	mClients[cID].mStateLock.lock();
+	if (mClients[cID].mState == eSessionState::ST_FREE) {
+		mClients[cID].mStateLock.unlock();
+		return;
+	}
+	DEBUGMSGONEPARAM("DISCONNECT [%s]\n", mClients[cID].mID);
+
+	closesocket(mClients[cID].mSocket);
+	mClients[cID].Reset();
+	mClients[cID].mStateLock.unlock();
+}
+
 int Server::GetNewClientID()
 {
 	for (int i = MAXGAMESERVER; i < MAX_USER; ++i) {
@@ -77,6 +91,16 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 {
 	switch (cpacket[1])
 	{
+	case CL_CHECK_VERSION:
+	{
+		CL_CHECK_VERSION_PACKET* p = reinterpret_cast<CL_CHECK_VERSION_PACKET*>(cpacket);
+
+		if (strcmp(GAMEVERSION, p->gameVersion) != 0)
+		{
+			DisconnectForVersionCheck(cID);
+		}
+		break;
+	}
 	case CL_LOGIN:
 	{
 		CL_LOGIN_PACKET* p = reinterpret_cast<CL_LOGIN_PACKET*>(cpacket);

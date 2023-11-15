@@ -187,6 +187,16 @@ void send_newaccount_packet(SOCKET& sock, const char* id, const char* passWord, 
 	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
 }
 
+void send_checkversion_packet(SOCKET& sock, const char* version)
+{
+	CL_CHECK_VERSION_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = CL_CHECK_VERSION;
+	strcpy_s(packet.gameVersion, version);
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+}
+
 void send_login_packet(SOCKET& sock, const char* id, const char* passWord)
 {
 	CL_LOGIN_PACKET packet;
