@@ -165,7 +165,8 @@ void ATinoCharacter::Tick(float DeltaTime)
 						ServerSyncElapsedTime += DeltaTime;
 						if (ServerSyncDeltaTime < ServerSyncElapsedTime)
 						{
-							send_move_packet(Network::GetNetwork()->s_socket, Cast<UCharacterAnimInstance>(GetMesh()->GetAnimInstance())->bIsAir, pos.X, pos.Y, pos.Z, rot, GetVelocity().Size2D(), GetCharacterMovement()->Velocity);
+							if (!bIsSpactateModeEnabled)
+								send_move_packet(Network::GetNetwork()->s_socket, Cast<UCharacterAnimInstance>(GetMesh()->GetAnimInstance())->bIsAir, pos.X, pos.Y, pos.Z, rot, GetVelocity().Size2D(), GetCharacterMovement()->Velocity);
 							ServerSyncElapsedTime = 0.0f;
 						}
 
@@ -176,7 +177,6 @@ void ATinoCharacter::Tick(float DeltaTime)
 		}
 
 		PlayTumbleMontage(DeltaTime);
-		
 
 		// 10/04 가만히 있을 때 충돌하지 안흔 부분을 해결하기 위한 코드 추가
 		FHitResult OutHit;
@@ -220,6 +220,7 @@ void ATinoCharacter::PlayTumbleMontage(float DeltaTime)
 			bCanTumbled = false;
 			SendAnimPacket(3);
 			PlayAnimMontage(TumbleMontage);
+			//SetMovementState(EMovementState::EMS_Tumbled);
 		}
 		else
 			CLog::Log("Asset TumbleMontage is Invalid");
@@ -246,6 +247,7 @@ void ATinoCharacter::PlayerInterpolation(float DeltaTime)
 		CurrentStopTime += DeltaTime;
 
 	//기준 시간 초과시 플레이어는 안움직이는 상태이다
+	//11.15 지금 보간을 velocity로 해주는게 아니고 SetLocation으로 하는거라 무조건 StopTime에 들어옴.
 	if (CurrentStopTime >= StopTime)
 	{
 		CurrentStopTime -= StopTime;
@@ -261,14 +263,12 @@ void ATinoCharacter::PlayerInterpolation(float DeltaTime)
 	if (CurrentInterTime >= InterTime)
 	{
 		CurrentInterTime -= InterTime;
-		InterVelocity = (PreviousLocation - GetActorLocation()) / InterTime;
+		InterVelocity = (PreviousLocation - GetActorLocation()) ;
 	}
 
 	// 보간 주기만 큼 나눠주면 속도가된다
-	if (InterVelocity.IsNearlyZero() == false && InterVelocity.Length() <= GetCharacterMovement()->MaxWalkSpeed)
+	if (InterVelocity.IsNearlyZero() == false)
 	{
-		if (MovementState == EMovementState::EMS_Grabbing)
-			InterVelocity *= InterTime * InterTime;
 		SetActorLocation(GetActorLocation() + InterVelocity * DeltaTime);
 	}
 }
@@ -324,13 +324,13 @@ void ATinoCharacter::MakeAndShowLoginFail()
 void ATinoCharacter::MakeAndShowCreateAccountsSignUpOK()
 {
 	auto CreateAccountWidget = GetController<ATinoController>()->CreateAccountsUIInstance;
-	CreateAccountWidget->CheckCreateAccount(true);
+	CreateAccountWidget->ShowCreateAccountResult(true);
 }
 
 void ATinoCharacter::MakeAndShowCreateAccountsSignUpFail()
 {
 	auto CreateAccountWidget = GetController<ATinoController>()->CreateAccountsUIInstance;
-	CreateAccountWidget->CheckCreateAccount(false);
+	CreateAccountWidget->ShowCreateAccountResult(false);
 }
 
 void ATinoCharacter::MakeAndShowLevelStartCountdown()
@@ -452,22 +452,24 @@ void ATinoCharacter::RemoveStoreDialog()
 		TinoController->RemoveDialogUI();
 }
 
-void ATinoCharacter::UpdataPointInLobby(int point)
+void ATinoCharacter::UpdateUserStatusInLobby(int point,double grade)
 {
 	auto TinoController = GetController<ATinoController>();
 
 	SetPoint(point);
+	SetGrade(grade);
 
 	if (!!TinoController)
 	{
 		auto LobbyUI = TinoController->LobbyUIInstance;
 		LobbyUI->Point = point;
-
+		LobbyUI->Grade = grade;
 		auto StoreUI = TinoController->StoreUIInstance;
 		StoreUI->Point = point;
-
+		StoreUI->Grade = grade;
 		auto InventoryUI = TinoController->InventoryUIInstance;
 		InventoryUI->Point = point;
+		InventoryUI->Grade = grade;
 	}
 }
 
@@ -488,7 +490,7 @@ FItemData ATinoCharacter::GetItemDataFromItemCode(const int64& ItemCode)
 	if (Data == nullptr) return FItemData();
 
 	FItemData ItemData;
-	ItemData.ItemCode = ItemCode; 
+	ItemData.ItemCode = ItemCode;
 	ItemData.EquipType = Data->EquipType;
 	ItemData.TextData = Data->TextData;
 	ItemData.NumericData = Data->NumericData;
@@ -608,7 +610,6 @@ void ATinoCharacter::OnAccelEffect()
 void ATinoCharacter::OffAccelEffect()
 {
 	Camera->PostProcessSettings.bOverride_VignetteIntensity = false;
-
 }
 
 void ATinoCharacter::SetOriginalSpeed()
@@ -670,7 +671,7 @@ void ATinoCharacter::SetAccessoryFromEquippedFlag(const long long& EquippedItems
 		{
 			int64 ItemCode = i;
 			//InventoryComponent->AddItem(GetItemDataFromItemCode(ItemCode),true);
-			
+
 			WearAccessory(ItemCode);
 		}
 	}
@@ -705,7 +706,7 @@ void ATinoCharacter::WearAccessory(const int ItemCode)
 		InventoryComponent->SetInstnace(ItemCode, Accessory);
 	}
 	InventoryComponent->SetEquipped(ItemCode, true);
-	Accessory->Equip(); 
+	Accessory->Equip();
 	//int idx = EquipAccessoryContainer.Add(Accessory);
 	//EquipAccessoryContainer[idx]->SetItemCode(Item.ItemCode);
 	//EquipAccessoryContainer[idx]->Equip();
@@ -716,7 +717,7 @@ void ATinoCharacter::UnWearAccessory(const int ItemCode)
 	for (auto item : GetInventoryContents())
 	{
 		auto Accessory = InventoryComponent->GetInstnace(item.ItemInfo.ItemCode);
-		if(Accessory)
+		if (Accessory)
 			Accessory->UnEquip();
 	}
 	//auto Accessory = EquipAccessoryContainer.FindByPredicate([&ItemCode](const AAccessoryItem& i) { return i.GetItemCode() == ItemCode; });
@@ -811,21 +812,17 @@ void ATinoCharacter::OnGrab()
 
 void ATinoCharacter::OffGrab()
 {
-
 	SendAnimPacket(5);
 
-		StopAnimMontage(GrabMontage);
-		ASoundManager::GetSoundManager()->PlaySFXAtLocation(this, ESFXType::ESFXType_OffGrab, GetActorLocation());
+	StopAnimMontage(GrabMontage);
+	ASoundManager::GetSoundManager()->PlaySFXAtLocation(this, ESFXType::ESFXType_OffGrab, GetActorLocation());
+	if (MovementState == EMovementState::EMS_Grabbing)
 		SetMovementState(EMovementState::EMS_Normal);
-	
+
 	bIsGrabbing = false;
 
-
 	//if (Target == nullptr) return;
-
 	//GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-
-	
 	//SetTargetGrabbedToNormal();
 
 	bIsGrabCoolTime = true;

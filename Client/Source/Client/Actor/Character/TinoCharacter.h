@@ -160,7 +160,7 @@ public:
 	FORCEINLINE void SetPoint(const float PointValue) { Point = PointValue; };
 	FORCEINLINE FVector GetNetworkLocation() { return PreviousLocation; }
 
-	void UpdataPointInLobby(int point);
+	void UpdateUserStatusInLobby(int point,double grade);
 
 	//인벤토리에 저장된 데이터에 접근할 수 있음
 	UFUNCTION(BlueprintCallable, Category = "Inventory")

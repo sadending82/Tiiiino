@@ -90,11 +90,12 @@ bool ACustomLevel_Test::ConnGameServer()
 
 bool ACustomLevel_Test::ConnLobbyServer()
 {
-	auto player = Network::GetNetwork()->mMyCharacter;
+	auto Game = Network::GetNetwork();
+	auto player = Game->mMyCharacter;
 	if (nullptr == player) return false;
 	player->GetCharacterMovement()->GravityScale = 0.0;
 	// 이미 연결 되어있다면,
-	if (true == Network::GetNetwork()->bIsConnectedLobby)
+	if (true == Game->bIsConnectedLobby)
 	{
 		auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 		if (TinoController == nullptr)
@@ -103,24 +104,24 @@ bool ACustomLevel_Test::ConnLobbyServer()
 		}
 		else {
 			TinoController->InitializeUIInstance();
-			send_refresh_dep_rank_packet(Network::GetNetwork()->l_socket);
-			send_refresh_point_packet(Network::GetNetwork()->l_socket);
-			send_refresh_inventory_packet(Network::GetNetwork()->l_socket);
+			send_refresh_dep_rank_packet(Game->l_socket);
+			send_refresh_userstatus_packet(Game->l_socket);
+			send_refresh_inventory_packet(Game->l_socket);
 
 			// 여기서 결과 UI를 띄워줌
-			if (-1 != Network::GetNetwork()->GameResult.point)
+			if (-1 != Game->GameResult.point)
 			{
 				UE_LOG(LogTemp, Error, TEXT("Result is Comming"));
 				// UI에 3개값을 넣고 띄워주면 됨. rank는 -1이나 0이면 retire임으로, 변환해주시길 -수민-
-				Network::GetNetwork()->GameResult.point;
-				Network::GetNetwork()->GameResult.grade;
-				Network::GetNetwork()->GameResult.rank;
+				Game->GameResult.point;
+				Game->GameResult.grade;
+				Game->GameResult.rank;
 
 				//학점 재반영 (게임 종료 -> 로비)
-				player->MakeAndShowLoginOK(Network::GetNetwork()->GameResult.grade);
+				player->MakeAndShowLoginOK(Game->GameResult.grade);
 				// 결과창 출력
 				ShowGameResult();
-				Network::GetNetwork()->GameResult = sGameResult{}; // 결과 처리 했으니 비워주기.
+				Game->GameResult = sGameResult{}; // 결과 처리 했으니 비워주기.
 			}
 
 			CLog::Log("Connect Lobby Against Successfully");
@@ -131,6 +132,7 @@ bool ACustomLevel_Test::ConnLobbyServer()
 
 	if (true == Network::GetNetwork()->ConnectServerLobby())
 	{
+		send_checkversion_packet(Game->l_socket, GAMEVERSION);
 		GetWorld()->GetFirstPlayerController<ATinoController>()->SetInputUIMode();
 		CLog::Log("Connect Lobby Successfully");
 		auto controller = Cast<ATinoController>(player->GetController());
@@ -162,6 +164,9 @@ void ACustomLevel_Test::ShowGameResult()
 		TinoController->ShowGameResult(level, rank, grade, point);
 	}
 }
+
+
+
 
 
 

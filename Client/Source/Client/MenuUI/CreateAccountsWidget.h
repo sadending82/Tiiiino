@@ -30,22 +30,26 @@ public:
 	void TryCreateAccounts();
 
 	UPROPERTY(meta = (BindWidget))
-	class UEditableTextBox* CreateIDTextBox;
+	class UEditableTextBox* NewIDTextBox;
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	void InputCreateID(const FText& Text);
+	void CheckNewID();
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void CheckNewIDLastword();
 
 	UPROPERTY(meta = (BindWidget))
-	class UEditableTextBox* CreatePasswordTextBox;
+	class UEditableTextBox* NewPasswordTextBox;
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	void InputCreatePassword(const FText& Text);
+	void CheckNewPassword();
+	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
+	void CheckNewPassowordLastword();
 
 	UPROPERTY(EditAnywhere, BlueprintReadwrite ,Category = "UMG_Game")
 	int DepartmentNum;
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
-	void CheckCreateAccount(bool check);
+	void ShowCreateAccountResult(bool check);
 
 	UFUNCTION(Blueprintcallable, Category = "UMG_Game")
 	void CheckIDTextLength();

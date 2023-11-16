@@ -9,7 +9,7 @@
 #include "CoreMinimal.h"
 #include "GameDataManager/GameDataManager.h"
 
-constexpr const char* GAMEVERSION = "2.2.0";
+constexpr const char* GAMEVERSION = "2.2.2";
 
 
 struct sGameResult {
@@ -32,6 +32,7 @@ class ATinoCharacter;
 class ABaseObstacle;
 
 //lobby packet
+void send_checkversion_packet(SOCKET& sock, const char* version);
 void send_login_packet(SOCKET& sock,const char* id, const char* passWord); 
 void send_logout_packet(SOCKET& sock);
 void send_newaccount_packet(SOCKET& sock, const char* id, const char* passWord, const int department);
@@ -42,7 +43,7 @@ void send_buyitem_packet(SOCKET& sock, const int itemCode);
 void send_equip_packet(SOCKET& sock, const int itemCode);
 void send_unequip_packet(SOCKET& sock, const int itemCode);
 void send_refresh_dep_rank_packet(SOCKET& sock);
-void send_refresh_point_packet(SOCKET& sock);
+void send_refresh_userstatus_packet(SOCKET& sock);
 void send_refresh_inventory_packet(SOCKET& sock);
 void send_coupon_packet(SOCKET& sock, const char* couponCode);
 //game packet

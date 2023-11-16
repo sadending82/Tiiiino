@@ -44,6 +44,12 @@ void UDialogUIWidget::DisconnectNetwork()
 
 void UDialogUIWidget::RenderDisconnectNetworkWindow()
 {
+
+	auto TinoController = Cast<ATinoController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (!!TinoController)
+	{
+		TinoController->SetInputUIMode();
+	}
 	DisconnectNetworkButton->SetRenderOpacity(1.0);
 	DisconnectNetworkText->SetRenderOpacity(1.0);
 	DisconnectNetworkButtonText->SetRenderOpacity(1.0);
@@ -62,10 +68,11 @@ void UDialogUIWidget::RenderInGameMenuUI()
 
 void UDialogUIWidget::DisconnectGame()
 {
+	UKismetSystemLibrary::QuitGame(GetWorld(), nullptr, EQuitPreference::Quit, false);
 	// 로비로 돌아가는 기능
-	Network::GetNetwork()->bIsConnected = false;
-	Network::GetNetwork()->bLevelOpenTriggerEnabled = true;
-	UGameplayStatics::OpenLevel(GetWorld(), FName("Lobby"));
+	//Network::GetNetwork()->bIsConnected = false;
+	//Network::GetNetwork()->bLevelOpenTriggerEnabled = true;
+	//UGameplayStatics::OpenLevel(GetWorld(), FName("Lobby"));
 	// 임시로 게임종료하도록 설정
 	//UKismetSystemLibrary::QuitGame(GetWorld(), nullptr, EQuitPreference::Quit, false);
 

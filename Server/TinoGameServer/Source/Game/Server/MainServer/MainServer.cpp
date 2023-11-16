@@ -587,6 +587,12 @@ void MainServer::ProcessPacket(const int client_id, unsigned char* p)
 			break;
 
 		}
+		if (player->GetUID() < 0)
+		{
+			DEBUGMSGONEPARAM("[%d]플레이어 UID에서 버그. 접속 해제", player->GetSocketID());
+			player->DisConnectAndReset();
+			break;
+		}
 		Room* pRoom = mRooms[player->GetRoomID()];
 		pRoom->AddObject(player);
 		{

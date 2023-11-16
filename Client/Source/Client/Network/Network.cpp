@@ -118,7 +118,7 @@ void Network::release()
 	{
 		bGameIsStart = false;
 		mGeneratedID = 0;
-		mMyCharacter->bIsConnected = 0;
+		//mMyCharacter->bIsConnected = 0;
 		mMyCharacter = nullptr;
 		for (auto& p : mOtherCharacter)
 			p = nullptr;
@@ -185,6 +185,28 @@ void send_newaccount_packet(SOCKET& sock, const char* id, const char* passWord, 
 	//strcpy_s(packet.name, TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterName));
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
 	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+	if (SOCKET_ERROR == ret)
+	{
+		int err = WSAGetLastError();
+		if (err != WSA_IO_PENDING)
+		{
+			//error ! 
+			auto Game = Network::GetNetwork();
+			if (Game->mMyCharacter)
+				Game->mMyCharacter->MakeAndShowDialogInLobby();
+		}
+	}
+
+}
+
+void send_checkversion_packet(SOCKET& sock, const char* version)
+{
+	CL_CHECK_VERSION_PACKET packet;
+	packet.size = sizeof(packet);
+	packet.type = CL_CHECK_VERSION;
+	strcpy_s(packet.gameVersion, version);
+	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
+	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
 }
 
 void send_login_packet(SOCKET& sock, const char* id, const char* passWord)
@@ -198,6 +220,17 @@ void send_login_packet(SOCKET& sock, const char* id, const char* passWord)
 	//strcpy_s(packet.name, TCHAR_TO_ANSI(*Network::GetNetwork()->MyCharacterName));
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
 	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
+	if (SOCKET_ERROR == ret)
+	{
+		int err = WSAGetLastError();
+		if (err != WSA_IO_PENDING)
+		{
+			//error ! 
+			auto Game = Network::GetNetwork();
+			if (Game->mMyCharacter)
+				Game->mMyCharacter->MakeAndShowDialogInLobby();
+		}
+	}
 }
 
 void send_logout_packet(SOCKET& sock)
@@ -290,11 +323,11 @@ void send_refresh_dep_rank_packet(SOCKET& sock)
 	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
 }
 
-void send_refresh_point_packet(SOCKET& sock)
+void send_refresh_userstatus_packet(SOCKET& sock)
 {
-	CL_REFRESH_POINT_PACKET packet;
+	CL_REFRESH_USERSTATUS_PACKET packet;
 	packet.size = sizeof(packet);
-	packet.type = CL_REFRESH_POINT;
+	packet.type = CL_REFRESH_USERSTATUS;
 	WSA_OVER_EX* once_exp = new WSA_OVER_EX(sizeof(packet), &packet);
 	int ret = WSASend(sock, &once_exp->GetWsaBuf(), 1, 0, 0, &once_exp->GetWsaOver(), send_callback);
 }
@@ -531,6 +564,7 @@ void Network::process_packet(unsigned char* p)
 				mc->bIsControlledPlayer = false;
 				mc->FinishSpawning(trans);
 				mc->SetDepartmentClothes(packet->department);
+				mc->SetNetworkLocation(FVector(888, 1566, -10000 + (id * 150)));
 				mOtherCharacter[id] = mc;
 				mOtherCharacter[id]->SetAccessoryFromEquippedFlag(packet->equipmentFlag);
 				//mOtherCharacter[id]->WearAllAccessory();
@@ -553,9 +587,21 @@ void Network::process_packet(unsigned char* p)
 		int id = packet->id;
 		if (nullptr != mOtherCharacter[id])
 		{
+			mOtherCharacter[packet->id]->SetActorEnableCollision(false);
+			mOtherCharacter[packet->id]->SetActorHiddenInGame(true);
+
+			TArray<AActor*> children;
+
+			mOtherCharacter[packet->id]->GetAttachedActors(children);
+
+			for (auto actor : children) {
+				actor->SetActorHiddenInGame(true);
+				actor->SetActorEnableCollision(false);
+			}
 			mOtherCharacter[id]->Destroy();
 			mOtherCharacter[id] = nullptr;
 		}
+
 		break;
 	}
 	case SC_PING: {
@@ -639,9 +685,10 @@ void Network::process_packet(unsigned char* p)
 		SC_PLAYER_ARRIVE_PACKET* packet = reinterpret_cast<SC_PLAYER_ARRIVE_PACKET*>(p);
 		if (nullptr != mOtherCharacter[packet->id])
 		{
+			mOtherCharacter[packet->id]->SetActorLocation(FVector(0, 1'000'000, 0));
 			mOtherCharacter[packet->id]->SetActorEnableCollision(false);
 			mOtherCharacter[packet->id]->SetActorHiddenInGame(true);
-
+			
 			TArray<AActor*> children;
 
 			mOtherCharacter[packet->id]->GetAttachedActors(children);
@@ -704,7 +751,7 @@ void Network::l_process_packet(unsigned char* p)
 		//학점과 포인트 표기
 		mMyCharacter->MakeAndShowLobbyRankSystem(packet->ranking);
 		mMyCharacter->MakeAndShowLoginOK(packet->grade);
-		mMyCharacter->UpdataPointInLobby(packet->point);
+		mMyCharacter->UpdateUserStatusInLobby(packet->point,packet->grade);
 		break;
 	}
 	case LC_LOGIN_FAIL:
@@ -788,9 +835,9 @@ void Network::l_process_packet(unsigned char* p)
 		
 		break;
 	}
-	case LC_REFRESH_POINT: {
-		LC_REFRESH_POINT_PACKET* packet = reinterpret_cast<LC_REFRESH_POINT_PACKET*>(p);
-		mMyCharacter->UpdataPointInLobby(packet->point);
+	case LC_REFRESH_USERSTATUS: {
+		LC_REFRESH_USERSTATUS_PACKET* packet = reinterpret_cast<LC_REFRESH_USERSTATUS_PACKET*>(p);
+		mMyCharacter->UpdateUserStatusInLobby(packet->point,packet->grade);
 		break;
 	}
 	case LC_EQUIP_OK: {
@@ -847,6 +894,7 @@ void CALLBACK recv_Gamecallback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv
 	if (err != 0)
 	{
 		UE_LOG(LogTemp, Error, TEXT("[%d]"), err);
+
 		if (Game->mMyCharacter)
 			Game->mMyCharacter->MakeAndShowDialogInGame();
 		Game->release();

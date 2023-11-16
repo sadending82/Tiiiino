@@ -7,7 +7,7 @@ constexpr const char* SERVERIP = "127.0.0.1";
 constexpr const char* LOOBYSERVER_ADDR = "127.0.0.1";
 
 constexpr int GAMESERVERPORT = 3600;
-constexpr int LOBBYSERVERPORT = 3500;
+constexpr int LOBBYSERVERPORT = 3501;
 constexpr int BUF_SIZE = 200;
 
 
@@ -90,8 +90,7 @@ enum PacketType {
 	CL_USE_COUPON,
 	CL_REFRESH_INVENTORY,
 	CL_REFRESH_DEP_RANK,
-	CL_REFRESH_POINT,
-
+	CL_REFRESH_USERSTATUS,
 	// ManageMent To LobbyServer
 	ML_ALERT,
 
@@ -126,13 +125,14 @@ enum PacketType {
 	LC_BUYITEM_FAIL,
 	LC_REFRESH_INVENTORY,
 	LC_REFRESH_DEP_RANK,
-	LC_REFRESH_POINT,
+	LC_REFRESH_USERSTATUS,
 	LC_EQUIP_OK,
 	LC_UNEQUIP_OK,
 	LC_USE_COUPON_OK,
 	LC_USE_COUPON_FAIL,
 	LC_ALERT,
 
+	CL_CHECK_VERSION,
 };
 
 #pragma pack (push, 1)
@@ -243,8 +243,13 @@ struct CL_REFRESH_DEP_RANK_PACKET : public PACKET {
 
 };
 
-struct CL_REFRESH_POINT_PACKET : public PACKET {
+struct CL_REFRESH_USERSTATUS_PACKET : public PACKET {
 	
+};
+
+struct CL_CHECK_VERSION_PACKET : public PACKET {
+
+	char gameVersion[MAX_VERSION_SIZE];
 };
 //-----------------------------------
 struct ML_ALERT_PACKET : public PACKET {
@@ -396,8 +401,9 @@ struct LC_REFRESH_DEP_RANK_PACKET : public PACKET {
 	rankInfo ranking[10];
 };
 
-struct LC_REFRESH_POINT_PACKET : public PACKET {
+struct LC_REFRESH_USERSTATUS_PACKET : public PACKET {
 	int point;
+	double grade;
 };
 
 struct LC_EQUIP_OK_PACKET : public PACKET {

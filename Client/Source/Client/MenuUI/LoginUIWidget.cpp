@@ -91,6 +91,74 @@ void ULoginUIWidget::CheckPasswordTextLength()
 	LoginPasswordTextBox->SetText(cur_text);
 }
 
+void ULoginUIWidget::CheckIDTextBox()
+{
+	CheckIDTextBoxLastword();
+}
+
+void ULoginUIWidget::CheckIDTextBoxLastword()
+{
+	FText cur_text = LoginIDTextBox->GetText();
+	FString OriginalText = cur_text.ToString();
+	int32 length = OriginalText.Len() - 1;
+
+	if (length >= 0)
+	{
+		if (OriginalText[length] >= 'a' && OriginalText[length] <= 'z')
+		{
+			return;
+		}
+		else if (OriginalText[length] >= 'A' && OriginalText[length] <= 'Z')
+		{
+			return;
+		}
+		else if (OriginalText[length] >= '0' && OriginalText[length] <= '9')
+		{
+			return;
+		}
+		else
+		{
+			cur_text = FText::FromString(OriginalText.Left(length));
+
+			LoginIDTextBox->SetText(cur_text);
+		}
+	}
+}
+
+void ULoginUIWidget::CheckPasswordTextBox()
+{
+	CheckPasswordTextBoxLastword();
+}
+
+void ULoginUIWidget::CheckPasswordTextBoxLastword()
+{
+	FText cur_text = LoginPasswordTextBox->GetText();
+	FString OriginalText = cur_text.ToString();
+	int32 length = OriginalText.Len() - 1;
+
+	if (length >= 0)
+	{
+		if (OriginalText[length] >= 'a' && OriginalText[length] <= 'z')
+		{
+			return;
+		}
+		else if (OriginalText[length] >= 'A' && OriginalText[length] <= 'Z')
+		{
+			return;
+		}
+		else if (OriginalText[length] >= '0' && OriginalText[length] <= '9')
+		{
+			return;
+		}
+		else
+		{
+			cur_text = FText::FromString(OriginalText.Left(length));
+
+			LoginPasswordTextBox->SetText(cur_text);
+		}
+	}
+}
+
 void ULoginUIWidget::ShowCreditUI()
 {
 	CreditUI = Cast<UCreditUIWidget>(CreateWidget(GetWorld(), CreditUIClass));

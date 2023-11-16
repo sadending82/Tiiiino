@@ -13,11 +13,15 @@ void Server::Disconnect(int cID)
 	DEBUGMSGONEPARAM("DISCONNECT [%s]\n", mClients[cID].mID);
 
 	//mMatchListHighTier.remove(cID);
-	mMatchListLowTier.remove(cID);
+
 
 	closesocket(mClients[cID].mSocket);
-	mClients[cID].mState = eSessionState::ST_FREE;
+	mClients[cID].Reset();
 	mClients[cID].mStateLock.unlock();
+
+	mLowListlock.lock();
+	mMatchListLowTier.remove(cID);
+	mLowListlock.unlock();
 
 	LD_LOGOUT_PACKET p;
 	p.size = sizeof(LD_LOGOUT_PACKET);
@@ -25,6 +29,20 @@ void Server::Disconnect(int cID)
 	p.uid = mClients[cID].mUID;
 
 	mServers[0].ServerDoSend(&p);
+}
+
+void Server::DisconnectForVersionCheck(int cID)
+{
+	mClients[cID].mStateLock.lock();
+	if (mClients[cID].mState == eSessionState::ST_FREE) {
+		mClients[cID].mStateLock.unlock();
+		return;
+	}
+	DEBUGMSGONEPARAM("DISCONNECT [%s]\n", mClients[cID].mID);
+
+	closesocket(mClients[cID].mSocket);
+	mClients[cID].Reset();
+	mClients[cID].mStateLock.unlock();
 }
 
 int Server::GetNewClientID()
@@ -73,6 +91,16 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 {
 	switch (cpacket[1])
 	{
+	case CL_CHECK_VERSION:
+	{
+		CL_CHECK_VERSION_PACKET* p = reinterpret_cast<CL_CHECK_VERSION_PACKET*>(cpacket);
+
+		if (strcmp(GAMEVERSION, p->gameVersion) != 0)
+		{
+			DisconnectForVersionCheck(cID);
+		}
+		break;
+	}
 	case CL_LOGIN:
 	{
 		CL_LOGIN_PACKET* p = reinterpret_cast<CL_LOGIN_PACKET*>(cpacket);
@@ -86,6 +114,9 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 		pac.type = LD_LOGOUT;
 		pac.size = sizeof(LD_LOGOUT_PACKET);
 		pac.uid = mClients[cID].mUID;
+		mClients[cID].mStateLock.lock();
+		mClients[cID].mUID = 0;
+		mClients[cID].mStateLock.unlock();
 		mServers[0].DoSend(&pac);
 		break;
 	}
@@ -138,10 +169,10 @@ void Server::ProcessPacket(int cID, unsigned char* cpacket)
 		SendRefreshRankingRequest(cID);
 		break;
 	}
-	case CL_REFRESH_POINT: {
-		LD_GET_POINT_PACKET p;
+	case CL_REFRESH_USERSTATUS: {
+		LD_GET_USERSTATUS_PACKET p;
 		p.size = sizeof(p);
-		p.type = LD_GET_POINT;
+		p.type = LD_GET_USERSTATUS;
 		p.userKey = cID;
 		p.uid = mClients[cID].mUID;
 
@@ -212,7 +243,8 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 
 		DEBUGMSGONEPARAM("[%s] player login ok\n", p->id);
 
-		if (p->connState == TRUE) {
+		//if (p->connState == TRUE) 
+		{
 			CheckDuplicateLogin(p->uid);
 		}
 
@@ -309,13 +341,14 @@ void Server::ProcessPacketServer(int sID, unsigned char* spacket)
 		SendUseCouponFail(p->userKey);
 		break;
 	}
-	case DL_GET_POINT: {
-		DL_GET_POINT_PACKET* p = reinterpret_cast<DL_GET_POINT_PACKET*>(spacket);
+	case DL_GET_USERSTATUS: {
+		DL_GET_USERSTATUS_PACKET* p = reinterpret_cast<DL_GET_USERSTATUS_PACKET*>(spacket);
 	
-		LC_REFRESH_POINT_PACKET pac;
+		LC_REFRESH_USERSTATUS_PACKET pac;
 		pac.point = p->point;
+		pac.grade = p->grade;
 		pac.size = sizeof(pac);
-		pac.type = LC_REFRESH_POINT;
+		pac.type = LC_REFRESH_USERSTATUS;
 
 		mClients[p->userKey].DoSend(&pac);
 		break;
@@ -880,6 +913,7 @@ void Server::CheckDuplicateLogin(int uid)
 	if (target != -1) {
 		if (mClients[target].mState == eSessionState::ST_INGAME) {
 			SendDiconnectPacketToGameServer(target, uid, mClients[target].mRoomID);
+			Disconnect(target);
 		}
 		else {
 			Disconnect(target);
